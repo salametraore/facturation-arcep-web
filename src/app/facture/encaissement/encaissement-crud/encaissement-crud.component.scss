@@ -1,0 +1,137 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.dashboard-title {
+  color: red;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.demand-status {
+  margin-bottom: 20px;
+}
+
+.status-label, .section-label, .subsection-label {
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.active-step {
+  color: red;
+  font-weight: bold;
+}
+
+mat-stepper {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.documents-section {
+  margin-bottom: 20px;
+}
+
+.tech-sheet-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.domiciliation-section, .comment-section {
+  margin-bottom: 20px;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: row; /* Alignement horizontal */
+  gap: 20px; /* Espacement entre les radio buttons */
+}
+
+mat-radio-group {
+  margin-top: 10px;
+}
+.confirmation-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.step-title {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.general-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.amount-info span {
+  margin-right: 20px;
+}
+
+.invoice-table {
+  width: 100%;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+}
+
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.return-button {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.register-print-button {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.register-button {
+  background-color: #d32f2f;
+  color: white;
+}

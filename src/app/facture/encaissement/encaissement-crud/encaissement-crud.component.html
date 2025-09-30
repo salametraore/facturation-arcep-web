@@ -1,0 +1,201 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title" style="color: #030303">Saisie mise à jour des encaissements</h1>
+
+  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
+  <!--  <div class="demand-status">-->
+  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
+  <!--    <mat-stepper [linear]="true" #stepper>-->
+  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
+  <!--        <ng-template matStepLabel>-->
+  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
+  <!--        </ng-template>-->
+  <!--      </mat-step>-->
+  <!--    </mat-stepper>-->
+  <!--  </div>-->
+
+  <!-- Documents -->
+  <!--  <div class="documents-section">-->
+  <!--    <span class="section-label">DOCUMENTS</span>-->
+  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
+  <!--  </div>-->
+
+  <mat-stepper #stepper (selectionChange)="onStepChange($event)">
+    <mat-step [stepControl]="firstFormGroup">
+      <form [formGroup]="firstFormGroup">
+        <ng-template matStepLabel>Entête encaissement</ng-template>
+        <mat-form-field>
+          <mat-label>Nom du client</mat-label>
+          <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
+                 matInput matTooltip="Nom du client" placeholder="Nom du client" required>
+          <mat-autocomplete #auto_cl="matAutocomplete">
+            <mat-option *ngFor="let item of clients | search:nomClient" (click)="getInfosComplementaire(item)"
+                        [value]="item.denomination_sociale">
+              <span>{{item.denomination_sociale}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Objet</mat-label>
+          <input matInput formControlName="objet" placeholder="Objet">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Date d'encaissement</mat-label>
+          <input matInput formControlName="date_encaissement" [matDatepicker]="pickerEnd"
+                 placeholder="Date d'encaissement">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+          <mat-datepicker #pickerEnd></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Mode de paiement</mat-label>
+          <mat-select formControlName="mode_paiement" placeholder="Mode de paiement">
+            <mat-option *ngFor="let item of modePaiements" [value]="item.id">
+              {{item.libelle}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Référence</mat-label>
+          <input matInput formControlName="reference" placeholder="Référence">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Montant</mat-label>
+          <input matInput formControlName="montant" placeholder="Montant">
+        </mat-form-field>
+
+        <div class="action-buttons">
+          <button mat-button matStepperNext>Suivant</button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Affectation aux factures</ng-template>
+      <div>
+        <button mat-raised-button (click)="onAncinnete()">Affectation automatique (par ancinneté)</button>&nbsp;&nbsp;
+        <button mat-raised-button (click)="onVider()" >Vider</button>
+      </div>
+
+
+      <div class="mat-elevation-z10">
+        <table [dataSource]="t_Affectation1" mat-table matSort style="width: 100%">
+
+          <ng-container matColumnDef="facture_id">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header> Facture</th>
+            <td *matCellDef="let element" mat-cell> {{element.facture_id}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="date_affectation">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header> Date échéance</th>
+            <td *matCellDef="let element" mat-cell> {{element.date_affectation|date: 'dd/mm/yyyy'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="montant">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant</th>
+            <td *matCellDef="let element" mat-cell> {{element.montant}} </td>
+          </ng-container>
+          <ng-container matColumnDef="montant_affecte">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant affecté</th>
+            <td *matCellDef="let element" mat-cell>
+              <input type="number" [(ngModel)]="element.montant_affecte" (ngModelChange)="onMontantAffecteChange()"/>
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
+              [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr *matNoDataRow class="mat-row">
+            <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au
+              critère
+              de
+              recherche
+            </td>
+          </tr>
+        </table>
+        <mat-paginator #paginator1 [pageSizeOptions]="[3,5, 10, 15]" [pageSize]="10"
+                       showFirstLastButtons></mat-paginator>
+      </div>
+      <div class="action-buttons">
+        <button mat-button matStepperPrevious>Retour</button>
+        <button mat-button matStepperNext (click)="copyAffectationsAvecMontant()">Suivant</button>
+      </div>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Récapitulatif</ng-template>
+
+
+      <div class="confirmation-container">
+
+        <!-- Informations générales -->
+        <div class="general-info">
+          <div>
+            <strong>{{client?.denomination_sociale}}</strong>
+          </div>
+          <div class="amount-info">
+            <span>Montant encaissé : <strong>{{this.encaissementDetail?.montant}} XOF</strong></span>
+            <span>Montant affecté : <strong>{{this.somme_affectee}} XOF</strong></span>
+            <span>Crédit : <strong>{{credit}} XOF</strong></span>
+          </div>
+        </div>
+
+        <!-- Tableau des factures -->
+        <div class="invoice-table">
+          <div class="mat-elevation-z10">
+            <table [dataSource]="t_Affectation2" mat-table matSort style="width: 100%">
+
+              <ng-container matColumnDef="facture_id">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Facture</th>
+                <td *matCellDef="let element" mat-cell> {{element.facture_id}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="date_affectation">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Date échéance</th>
+                <td *matCellDef="let element" mat-cell> {{element.date_affectation|date: 'dd/mm/yyyy'}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="montant">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant</th>
+                <td *matCellDef="let element" mat-cell> {{element.montant}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="montant_affecte">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant affecté</th>
+                <td *matCellDef="let element" mat-cell> {{element.montant_affecte}} </td>
+              </ng-container>
+
+              <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+              <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
+                  [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+
+              <!-- Row shown when there is no matching data. -->
+              <tr *matNoDataRow class="mat-row">
+                <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au
+                  critère
+                  de
+                  recherche
+                </td>
+              </tr>
+            </table>
+            <mat-paginator #paginator2 [pageSizeOptions]="[3,5, 10, 15]" [pageSize]="10"
+                           showFirstLastButtons></mat-paginator>
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="action-buttons">
+          <button mat-button matStepperPrevious>Retour</button>
+          <button mat-raised-button class="register-print-button" (click)="saveAndPrint()">Enregistrer & imprimer
+          </button>
+          <button mat-raised-button class="register-button" (click)="save()">Enregistrer</button>
+          <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
+        </div>
+      </div>
+
+
+    </mat-step>
+  </mat-stepper>
+</div>

@@ -1,0 +1,93 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title">Tableau de bord / Instance</h1>
+
+  <!-- Filtres -->
+  <div class="filter-section">
+    <div class="filter-group">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Fiche technique : instance</mat-label>
+        <input matInput placeholder="Rechercher" [formControl]="instanceNameFilter" (input)="applyFilters()">
+      </mat-form-field>
+    </div>
+
+    <div class="filter-group">
+      <mat-form-field appearance="outline">
+        <mat-label>Date début</mat-label>
+        <input matInput [matDatepicker]="pickerStart" [formControl]="startDate" (dateChange)="applyFilters()">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStart></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Date fin</mat-label>
+        <input matInput [matDatepicker]="pickerEnd" [formControl]="endDate" (dateChange)="applyFilters()">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEnd></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Catégorie de service</mat-label>
+        <mat-select [formControl]="serviceFilter" (selectionChange)="applyFilters()">
+          <mat-option value="">Tous</mat-option>
+          <mat-option value="Gestion des instances">Gestion des instances</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Statut</mat-label>
+        <mat-select [formControl]="statusFilter" (selectionChange)="applyFilters()">
+          <mat-option value="">Tous</mat-option>
+          <mat-option value="Transmis">Transmis</mat-option>
+          <mat-option value="En attente">En attente</mat-option>
+          <mat-option value="Clos">Clos</mat-option>
+          <mat-option value="Abandon">Abandon</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="warn" class="export-btn">Exporter</button>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <table mat-table [dataSource]="dataSource" class="simple-table">
+    <!-- Colonnes -->
+    <ng-container matColumnDef="instance">
+      <th mat-header-cell *matHeaderCellDef>Instance</th>
+      <td mat-cell *matCellDef="let element">
+        <mat-checkbox></mat-checkbox> {{ element.instance }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="dateSubmission">
+      <th mat-header-cell *matHeaderCellDef>Date soumission</th>
+      <td mat-cell *matCellDef="let element">{{ element.dateSubmission }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="service">
+      <th mat-header-cell *matHeaderCellDef>Catégorie de service</th>
+      <td mat-cell *matCellDef="let element">{{ element.service }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Statut</th>
+      <td mat-cell *matCellDef="let element" [ngClass]="getStatusColor(element.status)">
+        {{ element.status }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-button color="warn">{{ element.actions }}</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    [pageSize]="pageSize"
+    [length]="totalItems"
+    (page)="onPageChange($event.pageIndex + 1)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>

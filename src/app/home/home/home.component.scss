@@ -1,0 +1,127 @@
+.stats-container {
+  display: flex;
+  flex-wrap: wrap; /* Permet d'adapter le contenu en plusieurs lignes */
+  justify-content: center; /* Centre les cartes horizontalement */
+  margin: 20px; /* Marge autour de la grille */
+}
+
+.stat-card {
+  width: 300px; /* Largeur de chaque carte */
+  margin: 15px; /* Marge autour de chaque carte */
+  text-align: center; /* Centre le contenu */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre pour l'effet de profondeur */
+  transition: 0.3s; /* Transition douce pour l'animation au survol */
+}
+
+.stat-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée au survol */
+}
+
+mat-card-title {
+  font-size: 1.5em; /* Taille de la police pour le titre */
+  font-weight: bold; /* Met le titre en gras */
+}
+
+/* Ajout des couleurs */
+.commandes-soldees {
+  background-color: #a5d6a7; /* Vert clair pour les commandes soldées */
+}
+
+.commandes-non-soldees {
+  background-color: #ffcc80; /* Jaune clair pour les commandes non soldées */
+}
+
+.commandes-annulees {
+  background-color: #ef9a9a; /* Rouge clair pour les commandes annulées */
+}
+
+.produits-rupture-magasin {
+  background-color: #90caf9; /* Bleu clair pour les produits en rupture de stock (magasin) */
+}
+
+.produits-rupture-boutique {
+  background-color: #f48fb1; /* Rose clair pour les produits en rupture de stock (boutique) */
+}
+
+mat-card-content p {
+  font-size: 1.2em; /* Taille de la police pour le contenu */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+!* Pour que le body prenne toute la hauteur de la page *!
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+!* Conteneur principal qui englobe le contenu de la page *!
+.card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5px;
+  text-align: center;
+  height: auto;
+  width: 100%; !* Permet au conteneur de s'étendre *!
+}
+
+!* Style de la carte *!
+.example-card {
+  width: 100%; !* Prend toute la largeur disponible *!
+  max-width: 1200px; !* Limite à 1200px pour les grands écrans *!
+  padding: 20px;
+  box-sizing: border-box;
+  margin: 0 auto; !* Centre la carte horizontalement *!
+}
+
+!* Pour rendre l'image responsive *!
+.responsive-image {
+  width: 100%; !* L'image prend 100% de la largeur de son conteneur *!
+  height: auto; !* Maintient le ratio d'aspect *!
+}
+
+!* Responsivité pour les petits écrans *!
+@media (max-width: 600px) {
+  .example-card {
+    max-width: 90%; !* Prend 90% de l'espace sur petits écrans *!
+  }
+}
+
+!* Responsivité pour les écrans moyens *!
+@media (min-width: 600px) and (max-width: 1200px) {
+  .example-card {
+    max-width: 90%; !* Prend 90% de l'écran pour les écrans moyens *!
+  }
+}
+
+!* Responsivité pour les grands écrans *!
+@media (min-width: 1200px) {
+  .example-card {
+    max-width: 90%; !* La carte prend toute la largeur sur les grands écrans *!
+  }
+}
+*/

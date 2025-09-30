@@ -1,0 +1,166 @@
+<div class="facture-container">
+  <!-- En-tête avec les étapes de la démarche -->
+  <div class="header">
+    <h2>Factures - DGSN</h2>
+    <p>ÉTAT DE LA DÉMARCHE</p>
+    <div class="etapes">
+      <div *ngFor="let etape of etapes; let i = index" class="etape" [class.active]="i === etapeActuelle">
+        {{ etape }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Import des annexes -->
+  <div class="import-annexes">
+    <h3>DOCUMENTS</h3>
+    <button mat-raised-button color="primary" (click)="importerAnnexe()">
+      <mat-icon>attach_file</mat-icon> Importer
+    </button>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="factureForm" class="facture-form">
+    <!-- Section Saisie de la facture -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>SAISIE DE LA FACTURE</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Client</mat-label>
+            <input matInput formControlName="client" />
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Objet de la facture</mat-label>
+            <input matInput formControlName="objetFacture" />
+          </mat-form-field>
+        </div>
+        <div class="elements-techniques">
+          <h4>Élément technique</h4>
+          <div class="element-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Désignation</mat-label>
+              <input matInput />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Qté</mat-label>
+              <input matInput type="number" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Prix unitaire</mat-label>
+              <input matInput type="number" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Total</mat-label>
+              <input matInput type="number" />
+            </mat-form-field>
+          </div>
+          <!-- Ajoutez d'autres lignes d'éléments techniques ici -->
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Numéro de compte</mat-label>
+            <input matInput formControlName="numeroCompte" />
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nom du signataire</mat-label>
+            <input matInput formControlName="nomSignataire" />
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Commentaires (ce commentaire ne sera pas visible sur la facture)</mat-label>
+            <textarea matInput formControlName="commentaires"></textarea>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Informations Générales -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>INFORMATIONS GÉNÉRALES</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <p><strong>Client:</strong> {{ factureForm.get('client')?.value }}</p>
+          <p><strong>Nom de Toget:</strong> {{ factureForm.get('nomToget')?.value }}</p>
+        </div>
+        <div class="documents">
+          <h4>DOCUMENTS</h4>
+          <div class="document-row">
+            <div class="document">
+              <mat-icon>picture_as_pdf</mat-icon>
+              <p>Fiche Bile à la démarche</p>
+              <button mat-button color="primary">TÉLÉCHARGÉ</button>
+            </div>
+            <div class="document">
+              <mat-icon>picture_as_pdf</mat-icon>
+              <p>Fiche Bile à la démarche</p>
+              <button mat-button color="warn">TÉLÉCHARGER</button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Informations Techniques -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>INFORMATIONS TECHNIQUES</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <p><strong>N° de Stations Fixes (FS):</strong> 10</p>
+          <p><strong>N° de Stations Mobiles (MS):</strong> 18</p>
+          <p><strong>N° de Stations Portatives (PS):</strong> 7</p>
+        </div>
+        <div class="info-row">
+          <p><strong>Enclave de fréquences:</strong> Oui</p>
+          <p><strong>Plafonnement:</strong> Oui</p>
+          <p><strong>Type de continu:</strong> Numérique</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Historique de la démarche -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>HISTORIQUE DE LA DÉMARCHE</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="historique-row">
+          <div class="historique-item">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <div>
+              <p><strong>Demande Initialisée:</strong></p>
+              <p>Par Tapsoba Silémané / le 15 janvier 2025</p>
+            </div>
+            <button mat-button color="primary">Valider</button>
+          </div>
+          <div class="historique-item">
+            <mat-icon color="warn">pending</mat-icon>
+            <div>
+              <p><strong>Frais de traitement de dossier enclenchés:</strong></p>
+              <p>Par SONON hyacinthe / le 16 janvier 2025</p>
+            </div>
+            <button mat-button color="warn">Valider</button>
+          </div>
+          <!-- Ajoutez d'autres éléments d'historique ici -->
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Boutons -->
+    <div class="actions">
+      <button mat-raised-button color="basic" (click)="rejeterEtNotifier()">Rejeter et Notifier la direction</button>
+      <button mat-raised-button color="primary" (click)="approuver()">Approuver</button>
+      <button mat-raised-button color="warn" (click)="enregistrer()">Enregistrer</button>
+    </div>
+  </form>
+</div>

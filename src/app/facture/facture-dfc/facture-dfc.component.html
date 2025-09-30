@@ -1,0 +1,213 @@
+<div class="facture-container">
+  <!-- En-tête -->
+  <div class="header">
+    <h2>Facture – OFC</h2>
+    <p>Étape de la démarche</p>
+    <div class="etapes">
+      <div *ngFor="let etape of etapes; let i = index" class="etape" [class.active]="i === etapeActuelle">
+        {{ etape }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Import des annexes -->
+  <div class="import-annexes">
+    <h3>Importer des annexes</h3>
+    <button mat-raised-button color="primary" (click)="importerAnnexe()">
+      <mat-icon>attach_file</mat-icon> Importer
+    </button>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="factureForm" class="facture-form">
+    <!-- Section Client -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Client</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Saisissez le nom du client, numéro de compte, télécentre</mat-label>
+            <input matInput formControlName="client" />
+          </mat-form-field>
+          <button mat-button color="accent">+ Nouveau</button>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de compte client</mat-label>
+            <input matInput formControlName="numeroCompteClient" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Type de client</mat-label>
+            <mat-select formControlName="typeClient">
+              <mat-option value="Client ordinaire">Client ordinaire</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Objet de la facture -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Objet de la facture</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>1 ligne(s) de fourniture d'énergie du mois de</mat-label>
+          <input matInput formControlName="objetFacture" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Numéro de compteur et coefficient de facturation -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Numéro de compteur</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de compteur</mat-label>
+            <input matInput formControlName="numeroCompteur" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Coefficient de facturation</mat-label>
+            <input matInput formControlName="coefficientFacturation" />
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Date de facturation -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Date de facturation</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Date de facturation</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dateFacturation" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Mois facturé</mat-label>
+            <mat-select formControlName="moisFacture">
+              <mat-option value="Janvier">Janvier</mat-option>
+              <mat-option value="Février">Février</mat-option>
+              <!-- Ajoutez les autres mois -->
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Consommation -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Consommation</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Consommation heure de pointe</mat-label>
+            <input matInput formControlName="consommationHeurePleine" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Consommation heure creuse</mat-label>
+            <input matInput formControlName="consommationHeureCreuse" />
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Différence d'index</mat-label>
+            <input matInput formControlName="differenceIndex" />
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Puissance souscrite et tarif -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Puissance souscrite (kVA)</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Puissance souscrite</mat-label>
+            <input matInput formControlName="puissanceSouscrite" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Tarif</mat-label>
+            <mat-select formControlName="tarif">
+              <mat-option value="Tarif A">Tarif A</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Coefficient tarifaire</mat-label>
+            <input matInput formControlName="coefficientTarifaire" />
+          </mat-form-field>
+          <mat-checkbox formControlName="tva">TVA (18 %)</mat-checkbox>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Éléments -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Éléments</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="elements">
+          <!-- Ajoutez ici la logique pour afficher les éléments -->
+        </div>
+        <button mat-button color="warn" (click)="ajouterLigne()">
+          <mat-icon>add</mat-icon> Ajouter une ligne
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Numéro de compte -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Numéro de compte</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>SICAS N°523 0003 819 05593 - 13</mat-label>
+          <input matInput formControlName="numeroCompte" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Nom du signataire -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Nom du signataire</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nom du signataire</mat-label>
+          <input matInput formControlName="nomSignataire" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cachet et signature du signataire</mat-label>
+          <input matInput />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Boutons -->
+    <div class="actions">
+      <button mat-raised-button color="basic" (click)="annuler()">Annuler</button>
+      <button mat-raised-button color="primary" (click)="approver()">Approuver</button>
+      <button mat-raised-button color="warn" (click)="enregistrer()">Enregistrer</button>
+    </div>
+  </form>
+</div>

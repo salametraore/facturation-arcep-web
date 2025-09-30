@@ -1,0 +1,14 @@
+<pdf-viewer *ngIf="pdfFile" [original-size]="false" [render-text]="true"
+            [src]="pdfFile" autoresize="true" show-borders="true">
+</pdf-viewer>
+
+<div mat-dialog-actions align="center">
+  <button mat-button (click)="printPDF()" color="primary">
+    <mat-icon>print</mat-icon>
+    Imprimer
+  </button>
+  <button mat-button mat-dialog-close color="primary" cdkFocusInitial>
+    <mat-icon>cancel</mat-icon>
+    Fermer
+  </button>
+</div>

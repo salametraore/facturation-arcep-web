@@ -1,0 +1,192 @@
+// Import Angular Material theming
+@use '@angular/material' as mat;
+@use '@angular/material/core/theming/palette' as palette;
+
+// Optionnel : icônes Material
+@import 'node_modules/material-icons/iconfont/material-icons.css';
+
+// Inclure les styles de base de Material (une seule fois)
+@include mat.core();
+
+// Utilise les palettes par défaut de Material Design
+$primary: mat.define-palette(palette.$pink-palette,50);
+$accent: mat.define-palette(palette.$pink-palette, 200);
+$warn: mat.define-palette(palette.$pink-palette,300);
+
+// Définition d’un thème **clair** avec couleurs par défaut
+$default-light-theme: mat.define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+  )
+));
+
+// Appliquer ce thème à tous les composants Angular Material
+@include mat.all-component-themes($default-light-theme);
+
+
+/* You can add global styles to this file, and also import other style files */
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+div[align="end"] {
+  text-align: right;
+}
+
+a {
+  cursor: pointer;
+}
+
+.failed-save {
+  background-color: #d52519;
+  color: black;
+}
+
+.success-save {
+  background-color: #ff9800;
+  color: black;
+}
+
+.mat-tooltip {
+  font-size: 12px;
+  background-color: #ff9800; /* Couleur de fond personnalisée */
+  color: #030303; /* Couleur du texte personnalisée */
+}
+
+
+.spinner-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.32);
+  z-index: 20000;
+}
+
+
+.mat-raised-button.custom-chip-button {
+  border-radius: 16px; /* Arrondir les coins comme un mat-chip */
+  padding: 0 12px; /* Ajuster l'espacement interne */
+  font-size: 14px; /* Taille de la police similaire à mat-chip */
+  min-width: 0; /* Enlever la largeur minimale */
+  height: 32px; /* Hauteur similaire à un mat-chip */
+  line-height: 5px;
+  margin-right: 1px; /* Ajoute un espace entre les boutons */
+  margin-bottom: 4px; /* Ajoute un espace en bas des boutons */
+}
+
+/* Réduction de la hauteur des lignes de l'en-tête */
+.mat-table .mat-header-row {
+  height: 32px; /* Hauteur des en-têtes de la table */
+}
+
+.mat-table .mat-header-cell {
+  padding: 8px 16px; /* Espacement interne (padding) des cellules de l'en-tête */
+  line-height: 1; /* Réduction de l'espace vertical */
+  font-size: 14px; /* Taille de la police des cellules de l'en-tête */
+  color: #030303; /* Couleur du texte */
+}
+
+/* Réduction de la hauteur des lignes des données */
+.mat-table .mat-row {
+  height: 32px; /* Hauteur des lignes de données */
+}
+
+.mat-table .mat-cell {
+  padding: 1px 2px; /* Espacement interne (padding) des cellules de données */
+  line-height: 1; /* Réduction de l'espace vertical */
+  font-size: 14px; /* Taille de la police des cellules */
+}
+
+
+.table-container {
+  display: flex;
+  justify-content: center; /* Centrer la table horizontalement */
+  flex-wrap: wrap; /* Permet à la table de s'ajuster si l'écran est petit */
+  overflow-x: auto; /* Ajoute une barre de défilement horizontale si le tableau est trop large */
+}
+
+.form-container {
+  display: flex;
+  flex-wrap: wrap; /* Permet aux champs de passer à la ligne si nécessaire */
+}
+/* Styles responsives */
+@media (max-width: 600px) {
+  mat-form-field {
+    width: 100%;
+  }
+
+  .custom-chip-button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 960px) {
+  mat-form-field {
+    width: 45%;
+  }
+}
+
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 0.8rem; /* Réduit l'espace entre les champs */
+
+  /* Réduit la taille globale du champ */
+  &.mat-form-field-appearance-outline {
+    .mat-form-field-outline {
+      top: -1.2em; /* Ajuste la position de la bordure */
+    }
+
+    .mat-form-field-infix {
+      padding: 0.3em 0; /* Réduit le padding interne */
+    }
+  }
+
+  /* Réduit la taille de la police */
+  .mat-input-element {
+    font-size: 0.9rem; /* Taille de police plus petite */
+    line-height: 1.2;
+  }
+
+  /* Réduit la taille du label */
+  .mat-form-field-label {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    top: -0.8em; /* Ajuste la position du label */
+  }
+
+  .app-toolbar {
+    display: flex;           /* assure le layout en flex */
+    align-items: center;
+  }
+
+  .app-toolbar .push-right {
+    margin-left: auto;       /* pousse le bloc à droite */
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .app-toolbar .auth-btn {
+    text-transform: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    font-weight: 600;
+  }
+
+  .app-toolbar .auth-btn .chevron {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+}

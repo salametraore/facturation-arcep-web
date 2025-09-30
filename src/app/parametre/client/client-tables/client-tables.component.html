@@ -1,0 +1,45 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title><h3>Relevé de compte</h3></mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+
+    <!-- Onglets principaux -->
+    <mat-tab-group>
+      <!-- Onglet Factures -->
+      <mat-tab label="Factures">
+        <client-factures></client-factures>
+      </mat-tab>
+
+      <!-- Onglet Encaissements -->
+      <mat-tab label="Encaissements">
+        <client-encaissements></client-encaissements>
+      </mat-tab>
+
+      <!-- Onglet Avances -->
+      <mat-tab label="Avances">
+        <client-avances></client-avances>
+      </mat-tab>
+
+      <!-- Onglet Relances -->
+      <mat-tab label="Relances">
+        <client-relances></client-relances>
+      </mat-tab>
+
+      <!-- Onglet Promesses -->
+      <mat-tab label="Promesses">
+        <client-promesses></client-promesses>
+      </mat-tab>
+
+      <!-- Onglet Relevé de compte -->
+      <mat-tab label="Relevé de compte">
+        <client-releve-compte></client-releve-compte>
+      </mat-tab>
+    </mat-tab-group>
+    <br>
+    <div align="end">
+      <button mat-raised-button color="warn" (click)="onFerme()">Fermer</button>
+    </div>
+    <br>
+  </mat-card-content>
+</mat-card>

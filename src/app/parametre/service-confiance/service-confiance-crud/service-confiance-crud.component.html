@@ -1,0 +1,103 @@
+<div class="dashboard-container">
+  <h5 class="dashboard-title" style="color: #030303">Saisie mise à jour fiche technique - Service de confiance</h5>
+
+  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
+  <!--  <div class="demand-status">-->
+  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
+  <!--    <mat-stepper [linear]="true" #stepper>-->
+  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
+  <!--        <ng-template matStepLabel>-->
+  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
+  <!--        </ng-template>-->
+  <!--      </mat-step>-->
+  <!--    </mat-stepper>-->
+  <!--  </div>-->
+
+  <!-- Documents -->
+  <!--  <div class="documents-section">-->
+  <!--    <span class="section-label">DOCUMENTS</span>-->
+  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
+  <!--  </div>-->
+
+  <!-- Fiche technique -->
+
+
+
+  <div fxLayout="row" fxLayoutGap="20px">
+    <!-- Colonne de gauche : Fiche Technique -->
+    <div fxFlex="70%">
+      <mat-card class="dark-card">
+      <div class="tech-sheet-section">
+
+        <form [formGroup]="form">
+
+          <div class="client-section">
+            <span class="subsection-label">Client</span>
+            <mat-form-field>
+              <mat-label>Client</mat-label>
+              <mat-select formControlName="client" placeholder="Cliquez et sélectionnez votre client">
+                <mat-option *ngFor="let item of clients" [value]="item.id">
+                  {{item.denomination_sociale}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="domiciliation-section">
+            <span class="subsection-label">Type de service de confiance</span>
+            <mat-form-field>
+              <mat-label>Type de service de confiance</mat-label>
+              <mat-select formControlName="produit" placeholder="Type de service de confiance" matTooltip="Type de service de confiance">
+                <mat-option *ngFor="let item of produits" [value]="item.id">
+                  {{item.libelle}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="comment-section">
+            <span class="subsection-label">COMMENTAIRE</span>
+            <mat-form-field>
+              <mat-label>Commentaire</mat-label>
+              <textarea matInput formControlName="commentaire" placeholder="Commentaire" matTooltip="Commentaire"></textarea>
+            </mat-form-field>
+          </div>
+        </form>
+        <div class="actions">
+          <button mat-raised-button (click)="crud()" color="warn">Enregistrer</button>
+          <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
+        </div>
+      </div>
+      </mat-card>
+    </div>
+
+    <!-- Colonne de droite : Historique de la Demande -->
+    <div fxFlex="25%">
+      <div class="section">
+        <h5>Historique de la demande</h5>
+        <mat-card class="dark-card">
+          <mat-card-content>
+            <p><strong>Etape 1 </strong></p>
+            <!--            <p>Par Tapsoba Siémane / le 15 janvier 2025</p>-->
+            <!--            <mat-chip disabled color="warn">En cours</mat-chip>-->
+          </mat-card-content>
+        </mat-card>
+        <mat-card class="dark-card">
+          <mat-card-content>
+            <p><strong>Etape 2</strong></p>
+            <!--            <ul>-->
+            <!--              <li>Par SANON Fabienne</li>-->
+            <!--              <li>Le 15 janvier 2025</li>-->
+            <!--              <li>Montant encaissé XXX F CFA</li>-->
+            <!--              <li>Nature du paiement : chèque</li>-->
+            <!--            </ul>-->
+            <!--            <mat-chip disabled color="primary">En cours</mat-chip>-->
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+

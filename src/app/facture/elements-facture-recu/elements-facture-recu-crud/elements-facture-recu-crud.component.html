@@ -1,0 +1,145 @@
+<div class="dashboard-container">
+<!--  <h5 class="dashboard-title" style="color: #030303">Factures</h5>-->
+
+  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
+  <!--  <div class="demand-status">-->
+  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
+  <!--    <mat-stepper [linear]="true" #stepper>-->
+  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
+  <!--        <ng-template matStepLabel>-->
+  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
+  <!--        </ng-template>-->
+  <!--      </mat-step>-->
+  <!--    </mat-stepper>-->
+  <!--  </div>-->
+
+  <!-- Documents -->
+  <!--  <div class="documents-section">-->
+  <!--    <span class="section-label">DOCUMENTS</span>-->
+  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
+  <!--  </div>-->
+
+  <!-- Fiche technique -->
+
+
+  <div fxLayout="row" fxLayoutGap="20px">
+    <!-- Colonne de gauche : Fiche Technique -->
+    <div fxFlex="75%">
+      <mat-card class="dark-card">
+        <div class="tech-sheet-section">
+          <form [formGroup]="form">
+
+            <div>
+              <span class="subsection-label">Factures</span>
+
+              <mat-form-field>
+                <mat-label>Client</mat-label>
+                <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
+                       placeholder="Cliquez et sélectionnez votre client">
+                <mat-autocomplete #auto_cl="matAutocomplete">
+                  <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
+                              [value]="item.denomination_sociale">
+                    <span>{{item.denomination_sociale}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+
+            </div>
+            <div>
+              <mat-form-field>
+                <mat-label>Compte comptable</mat-label>
+                <input matInput formControlName="numenroCompte" placeholder="Compte comptable">
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Signataire</mat-label>
+                <input matInput formControlName="signataire" placeholder="Signataire">
+              </mat-form-field>
+            </div>
+
+            <div>
+              <mat-form-field>
+                <mat-label>Objet</mat-label>
+                <input matInput formControlName="objet" placeholder="Objet">
+              </mat-form-field>
+            </div>
+
+            <div>
+<!--              <span class="subsection-label">COMMENTAIRE</span>-->
+              <mat-form-field>
+                <mat-label>Commentaire</mat-label>
+                <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>
+              </mat-form-field>
+            </div>
+          </form>
+
+          <div class="mat-elevation-z10">
+            <table [dataSource]="t_ProduitFiche" mat-table matSort style="width: 100%">
+
+              <ng-container matColumnDef="produit_nom">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Elément technique</th>
+                <td *matCellDef="let element" mat-cell> {{element.produit_nom}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="quantite">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Quantité</th>
+                <td *matCellDef="let element" mat-cell> {{element.quantite}} </td>
+              </ng-container>
+              <ng-container matColumnDef="prix_unitaire">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Prix unitaire</th>
+                <td *matCellDef="let element" mat-cell> {{element.prix_unitaire}} </td>
+              </ng-container>
+              <ng-container matColumnDef="total">
+                <th *matHeaderCellDef mat-header-cell mat-sort-header> Total</th>
+                <td *matCellDef="let element" mat-cell> {{element.total}} </td>
+              </ng-container>
+
+              <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+              <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
+                  [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+
+              <!-- Row shown when there is no matching data. -->
+              <tr *matNoDataRow class="mat-row">
+                <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au critère
+                  de
+                  recherche
+                </td>
+              </tr>
+            </table>
+          </div>
+          <br>
+          <div class="actions">
+            <button mat-raised-button (click)="crud()" color="warn">Enregistrer</button>
+            <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
+          </div>
+        </div>
+      </mat-card>
+
+    </div>
+
+    <!-- Colonne de droite : Historique de la Demande -->
+    <div fxFlex="25%">
+      <div class="section">
+        <h5>Historique de la demande</h5>
+        <mat-card class="dark-card">
+          <mat-card-content>
+            <p><strong>Etape 1 </strong></p>
+            <!--            <p>Par Tapsoba Siémane / le 15 janvier 2025</p>-->
+            <!--            <mat-chip disabled color="warn">En cours</mat-chip>-->
+          </mat-card-content>
+        </mat-card>
+        <mat-card class="dark-card">
+          <mat-card-content>
+            <p><strong>Etape 2</strong></p>
+            <!--            <ul>-->
+            <!--              <li>Par SANON Fabienne</li>-->
+            <!--              <li>Le 15 janvier 2025</li>-->
+            <!--              <li>Montant encaissé XXX F CFA</li>-->
+            <!--              <li>Nature du paiement : chèque</li>-->
+            <!--            </ul>-->
+            <!--            <mat-chip disabled color="primary">En cours</mat-chip>-->
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

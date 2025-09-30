@@ -1,0 +1,138 @@
+<!-- Mise à jour  de données -->
+<div *ngIf="errorMessage?.length > 0" class="alert alert-danger">
+  <div *ngFor="let msg of errorMessage" style="color: #ff7513;">
+    <b> <span>{{msg}}</span></b>
+  </div>
+</div>
+<div *ngIf="data_operation===this.operations.update">
+  <mat-toolbar color="primary">
+    <span class="title-center mat-h1">{{title}}</span>
+  </mat-toolbar>
+  <br/> <br/>
+  <form (ngSubmit)="crud()" [formGroup]="form">
+    <div mat-dialog-content>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Libellé</mat-label>
+          <input appUppercase formControlName="libelle" matInput matTooltip="Libellé" placeholder="Libellé" required>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea formControlName="description" matInput matTooltip="Description" placeholder="Description"></textarea>
+        </mat-form-field>
+      </div>
+      <mat-form-field>
+        <mat-label>Catégorie produit</mat-label>
+        <mat-select formControlName="categorieProduit" matInput matTooltip="Catégorie produit" placeholder="Catégorie produit">
+          <mat-option *ngFor="let item of categorieProduits" [value]="item.id">
+            {{item.libelle}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <div align="end" mat-dialog-actions>
+      <button [disabled]="form.invalid" color="primary" mat-button type="submit">
+        <mat-icon>save</mat-icon>
+        {{this.bouton_names.save}}
+      </button>
+      <button color="warn" mat-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+        {{this.bouton_names.cancel}}
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Ajout de données -->
+<div *ngIf="errorMessage?.length > 0" class="alert alert-danger">
+  <div *ngFor="let msg of errorMessage" style="color: #ff7513;">
+    <b> <span>{{msg}}</span></b>
+  </div>
+</div>
+<div *ngIf="data_operation===this.operations.create">
+  <mat-toolbar color="primary">
+    <span class="title-center mat-h1">{{title}}</span>
+  </mat-toolbar>
+  <br/> <br/>
+  <form (ngSubmit)="crud()" [formGroup]="form">
+    <div mat-dialog-content>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Libellé</mat-label>
+          <input appUppercase formControlName="libelle" matInput matTooltip="Libellé" placeholder="Libellé" required>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea formControlName="description" matInput matTooltip="Description" placeholder="Description"required></textarea>
+        </mat-form-field>
+      </div>
+      <mat-form-field>
+        <mat-label>Catégorie produit</mat-label>
+        <mat-select formControlName="categorieProduit" matInput matTooltip="Catégorie produit" placeholder="Catégorie produit">
+          <mat-option *ngFor="let item of categorieProduits" [value]="item.id">
+            {{item.libelle}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div align="end" mat-dialog-actions>
+      <button [disabled]="form.invalid" color="primary" mat-button type="submit">
+        <mat-icon>save</mat-icon>
+        {{this.bouton_names.save}}
+      </button>
+      <button color="warn" mat-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+        {{this.bouton_names.cancel}}
+      </button>
+    </div>
+  </form>
+</div>
+
+
+<!-- détails des données -->
+<div *ngIf="data_operation===this.operations.details">
+  <mat-toolbar color="primary">
+    <span class="title-center mat-h1">{{title}}</span>
+  </mat-toolbar>
+  <br/> <br/>
+  <form  [formGroup]="form">
+    <div mat-dialog-content>
+      <div>
+        <mat-form-field>
+          <mat-label>Libellé</mat-label>
+          <input appUppercase formControlName="libelle" matInput matTooltip="Libellé" placeholder="Libellé" required>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea formControlName="description" matInput matTooltip="Description" placeholder="Description" required></textarea>
+        </mat-form-field>
+      </div>
+      <mat-form-field>
+        <mat-label>Catégorie produit</mat-label>
+        <mat-select formControlName="categorieProduit" matInput matTooltip="Catégorie produit" placeholder="Catégorie produit">
+          <mat-option *ngFor="let item of categorieProduits" [value]="item.id">
+            {{item.libelle}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div align="end" mat-dialog-actions>
+      <button color="warn" mat-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+        {{this.bouton_names.cancel}}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,9 @@
+<section fxLayout="column" fxLayoutAlign="center center">
+  <h1 mat-dialog-title>{{data.leTitre}}</h1>
+  <mat-dialog-content>
+    <p>{{data.errorMessage}}</p>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button (click)="closeDialog()" color="warn" mat-raised-button>OK</button>
+  </mat-dialog-actions>
+</section>

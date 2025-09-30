@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+  <span *ngIf="data.title" class="title-center">{{data?.title}}</span>
+  <span *ngIf="!data.title" class="title-center">{{title}}</span>
+</mat-toolbar>
+
+<br>
+<div mat-dialog-content>
+  <span>{{data?.message}}</span>
+</div>
+
+<div [align]="'end'" mat-dialog-actions>
+  <button [mat-dialog-close]="false" color="primary" mat-button>
+    <mat-icon>close</mat-icon>
+    Fermer
+  </button>
+</div>
