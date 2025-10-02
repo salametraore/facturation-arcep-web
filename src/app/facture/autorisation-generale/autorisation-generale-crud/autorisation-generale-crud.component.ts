@@ -125,7 +125,7 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
 
     // Produits (JSON stringifié)
-    formData.append('produits_detail', JSON.stringify(dataFicheTechnique.produits_detail));
+    formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
 
     // Upload fichiers
     /*    files.forEach(file => {

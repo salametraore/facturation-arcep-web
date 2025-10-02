@@ -229,15 +229,16 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
 
 
     const dataFicheTechnique: FicheTechniques = {
-      client: this.client?.id,
+      client: formValue['client'],
       direction: 1,
       objet: formValue['objet'],
       utilisateur: 1,
       position: 1,
       commentaire: formValue['commentaire'],
+      periode: formValue['periode'],
       categorie_produit: this.fixeCategorie,
       statut: this.statutFicheTechnique,
-      produits_detail: this.t_FicheTechniquesProduits?.data,
+      produits: this.t_FicheTechniquesProduits?.data,
     };
 
     console.log(dataFicheTechnique);
@@ -253,10 +254,10 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
-    formData.append('statut', String(dataFicheTechnique.statut));
+
 
     // Produits (JSON stringifié)
-    formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
+    formData.append('produits', JSON.stringify(dataFicheTechnique.produits));
 
 
     // Choisir la requête : création ou mise à jour

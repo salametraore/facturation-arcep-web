@@ -214,7 +214,7 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
 
 
     const dataFicheTechnique: FicheTechniques = {
-      client: this.client?.id,
+      client: formValue['client'],
       direction: 1,
       utilisateur: 1,
       position: 1,

@@ -126,8 +126,6 @@ export class DomaineCrudComponent implements OnInit {
       direction: formValue['direction'],
       utilisateur: '1',
       position: formValue['position'],
-      etat: formValue['etat'],
-      statut: formValue['statut'],
       commentaire: formValue['commentaire'],
       categorie_produit: this.fixeCategorie,
       produits_detail: [
@@ -143,13 +141,11 @@ export class DomaineCrudComponent implements OnInit {
     formData.append('direction', String(dataFicheTechnique.direction));
     formData.append('utilisateur', String(dataFicheTechnique.utilisateur));
     formData.append('position', String(dataFicheTechnique.position));
-    formData.append('etat', String(dataFicheTechnique.etat));
-    formData.append('statut', String(dataFicheTechnique.statut));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
 
     // Produits (JSON stringifié)
-    formData.append('produits_detail', JSON.stringify(dataFicheTechnique.produits_detail));
+    formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
 
     // Upload fichiers
     /*    files.forEach(file => {

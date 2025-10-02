@@ -32,6 +32,7 @@ export class FicheTechniquesService {
   }
 
   update(id: number, ficheTechniqueData: FormData): Observable<FicheTechniques> {
+    console.log(FormData.toString())
     return this.http.put<FicheTechniques>(`${this.baseUrl}/${id}/`, ficheTechniqueData);
   }
 

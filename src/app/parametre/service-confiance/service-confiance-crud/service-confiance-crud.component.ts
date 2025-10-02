@@ -145,8 +145,6 @@ export class ServiceConfianceCrudComponent implements OnInit {
     formData.append('direction', String(dataFicheTechnique.direction));
     formData.append('utilisateur', String(dataFicheTechnique.utilisateur));
     formData.append('position', String(dataFicheTechnique.position));
-    formData.append('etat', String(dataFicheTechnique.etat));
-    formData.append('statut', String(dataFicheTechnique.statut));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
 
