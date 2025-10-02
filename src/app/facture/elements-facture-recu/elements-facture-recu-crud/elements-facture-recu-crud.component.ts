@@ -14,8 +14,8 @@ import {AuthService} from "../../../authentication/auth.service";
 import {bouton_names, operations} from "../../../constantes";
 import {MatTableDataSource} from "@angular/material/table";
 import {FicheTechniqueAFacturer, ProduitFiche} from "../../../shared/models/fiche-technique-a-facturer";
-import {RequestGenererFacture} from "../../../shared/models/ficheTechniques";
 import {FactureService} from "../../../shared/services/facture.service";
+import {RequestGenererFacture} from "../../../shared/models/ficheTechniques";
 
 @Component({
   selector: 'app-elements-facture-recu-crud',

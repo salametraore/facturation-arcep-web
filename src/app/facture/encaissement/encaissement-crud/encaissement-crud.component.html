@@ -23,10 +23,11 @@
     <mat-step [stepControl]="firstFormGroup">
       <form [formGroup]="firstFormGroup">
         <ng-template matStepLabel>Entête encaissement</ng-template>
+
         <mat-form-field>
           <mat-label>Nom du client</mat-label>
           <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
-                 matInput matTooltip="Nom du client" placeholder="Nom du client" required>
+                 matInput matTooltip="Nom du client"   required>
           <mat-autocomplete #auto_cl="matAutocomplete">
             <mat-option *ngFor="let item of clients | search:nomClient" (click)="getInfosComplementaire(item)"
                         [value]="item.denomination_sociale">
@@ -37,20 +38,19 @@
 
         <mat-form-field>
           <mat-label>Objet</mat-label>
-          <input matInput formControlName="objet" placeholder="Objet">
+          <input matInput formControlName="objet"  >
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Date d'encaissement</mat-label>
-          <input matInput formControlName="date_encaissement" [matDatepicker]="pickerEnd"
-                 placeholder="Date d'encaissement">
+          <input matInput formControlName="date_encaissement" [matDatepicker]="pickerEnd">
           <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
           <mat-datepicker #pickerEnd></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Mode de paiement</mat-label>
-          <mat-select formControlName="mode_paiement" placeholder="Mode de paiement">
+          <mat-select formControlName="mode_paiement" >
             <mat-option *ngFor="let item of modePaiements" [value]="item.id">
               {{item.libelle}}
             </mat-option>
@@ -59,12 +59,12 @@
 
         <mat-form-field>
           <mat-label>Référence</mat-label>
-          <input matInput formControlName="reference" placeholder="Référence">
+          <input matInput formControlName="reference" >
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Montant</mat-label>
-          <input matInput formControlName="montant" placeholder="Montant">
+          <input matInput formControlName="montant" >
         </mat-form-field>
 
         <div class="action-buttons">

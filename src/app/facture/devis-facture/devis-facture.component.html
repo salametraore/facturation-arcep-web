@@ -19,7 +19,7 @@
       <mat-form-field>
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="checher()" required>
+               matInput matTooltip="Nom du client"  (keyup.enter)="checher()" required>
         <mat-autocomplete #auto_cl="matAutocomplete">
           <mat-option *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>

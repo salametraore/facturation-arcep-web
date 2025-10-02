@@ -8,6 +8,7 @@ export const operations = {
   delete: 'DELETE',
   validate: 'VALIDATE',
   update_pwd: 'update_pwd',
+  table: 'Table',
 };
 
 export const bouton_names = {
@@ -32,6 +33,7 @@ export const windows_titles = {
   windows_delete: 'Suppression ',
   windows_detail: 'Détail '
 };
+
 
 export function format_date_for_url(text: any) {
   let tex = text.replace('/', '-');

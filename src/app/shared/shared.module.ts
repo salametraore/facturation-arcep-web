@@ -18,7 +18,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
 import { PdfComponent } from './components/pdf/pdf.component';
-import {PdfViewerModule} from 'ng2-pdf-viewer';
 import { ThousandSeparatorPipe } from './pipes/thousand-separator.pipe';
 import { ThousandsSeparatorDirective } from './directive/thousands-separator.directive';
 import {FlexLayoutModule} from "@ngbracket/ngx-layout";
@@ -52,7 +51,6 @@ import {SearchPipe} from "./pipes/search.pipe";
     MatSidenavModule,
     MatIconModule,
     MatListModule,
-    PdfViewerModule,
     FlexLayoutModule,
     MatGridList,
     MatGridTile,

@@ -27,6 +27,27 @@ import {ElementsFactureRecuComponent} from "./elements-facture-recu/elements-fac
 import {
   ElementsFactureRecuCrudComponent
 } from "./elements-facture-recu/elements-facture-recu-crud/elements-facture-recu-crud.component";
+import {FicherTechniqueDfcComponent} from "./ficher-technique-dfc/ficher-technique-dfc.component";
+import {
+  FicherTechniqueDfcCrudComponent
+} from "./ficher-technique-dfc/ficher-technique-dfc-crud/ficher-technique-dfc-crud.component";
+import {
+  FicheTechniqueDfcTableComponent
+} from "./ficher-technique-dfc/fiche-technique-dfc-table/fiche-technique-dfc-table.component";
+import {ServiceAValeurAjouteComponent} from "./service-a-valeur-ajoute/service-a-valeur-ajoute.component";
+import {
+  ServiceAValeurAjouteTableComponent
+} from "./service-a-valeur-ajoute/service-a-valeur-ajoute-table/service-a-valeur-ajoute-table.component";
+import {
+  ServiceAValeurAjouteCrudComponent
+} from "./service-a-valeur-ajoute/service-a-valeur-ajoute-crud/service-a-valeur-ajoute-crud.component";
+import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisation-generale.component";
+import {
+  AutorisationGeneraleTableComponent
+} from "./autorisation-generale/autorisation-generale-table/autorisation-generale-table.component";
+import {
+  AutorisationGeneraleCrudComponent
+} from "./autorisation-generale/autorisation-generale-crud/autorisation-generale-crud.component";
 
 
 @NgModule({
@@ -46,7 +67,16 @@ import {
     DevisFactureComponent,
     DevisFactureCrudComponent,
     ElementsFactureRecuComponent,
-    ElementsFactureRecuCrudComponent
+    ElementsFactureRecuCrudComponent,
+    FicherTechniqueDfcComponent,
+    FicherTechniqueDfcCrudComponent,
+    FicheTechniqueDfcTableComponent,
+    ServiceAValeurAjouteComponent,
+    ServiceAValeurAjouteTableComponent,
+    ServiceAValeurAjouteCrudComponent,
+    AutorisationGeneraleComponent,
+    AutorisationGeneraleTableComponent,
+    AutorisationGeneraleCrudComponent
   ],
   imports: [
     CommonModule,

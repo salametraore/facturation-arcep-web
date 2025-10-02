@@ -5,7 +5,7 @@
     <div class="dashboard-actions">
       <button (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
         <mat-icon>add</mat-icon>
-        FT service de confiance
+        FT nom de domaine
       </button>
       <button color="warn" mat-flat-button>
         <mat-icon>print</mat-icon>
@@ -16,12 +16,13 @@
 
   <div class="filter-section">
     <div class="filter-group">
+
       <mat-form-field>
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
                matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="checher()" required>
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option  *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
+          <mat-option *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>
           </mat-option>
         </mat-autocomplete>
@@ -33,6 +34,7 @@
         <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
         <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
+
       <mat-form-field>
         <mat-label>Date fin</mat-label>
         <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (keyup.enter)="checher()">
@@ -83,9 +85,9 @@
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Catégorie</th>
         <td *matCellDef="let element" mat-cell> {{getCategorie(element.categorie_produit)}} </td>
       </ng-container>
-      <ng-container matColumnDef="statut">
+      <ng-container matColumnDef="statut.libelle">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Statut</th>
-        <td *matCellDef="let element" mat-cell> {{getStatut(element.statut)}} </td>
+        <td *matCellDef="let element" mat-cell> {{element.statut?.libelle}} </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
@@ -99,6 +101,11 @@
             <button (click)="crud(element,this.operations.update)" mat-menu-item>
               <mat-icon color="warn">edit</mat-icon>
               Modifier
+            </button>
+            <button *ngIf="element.statut?.code==='INIT'"  (click)="crud(element,this.operations.transmettre)"
+                    mat-menu-item>
+              <mat-icon color="warn">edit</mat-icon>
+              Transmettre
             </button>
             <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
               <mat-icon color="warn">delete</mat-icon>

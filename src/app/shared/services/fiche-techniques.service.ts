@@ -24,6 +24,10 @@ export class FicheTechniquesService {
   }
 
   create(ficheTechniqueData: FormData): Observable<FicheTechniques> {
+    console.log('--- Contenu du FormData ---');
+    for (const pair of (ficheTechniqueData as any).entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
     return this.http.post<FicheTechniques>(`${this.baseUrl}/`, ficheTechniqueData);
   }
 

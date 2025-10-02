@@ -12,6 +12,7 @@ import {MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDateFormats} from '@angular/materi
 import {SharedModule} from './shared/shared.module';
 import {AuthInterceptor} from "./authentication/auth.interceptor";
 
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 registerLocaleData(localeFR);
 
@@ -49,7 +50,15 @@ export const MY_FORMAT: MatDateFormats = {
     },
     {provide: LOCALE_ID, useValue: 'fr'},
     {provide: MAT_DATE_LOCALE, useValue: 'fr-FR'},
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMAT}
+    {provide: MAT_DATE_FORMATS, useValue: MY_FORMAT},
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: {
+        appearance: 'outline',
+        floatLabel: 'always',
+        subscriptSizing: 'dynamic'
+      }
+    }
   ],
   bootstrap: [AppComponent]
 })

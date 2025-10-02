@@ -130,11 +130,9 @@ export class DomaineCrudComponent implements OnInit {
       statut: formValue['statut'],
       commentaire: formValue['commentaire'],
       categorie_produit: this.fixeCategorie,
-      produits: {
-        produits: [
+      produits_detail: [
           {produit: Number(formValue['produit']), quantite: 1},
         ],
-      },
     };
 
     // Construire FormData
@@ -151,7 +149,7 @@ export class DomaineCrudComponent implements OnInit {
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
 
     // Produits (JSON stringifié)
-    formData.append('produits', JSON.stringify(dataFicheTechnique.produits));
+    formData.append('produits_detail', JSON.stringify(dataFicheTechnique.produits_detail));
 
     // Upload fichiers
     /*    files.forEach(file => {

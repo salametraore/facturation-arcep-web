@@ -17,6 +17,7 @@ import {Client} from "../../shared/models/client";
 import {ClientService} from "../../shared/services/client.service";
 import {StatutFicheTechniqueService} from "../../shared/services/statut-fiche-technique.service";
 import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
+import {DomaineCrudComponent} from "../domaine/domaine-crud/domaine-crud.component";
 
 @Component({
   selector: 'app-service-confiance',
@@ -25,21 +26,21 @@ import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
 })
 export class ServiceConfianceComponent implements OnInit, AfterViewInit {
 
-  @Input() fixeCategorie:number;
+  @Input() fixeCategorie: number;
 
   ficheTechniques?: MatTableDataSource<FicheTechniques>;
-  displayedColumns: string[] = ['client_nom', 'date_creation','categorie_produit','statut', 'actions'];
+  displayedColumns: string[] = ['client_nom', 'date_creation', 'categorie_produit', 'statut.libelle', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   public operations = operations;
   selectedRow: any = undefined;
-  nomClient:any;
-  startDate :any;
-  endDate :any;
-  serviceFilter :any;
-  statusFilter :any;
-  categories:CategorieProduit[];
-  produits:Produit[];
+  nomClient: any;
+  startDate: any;
+  endDate: any;
+  serviceFilter: any;
+  statusFilter: any;
+  categories: CategorieProduit[];
+  produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
 
@@ -68,19 +69,22 @@ export class ServiceConfianceComponent implements OnInit, AfterViewInit {
 
   reloadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
-      this.categories= categories;
+      this.categories = categories;
     });
-    this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits.filter(f=>f.categorieProduit===this.fixeCategorie);
-    });
+
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
       this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
     });
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
     });
+
+    this.produitService.getListItems().subscribe((produits: Produit[]) => {
+      this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
+    });
+
     this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response.filter(f=>f.categorie_produit===this.fixeCategorie);
+      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
     });
   }
 
@@ -94,9 +98,9 @@ export class ServiceConfianceComponent implements OnInit, AfterViewInit {
     const fixeCategorie = this.fixeCategorie;
     dialogConfig.width = '1024px';
     dialogConfig.autoFocus = true;
-    dialogConfig.data = {ficheTechnique,fixeCategorie, operation};
+    dialogConfig.data = {ficheTechnique, fixeCategorie, operation};
     dialogConfig.disableClose = true;
-    let ref = this.dialog.open(ServiceConfianceCrudComponent, dialogConfig);
+    let ref = this.dialog.open(DomaineCrudComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {
@@ -155,12 +159,14 @@ export class ServiceConfianceComponent implements OnInit, AfterViewInit {
 
   }
 
-  getCategorie(id:number){
-    return this.categories?.find(cat=>cat.id===id).libelle;
+  getCategorie(id: number) {
+    return this.categories?.find(cat => cat.id === id).libelle;
   }
 
   getStatut(id: number) {
     return this.statutFicheTechniques?.find(st => st.id === id).libelle;
   }
+
+
 
 }

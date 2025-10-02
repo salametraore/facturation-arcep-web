@@ -78,7 +78,8 @@ import {CategorieStationComponent} from "./categorie-station/categorie-station.c
     ZonePostaleCrudComponent,
     ZonePostaleComponent,
     ZoneCouvertureComponent,
-    CategorieStationComponent
+    CategorieStationComponent,
+
   ],
   imports: [
     CommonModule,

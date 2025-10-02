@@ -22,52 +22,56 @@
   <!-- Fiche technique -->
 
 
-
   <div fxLayout="row" fxLayoutGap="20px">
     <!-- Colonne de gauche : Fiche Technique -->
-    <div fxFlex="70%">
+    <div fxFlex="75%">
       <mat-card class="dark-card">
-      <div class="tech-sheet-section">
+        <div class="tech-sheet-section">
+          <form [formGroup]="form">
 
-        <form [formGroup]="form">
+            <div class="client-section">
+              <span class="subsection-label">Client</span>
 
-          <div class="client-section">
-            <span class="subsection-label">Client</span>
-            <mat-form-field>
-              <mat-label>Client</mat-label>
-              <mat-select formControlName="client" placeholder="Cliquez et sélectionnez votre client">
-                <mat-option *ngFor="let item of clients" [value]="item.id">
-                  {{item.denomination_sociale}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+              <mat-form-field>
+                <mat-label>Client</mat-label>
+                <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
+                       placeholder="Cliquez et sélectionnez votre client">
+                <mat-autocomplete #auto_cl="matAutocomplete">
+                  <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
+                              [value]="item.denomination_sociale">
+                    <span>{{item.denomination_sociale}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+
+            </div>
+
+            <div class="domiciliation-section">
+              <span class="subsection-label">Domiciliation</span>
+              <mat-form-field>
+                <mat-label>Domiciliation du demandeur</mat-label>
+                <mat-select formControlName="produit" placeholder="Domiciliation" matTooltip="Domiciliation">
+                  <mat-option *ngFor="let item of produits" [value]="item.id">
+                    {{item.libelle}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="comment-section">
+              <span class="subsection-label">COMMENTAIRE</span>
+              <mat-form-field>
+                <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
+                <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>
+              </mat-form-field>
+            </div>
+          </form>
+          <div class="actions">
+            <button mat-raised-button *ngIf="this.data_operation===this.operations.create ||this.data_operation===this.operations.update" (click)="crud()" color="warn">Enregistrer</button>
+            <button mat-raised-button *ngIf="this.data_operation===this.operations.transmettre" (click)="onTransmettre()" color="warn">Transmettre</button>
+            <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
           </div>
-
-          <div class="domiciliation-section">
-            <span class="subsection-label">Type de service de confiance</span>
-            <mat-form-field>
-              <mat-label>Type de service de confiance</mat-label>
-              <mat-select formControlName="produit" placeholder="Type de service de confiance" matTooltip="Type de service de confiance">
-                <mat-option *ngFor="let item of produits" [value]="item.id">
-                  {{item.libelle}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="comment-section">
-            <span class="subsection-label">COMMENTAIRE</span>
-            <mat-form-field>
-              <mat-label>Commentaire</mat-label>
-              <textarea matInput formControlName="commentaire" placeholder="Commentaire" matTooltip="Commentaire"></textarea>
-            </mat-form-field>
-          </div>
-        </form>
-        <div class="actions">
-          <button mat-raised-button (click)="crud()" color="warn">Enregistrer</button>
-          <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
         </div>
-      </div>
       </mat-card>
     </div>
 
@@ -97,7 +101,4 @@
       </div>
     </div>
   </div>
-
 </div>
-
-

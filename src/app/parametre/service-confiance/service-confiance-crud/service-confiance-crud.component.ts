@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {FicheTechniques} from "../../../shared/models/ficheTechniques";
+import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/ficheTechniques";
 import {CategorieProduit} from "../../../shared/models/categorie-produit";
 import {Produit} from "../../../shared/models/produit";
 import {Client} from "../../../shared/models/client";
@@ -30,10 +30,12 @@ export class ServiceConfianceCrudComponent implements OnInit {
   categories: CategorieProduit[];
   produits: Produit[];
   clients: Client[];
+  client: Client;
   public operations = operations;
   public bouton_names = bouton_names;
   public data_operation: string = '';
   errorMessage: any;
+  nomClient: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -54,13 +56,12 @@ export class ServiceConfianceCrudComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.ficheTechnique)
     this.init();
     this.reloadData();
   }
 
   init() {
-    if (this.ficheTechnique && this.data_operation === this.operations.update) {
+    if (this.ficheTechnique && (this.data_operation === this.operations.update||this.data_operation === this.operations.transmettre)) {
       this.mode = this.data_operation;
       this.title = 'Mise à jour';
       this.initForm_update();
@@ -79,6 +80,10 @@ export class ServiceConfianceCrudComponent implements OnInit {
   reloadData() {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
+      if(this.ficheTechnique){
+        this.client = clients?.find(c=>c.id ===this.ficheTechnique?.client);
+        this.nomClient = this.client?.denomination_sociale;
+      }
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
@@ -90,8 +95,8 @@ export class ServiceConfianceCrudComponent implements OnInit {
     this.form = this.formBuilder.group({
       id: [this.ficheTechnique?.id],
       client: [this.ficheTechnique?.client],
-      produit: [this.ficheTechnique?.produits[0]],
-      commentaire: [],
+      produit: [this.ficheTechnique?.produits_detail[0].produit],
+      commentaire: [this.ficheTechnique?.commentaire],
       direction: [2],
       statut: [1],
       position: [1],
@@ -117,20 +122,20 @@ export class ServiceConfianceCrudComponent implements OnInit {
 
 
     const dataFicheTechnique = {
-      client: formValue['client'],
+      client: this.client?.id,
       direction: formValue['direction'],
       utilisateur: '1',
       position: formValue['position'],
       etat: formValue['etat'],
       statut: formValue['statut'],
+      commentaire: formValue['commentaire'],
       categorie_produit: this.fixeCategorie,
       produits: {
         produits: [
-          { produit: Number(formValue['produit']), quantite: 1 },
+          {produit: Number(formValue['produit']), quantite: 1},
         ],
       },
     };
-
 
     // Construire FormData
     const formData = new FormData();
@@ -141,7 +146,8 @@ export class ServiceConfianceCrudComponent implements OnInit {
     formData.append('utilisateur', String(dataFicheTechnique.utilisateur));
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('etat', String(dataFicheTechnique.etat));
-    formData.append('statut',String(dataFicheTechnique.statut));
+    formData.append('statut', String(dataFicheTechnique.statut));
+    formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
 
     // Produits (JSON stringifié)
@@ -151,8 +157,6 @@ export class ServiceConfianceCrudComponent implements OnInit {
     /*    files.forEach(file => {
           formData.append('documents', file, file.name);
         });*/
-
-    console.log(formData)
 
     // Choisir la requête : création ou mise à jour
     const request$ =
@@ -167,13 +171,22 @@ export class ServiceConfianceCrudComponent implements OnInit {
       },
       (error) => {
         console.log(error);
-        this.dialogService.alert({ message: error.message });
+        this.dialogService.alert({message: error.message});
         this.errorMessage = error.error?.message || error.message;
       }
     );
   }
 
-
+  onTransmettre(){
+    const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();
+    miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
+    miseAJourStatutFiche.statut = 2;
+    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone:MiseAJourStatutFiche)=>{
+      this.msgMessageService.success("Fiche transmise avec succès !");
+    },error => {
+      this.dialogService.alert({message:error.message});
+    });
+  }
 
   onSubmit() {
     // Logique pour soumettre la fiche technique
@@ -192,5 +205,9 @@ export class ServiceConfianceCrudComponent implements OnInit {
 
   onFerme() {
     this.dialogRef.close('Yes');
+  }
+
+  onGetClient(client: Client) {
+    this.client = client;
   }
 }

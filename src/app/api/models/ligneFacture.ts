@@ -12,9 +12,11 @@
 export interface LigneFacture { 
     readonly id: number;
     produit?: number;
+    facture_id: number;
     readonly produit_libelle: string;
     prix_unitaire: number;
     quantite: number;
     readonly total: string;
+    designation?: string | null;
 }
 

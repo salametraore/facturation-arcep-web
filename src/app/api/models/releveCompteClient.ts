@@ -11,9 +11,12 @@
 
 export interface ReleveCompteClient { 
     id: number;
+    client_id: number;
+    client: string;
     type_ligne: string;
     date_echeance: string;
     reference?: string | null;
-    montant: number;
+    montant_facture: number;
+    montant_encaissement: number;
 }
 

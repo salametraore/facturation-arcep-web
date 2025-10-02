@@ -978,6 +978,20 @@
                 "description": "Liste et création des catégories produits\nAvec recherche par code et libellé",
                 "parameters": [
                     {
+                        "in": "query",
+                        "name": "code",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "libelle",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "ordering",
                         "required": false,
                         "in": "query",
@@ -2805,13 +2819,18 @@
                         "schema": {
                             "type": "string",
                             "enum": [
+                                "DA",
+                                "EL",
                                 "FD",
                                 "GA",
+                                "IN",
+                                "LO",
+                                "RA",
                                 "RC",
                                 "RD"
                             ]
                         },
-                        "description": "* `FD` - Frais de dossier\n* `GA` - Garantie\n* `RD` - Redevance annuelle\n* `RC` - Redevance de contrôle"
+                        "description": "* `FD` - Frais de dossier\n* `GA` - Garantie\n* `RD` - Redevance annuelle\n* `RC` - Redevance de contrôle\n* `EL` - Electricité\n* `LO` - Loyer\n* `IN` - Inscription\n* `RA` - Restauration\n* `DA` - Dossier d'Appel d'Offre "
                     }
                 ],
                 "tags": [
@@ -3795,6 +3814,60 @@
                 }
             }
         },
+        "/facturation_api/factures/client/{id}/": {
+            "get": {
+                "operationId": "facturation_api_factures_client_list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "facturation_api"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Facture"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/facturation_api/fiche-techniques/": {
             "get": {
                 "operationId": "facturation_api_fiche_techniques_list",
@@ -3898,7 +3971,84 @@
         },
         "/facturation_api/fiche-techniques-produits/": {
             "get": {
+                "operationId": "facturation_api_fiche_techniques_produits_list",
+                "tags": [
+                    "facturation_api"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/FicheTechniqueProduit"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "facturation_api_fiche_techniques_produits_create",
+                "tags": [
+                    "facturation_api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FicheTechniqueProduit"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FicheTechniqueProduit"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FicheTechniqueProduit"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FicheTechniqueProduit"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/facturation_api/fiche-techniques-produits/{id}/": {
+            "get": {
                 "operationId": "facturation_api_fiche_techniques_produits_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
                 "tags": [
                     "facturation_api"
                 ],
@@ -3920,6 +4070,16 @@
             },
             "put": {
                 "operationId": "facturation_api_fiche_techniques_produits_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
                 "tags": [
                     "facturation_api"
                 ],
@@ -3961,6 +4121,16 @@
             },
             "patch": {
                 "operationId": "facturation_api_fiche_techniques_produits_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
                 "tags": [
                     "facturation_api"
                 ],
@@ -4001,154 +4171,6 @@
             },
             "delete": {
                 "operationId": "facturation_api_fiche_techniques_produits_destroy",
-                "tags": [
-                    "facturation_api"
-                ],
-                "security": [
-                    {}
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No response body"
-                    }
-                }
-            }
-        },
-        "/facturation_api/fiche-techniques-produits/{id}/": {
-            "get": {
-                "operationId": "facturation_api_fiche_techniques_produits_retrieve_2",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "facturation_api"
-                ],
-                "security": [
-                    {}
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FicheTechniqueProduit"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "put": {
-                "operationId": "facturation_api_fiche_techniques_produits_update_2",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "facturation_api"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/FicheTechniqueProduit"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/FicheTechniqueProduit"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/FicheTechniqueProduit"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "security": [
-                    {}
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FicheTechniqueProduit"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "patch": {
-                "operationId": "facturation_api_fiche_techniques_produits_partial_update_2",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "facturation_api"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PatchedFicheTechniqueProduit"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PatchedFicheTechniqueProduit"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PatchedFicheTechniqueProduit"
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {}
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FicheTechniqueProduit"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "delete": {
-                "operationId": "facturation_api_fiche_techniques_produits_destroy_2",
                 "parameters": [
                     {
                         "in": "path",
@@ -7807,6 +7829,39 @@
                                     "items": {
                                         "$ref": "#/components/schemas/ReleveCompteClient"
                                     }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/facturation_api/releve-client/{id}/": {
+            "get": {
+                "operationId": "facturation_api_releve_client_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "facturation_api"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReleveCompteClient"
                                 }
                             }
                         },
@@ -13423,7 +13478,7 @@
                     },
                     "libelle": {
                         "type": "string",
-                        "maxLength": 255
+                        "maxLength": 200
                     },
                     "type_direction": {
                         "type": "integer"
@@ -13721,6 +13776,11 @@
                     },
                     "type_frais": {
                         "$ref": "#/components/schemas/TypeFraisEnum"
+                    },
+                    "periode": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 100
                     }
                 },
                 "required": [
@@ -13907,7 +13967,12 @@
                         "type": "integer"
                     },
                     "statut": {
-                        "$ref": "#/components/schemas/StatutFicheTechnique"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/StatutFicheTechnique"
+                            }
+                        ],
+                        "nullable": true
                     },
                     "documents": {
                         "type": "array",
@@ -13934,6 +13999,27 @@
                     },
                     "avis": {
                         "$ref": "#/components/schemas/AvisEnum"
+                    },
+                    "duree": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": -2147483648,
+                        "nullable": true
+                    },
+                    "date_fin": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "date_debut": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "periode": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 100
                     }
                 },
                 "required": [
@@ -13942,8 +14028,7 @@
                     "direction",
                     "documents_detail",
                     "id",
-                    "produits_detail",
-                    "statut"
+                    "produits_detail"
                 ]
             },
             "FicheTechniqueDocument": {
@@ -13977,6 +14062,10 @@
                     "produit": {
                         "type": "integer"
                     },
+                    "fiche_technique_id": {
+                        "type": "integer",
+                        "writeOnly": true
+                    },
                     "produit_libelle": {
                         "type": "string",
                         "readOnly": true
@@ -13986,9 +14075,27 @@
                         "maximum": 2147483647,
                         "minimum": -2147483648,
                         "nullable": true
+                    },
+                    "prix_unitaire": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$",
+                        "nullable": true
+                    },
+                    "designation": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 1000
+                    },
+                    "total": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$",
+                        "nullable": true
                     }
                 },
                 "required": [
+                    "fiche_technique_id",
                     "id",
                     "produit",
                     "produit_libelle"
@@ -14254,6 +14361,10 @@
                     "produit": {
                         "type": "integer"
                     },
+                    "facture_id": {
+                        "type": "integer",
+                        "writeOnly": true
+                    },
                     "produit_libelle": {
                         "type": "string",
                         "readOnly": true
@@ -14270,9 +14381,15 @@
                     "total": {
                         "type": "string",
                         "readOnly": true
+                    },
+                    "designation": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 1000
                     }
                 },
                 "required": [
+                    "facture_id",
                     "id",
                     "prix_unitaire",
                     "produit_libelle",
@@ -15001,7 +15118,7 @@
                     },
                     "libelle": {
                         "type": "string",
-                        "maxLength": 255
+                        "maxLength": 200
                     },
                     "type_direction": {
                         "type": "integer"
@@ -15188,6 +15305,11 @@
                     },
                     "type_frais": {
                         "$ref": "#/components/schemas/TypeFraisEnum"
+                    },
+                    "periode": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 100
                     }
                 }
             },
@@ -15288,7 +15410,12 @@
                         "type": "integer"
                     },
                     "statut": {
-                        "$ref": "#/components/schemas/StatutFicheTechnique"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/StatutFicheTechnique"
+                            }
+                        ],
+                        "nullable": true
                     },
                     "documents": {
                         "type": "array",
@@ -15315,6 +15442,27 @@
                     },
                     "avis": {
                         "$ref": "#/components/schemas/AvisEnum"
+                    },
+                    "duree": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": -2147483648,
+                        "nullable": true
+                    },
+                    "date_fin": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "date_debut": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "periode": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 100
                     }
                 }
             },
@@ -15328,6 +15476,10 @@
                     "produit": {
                         "type": "integer"
                     },
+                    "fiche_technique_id": {
+                        "type": "integer",
+                        "writeOnly": true
+                    },
                     "produit_libelle": {
                         "type": "string",
                         "readOnly": true
@@ -15336,6 +15488,23 @@
                         "type": "integer",
                         "maximum": 2147483647,
                         "minimum": -2147483648,
+                        "nullable": true
+                    },
+                    "prix_unitaire": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$",
+                        "nullable": true
+                    },
+                    "designation": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 1000
+                    },
+                    "total": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$",
                         "nullable": true
                     }
                 }
@@ -15441,6 +15610,10 @@
                     "produit": {
                         "type": "integer"
                     },
+                    "facture_id": {
+                        "type": "integer",
+                        "writeOnly": true
+                    },
                     "produit_libelle": {
                         "type": "string",
                         "readOnly": true
@@ -15457,6 +15630,11 @@
                     "total": {
                         "type": "string",
                         "readOnly": true
+                    },
+                    "designation": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 1000
                     }
                 }
             },
@@ -16909,6 +17087,15 @@
                         "minimum": -9223372036854775808,
                         "format": "int64"
                     },
+                    "client_id": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": -2147483648
+                    },
+                    "client": {
+                        "type": "string",
+                        "maxLength": 1000
+                    },
                     "type_ligne": {
                         "type": "string",
                         "maxLength": 50
@@ -16922,15 +17109,22 @@
                         "nullable": true,
                         "maxLength": 255
                     },
-                    "montant": {
+                    "montant_facture": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "montant_encaissement": {
                         "type": "number",
                         "format": "double"
                     }
                 },
                 "required": [
+                    "client",
+                    "client_id",
                     "date_echeance",
                     "id",
-                    "montant",
+                    "montant_encaissement",
+                    "montant_facture",
                     "type_ligne"
                 ]
             },
@@ -17788,10 +17982,15 @@
                     "FD",
                     "GA",
                     "RD",
-                    "RC"
+                    "RC",
+                    "EL",
+                    "LO",
+                    "IN",
+                    "RA",
+                    "DA"
                 ],
                 "type": "string",
-                "description": "* `FD` - Frais de dossier\n* `GA` - Garantie\n* `RD` - Redevance annuelle\n* `RC` - Redevance de contrôle"
+                "description": "* `FD` - Frais de dossier\n* `GA` - Garantie\n* `RD` - Redevance annuelle\n* `RC` - Redevance de contrôle\n* `EL` - Electricité\n* `LO` - Loyer\n* `IN` - Inscription\n* `RA` - Restauration\n* `DA` - Dossier d'Appel d'Offre "
             },
             "TypeGroupeRecouvrementEnum": {
                 "enum": [

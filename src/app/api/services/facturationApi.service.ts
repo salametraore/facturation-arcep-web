@@ -1738,17 +1738,23 @@ export class FacturationApiService extends BaseService {
 
     /**
      * Liste et création des catégories produits Avec recherche par code et libellé
+     * @param code 
+     * @param libelle 
      * @param ordering Which field to use when ordering the results.
      * @param search A search term.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public facturationApiCategoriesProduitsList(ordering?: string, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<CategorieProduit>>;
-    public facturationApiCategoriesProduitsList(ordering?: string, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<CategorieProduit>>>;
-    public facturationApiCategoriesProduitsList(ordering?: string, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<CategorieProduit>>>;
-    public facturationApiCategoriesProduitsList(ordering?: string, search?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public facturationApiCategoriesProduitsList(code?: string, libelle?: string, ordering?: string, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<CategorieProduit>>;
+    public facturationApiCategoriesProduitsList(code?: string, libelle?: string, ordering?: string, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<CategorieProduit>>>;
+    public facturationApiCategoriesProduitsList(code?: string, libelle?: string, ordering?: string, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<CategorieProduit>>>;
+    public facturationApiCategoriesProduitsList(code?: string, libelle?: string, ordering?: string, search?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+          <any>code, 'code');
+        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+          <any>libelle, 'libelle');
         localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
           <any>ordering, 'ordering');
         localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
@@ -4572,14 +4578,14 @@ export class FacturationApiService extends BaseService {
      * @param ordering Which field to use when ordering the results.
      * @param search A search term.
      * @param statut * &#x60;CREE&#x60; - Créé * &#x60;TRAITE&#x60; - Traité
-     * @param typeFrais * &#x60;FD&#x60; - Frais de dossier * &#x60;GA&#x60; - Garantie * &#x60;RD&#x60; - Redevance annuelle * &#x60;RC&#x60; - Redevance de contrôle
+     * @param typeFrais * &#x60;FD&#x60; - Frais de dossier * &#x60;GA&#x60; - Garantie * &#x60;RD&#x60; - Redevance annuelle * &#x60;RC&#x60; - Redevance de contrôle * &#x60;EL&#x60; - Electricité * &#x60;LO&#x60; - Loyer * &#x60;IN&#x60; - Inscription * &#x60;RA&#x60; - Restauration * &#x60;DA&#x60; - Dossier d\&#39;Appel d\&#39;Offre 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'FD' | 'GA' | 'RC' | 'RD', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<ElementFacturationRecu>>;
-    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'FD' | 'GA' | 'RC' | 'RD', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<ElementFacturationRecu>>>;
-    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'FD' | 'GA' | 'RC' | 'RD', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<ElementFacturationRecu>>>;
-    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'FD' | 'GA' | 'RC' | 'RD', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'DA' | 'EL' | 'FD' | 'GA' | 'IN' | 'LO' | 'RA' | 'RC' | 'RD', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<ElementFacturationRecu>>;
+    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'DA' | 'EL' | 'FD' | 'GA' | 'IN' | 'LO' | 'RA' | 'RC' | 'RD', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<ElementFacturationRecu>>>;
+    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'DA' | 'EL' | 'FD' | 'GA' | 'IN' | 'LO' | 'RA' | 'RC' | 'RD', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<ElementFacturationRecu>>>;
+    public facturationApiElementsFacturationRecusList(ficheTechnique?: number, ordering?: string, search?: string, statut?: 'CREE' | 'TRAITE', typeFrais?: 'DA' | 'EL' | 'FD' | 'GA' | 'IN' | 'LO' | 'RA' | 'RC' | 'RD', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
         localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
@@ -5166,6 +5172,68 @@ export class FacturationApiService extends BaseService {
             {
                 context: localVarHttpContext,
                 body: encaissement,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @param id 
+     * @param ordering Which field to use when ordering the results.
+     * @param search A search term.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public facturationApiFacturesClientList(id: number, ordering?: string, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<Facture>>;
+    public facturationApiFacturesClientList(id: number, ordering?: string, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<Facture>>>;
+    public facturationApiFacturesClientList(id: number, ordering?: string, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<Facture>>>;
+    public facturationApiFacturesClientList(id: number, ordering?: string, search?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling facturationApiFacturesClientList.');
+        }
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+          <any>ordering, 'ordering');
+        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+          <any>search, 'search');
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/facturation_api/factures/client/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<Array<Facture>>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -5923,7 +5991,6 @@ export class FacturationApiService extends BaseService {
      * @param clientNom Dénomination sociale
      * @param direction 
      * @param produitsDetail 
-     * @param statut 
      * @param documentsDetail 
      * @param utilisateur 
      * @param produits 
@@ -5931,17 +5998,22 @@ export class FacturationApiService extends BaseService {
      * @param position 
      * @param positionDirection 
      * @param categorieProduit 
+     * @param statut 
      * @param documents 
      * @param objet 
      * @param commentaire 
      * @param avis 
+     * @param duree 
+     * @param dateFin 
+     * @param dateDebut 
+     * @param periode 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, statut: StatutFicheTechnique, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechnique>;
-    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, statut: StatutFicheTechnique, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechnique>>;
-    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, statut: StatutFicheTechnique, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechnique>>;
-    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, statut: StatutFicheTechnique, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, statut?: StatutFicheTechnique, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, duree?: number, dateFin?: string, dateDebut?: string, periode?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechnique>;
+    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, statut?: StatutFicheTechnique, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, duree?: number, dateFin?: string, dateDebut?: string, periode?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechnique>>;
+    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, statut?: StatutFicheTechnique, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, duree?: number, dateFin?: string, dateDebut?: string, periode?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechnique>>;
+    public facturationApiFicheTechniquesCreate(id: number, client: number, clientNom: string, direction: number, produitsDetail: Array<FicheTechniqueProduit>, documentsDetail: Array<FicheTechniqueDocument>, utilisateur?: number, produits?: Array<{ [key: string]: any; }>, dateCreation?: string, position?: number, positionDirection?: number, categorieProduit?: number, statut?: StatutFicheTechnique, documents?: Array<string>, objet?: string, commentaire?: string, avis?: AvisEnum, duree?: number, dateFin?: string, dateDebut?: string, periode?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesCreate.');
         }
@@ -5956,9 +6028,6 @@ export class FacturationApiService extends BaseService {
         }
         if (produitsDetail === null || produitsDetail === undefined) {
             throw new Error('Required parameter produitsDetail was null or undefined when calling facturationApiFicheTechniquesCreate.');
-        }
-        if (statut === null || statut === undefined) {
-            throw new Error('Required parameter statut was null or undefined when calling facturationApiFicheTechniquesCreate.');
         }
         if (documentsDetail === null || documentsDetail === undefined) {
             throw new Error('Required parameter documentsDetail was null or undefined when calling facturationApiFicheTechniquesCreate.');
@@ -6068,6 +6137,18 @@ export class FacturationApiService extends BaseService {
         }
         if (avis !== undefined) {
             localVarFormParams = localVarFormParams.append('avis', <any>avis) as any || localVarFormParams;
+        }
+        if (duree !== undefined) {
+            localVarFormParams = localVarFormParams.append('duree', <any>duree) as any || localVarFormParams;
+        }
+        if (dateFin !== undefined) {
+            localVarFormParams = localVarFormParams.append('date_fin', <any>dateFin) as any || localVarFormParams;
+        }
+        if (dateDebut !== undefined) {
+            localVarFormParams = localVarFormParams.append('date_debut', <any>dateDebut) as any || localVarFormParams;
+        }
+        if (periode !== undefined) {
+            localVarFormParams = localVarFormParams.append('periode', <any>periode) as any || localVarFormParams;
         }
 
         let responseType_: 'text' | 'json' | 'blob' = 'json';
@@ -6283,346 +6364,16 @@ export class FacturationApiService extends BaseService {
     }
 
     /**
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public facturationApiFicheTechniquesProduitsDestroy(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public facturationApiFicheTechniquesProduitsDestroy(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public facturationApiFicheTechniquesProduitsDestroy(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public facturationApiFicheTechniquesProduitsDestroy(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-
-        let localVarHeaders = this.defaultHeaders;
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/facturation_api/fiche-techniques-produits/`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * @param id 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public facturationApiFicheTechniquesProduitsDestroy2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public facturationApiFicheTechniquesProduitsDestroy2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public facturationApiFicheTechniquesProduitsDestroy2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public facturationApiFicheTechniquesProduitsDestroy2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsDestroy2.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/facturation_api/fiche-techniques-produits/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * @param patchedFicheTechniqueProduit 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public facturationApiFicheTechniquesProduitsPartialUpdate(patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
-    public facturationApiFicheTechniquesProduitsPartialUpdate(patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsPartialUpdate(patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsPartialUpdate(patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-
-        let localVarHeaders = this.defaultHeaders;
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json',
-            'application/x-www-form-urlencoded',
-            'multipart/form-data'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/facturation_api/fiche-techniques-produits/`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<FicheTechniqueProduit>('patch', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                body: patchedFicheTechniqueProduit,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * @param id 
-     * @param patchedFicheTechniqueProduit 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public facturationApiFicheTechniquesProduitsPartialUpdate2(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
-    public facturationApiFicheTechniquesProduitsPartialUpdate2(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsPartialUpdate2(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsPartialUpdate2(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsPartialUpdate2.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json',
-            'application/x-www-form-urlencoded',
-            'multipart/form-data'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/facturation_api/fiche-techniques-produits/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<FicheTechniqueProduit>('patch', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                body: patchedFicheTechniqueProduit,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public facturationApiFicheTechniquesProduitsRetrieve(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
-    public facturationApiFicheTechniquesProduitsRetrieve(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsRetrieve(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsRetrieve(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-
-        let localVarHeaders = this.defaultHeaders;
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/facturation_api/fiche-techniques-produits/`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<FicheTechniqueProduit>('get', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * @param id 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public facturationApiFicheTechniquesProduitsRetrieve2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
-    public facturationApiFicheTechniquesProduitsRetrieve2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsRetrieve2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsRetrieve2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsRetrieve2.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/facturation_api/fiche-techniques-produits/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<FicheTechniqueProduit>('get', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
      * @param ficheTechniqueProduit 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public facturationApiFicheTechniquesProduitsUpdate(ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
-    public facturationApiFicheTechniquesProduitsUpdate(ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsUpdate(ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsUpdate(ficheTechniqueProduit: FicheTechniqueProduit, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public facturationApiFicheTechniquesProduitsCreate(ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
+    public facturationApiFicheTechniquesProduitsCreate(ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsCreate(ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsCreate(ficheTechniqueProduit: FicheTechniqueProduit, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (ficheTechniqueProduit === null || ficheTechniqueProduit === undefined) {
-            throw new Error('Required parameter ficheTechniqueProduit was null or undefined when calling facturationApiFicheTechniquesProduitsUpdate.');
+            throw new Error('Required parameter ficheTechniqueProduit was null or undefined when calling facturationApiFicheTechniquesProduitsCreate.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -6663,7 +6414,7 @@ export class FacturationApiService extends BaseService {
 
         let localVarPath = `/facturation_api/fiche-techniques-produits/`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<FicheTechniqueProduit>('put', `${basePath}${localVarPath}`,
+        return this.httpClient.request<FicheTechniqueProduit>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: ficheTechniqueProduit,
@@ -6679,19 +6430,239 @@ export class FacturationApiService extends BaseService {
 
     /**
      * @param id 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public facturationApiFicheTechniquesProduitsDestroy(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public facturationApiFicheTechniquesProduitsDestroy(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public facturationApiFicheTechniquesProduitsDestroy(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public facturationApiFicheTechniquesProduitsDestroy(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsDestroy.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/facturation_api/fiche-techniques-produits/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public facturationApiFicheTechniquesProduitsList(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsList(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<FicheTechniqueProduit>>>;
+    public facturationApiFicheTechniquesProduitsList(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<FicheTechniqueProduit>>>;
+    public facturationApiFicheTechniquesProduitsList(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/facturation_api/fiche-techniques-produits/`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<Array<FicheTechniqueProduit>>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @param id 
+     * @param patchedFicheTechniqueProduit 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public facturationApiFicheTechniquesProduitsPartialUpdate(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
+    public facturationApiFicheTechniquesProduitsPartialUpdate(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsPartialUpdate(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsPartialUpdate(id: number, patchedFicheTechniqueProduit?: PatchedFicheTechniqueProduit, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsPartialUpdate.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json',
+            'application/x-www-form-urlencoded',
+            'multipart/form-data'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/facturation_api/fiche-techniques-produits/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<FicheTechniqueProduit>('patch', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: patchedFicheTechniqueProduit,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @param id 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public facturationApiFicheTechniquesProduitsRetrieve(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
+    public facturationApiFicheTechniquesProduitsRetrieve(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsRetrieve(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsRetrieve(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsRetrieve.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/facturation_api/fiche-techniques-produits/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<FicheTechniqueProduit>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @param id 
      * @param ficheTechniqueProduit 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public facturationApiFicheTechniquesProduitsUpdate2(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
-    public facturationApiFicheTechniquesProduitsUpdate2(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsUpdate2(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
-    public facturationApiFicheTechniquesProduitsUpdate2(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public facturationApiFicheTechniquesProduitsUpdate(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FicheTechniqueProduit>;
+    public facturationApiFicheTechniquesProduitsUpdate(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsUpdate(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FicheTechniqueProduit>>;
+    public facturationApiFicheTechniquesProduitsUpdate(id: number, ficheTechniqueProduit: FicheTechniqueProduit, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsUpdate2.');
+            throw new Error('Required parameter id was null or undefined when calling facturationApiFicheTechniquesProduitsUpdate.');
         }
         if (ficheTechniqueProduit === null || ficheTechniqueProduit === undefined) {
-            throw new Error('Required parameter ficheTechniqueProduit was null or undefined when calling facturationApiFicheTechniquesProduitsUpdate2.');
+            throw new Error('Required parameter ficheTechniqueProduit was null or undefined when calling facturationApiFicheTechniquesProduitsUpdate.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -12176,6 +12147,59 @@ export class FacturationApiService extends BaseService {
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @param id 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public facturationApiReleveClientRetrieve(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ReleveCompteClient>;
+    public facturationApiReleveClientRetrieve(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ReleveCompteClient>>;
+    public facturationApiReleveClientRetrieve(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ReleveCompteClient>>;
+    public facturationApiReleveClientRetrieve(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling facturationApiReleveClientRetrieve.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/facturation_api/releve-client/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: undefined})}/`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<ReleveCompteClient>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

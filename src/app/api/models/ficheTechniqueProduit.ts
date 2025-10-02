@@ -12,7 +12,11 @@
 export interface FicheTechniqueProduit { 
     readonly id: number;
     produit: number;
+    fiche_technique_id: number;
     readonly produit_libelle: string;
     quantite?: number | null;
+    prix_unitaire?: string | null;
+    designation?: string | null;
+    total?: string | null;
 }
 

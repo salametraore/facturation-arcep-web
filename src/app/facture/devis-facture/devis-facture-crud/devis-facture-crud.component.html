@@ -34,8 +34,7 @@
 
               <mat-form-field>
                 <mat-label>Client</mat-label>
-                <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
-                       placeholder="Cliquez et sélectionnez votre client">
+                <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client">
                 <mat-autocomplete #auto_cl="matAutocomplete">
                   <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
                               [value]="item.denomination_sociale">
@@ -48,18 +47,18 @@
             <div>
               <mat-form-field>
                 <mat-label>Compte comptable</mat-label>
-                <input matInput formControlName="numenroCompte" placeholder="Compte comptable">
+                <input matInput formControlName="numenroCompte" >
               </mat-form-field>
               <mat-form-field>
                 <mat-label>Signataire</mat-label>
-                <input matInput formControlName="signataire" placeholder="Signataire">
+                <input matInput formControlName="signataire" >
               </mat-form-field>
             </div>
 
             <div>
               <mat-form-field>
                 <mat-label>Objet</mat-label>
-                <input matInput formControlName="objet" placeholder="Objet">
+                <input matInput formControlName="objet" >
               </mat-form-field>
             </div>
 
@@ -67,7 +66,7 @@
               <!--              <span class="subsection-label">COMMENTAIRE</span>-->
               <mat-form-field>
                 <mat-label>Commentaire</mat-label>
-                <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>
+                <textarea matInput formControlName="commentaire" ></textarea>
               </mat-form-field>
             </div>
           </form>

@@ -136,41 +136,41 @@ a {
   }
 }
 
-.mat-form-field {
+/*.mat-form-field {
   width: 100%;
-  margin-bottom: 0.8rem; /* Réduit l'espace entre les champs */
+  margin-bottom: 0.8rem; !* Réduit l'espace entre les champs *!
 
-  /* Réduit la taille globale du champ */
+  !* Réduit la taille globale du champ *!
   &.mat-form-field-appearance-outline {
     .mat-form-field-outline {
-      top: -1.2em; /* Ajuste la position de la bordure */
+      top: -1.2em; !* Ajuste la position de la bordure *!
     }
 
     .mat-form-field-infix {
-      padding: 0.3em 0; /* Réduit le padding interne */
+      padding: 0.3em 0; !* Réduit le padding interne *!
     }
   }
 
-  /* Réduit la taille de la police */
+  !* Réduit la taille de la police *!
   .mat-input-element {
-    font-size: 0.9rem; /* Taille de police plus petite */
+    font-size: 0.9rem; !* Taille de police plus petite *!
     line-height: 1.2;
   }
 
-  /* Réduit la taille du label */
+  !* Réduit la taille du label *!
   .mat-form-field-label {
     font-size: 0.9rem;
     line-height: 1.2;
-    top: -0.8em; /* Ajuste la position du label */
+    top: -0.8em; !* Ajuste la position du label *!
   }
 
   .app-toolbar {
-    display: flex;           /* assure le layout en flex */
+    display: flex;           !* assure le layout en flex *!
     align-items: center;
   }
 
   .app-toolbar .push-right {
-    margin-left: auto;       /* pousse le bloc à droite */
+    margin-left: auto;       !* pousse le bloc à droite *!
     display: flex;
     align-items: center;
     gap: .5rem;
@@ -189,4 +189,73 @@ a {
     line-height: 1;
   }
 
+}*/
+
+/* === Densité globale “compacte” Material (propre, maintenable) === */
+@include mat.form-field-density(-2);
+@include mat.input-density(-2);
+@include mat.select-density(-2);
+@include mat.button-density(-1);
+/* (optionnel) si tu utilises beaucoup les tables : */
+// @include mat.table-density(-1);
+
+
+/* ——— Rythme vertical universel pour les formulaires ——— */
+
+/* 1) Entre deux champs consécutifs */
+form .mat-mdc-form-field + .mat-mdc-form-field {
+  margin-top: 8px;         /* ajuste à 6/10px si tu veux */
+}
+
+/* 2) Entre deux conteneurs "ligne" quel que soit le markup */
+form .form-row + .form-row,
+form .row + .row,
+form [fxlayout="row"] + [fxlayout="row"] {
+  margin-top: 8px;
+}
+
+/* 3) Cas stepper/dialog (au besoin) */
+.mat-stepper-horizontal .mat-step .mat-mdc-form-field + .mat-mdc-form-field,
+[mat-dialog-content] form .mat-mdc-form-field + .mat-mdc-form-field {
+  margin-top: 8px;
+}
+
+/* 4) La sous-ligne Material ne rajoute pas d'air parasite */
+.mat-mdc-form-field-subscript-wrapper {
+  margin-top: 0;
+}
+
+
+
+/* */
+
+/* ===== Rythme vertical global pour les champs ===== */
+/* Paramètre : adapte la valeur une fois pour toutes */
+:root { --app-field-gap: 10px; }  /* 8–12px selon ton goût */
+
+/* 1) Chaque mat-form-field prend toute la ligne et ajoute un "air" dessous */
+mat-form-field {
+  display: block;                            /* évite l’empilement serré inline */
+  margin: 0 0 var(--app-field-gap) 0;        /* espace sous chaque champ */
+}
+
+/* 2) Quand deux champs se suivent dans le même conteneur, encore un petit gap "au-dessus" du suivant
+      (utile si un wrapper met à 0 le margin-bottom, ou dans certains layouts) */
+.mat-mdc-form-field + .mat-mdc-form-field {
+  margin-top: var(--app-field-gap);
+}
+
+/* 3) Si tu utilises des "lignes" explicites, garde un peu d’air entre elles aussi */
+form .form-row + .form-row,
+form .row + .row,
+form [fxlayout="row"] + [fxlayout="row"] {
+  margin-top: var(--app-field-gap);
+}
+
+/* 4) La sous-ligne Material ne rajoute pas d’air parasite */
+.mat-mdc-form-field-subscript-wrapper { margin-top: 0; }
+
+/* 5) Variante mobile (un peu plus serré si tu veux) */
+@media (max-width: 599.98px) {
+  :root { --app-field-gap: 8px; }
 }

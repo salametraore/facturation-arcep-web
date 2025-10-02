@@ -1,5 +1,4 @@
 import { LignesFactures } from './lignesFactures';
-import { EtatEnum } from './etatEnum';
 
 export class Facture {
   id?: number;

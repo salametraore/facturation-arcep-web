@@ -28,12 +28,16 @@ export interface PatchedFicheTechnique {
     position?: number;
     position_direction?: number | null;
     categorie_produit?: number;
-    statut?: StatutFicheTechnique;
+    statut?: StatutFicheTechnique | null;
     documents?: Array<string>;
     readonly documents_detail?: Array<FicheTechniqueDocument>;
     objet?: string | null;
     commentaire?: string | null;
     avis?: AvisEnum;
+    duree?: number | null;
+    date_fin?: string | null;
+    date_debut?: string | null;
+    periode?: string | null;
 }
 export namespace PatchedFicheTechnique {
 }

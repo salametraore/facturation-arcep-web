@@ -38,6 +38,7 @@ export interface PatchedFacture {
     position?: number;
     readonly categorie_produit?: string;
     type_frais?: TypeFraisEnum;
+    periode?: string | null;
 }
 export namespace PatchedFacture {
 }

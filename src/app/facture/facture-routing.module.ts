@@ -17,6 +17,9 @@ import {FactureRecuDfcComponent} from "./facture-recu-dfc/facture-recu-dfc.compo
 import {EncaissementComponent} from "./encaissement/encaissement.component";
 import {DevisFactureComponent} from "./devis-facture/devis-facture.component";
 import {ElementsFactureRecuComponent} from "./elements-facture-recu/elements-facture-recu.component";
+import {FicherTechniqueDfcComponent} from "./ficher-technique-dfc/ficher-technique-dfc.component";
+import {ServiceAValeurAjouteComponent} from "./service-a-valeur-ajoute/service-a-valeur-ajoute.component";
+import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisation-generale.component";
 
 const routes: Routes = [
   {
@@ -35,6 +38,9 @@ const routes: Routes = [
       {path: 'facture-recu-dfc', component: FactureRecuDfcComponent},
       {path: 'encaissement', component: EncaissementComponent},
       {path: 'devis-facure', component: DevisFactureComponent},
+      {path: 'prestations-divers', component: FicherTechniqueDfcComponent},
+      {path: 'service-a-valeur-ajoute', component: ServiceAValeurAjouteComponent},
+      {path: 'autorisation-generale', component: AutorisationGeneraleComponent},
     ]
   }
 ];

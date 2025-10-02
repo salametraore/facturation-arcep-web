@@ -10,13 +10,18 @@
 
 
 /**
- * * `FD` - Frais de dossier * `GA` - Garantie * `RD` - Redevance annuelle * `RC` - Redevance de contrôle
+ * * `FD` - Frais de dossier * `GA` - Garantie * `RD` - Redevance annuelle * `RC` - Redevance de contrôle * `EL` - Electricité * `LO` - Loyer * `IN` - Inscription * `RA` - Restauration * `DA` - Dossier d\'Appel d\'Offre 
  */
 export const TypeFraisEnum = {
     Fd: 'FD',
     Ga: 'GA',
     Rd: 'RD',
-    Rc: 'RC'
+    Rc: 'RC',
+    El: 'EL',
+    Lo: 'LO',
+    In: 'IN',
+    Ra: 'RA',
+    Da: 'DA'
 } as const;
 export type TypeFraisEnum = typeof TypeFraisEnum[keyof typeof TypeFraisEnum];
 
