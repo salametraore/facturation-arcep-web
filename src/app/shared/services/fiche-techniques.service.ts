@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {
+  AvisEtudeTechnique,
   FicheTechniques,
   MiseAJourStatutFiche,
   RequestGenererFacture
@@ -23,16 +24,16 @@ export class FicheTechniquesService {
     return this.http.get<FicheTechniques>(`${this.baseUrl}/${id}`);
   }
 
+  setAvis(avisEtudeTechnique: AvisEtudeTechnique): Observable<AvisEtudeTechnique> {
+    console.log(avisEtudeTechnique);
+    return this.http.post<AvisEtudeTechnique>(`${environment.baseUrl}/update-avis-fiche-technique/`, avisEtudeTechnique);
+  }
+
   create(ficheTechniqueData: FormData): Observable<FicheTechniques> {
-    console.log('--- Contenu du FormData ---');
-    for (const pair of (ficheTechniqueData as any).entries()) {
-      console.log(`${pair[0]}:`, pair[1]);
-    }
     return this.http.post<FicheTechniques>(`${this.baseUrl}/`, ficheTechniqueData);
   }
 
   update(id: number, ficheTechniqueData: FormData): Observable<FicheTechniques> {
-    console.log(FormData.toString())
     return this.http.put<FicheTechniques>(`${this.baseUrl}/${id}/`, ficheTechniqueData);
   }
 

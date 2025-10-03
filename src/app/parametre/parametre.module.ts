@@ -4,12 +4,12 @@ import {ParametreRoutingModule} from './parametre-routing.module';
 import {SharedModule} from '../shared/shared.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PdfViewerModule} from 'ng2-pdf-viewer';
-import {DomaineComponent} from "./domaine/domaine.component";
-import {DomaineCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
-import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
-import {
-  ServiceConfianceCrudComponent
-} from "./service-confiance/service-confiance-crud/service-confiance-crud.component";
+// import {DomaineComponent} from "./domaine/domaine.component";
+// import {DomaineCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
+// import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
+// import {
+//   ServiceConfianceCrudComponent
+// } from "./service-confiance/service-confiance-crud/service-confiance-crud.component";
 import {ClientComponent} from "./client/client.component";
 import {ClientCrudComponent} from "./client/client-crud/client-crud.component";
 import {ClientTablesComponent} from "./client/client-tables/client-tables.component";
@@ -48,10 +48,10 @@ import {CategorieStationComponent} from "./categorie-station/categorie-station.c
 
 @NgModule({
   declarations: [
-    DomaineComponent,
-    DomaineCrudComponent,
-    ServiceConfianceComponent,
-    ServiceConfianceCrudComponent,
+    // DomaineComponent,
+    // DomaineCrudComponent,
+    // ServiceConfianceComponent,
+    // ServiceConfianceCrudComponent,
     ClientComponent,
     ClientCrudComponent,
     ClientTablesComponent,

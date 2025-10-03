@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from "@angular/material/table";
-import {FicheTechniques} from "../../shared/models/ficheTechniques";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {CategorieProduit} from "../../shared/models/categorie-produit";
@@ -11,11 +10,7 @@ import {ProduitService} from "../../shared/services/produits.service";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {DialogService} from "../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
-import {
-  ServiceConfianceCrudComponent
-} from "../../parametre/service-confiance/service-confiance-crud/service-confiance-crud.component";
-import {DomaineCrudComponent} from "../../parametre/domaine/domaine-crud/domaine-crud.component";
-import {operations} from "../../constantes";
+import {operations, TYPE_FRAIS} from "../../constantes";
 import {Direction} from "../../shared/models/direction";
 import {DirectionService} from "../../shared/services/direction.service";
 import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
@@ -53,7 +48,7 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
   direction:Direction;
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
-
+  TYPE_FRAIS = TYPE_FRAIS;
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
     private categorieProduitService: CategorieProduitService,
@@ -137,24 +132,6 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
     }
   }
 
-  onDelete(elementFacturation: ElementFacturationRecuCreeList) {
-    this.dialogService.yes_no({message: " Voulez-vous supprimer cet enregistrement"}).subscribe(yes_no => {
-      if (yes_no === true) {
-        // this.ficheTechniquesService
-        //   .delete(elementFacturation.element_facturation_recu_id)
-        //   .subscribe(
-        //     (data) => {
-        //       this.msgMessageService.success('Supprimé avec succès');
-        //       this.reloadData();
-        //     },
-        //     (error => {
-        //       this.dialogService.alert({message: error});
-        //     })
-        //   );
-      }
-    });
-  }
-
   onRowClicked(row) {
     if (this.selectedRow && this.selectedRow != row) {
       this.selectedRow = row;
@@ -198,5 +175,9 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
 
   onGetDirection(item: Direction) {
     this.direction = item;
+  }
+
+  getTypeFrais(type_frais:string){
+    return this.TYPE_FRAIS.find(t=>t.code===type_frais)?.label;
   }
 }

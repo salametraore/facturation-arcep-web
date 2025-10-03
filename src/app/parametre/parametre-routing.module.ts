@@ -1,9 +1,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {DefaultComponent} from '../shared/components/default/default.component';
-import {DomaineCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
-import {DomaineComponent} from "./domaine/domaine.component";
-import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
 import {ClientComponent} from "./client/client.component";
 import {CategorieProduitComponent} from "./categorie-produit/categorie-produit.component";
 import {CategorieStationComponent} from "./categorie-station/categorie-station.component";
@@ -19,9 +16,6 @@ const routes: Routes = [
   {
     path: '', component: DefaultComponent,
     children: [
-      {path: 'marques', component: DomaineCrudComponent},
-      {path: 'domaines', component: DomaineComponent},
-      {path: 'service-confiance', component: ServiceConfianceComponent},
       {path: 'clients', component: ClientComponent},
       {path: 'categorie-produits', component: CategorieProduitComponent},
       {path: 'categorie-stations', component: CategorieStationComponent},

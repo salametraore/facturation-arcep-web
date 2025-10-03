@@ -1,5 +1,4 @@
 
-
 export class FicheTechniqueProduit {
   readonly id: number;
   produit: number;
@@ -9,14 +8,8 @@ export class FicheTechniqueProduit {
   quantite?: number | null;
   prix_unitaire?: number | null;
   total?: string | null;
+  marque?: string | null;
+  modele?: string | null;
+  plage_numero?: string | null;
 }
 
-export class FicheTechniquesProduitsNouveau {
-    id?: number;
-    produit?: number;
-    produit_libelle?: string;
-    designation?: string;
-    quantite?: number | null;
-    prix_unitaire?: number | null;
-    total?: number | null;
-}

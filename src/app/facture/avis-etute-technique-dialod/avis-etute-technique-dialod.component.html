@@ -1,0 +1,82 @@
+<div>
+  <form (ngSubmit)="crud()" [formGroup]="form">
+    <div mat-dialog-content>
+      <h2>Avis sur fiche technique</h2>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Client</mat-label>
+          <input matInput formControlName="client" matInput matTooltip="Client" placeholder="Client" readonly>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Objet</mat-label>
+          <input matInput formControlName="objet" matInput matTooltip="Objet" placeholder="Objet" readonly>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Catégorie</mat-label>
+          <input matInput formControlName="categorie_produit" matInput matTooltip="Catégorie" placeholder="Catégorie"
+                 readonly>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Commentaire</mat-label>
+          <input matInput formControlName="commentaire" matInput matTooltip="Commentaire" placeholder="Commentaire"
+                 readonly>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Avis</mat-label>
+          <mat-select formControlName="avis" matTooltip="Avis" placeholder="Avis" required>
+            <mat-option *ngFor="let avis of avisChoices" [value]="avis.value">
+              {{ avis.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="date-row">
+        <mat-form-field>
+          <mat-label>Date début</mat-label>
+          <input matInput [matDatepicker]="pickerStart" formControlName="date_debut" matTooltip="Date début"
+                 placeholder="Date début" required>
+          <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+          <mat-datepicker #pickerStart></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Durée</mat-label>
+          <input matInput formControlName="duree" matTooltip="Durée" type="number" placeholder="Durée" required>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Date fin</mat-label>
+          <input matInput [matDatepicker]="pickerEnd" formControlName="date_fin" matTooltip="Date fin"
+                 placeholder="Date fin" readonly>
+          <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+          <mat-datepicker #pickerEnd></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+    </div>
+    <div align="end" mat-dialog-actions>
+      <button [disabled]="form.invalid" color="primary" mat-button type="submit">
+        <mat-icon>save</mat-icon>
+        {{this.bouton_names.save}}
+      </button>
+      <button color="warn" mat-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+        {{this.bouton_names.cancel}}
+      </button>
+    </div>
+  </form>
+</div>

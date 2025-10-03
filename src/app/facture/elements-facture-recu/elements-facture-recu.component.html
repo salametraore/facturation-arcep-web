@@ -103,7 +103,7 @@
 
             <ng-container matColumnDef="type_frais">
               <th *matHeaderCellDef mat-header-cell mat-sort-header> Type frais</th>
-              <td *matCellDef="let element" mat-cell> Frais de dossier </td>
+              <td *matCellDef="let element" mat-cell> {{getTypeFrais(element.type_frais)}} </td>
             </ng-container>
 
       <ng-container matColumnDef="actions">
@@ -117,10 +117,6 @@
             <button (click)="crud(element,this.operations.update)" mat-menu-item>
               <mat-icon color="warn">edit</mat-icon>
               Traiter
-            </button>
-            <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
-              <mat-icon color="warn">delete</mat-icon>
-              Supprimer
             </button>
           </mat-menu>
         </td>

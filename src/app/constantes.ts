@@ -109,13 +109,21 @@ export interface Libelle {
   libelle: string
 };
 
+export const AVIS = [
+  { value: 'FAV', label: 'Avis favorable' },
+  { value: 'DEF', label: 'Avis défavorable' },
+  { value: 'NOF', label: 'Avis non fourni' }
+];
 
-/**
- * * `FD` - Frais de dossier * `GA` - Garantie * `RD` - Redevance annuelle * `RC` - Redevance de contrôle
- */
-export const TypeFraisEnum = {
-  Fd: 'FD',
-  Ga: 'GA',
-  Rd: 'RD',
-  Rc: 'RC'
-};
+
+export const TYPE_FRAIS = [
+  { code: 'FD', label: 'Frais de dossier' },
+  { code: 'GA', label: 'Garantie' },
+  { code: 'RD', label: 'Redevance annuelle' },
+  { code: 'RC', label: 'Redevance de contrôle' },
+  { code: 'EL', label: 'Electricité' },
+  { code: 'LO', label: 'Loyer' },
+  { code: 'IN', label: 'Inscription' },
+  { code: 'RA', label: 'Restauration' },
+  { code: 'DA', label: "Dossier d'Appel d'Offre" }
+];

@@ -48,10 +48,30 @@ import {
 import {
   AutorisationGeneraleCrudComponent
 } from "./autorisation-generale/autorisation-generale-crud/autorisation-generale-crud.component";
+import { AgrementInstalleurComponent } from './agrement-installeur/agrement-installeur.component';
+import { AgrementInstalleurCrudComponent } from './agrement-installeur/agrement-installeur-crud/agrement-installeur-crud.component';
+import { AgrementInstalleurTableComponent } from './agrement-installeur/agrement-installeur-table/agrement-installeur-table.component';
+import { NumerotationComponent } from './numerotation/numerotation.component';
+import { NumerotationTableComponent } from './numerotation/numerotation-table/numerotation-table.component';
+import { NumerotationCrudComponent } from './numerotation/numerotation-crud/numerotation-crud.component';
+import { AgrementEquipementComponent } from './agrement-equipement/agrement-equipement.component';
+import { AgrementEquipementTableComponent } from './agrement-equipement/agrement-equipement-table/agrement-equipement-table.component';
+import { AgrementEquipementCrudComponent } from './agrement-equipement/agrement-equipement-crud/agrement-equipement-crud.component';
+import {DomaineComponent} from "./domaine/domaine.component";
+import {DomaineCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
+import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
+import {
+  ServiceConfianceCrudComponent
+} from "./service-confiance/service-confiance-crud/service-confiance-crud.component";
+import {AvisEtuteTechniqueDialodComponent} from "./avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 
 
 @NgModule({
   declarations: [
+    DomaineComponent,
+    DomaineCrudComponent,
+    ServiceConfianceComponent,
+    ServiceConfianceCrudComponent,
     FactureComponent,
     FactureDfcComponent,
     FactureDetailDfcEnergieComponent,
@@ -76,7 +96,17 @@ import {
     ServiceAValeurAjouteCrudComponent,
     AutorisationGeneraleComponent,
     AutorisationGeneraleTableComponent,
-    AutorisationGeneraleCrudComponent
+    AutorisationGeneraleCrudComponent,
+    AgrementInstalleurComponent,
+    AgrementInstalleurCrudComponent,
+    AgrementInstalleurTableComponent,
+    NumerotationComponent,
+    NumerotationTableComponent,
+    NumerotationCrudComponent,
+    AgrementEquipementComponent,
+    AgrementEquipementTableComponent,
+    AgrementEquipementCrudComponent,
+    AvisEtuteTechniqueDialodComponent,
   ],
   imports: [
     CommonModule,

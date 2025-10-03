@@ -75,11 +75,14 @@ export class MainNavComponent implements OnInit {
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
         { id: 2005, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-fiche-technique' },
-        { id: 2010, titre: 'Noms de domaine', description: 'Noms de domaine', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/domaines' },
-        { id: 2015, titre: 'Service de confiance', description: 'Service de confiance', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/service-confiance' },
+        { id: 2010, titre: 'Noms de domaine', description: 'Noms de domaine', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/domaines' },
+        { id: 2015, titre: 'Service de confiance', description: 'Service de confiance', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-confiance' },
         { id: 2020, titre: 'Prestations diverses', description: 'Prestations diverses', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/prestations-divers' },
         { id: 2025, titre: 'Services à valeur ajoutée', description: 'Services à valeur ajoutée', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-a-valeur-ajoute' },
         { id: 2030, titre: 'Autorisation générale', description: 'Autorisation générale', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/autorisation-generale' },
+        { id: 2040, titre: 'Agrement installateur', description: 'Agrement d\'installateur', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-installeur' },
+        { id: 2045, titre: 'Numérotation', description: 'Numérotation', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/numerotation' },
+        { id: 2050, titre: 'Agrément equipement', description: 'Agrément equipement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-equipement' },
       ]
     },
     {

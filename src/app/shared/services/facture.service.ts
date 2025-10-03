@@ -35,6 +35,12 @@ export class FactureService {
     return this.http.get<Facture[]>(`${this.baseUrl}`);
   }
 
+  getListFacturesByEtat(id:number,etat:string) : Observable<Facture[]> {
+    let params = new HttpParams();
+    params.set('etat',etat)
+    return this.http.get<Facture[]>(`${this.baseUrl}/${id}`,{params});
+  }
+
   getFacturesEnAttentesByClientId(client_id:number) : Observable<Facture[]> {
     let params = new HttpParams();
     params.set('client',client_id.toString())

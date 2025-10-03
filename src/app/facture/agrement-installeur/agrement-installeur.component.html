@@ -1,0 +1,8 @@
+
+<agrement-installeur-table *ngIf="operation===operations.table" (notifyActionOperation)="onGetOperation($event)"
+                             (notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></agrement-installeur-table>
+
+
+<agrement-installeur-crud *ngIf="operation!=operations.table" [operation]="operation"  [ficheTechnique]="fichetTechnique"   (notifyActionOperation)="onGetOperation($event)"
+                            (notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></agrement-installeur-crud>
+

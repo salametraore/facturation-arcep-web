@@ -1,51 +1,55 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
-import {FormControl} from "@angular/forms";
 import {MatTableDataSource} from "@angular/material/table";
+import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {FicheTechniques} from "../../shared/models/ficheTechniques";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
-import {CategorieProduit} from "../../shared/models/categorie-produit";
-import {Produit} from "../../shared/models/produit";
+import {operations} from "../../constantes";
+import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
+import {DialogService} from "../../shared/services/dialog.service";
 import {FicheTechniquesService} from "../../shared/services/fiche-techniques.service";
+import {CategorieProduit} from "../../shared/models/categorie-produit";
 import {CategorieProduitService} from "../../shared/services/categorie-produit.service";
 import {ProduitService} from "../../shared/services/produits.service";
-import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
-import {DialogService} from "../../shared/services/dialog.service";
-import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
-import {operations} from "../../constantes";
-import {FactureRecuDfcCrudComponent} from "./facture-recu-dfc-crud/facture-recu-dfc-crud.component";
-import {
-  ServiceConfianceCrudComponent
-} from "../service-confiance/service-confiance-crud/service-confiance-crud.component";
-import {DomaineCrudComponent} from "../domaine/domaine-crud/domaine-crud.component";
+import {Produit} from "../../shared/models/produit";
+import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
+import {StatutFicheTechniqueService} from "../../shared/services/statut-fiche-technique.service";
+import {Client} from "../../shared/models/client";
+import {ClientService} from "../../shared/services/client.service";
+import {DomaineCrudComponent} from "./domaine-crud/domaine-crud.component";
+import {AvisEtuteTechniqueDialodComponent} from "../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 
 @Component({
-  selector: 'app-facture-recu-dfc',
-  templateUrl: './facture-recu-dfc.component.html',
-  styleUrl: './facture-recu-dfc.component.scss'
+  selector: 'app-domaine',
+  templateUrl: './domaine.component.html',
+  styleUrl: './domaine.component.scss'
 })
-export class FactureRecuDfcComponent  implements OnInit, AfterViewInit {
+export class DomaineComponent implements OnInit, AfterViewInit {
 
-  @Input() fixeCategorie:number;
+  @Input() fixeCategorie: number;
 
   ficheTechniques?: MatTableDataSource<FicheTechniques>;
-  displayedColumns: string[] = ['client_nom', 'date_creation','categorie_produit','statut', 'actions'];
+  displayedColumns: string[] = ['client_nom', 'date_creation', 'categorie_produit', 'statut.libelle', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   public operations = operations;
   selectedRow: any = undefined;
-  nomClient:any;
-  startDate :any;
-  endDate :any;
-  serviceFilter :any;
-  statusFilter :any;
-  categories:CategorieProduit[];
-  produits:Produit[];
+  nomClient: any;
+  startDate: any;
+  endDate: any;
+  serviceFilter: any;
+  statusFilter: any;
+  categories: CategorieProduit[];
+  produits: Produit[];
+  statutFicheTechniques: StatutFicheTechnique[];
+  clients: Client[];
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
     private categorieProduitService: CategorieProduitService,
     private produitService: ProduitService,
+    private clientService: ClientService,
+    private statutFicheTechniqueService: StatutFicheTechniqueService,
     public dialog: MatDialog,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
@@ -65,15 +69,22 @@ export class FactureRecuDfcComponent  implements OnInit, AfterViewInit {
 
   reloadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
-      this.categories= categories;
+      this.categories = categories;
     });
+
+    this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
+      this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
+    });
+    this.clientService.getItems().subscribe((clients: Client[]) => {
+      this.clients = clients;
+    });
+
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits.filter(f=>f.categorieProduit===this.fixeCategorie);
+      this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
     this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response.filter(f=>f.categorie_produit===this.fixeCategorie);
-
+      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
     });
   }
 
@@ -87,36 +98,7 @@ export class FactureRecuDfcComponent  implements OnInit, AfterViewInit {
     const fixeCategorie = this.fixeCategorie;
     dialogConfig.width = '1024px';
     dialogConfig.autoFocus = true;
-    dialogConfig.data = {ficheTechnique,fixeCategorie, operation};
-    dialogConfig.disableClose = true;
-    let ref = this.dialog.open(FactureRecuDfcCrudComponent, dialogConfig);
-    ref.afterClosed().subscribe(() => {
-      this.reloadData();
-    }, error => {
-
-    });
-  }
-
-  onServiceConfaince(ficheTechnique?: FicheTechniques, operation?: string) {
-    const dialogConfig = new MatDialogConfig();
-    const fixeCategorie = this.fixeCategorie;
-    dialogConfig.width = '1024px';
-    dialogConfig.autoFocus = true;
-    dialogConfig.data = {ficheTechnique,fixeCategorie, operation};
-    dialogConfig.disableClose = true;
-    let ref = this.dialog.open(ServiceConfianceCrudComponent, dialogConfig);
-    ref.afterClosed().subscribe(() => {
-      this.reloadData();
-    }, error => {
-
-    });
-  }
-  onDomaine(ficheTechnique?: FicheTechniques, operation?: string) {
-    const dialogConfig = new MatDialogConfig();
-    const fixeCategorie = this.fixeCategorie;
-    dialogConfig.width = '1024px';
-    dialogConfig.autoFocus = true;
-    dialogConfig.data = {ficheTechnique,fixeCategorie, operation};
+    dialogConfig.data = {ficheTechnique, fixeCategorie, operation};
     dialogConfig.disableClose = true;
     let ref = this.dialog.open(DomaineCrudComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
@@ -177,7 +159,26 @@ export class FactureRecuDfcComponent  implements OnInit, AfterViewInit {
 
   }
 
-  getCategorie(id:number){
-    return this.categories?.find(cat=>cat.id===id).libelle;
+  getCategorie(id: number) {
+    return this.categories?.find(cat => cat.id === id).libelle;
   }
+
+  getStatut(id: number) {
+    return this.statutFicheTechniques?.find(st => st.id === id).libelle;
+  }
+
+  onSetAvis(ficheTechnique: FicheTechniques, operation?: string) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '800px';
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {ficheTechnique, operation};
+    dialogConfig.disableClose = true;
+    let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    ref.afterClosed().subscribe(() => {
+      this.reloadData();
+    }, error => {
+
+    });
+  }
+
 }

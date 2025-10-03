@@ -39,3 +39,11 @@ export class RequestGenererFacture {
   objet?: string;
   signataire?: string;
 }
+
+export class AvisEtudeTechnique {
+  fiche_technique?: number | null;
+  avis?: string;
+  date_debut?: Date | null;
+  duree?: number | null;
+  nouveau_statut?: number | null;
+}
