@@ -144,6 +144,9 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       signataire: this.form.get('signataire').value
     };
 
+    console.log(payload.toString())
+    console.log(this.ficheTechniqueAFacturer.toString())
+
     if(this.ficheTechniqueAFacturer?.type_frais==='FD'){
       this.genererDossierFacture(payload);
     }else if(this.ficheTechniqueAFacturer?.type_frais==='RD'){
