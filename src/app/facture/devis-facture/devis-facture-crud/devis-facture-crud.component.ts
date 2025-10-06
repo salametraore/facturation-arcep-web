@@ -11,11 +11,12 @@ import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog
 import {DialogService} from "../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {AuthService} from "../../../authentication/auth.service";
-import {bouton_names, operations} from "../../../constantes";
+import {bouton_names, date_converte, operations} from "../../../constantes";
 import {MatTableDataSource} from "@angular/material/table";
 import {Facture} from "../../../shared/models/facture";
 import {LignesFactures} from "../../../shared/models/lignesFactures";
 import {FactureService} from "../../../shared/services/facture.service";
+import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 
 @Component({
   selector: 'app-devis-facture-crud',
@@ -43,6 +44,7 @@ export class DevisFactureCrudComponent implements OnInit {
   errorMessage: any;
   nomClient: any;
   montant: number;
+  workflowHistories:WorkflowHistory[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -104,6 +106,10 @@ export class DevisFactureCrudComponent implements OnInit {
     if (this.facture) {
       this.t_LignesFactures.data = this.facture?.lignes_facture;
     }
+
+    this.ficheTechniquesService.getWorkflowHistoryById(this.facture?.fiche_technique).subscribe((workflowHistories:WorkflowHistory[]) => {
+      this.workflowHistories = workflowHistories;
+    });
   }
 
   initForm_update() {
@@ -111,13 +117,19 @@ export class DevisFactureCrudComponent implements OnInit {
       id: [this.facture?.id],
       client: [this.facture?.client],
       objet: [this.facture?.objet],
+      reference: [this.facture?.reference],
+      date_reception: [this.facture?.date_reception],
+      date_echeance : [this.facture?.date_echeance],
       numenroCompte: [],
       signataire: [this.facture?.signataire],
       commentaire: [this.facture?.commentaire],
-      direction: [2],
-      statut: [1],
-      position: [1],
-      etat: ['INIT'],
+      etat: [this.facture?.etat],
+      montant: [this.facture?.montant],
+      fiche_technique: [this.facture?.fiche_technique],
+      direction_technique: [this.facture?.direction_technique],
+      position_direction: [this.facture?.position_direction],
+      type_frais : [this.facture?.type_frais],
+      categorie_produit: [this.facture?.categorie_produit],
     });
     this.montant = this.facture?.montant;
   }
@@ -127,23 +139,53 @@ export class DevisFactureCrudComponent implements OnInit {
       id: [],
       client: [],
       objet: [],
+      reference: [],
+      date_reception: [],
+      date_echeance : [],
       numenroCompte: [],
       signataire: [],
       commentaire: [],
-      direction: [2],
-      statut: [1],
-      position: [1],
-      etat: ['INIT'],
+      montant: [],
+      fiche_technique: [],
+      direction_technique: [],
+      position_direction: [],
+      etat: ['EN_ATTENTE'],
+      type_frais: [],
+      categorie_produit: [],
     });
   }
 
+
+
   crud() {
     const formValue = this.form.value;
+
+    const toIsoLocal = (d: any): string => {
+      const x = (d instanceof Date) ? d : new Date(d);
+      const y = x.getFullYear();
+      const m = String(x.getMonth() + 1).padStart(2, '0');
+      const day = String(x.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
     const facture: Facture = new Facture();
     facture.id = this.facture?.id;
     facture.objet = formValue['objet'];
     facture.commentaire = formValue['commentaire'];
     facture.signataire = formValue['signataire'];
+    facture.client= this.client.id;
+    facture.reference= formValue['reference'];
+    facture.montant= formValue['montant'];
+    facture.fiche_technique= formValue['fiche_technique'];
+    facture.direction_technique= formValue['direction_technique'];
+    facture.position_direction= formValue['position_direction'];
+    facture.etat= formValue['etat'];
+    facture.date_reception= date_converte(formValue['date_reception']);
+    facture.date_echeance= date_converte(formValue['date_echeance'] ) ;
+    facture.categorie_produit=formValue['categorie_produit'];
+    facture.type_frais=formValue['type_frais'];
+
+    console.log(facture);
     this.factureService.update(this.facture?.id, facture).subscribe((facture: Facture) => {
       this.facture = facture;
       this.msgMessageService.success("Facture modifiée avec succès !");

@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from "@angular/material/table";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
-import {FicheTechniques} from "../../shared/models/ficheTechniques";
+import {ChercheFiche, FicheTechniques} from "../../shared/models/ficheTechniques";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
-import {operations} from "../../constantes";
+import {date_converte, operations} from "../../constantes";
 import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
 import {DialogService} from "../../shared/services/dialog.service";
 import {FicheTechniquesService} from "../../shared/services/fiche-techniques.service";
@@ -43,6 +43,7 @@ export class DomaineComponent implements OnInit, AfterViewInit {
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+  client: Client;
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -152,12 +153,16 @@ export class DomaineComponent implements OnInit, AfterViewInit {
   }
 
   reset() {
-
+    this.startDate = undefined;
+    this.endDate = undefined;
+    this.statusFilter = undefined;
+    this.nomClient = undefined;
+    this.client = undefined;
+    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
+      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
+    });
   }
 
-  checher() {
-
-  }
 
   getCategorie(id: number) {
     return this.categories?.find(cat => cat.id === id).libelle;
@@ -177,8 +182,23 @@ export class DomaineComponent implements OnInit, AfterViewInit {
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {
-
     });
   }
 
+  cherche(){
+    const chercheFiche: ChercheFiche = new ChercheFiche();
+    chercheFiche.categorie_produit = this.fixeCategorie;
+    chercheFiche.client = this.client?.id;
+    chercheFiche.date_debut = date_converte(this.startDate);
+    chercheFiche.date_fin = date_converte(this.endDate);
+    chercheFiche.statut = this.statusFilter;
+    this.ficheTechniquesService.getFicheTechniques(chercheFiche).subscribe((response: FicheTechniques[]) => {
+      console.log(response.filter(f => f.categorie_produit === this.fixeCategorie))
+      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
+    });
+  }
+
+  onGetClient(item: Client) {
+    this.client = item;
+  }
 }

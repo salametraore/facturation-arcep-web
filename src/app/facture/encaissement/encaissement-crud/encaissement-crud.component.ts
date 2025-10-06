@@ -161,10 +161,8 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
     this.somme_affectee = this.t_Affectation1.data?.reduce((total, a) => total + (Number(a.montant_affecte) || 0), 0);
   }
 
-
   onMontantAffecteChange1(): void {
     if (!this.t_Affectation1?.data) return;
-
     this.somme_affectee = this.t_Affectation1.data
       .filter(a => a.montant_affecte && a.montant_affecte > 0)
       .reduce((total, a) => total + a.montant_affecte!, 0);
@@ -173,14 +171,15 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
   getInfosComplementaire(client: Client) {
     this.client = client;
     if (!this.encaissementDetail) {
-      this.factureService.getFacturesEnAttentesByClientId(client.id).subscribe((factures: Facture[]) => {
-        this.facturesImpayees = factures.filter(f => f.etat === 'INIT');
+      this.factureService.getListFacturesByEtat(client.id,'EN_ATTENTE').subscribe((factures: Facture[]) => {
+        console.log(factures);
+        //this.facturesImpayees = factures.filter(f => f.etat === 'INIT');
+        this.facturesImpayees =factures;
         let affectations: Affectation[] = this.facturesImpayees.map(a => ({
           facture_id: a.id,
           date_affectation: a.date_echeance,
           montant: a.montant
         }));
-
         setTimeout(() => {
           this.t_Affectation1.data = [...affectations];
         }, 1000);

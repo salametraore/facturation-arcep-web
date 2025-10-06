@@ -5,7 +5,7 @@ import {CategorieProduit} from "../../../../shared/models/categorie-produit";
 import {Produit} from "../../../../shared/models/produit";
 import {Client} from "../../../../shared/models/client";
 import {MatTableDataSource} from "@angular/material/table";
-import {LigneReleveCompteClient} from "../../../../shared/models/ligne-releve-compte-client";
+import {ReleveCompteClient} from "../../../../shared/models/ligne-releve-compte-client";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {FicheTechniquesService} from "../../../../shared/services/fiche-techniques.service";
@@ -38,9 +38,9 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
-  t_LigneReleveCompteClient?: MatTableDataSource<LigneReleveCompteClient>;
+  t_ReleveCompteClient?: MatTableDataSource<ReleveCompteClient>;
 
-  displayedColumns: string[] = ['date_echeance', 'reference','produit','montant_facture','montant_encaissement'];
+  displayedColumns: string[] = ['date_echeance', 'reference','montant_facture','montant_encaissement'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -62,7 +62,7 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
     this.detailFicheClient = data.detailFicheClient;
     this.data_operation = data.operation;
     this.fixeCategorie = data.fixeCategorie;
-    this.t_LigneReleveCompteClient = new MatTableDataSource<LigneReleveCompteClient>([]);
+    this.t_ReleveCompteClient = new MatTableDataSource<ReleveCompteClient>([]);
   }
 
   ngOnInit(): void {
@@ -70,8 +70,8 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.t_LigneReleveCompteClient.paginator = this.paginator;
-    this.t_LigneReleveCompteClient.sort = this.sort;
+    this.t_ReleveCompteClient.paginator = this.paginator;
+    this.t_ReleveCompteClient.sort = this.sort;
   }
 
   reloadData() {
@@ -81,15 +81,20 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
       if(this.detailFicheClient){
         this.client = clients?.find(c=>c.id ===this.detailFicheClient?.id_client);
         this.nomClient = this.client?.denomination_sociale;
+        this.clientService.getReleveCompteClientByIdClient(this.client?.id).subscribe((ReleveCompteClients: ReleveCompteClient[]) => {
+          this.t_ReleveCompteClient.data = ReleveCompteClients.filter(c=>c.id===this.detailFicheClient.id_client);
+        });
+      }else{
+        this.clientService.getReleveCompteClient().subscribe((ReleveCompteClients: ReleveCompteClient[]) => {
+          this.t_ReleveCompteClient.data = ReleveCompteClients.filter(c=>c.id===this.detailFicheClient.id_client);
+        });
       }
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
-    this.clientService.getReleveCompteClient().subscribe((ligneReleveCompteClients: LigneReleveCompteClient[]) => {
-      this.t_LigneReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.detailFicheClient.id_client);
-    });
+
   }
 
   onSubmit() {

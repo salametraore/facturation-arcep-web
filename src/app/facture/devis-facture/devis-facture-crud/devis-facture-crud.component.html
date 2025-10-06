@@ -37,7 +37,7 @@
                 <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client">
                 <mat-autocomplete #auto_cl="matAutocomplete">
                   <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
-                              [value]="item.denomination_sociale">
+                              [value]="item.id">
                     <span>{{item.denomination_sociale}}</span>
                   </mat-option>
                 </mat-autocomplete>
@@ -69,6 +69,24 @@
                 <textarea matInput formControlName="commentaire" ></textarea>
               </mat-form-field>
             </div>
+
+            <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px" fxLayoutGap.xs="10px">
+
+              <mat-form-field  appearance="outline" floatLabel="always" fxFlex="50" fxFlex.xs="100">
+                <mat-label>Date réception</mat-label>
+                <input matInput [matDatepicker]="pickerStart" formControlName="date_reception" matTooltip="Date réception">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+                <mat-datepicker #pickerStart></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field  appearance="outline" floatLabel="always" fxFlex="50" fxFlex.xs="100">
+                <mat-label>Date échéance</mat-label>
+                <input matInput [matDatepicker]="pickerStart" formControlName="date_echeance" matTooltip="Date échéance">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+                <mat-datepicker #pickerStart></mat-datepicker>
+              </mat-form-field>
+            </div>
+
           </form>
 
           <div class="mat-elevation-z10">
@@ -120,32 +138,13 @@
           </div>
         </div>
       </mat-card>
-
     </div>
 
     <!-- Colonne de droite : Historique de la Demande -->
     <div fxFlex="25%">
       <div class="section">
         <h5>Historique de la demande</h5>
-        <mat-card class="dark-card">
-          <mat-card-content>
-            <p><strong>Etape 1 </strong></p>
-            <!--            <p>Par Tapsoba Siémane / le 15 janvier 2025</p>-->
-            <!--            <mat-chip disabled color="warn">En cours</mat-chip>-->
-          </mat-card-content>
-        </mat-card>
-        <mat-card class="dark-card">
-          <mat-card-content>
-            <p><strong>Etape 2</strong></p>
-            <!--            <ul>-->
-            <!--              <li>Par SANON Fabienne</li>-->
-            <!--              <li>Le 15 janvier 2025</li>-->
-            <!--              <li>Montant encaissé XXX F CFA</li>-->
-            <!--              <li>Nature du paiement : chèque</li>-->
-            <!--            </ul>-->
-            <!--            <mat-chip disabled color="primary">En cours</mat-chip>-->
-          </mat-card-content>
-        </mat-card>
+        <historique-traitement [workflowHistories]="workflowHistories"></historique-traitement>
       </div>
     </div>
   </div>

@@ -13,6 +13,7 @@ import {DialogService} from "../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {AuthService} from "../../../authentication/auth.service";
 import {bouton_names, operations} from "../../../constantes";
+import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 
 @Component({
   selector: 'app-service-confiance-crud',
@@ -36,7 +37,8 @@ export class ServiceConfianceCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
-
+  workflowHistories:WorkflowHistory[];
+  
   constructor(
     private formBuilder: FormBuilder,
     private ficheTechniquesService: FicheTechniquesService,
@@ -88,6 +90,10 @@ export class ServiceConfianceCrudComponent implements OnInit {
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
+    });
+
+    this.ficheTechniquesService.getWorkflowHistoryById(this.ficheTechnique?.id).subscribe((workflowHistories:WorkflowHistory[]) => {
+      this.workflowHistories = workflowHistories;
     });
   }
 

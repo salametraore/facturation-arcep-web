@@ -47,3 +47,12 @@ export class AvisEtudeTechnique {
   duree?: number | null;
   nouveau_statut?: number | null;
 }
+
+export class ChercheFiche{
+  categorie_produit?: number;
+  client?: number;
+  direction?: number;
+  statut?: number;
+  date_debut?: string;
+  date_fin?: string;
+}

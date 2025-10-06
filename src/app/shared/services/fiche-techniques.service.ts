@@ -3,19 +3,23 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {
-  AvisEtudeTechnique,
+  AvisEtudeTechnique, ChercheFiche,
   FicheTechniques,
   MiseAJourStatutFiche,
   RequestGenererFacture
 } from "../models/ficheTechniques";
 import {ElementFacturationRecuCreeList} from "../models/element-facturation-recu-cree-list";
 import {FicheTechniqueAFacturer} from "../models/fiche-technique-a-facturer";
+import {Client} from "../models/client";
+import {WorkflowHistory} from "../models/workflowHistory";
+import {HistoriqueFicheTechnique} from "../models/historique-traitement-fiche-technique";
 
 @Injectable({providedIn: 'root',})
 export class FicheTechniquesService {
   private baseUrl = environment.baseUrl + '/fiche-techniques';
   private baseUrl_1 = environment.baseUrl + '/change-statut-fiche';
   private baseUrl_2 = environment.baseUrl + '/elements-facturation-recu-cree';
+  private baseUrl_histo = environment.baseUrl + '/api/historique/';
 
   constructor(private http: HttpClient) {
   }
@@ -25,7 +29,6 @@ export class FicheTechniquesService {
   }
 
   setAvis(avisEtudeTechnique: AvisEtudeTechnique): Observable<AvisEtudeTechnique> {
-    console.log(avisEtudeTechnique);
     return this.http.post<AvisEtudeTechnique>(`${environment.baseUrl}/update-avis-fiche-technique/`, avisEtudeTechnique);
   }
 
@@ -53,27 +56,41 @@ export class FicheTechniquesService {
     return this.http.get<ElementFacturationRecuCreeList[]>(`${this.baseUrl_2}`);
   }
 
-  getFicheTechniques(categorie_produit?: number, client?: number, direction?: number, statut?: number, date_debut?: string, date_fin?: string, count: boolean = false): Observable<FicheTechniques[]> {
+  getFicheTechniques(chercheFiche?:ChercheFiche): Observable<FicheTechniques[]> {
+    console.log(chercheFiche);
     let params = new HttpParams();
 
-    if (categorie_produit) {
-      params.set('categorie_produit', categorie_produit?.toString())
+    if (chercheFiche?.categorie_produit) {
+      params.set('categorie_produit', chercheFiche?.categorie_produit?.toString())
     }
-    if (client)
-      params.set('client', client?.toString())
-    if (direction)
-      params.set('direction', direction?.toString())
-    if (statut)
-      params.set('statut', statut?.toString())
-    if (date_debut)
-      params.set('date_debut', date_debut)
-    if (date_fin)
-      params.set('date_fin', date_fin)
-    params.set('count', count.toString());
+    if (chercheFiche?.client)
+      params.set('client', chercheFiche?.client?.toString())
+    if (chercheFiche?.direction)
+      params.set('direction', chercheFiche?.direction?.toString())
+    if (chercheFiche?.statut)
+      params.set('statut', chercheFiche?.statut?.toString())
+    if (chercheFiche?.date_debut)
+      params.set('date_debut', chercheFiche?.date_debut)
+    if (chercheFiche?.date_fin)
+      params.set('date_fin', chercheFiche?.date_fin)
 
     return this.http.get<FicheTechniques[]>(this.baseUrl, {params});
   }
+
+
  setStatutFiche(miseAJourStatutFiche: MiseAJourStatutFiche): Observable<MiseAJourStatutFiche> {
     return this.http.post<MiseAJourStatutFiche>(`${this.baseUrl_1}/`, miseAJourStatutFiche);
   }
+
+  getWorkflowHistoryById(id_fiche:number): Observable<WorkflowHistory[]> {
+    return this.http.get<WorkflowHistory[]>(`${environment.baseUrl}/workflow-history/${id_fiche}/`);
+  }
+
+  getHistoriqueTraitementFicheTechnique(ficheId: number): Observable<HistoriqueFicheTechnique[]> {
+    const url = `${environment.baseUrl}/api/historique/`; // garde le slash final (DRF)
+    const params = new HttpParams().set('fiche_technique_id', String(ficheId));
+
+    return this.http.get<HistoriqueFicheTechnique[]>(url, { params });
+  }
+
 }

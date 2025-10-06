@@ -13,6 +13,8 @@ import {Produit} from "../../../shared/models/produit";
 import {AuthService} from "../../../authentication/auth.service";
 import {ClientService} from "../../../shared/services/client.service";
 import {Client} from "../../../shared/models/client";
+import {WorkflowHistory} from "../../../shared/models/workflowHistory";
+import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 
 @Component({
   selector: 'app-domaine-crud',
@@ -36,6 +38,8 @@ export class DomaineCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
+  workflowHistories:WorkflowHistory[];
+  historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -88,6 +92,14 @@ export class DomaineCrudComponent implements OnInit {
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
+    });
+
+    this.ficheTechniquesService.getWorkflowHistoryById(this.ficheTechnique?.id).subscribe((workflowHistories:WorkflowHistory[]) => {
+      this.workflowHistories = workflowHistories;
+    });
+
+    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
+      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
     });
   }
 

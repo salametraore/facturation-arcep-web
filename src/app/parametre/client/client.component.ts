@@ -47,6 +47,7 @@ export class ClientComponent implements OnInit, AfterViewInit {
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+  client: Client;
   detailFicheClients: DetailFicheClient[];
 
   constructor(
@@ -172,11 +173,17 @@ export class ClientComponent implements OnInit, AfterViewInit {
   }
 
   reset() {
-
+    this.nomClient = null;
+    this.client = undefined;
+    this.clientService.getDetailFicheClients().subscribe((detailFicheClients: RecouvDashboardClient[]) => {
+      this.t_RecouvDashboardClient.data = detailFicheClients;
+    });
   }
 
   checher() {
-
+    this.clientService.getReleveCompteClientByIdClient(this.client?.id).subscribe((detailFicheClients: RecouvDashboardClient[]) => {
+      this.t_RecouvDashboardClient.data = detailFicheClients;
+    });
   }
 
   getCategorie(id: number) {
@@ -188,4 +195,7 @@ export class ClientComponent implements OnInit, AfterViewInit {
   }
 
 
+  onGetClient(item: Client) {
+    this.client = item;
+  }
 }

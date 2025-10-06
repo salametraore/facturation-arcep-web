@@ -64,6 +64,8 @@ import {
   ServiceConfianceCrudComponent
 } from "./service-confiance/service-confiance-crud/service-confiance-crud.component";
 import {AvisEtuteTechniqueDialodComponent} from "./avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {HistoriqueTraitementComponent} from "./historique-traitement/historique-traitement.component";
+import {AvisTechniqueInfosComponent} from "./avis-technique-infos/avis-technique-infos.component";
 
 
 @NgModule({
@@ -107,6 +109,8 @@ import {AvisEtuteTechniqueDialodComponent} from "./avis-etute-technique-dialod/a
     AgrementEquipementTableComponent,
     AgrementEquipementCrudComponent,
     AvisEtuteTechniqueDialodComponent,
+    HistoriqueTraitementComponent,
+    AvisTechniqueInfosComponent
   ],
   imports: [
     CommonModule,

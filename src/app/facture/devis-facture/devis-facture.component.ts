@@ -9,7 +9,7 @@ import {ProduitService} from "../../shared/services/produits.service";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {DialogService} from "../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
-import {operations} from "../../constantes";
+import {operations, TYPE_FRAIS} from "../../constantes";
 import {DevisFactureCrudComponent} from "./devis-facture-crud/devis-facture-crud.component";
 import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
 import {Client} from "../../shared/models/client";
@@ -42,6 +42,8 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   produits:Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+
+  TYPE_FRAIS=TYPE_FRAIS;
 
   constructor(
     private factureService: FactureService,

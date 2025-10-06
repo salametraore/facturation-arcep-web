@@ -15,7 +15,7 @@ import {bouton_names, operations} from "../../../constantes";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
-import {LigneReleveCompteClient} from "../../../shared/models/ligne-releve-compte-client";
+import {LigneReleveCompteClient, ReleveCompteClient} from "../../../shared/models/ligne-releve-compte-client";
 import {DetailFicheClient} from "../../../shared/models/detail-fiche-client";
 import {RecouvDashboardClient} from "../../../shared/models/recouv-dashboard-client";
 
@@ -39,9 +39,9 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
-  t_LigneReleveCompteClient?: MatTableDataSource<LigneReleveCompteClient>;
+  t_ReleveCompteClient?: MatTableDataSource<ReleveCompteClient>;
 
-  displayedColumns: string[] = ['date_echeance', 'reference','produit','montant_facture','montant_encaissement'];
+  displayedColumns: string[] = ['reference','date_echeance', 'montant_facture','montant_encaissement'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -63,7 +63,7 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
     this.recouvDashboardClient = data.recouvDashboardClient;
     this.data_operation = data.operation;
     this.fixeCategorie = data.fixeCategorie;
-    this.t_LigneReleveCompteClient = new MatTableDataSource<LigneReleveCompteClient>([]);
+    this.t_ReleveCompteClient = new MatTableDataSource<ReleveCompteClient>([]);
   }
 
   ngOnInit(): void {
@@ -71,8 +71,8 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.t_LigneReleveCompteClient.paginator = this.paginator;
-    this.t_LigneReleveCompteClient.sort = this.sort;
+    this.t_ReleveCompteClient.paginator = this.paginator;
+    this.t_ReleveCompteClient.sort = this.sort;
   }
 
   reloadData() {
@@ -82,15 +82,20 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
       if(this.recouvDashboardClient){
         this.client = clients?.find(c=>c.id ===this.recouvDashboardClient?.client_id);
         this.nomClient = this.client?.denomination_sociale;
+        this.clientService.getReleveCompteClientByIdClient(this.client?.id).subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
+          this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+        });
+      }else{
+        this.clientService.getReleveCompteClient().subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
+          this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+        });
       }
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
-    this.clientService.getReleveCompteClient().subscribe((ligneReleveCompteClients: LigneReleveCompteClient[]) => {
-      this.t_LigneReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
-    });
+
   }
 
   onSubmit() {

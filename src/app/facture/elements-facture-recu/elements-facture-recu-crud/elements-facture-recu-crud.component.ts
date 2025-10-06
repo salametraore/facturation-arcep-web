@@ -16,6 +16,7 @@ import {MatTableDataSource} from "@angular/material/table";
 import {FicheTechniqueAFacturer, ProduitFiche} from "../../../shared/models/fiche-technique-a-facturer";
 import {FactureService} from "../../../shared/services/facture.service";
 import {RequestGenererFacture} from "../../../shared/models/ficheTechniques";
+import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 
 @Component({
   selector: 'app-elements-facture-recu-crud',
@@ -42,6 +43,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
+  workflowHistories:WorkflowHistory[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -103,6 +105,13 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
+
+    if(this.ficheTechniqueAFacturer){
+      this.ficheTechniquesService.getWorkflowHistoryById(this.ficheTechniqueAFacturer?.fiche_technique_id).subscribe((workflowHistories:WorkflowHistory[]) => {
+        this.workflowHistories = workflowHistories;
+      });
+    }
+
   }
 
   initForm_update() {

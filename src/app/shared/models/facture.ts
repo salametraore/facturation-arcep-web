@@ -14,4 +14,12 @@ export class Facture {
   commentaire?:string;
   signataire?:string;
   lignes_facture?: Array<LignesFactures>;
+  date_reception?: Date;
+  client_nom!: string;
+  compte_comptable!: string;
+  fiche_technique?: number;
+  position_direction?: string;
+  categorie_produit!: string;
+  type_frais?: string;
+  periode?: string;
 }

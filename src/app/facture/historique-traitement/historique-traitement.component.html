@@ -1,0 +1,8 @@
+
+<mat-card class="dark-card" *ngFor="let etape of workflowHistories_; let index = index">
+  <mat-card-content>
+    <p><strong>Étape {{ index + 1 }}</strong></p>
+    <p>Par {{ etape.actor }} / le {{ etape.occurred_at | date: 'd MMMM y' }}</p>
+    <p>Commentaire: {{etape.comment}}</p>
+  </mat-card-content>
+</mat-card>

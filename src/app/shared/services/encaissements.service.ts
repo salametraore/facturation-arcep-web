@@ -37,6 +37,10 @@ export class EncaissementsService {
           return this.http.get<EncaissementList[]>(`${this.baseUrl}/`);
       }
 
+ /*   getListencaissement() : Observable<Encaissement[]> {
+      return this.http.get<Encaissement[]>(`${this.baseUrl_2}`);
+    }*/
+
     getListencaissement() : Observable<RecouvListeEncaissement[]> {
       return this.http.get<RecouvListeEncaissement[]>(`${this.baseUrl_2}`);
     }

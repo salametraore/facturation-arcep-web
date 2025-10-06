@@ -1,0 +1,36 @@
+<!--<div style="display: flex; gap: 1px; flex-wrap: wrap;">-->
+
+<!--  <mat-form-field>-->
+<!--    <mat-label>Avis</mat-label>-->
+<!--    <input matInput [value]="avis" disabled>-->
+<!--  </mat-form-field>-->
+
+<!--  <mat-form-field>-->
+<!--    <mat-label>Date de début</mat-label>-->
+<!--    <input matInput [value]="date_debut" disabled>-->
+<!--  </mat-form-field>-->
+
+<!-- <mat-form-field>-->
+<!--    <mat-label>Date fin</mat-label>-->
+<!--    <input matInput [value]="date_fin" disabled>-->
+<!--  </mat-form-field>-->
+
+<!--  <mat-form-field>-->
+<!--    <mat-label>Durée (année)</mat-label>-->
+<!--    <input matInput [value]="duree" disabled>-->
+<!--  </mat-form-field>-->
+
+<!--  <mat-form-field>-->
+<!--    <mat-label>Nouveau statut</mat-label>-->
+<!--    <input matInput [value]="statut" disabled>-->
+<!--  </mat-form-field>-->
+<!--</div>-->
+<br>
+<mat-card>
+<p>
+  <b>Avis :</b> {{ avis}} &nbsp;&nbsp;|&nbsp;&nbsp;
+  <b>Début : </b>{{ date_debut | date:'dd/MM/yyyy' }} &nbsp;&nbsp;|&nbsp;&nbsp;
+  <b>Durée :</b> {{ duree}} ans &nbsp;&nbsp;|&nbsp;&nbsp;
+  <b>Fin : </b>{{ date_fin | date:'dd/MM/yyyy'}}
+</p>
+</mat-card>

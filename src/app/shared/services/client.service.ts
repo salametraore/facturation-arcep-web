@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Client } from '../models/client';
 import {DetailFicheClient} from "../models/detail-fiche-client";
-import {LigneReleveCompteClient} from "../models/ligne-releve-compte-client";
+import {LigneReleveCompteClient, ReleveCompteClient} from "../models/ligne-releve-compte-client";
 import {RecouvDashboardClient} from "../models/recouv-dashboard-client";
 import {RecouvListeEncaissement} from "../models/recouv-liste-encaissement";
 
@@ -28,8 +28,12 @@ export class ClientService {
     return this.httpClient.get<RecouvDashboardClient[]>(`${this.url_backend_2}/dashboard-clients/`);
   }
 
-  getReleveCompteClient(): Observable<LigneReleveCompteClient[]> {
-    return this.httpClient.get<LigneReleveCompteClient[]>(this.url_backend_3);
+  getReleveCompteClient(): Observable<ReleveCompteClient[]> {
+    return this.httpClient.get<ReleveCompteClient[]>(this.url_backend_3);
+  }
+
+  getReleveCompteClientByIdClient(id:number): Observable<ReleveCompteClient[]> {
+    return this.httpClient.get<ReleveCompteClient[]>(`${this.url_backend_3}${id}/`);
   }
 
   getItem(id: any): Observable<Client> {

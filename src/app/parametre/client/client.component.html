@@ -17,28 +17,13 @@
       <mat-form-field>
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="checher()" required>
+               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="checher()">
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
+          <mat-option *ngFor="let item of clients | search:nomClient" (click)="onGetClient(item)" [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Date début</mat-label>
-        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (keyup.enter)="checher()">
-        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
-        <mat-datepicker #pickerStart></mat-datepicker>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Date fin</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (keyup.enter)="checher()">
-        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-        <mat-datepicker #pickerEnd></mat-datepicker>
-      </mat-form-field>
-
 
       <button (click)="checher()" color="primary" mat-mini-fab>
         <mat-icon>search</mat-icon>

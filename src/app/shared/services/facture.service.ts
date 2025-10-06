@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Facture} from "../models/facture";
+import {Facture } from "../models/facture";
 import {RequestGenererFacture} from "../models/ficheTechniques";
 
 @Injectable({
@@ -27,6 +27,7 @@ export class FactureService {
     return this.http.put<Facture>(`${this.baseUrl}/${id}/`, value);
   }
 
+
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
   }
@@ -35,10 +36,10 @@ export class FactureService {
     return this.http.get<Facture[]>(`${this.baseUrl}`);
   }
 
-  getListFacturesByEtat(id:number,etat:string) : Observable<Facture[]> {
+  getListFacturesByEtat(id:number,etat:string) : Observable<Facture[]> {//PAYEE ou EN_ATTENTE
     let params = new HttpParams();
     params.set('etat',etat)
-    return this.http.get<Facture[]>(`${this.baseUrl}/${id}`,{params});
+    return this.http.get<Facture[]>(`${this.baseUrl}/client/${id}`,{params});
   }
 
   getFacturesEnAttentesByClientId(client_id:number) : Observable<Facture[]> {
@@ -62,4 +63,5 @@ export class FactureService {
     console.log(payload);
     return this.http.post(`${environment.baseUrl}/generer-frais-redevance-facture/`, payload);
   }
+
 }

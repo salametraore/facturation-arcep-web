@@ -18,6 +18,7 @@ import {ModePaiementService} from "../../shared/services/mode-paiement.service";
 import {EncaissementCrudComponent} from "./encaissement-crud/encaissement-crud.component";
 import {RecouvListeEncaissement} from "../../shared/models/recouv-liste-encaissement";
 import {EncaissementDetail} from "../../shared/models/encaissementDetail";
+import {Encaissement} from "../../shared/models/encaissement";
 
 @Component({
   selector: 'app-encaissement',
@@ -27,9 +28,9 @@ import {EncaissementDetail} from "../../shared/models/encaissementDetail";
 export class EncaissementComponent implements OnInit, AfterViewInit {
 
   @Input() fixeCategorie:number;
-
   t_RecouvListeEncaissement?: MatTableDataSource<RecouvListeEncaissement>;
-  displayedColumns: string[] = ['client','montant_encaisse','montant_affecte', 'date_encaissement','montant_restant','mode_paiement', 'actions'];
+
+  displayedColumns: string[] = ['reference','client','montant','affecte','solde_non_affecte', 'date_encaissement','mode_paiement', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   public operations = operations;
@@ -83,6 +84,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     });
     this.encaissementsService.getListencaissement().subscribe((response: RecouvListeEncaissement[]) => {
       this.t_RecouvListeEncaissement.data = response;
+      console.log(response)
     });
   }
 
@@ -91,9 +93,11 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     this.t_RecouvListeEncaissement.filter = filterValue.trim().toLowerCase();
   }
 
-  crud(recouvListeEncaissement: RecouvListeEncaissement, operation?: string) {
-    if(recouvListeEncaissement){
-      this.encaissementsService.getItem(recouvListeEncaissement?.encaissement_id).subscribe((encaissementDetail: EncaissementDetail) => {
+  crud(encaissement: RecouvListeEncaissement, operation?: string) {
+
+    if(encaissement){
+      console.log(encaissement?.encaissement_id)
+      this.encaissementsService.getItem(encaissement?.encaissement_id).subscribe((encaissementDetail: EncaissementDetail) => {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '1024px';
         dialogConfig.autoFocus = true;
@@ -131,6 +135,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     } else if (this.selectedRow === row) {
       this.selectedRow = undefined;
     }
+    console.log(row)
   }
 
   getStatusColor(status: string): string {
