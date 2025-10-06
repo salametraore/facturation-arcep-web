@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {WorkflowHistory} from "../../shared/models/workflowHistory";
+import {HistoriqueFicheTechnique} from "../../shared/models/historique-traitement-fiche-technique";
 
 @Component({
   selector: 'historique-traitement',
@@ -7,8 +8,7 @@ import {WorkflowHistory} from "../../shared/models/workflowHistory";
   styleUrl: './historique-traitement.component.scss'
 })
 export class HistoriqueTraitementComponent {
-    workflowHistories_:WorkflowHistory[]=MOCK_TRANSITIONS;
- @Input() workflowHistories:WorkflowHistory[];
+ @Input() historiqueFicheTechniques:HistoriqueFicheTechnique[];
 }
 
 export const MOCK_TRANSITIONS: WorkflowHistory[] = [

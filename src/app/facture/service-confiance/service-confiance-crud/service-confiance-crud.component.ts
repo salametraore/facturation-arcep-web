@@ -14,6 +14,7 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 import {AuthService} from "../../../authentication/auth.service";
 import {bouton_names, operations} from "../../../constantes";
 import {WorkflowHistory} from "../../../shared/models/workflowHistory";
+import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 
 @Component({
   selector: 'app-service-confiance-crud',
@@ -37,8 +38,8 @@ export class ServiceConfianceCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
-  workflowHistories:WorkflowHistory[];
-  
+  historiqueFicheTechniques:HistoriqueFicheTechnique[];
+
   constructor(
     private formBuilder: FormBuilder,
     private ficheTechniquesService: FicheTechniquesService,
@@ -92,8 +93,8 @@ export class ServiceConfianceCrudComponent implements OnInit {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getWorkflowHistoryById(this.ficheTechnique?.id).subscribe((workflowHistories:WorkflowHistory[]) => {
-      this.workflowHistories = workflowHistories;
+    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
+      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
     });
   }
 

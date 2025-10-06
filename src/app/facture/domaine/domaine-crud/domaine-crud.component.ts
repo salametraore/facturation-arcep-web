@@ -38,7 +38,7 @@ export class DomaineCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
-  workflowHistories:WorkflowHistory[];
+
   historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
   constructor(
@@ -94,9 +94,6 @@ export class DomaineCrudComponent implements OnInit {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getWorkflowHistoryById(this.ficheTechnique?.id).subscribe((workflowHistories:WorkflowHistory[]) => {
-      this.workflowHistories = workflowHistories;
-    });
 
     this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
       this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;

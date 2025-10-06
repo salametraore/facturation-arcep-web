@@ -87,10 +87,7 @@ export class FicheTechniquesService {
   }
 
   getHistoriqueTraitementFicheTechnique(ficheId: number): Observable<HistoriqueFicheTechnique[]> {
-    const url = `${environment.baseUrl}/api/historique/`; // garde le slash final (DRF)
-    const params = new HttpParams().set('fiche_technique_id', String(ficheId));
-
-    return this.http.get<HistoriqueFicheTechnique[]>(url, { params });
+    return  this.http.get<HistoriqueFicheTechnique[]>(`${environment.baseUrl}/api/historique-fiche/${ficheId}/`);
   }
 
 }
