@@ -64,4 +64,13 @@ export class FactureService {
     return this.http.post(`${environment.baseUrl}/generer-frais-redevance-facture/`, payload);
   }
 
+  genererFacturePDF(facture_id: number) {
+    //const url = ${this.baseUrl}/generate-pdf/${facture_id};
+    const url = `${this.baseUrl}/generate-pdf/${facture_id}`
+    const httpOptions = {
+      'responseType': 'arraybuffer' as 'json'
+    };
+    return this.http.get<any>(url, httpOptions);
+  }
+
 }

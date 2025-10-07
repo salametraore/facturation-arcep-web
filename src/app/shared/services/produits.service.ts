@@ -30,4 +30,9 @@ export class ProduitService {
   getListItems(): Observable<Produit[]> {
     return this.http.get<Produit[]>(`${this.baseUrl}/`);
   }
+
+  getListeProduitsByDirection(directionId: number): Observable<Produit[]> {
+    return this.http.get<Produit[]>(`${this.baseUrl}/direction/${directionId}/`);
+  }
+
 }

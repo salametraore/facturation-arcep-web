@@ -6,6 +6,7 @@ import {CategorieProduit} from "../../shared/models/categorie-produit";
 import {Produit} from "../../shared/models/produit";
 import {CategorieProduitService} from "../../shared/services/categorie-produit.service";
 import {ProduitService} from "../../shared/services/produits.service";
+import {PdfViewService} from "../../shared/services/pdf-view.service";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {DialogService} from "../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
@@ -17,6 +18,7 @@ import {ClientService} from "../../shared/services/client.service";
 import {StatutFicheTechniqueService} from "../../shared/services/statut-fiche-technique.service";
 import {Facture} from "../../shared/models/facture";
 import {FactureService} from "../../shared/services/facture.service";
+import {HttpResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-devis-facture',
@@ -49,6 +51,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     private factureService: FactureService,
     private categorieProduitService: CategorieProduitService,
     private produitService: ProduitService,
+    private pdfViewService: PdfViewService,
     private clientService: ClientService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
     public dialog: MatDialog,
@@ -168,5 +171,15 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   getClient(id: number) {
     return this.clients?.find(c => c.id === id)?.denomination_sociale;
   }
+
+  onPrint(facture: Facture) {
+    this.factureService.genererFacturePDF(facture?.id).subscribe((response: HttpResponse<Blob>)=>{
+        this.pdfViewService.printDirectly(response);
+      },
+      error => {
+        this.dialogService.alert({message: error});
+      })
+  }
+
 
 }

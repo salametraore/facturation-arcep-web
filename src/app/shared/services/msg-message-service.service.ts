@@ -35,6 +35,18 @@ export class MsgMessageServiceService {
     });
   }
 
+  errorLoading(msg?:string) {
+    if(!msg){
+      msg = 'Echec chargement de données';
+    }
+    this._snackBar.open(msg, 'fermer', {
+      horizontalPosition: this.horizontalPosition,
+      verticalPosition: this.verticalPosition,
+      duration: 4000,
+      panelClass: 'failed-save'
+    });
+  }
+
   failedPWD(msg?:string) {
     if(!msg){
       msg = 'Echec';

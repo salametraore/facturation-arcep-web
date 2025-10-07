@@ -39,16 +39,20 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
   nomClient:any;
   startDate :any;
   endDate :any;
-  serviceFilter :any;
+  //serviceFilter :any;
   directionFilter :any;
   statusFilter :any;
   categories:CategorieProduit[];
+  filteredCategories: CategorieProduit[] = [];
   produits:Produit[];
   directions:Direction[];
   direction:Direction;
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
   TYPE_FRAIS = TYPE_FRAIS;
+  serviceFilter: number | null = null;
+  private textFilter = '';
+
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
     private categorieProduitService: CategorieProduitService,
@@ -61,6 +65,21 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
     private msgMessageService: MsgMessageServiceService,
   ) {
     this.t_ElementFacturationRecuCreeList = new MatTableDataSource<ElementFacturationRecuCreeList>([]);
+
+    this.t_ElementFacturationRecuCreeList.filterPredicate =
+      (data: ElementFacturationRecuCreeList, raw: string) => {
+        const f = raw ? JSON.parse(raw) : {};
+        const byCategorie =
+          !f.categorie || data.categorie_produit_id === f.categorie;
+
+        const txt = (f.text || '').toString();
+        const byText =
+          !txt ||
+          (data.client?.toLowerCase().includes(txt)) ||
+          (this.getCategorie(data.categorie_produit_id)?.toLowerCase().includes(txt));
+
+        return byCategorie && byText;
+      };
   }
 
   ngAfterViewInit(): void {
@@ -76,10 +95,18 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
   reloadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories= categories;
+      // Si des produits sont déjà chargés (cas particulier), recalcule:
+      this.computeFilteredCategories();
     });
+
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits.filter(f=>f.categorieProduit===this.fixeCategorie);
+      //this.produits = produits.filter(f=>f.categorieProduit===this.fixeCategorie);
+      ///this.produits = produits;
+      // Optionnel: si tu veux afficher des produits tant qu’aucune direction n’est choisie
+      this.produits = produits;
+     // this.computeFilteredCategories();
     });
+
     this.directionService.getListItems().subscribe((directions: Direction[]) => {
       this.directions = directions;
     });
@@ -94,12 +121,70 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
 
     this.ficheTechniquesService.getElementFacturationRecus().subscribe((elementFacturationRecuCreeLists: ElementFacturationRecuCreeList[]) => {
       this.t_ElementFacturationRecuCreeList.data = elementFacturationRecuCreeLists;
+      this.updateDataSourceFilter();
     });
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.t_ElementFacturationRecuCreeList.filter = filterValue.trim().toLowerCase();
+    this.updateDataSourceFilter();
+  }
+
+  /** Appelée quand la direction change */
+  onDirectionChange(directionId: number | null) {
+    this.directionFilter = directionId;
+    if (!directionId) {
+      this.produits = [];
+      this.filteredCategories = [];
+      this.serviceFilter = null;
+      return;
+    }
+
+    this.produitService.getListeProduitsByDirection(directionId).subscribe({
+      next: (produits) => {
+        this.produits = Array.isArray(produits) ? produits : [];
+        this.computeFilteredCategories();
+        if (!this.produits.some(p => p.id === this.serviceFilter)) {
+          this.serviceFilter = null;
+        }
+      },
+      error: () => {
+        this.msgMessageService.errorLoading('Impossible de charger les produits de la direction sélectionnée.');
+        this.produits = [];
+        this.filteredCategories = [];
+        this.serviceFilter = null;
+      }
+    });
+
+    this.direction = this.directions.find(d => d.id === directionId);
+  }
+
+  /** Garde uniquement les catégories utilisées par les produits courants */
+  private computeFilteredCategories() {
+    if (!this.categories?.length || !this.produits?.length) {
+      this.filteredCategories = [];
+      return;
+    }
+    const ids = new Set(this.produits.map(p => p.categorieProduit));
+    this.filteredCategories = this.categories.filter(c => ids.has(c.id));
+  }
+
+  /** Quand la catégorie change */
+  onCategorieChange(catId: number | null) {
+    this.serviceFilter = catId ?? null;
+    this.updateDataSourceFilter();
+  }
+
+  /** Applique le filtre composite à la dataSource */
+  private updateDataSourceFilter() {
+    const payload = {
+      categorie: this.serviceFilter ?? null,
+      text: this.textFilter || null,
+    };
+    this.t_ElementFacturationRecuCreeList!.filter = JSON.stringify(payload);
+    // Revenir à la première page après filtrage
+    this.t_ElementFacturationRecuCreeList!.paginator?.firstPage();
   }
 
   crud(elementFacturation: ElementFacturationRecuCreeList, operation?: string) {
@@ -180,4 +265,6 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
   getTypeFrais(type_frais:string){
     return this.TYPE_FRAIS.find(t=>t.code===type_frais)?.label;
   }
+
+
 }

@@ -1,3 +1,11 @@
+/* évite le décalage dû à l’espace d’erreur/hint quand il est vide */
+.mat-mdc-form-field-subscript-wrapper { height: 0; }
+
+/* même hauteur visuelle pour les champs */
+.mat-mdc-text-field-wrapper { height: 56px; }
+.mat-mdc-form-field-flex { height: 100%; align-items: center; }
+.mat-mdc-select-trigger { height: 56px; display: flex; align-items: center; }
+
 .dashboard-container {
   padding: 20px;
 }
@@ -19,33 +27,50 @@
   gap: 10px;
 }
 
-
+/* --- Filtres --- */
 .filter-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
+/* 2 champs + 2 boutons ; tous alignés verticalement */
 .filter-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  align-items: center;   /* centre verticalement (propre avec floatLabel=always) */
+  gap: 12px;
 }
 
-mat-form-field {
-  width: 400px;
+/* Appliquer cette classe aux <mat-form-field> */
+.filter-field {
+  width: 100%;
 }
 
+/* Appliquer cette classe aux boutons mini-fab */
+.filter-btn {
+  margin: 0;
+  align-self: center;    /* assure l’alignement sur l’axe vertical */
+}
+
+/* Réduit l’espace réservé aux hints/erreurs pour uniformiser la hauteur */
+.filter-field .mat-mdc-form-field-subscript-wrapper {
+  height: 0;             /* option sûr: on masque l’espace quand il n’y a pas d’erreur/hint */
+}
+
+/* --- Boutons éventuels pleine hauteur (si tu reviens à des gros boutons) */
 .add-btn, .export-btn {
   height: 56px;
 }
 
+/* --- Statuts (mappés à getStatusColor) --- */
+.status-transmis { color: #2e7d32; }
+.status-en-attente { color: #ed6c02; }
+.status-clos { color: #b71c1c; }
+.status-abandon { color: #757575; }
 
-
-.getStatusColor {
-  &.Transmis { color: green; }
-  &.En attente { color: orange; }
-  &.Clos { color: darkred; }
-  &.Abandon { color: gray; }
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .filter-group {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
 }

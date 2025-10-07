@@ -2,83 +2,43 @@
 
   <div class="dashboard-header">
     <h3 class="dashboard-title" style="color: #030303">Eléments de facturation reçus</h3>
-    <!--    <div class="dashboard-actions">-->
-    <!--      <button (click)="onDomaine(null,this.operations.create)" color="warn" mat-flat-button>-->
-    <!--        <mat-icon>add</mat-icon>-->
-    <!--        FT nom de domaine-->
-    <!--      </button>-->
-    <!--      <button (click)="onServiceConfaince(null,this.operations.create)" color="warn" mat-flat-button>-->
-    <!--        <mat-icon>add</mat-icon>-->
-    <!--        FT service de confiance-->
-    <!--      </button>-->
-    <!--      <button color="warn" mat-flat-button>-->
-    <!--        <mat-icon>print</mat-icon>-->
-    <!--        Exporter-->
-    <!--      </button>-->
-    <!--    </div>-->
   </div>
 
   <div class="filter-section">
-    <div class="filter-group">
-      <mat-form-field>
-        <mat-label>Catégorie de service</mat-label>
-        <mat-select [(ngModel)]="directionFilter">
-          <mat-option *ngFor="let item of directions" (click)="onGetDirection(item)" [value]="item.id">
-            {{item.libelle}}
+    <div
+      fxLayout="row"
+      fxLayout.xs="column"
+      fxLayoutAlign="start center"
+      fxLayoutGap="12px"
+      fxLayoutGap.xs="10px"
+    >
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="45" fxFlex.xs="100">
+        <mat-label>Direction</mat-label>
+        <mat-select [(ngModel)]="directionFilter" (selectionChange)="onDirectionChange($event.value)">
+          <mat-option *ngFor="let item of directions" [value]="item.id">
+            {{ item.libelle }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <!--      <mat-form-field>-->
-      <!--        <mat-label>Nom du client</mat-label>-->
-      <!--        <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"-->
-      <!--               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="checher()" required>-->
-      <!--        <mat-autocomplete #auto_cl="matAutocomplete">-->
-      <!--          <mat-option  *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">-->
-      <!--            <span>{{item.denomination_sociale}}</span>-->
-      <!--          </mat-option>-->
-      <!--        </mat-autocomplete>-->
-      <!--      </mat-form-field>-->
-
-      <!--      <mat-form-field>-->
-      <!--        <mat-label>Date début</mat-label>-->
-      <!--        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (keyup.enter)="checher()">-->
-      <!--        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>-->
-      <!--        <mat-datepicker #pickerStart></mat-datepicker>-->
-      <!--      </mat-form-field>-->
-      <!--      <mat-form-field>-->
-      <!--        <mat-label>Date fin</mat-label>-->
-      <!--        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (keyup.enter)="checher()">-->
-      <!--        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>-->
-      <!--        <mat-datepicker #pickerEnd></mat-datepicker>-->
-      <!--      </mat-form-field>-->
-
-      <mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="45" fxFlex.xs="100">
         <mat-label>Catégorie de service</mat-label>
-        <mat-select [(ngModel)]="serviceFilter">
-          <mat-option *ngFor="let item of produits" [value]="item.id">
-            {{item.libelle}}
+        <mat-select [(ngModel)]="serviceFilter" (selectionChange)="onCategorieChange($event.value)">
+          <mat-option *ngFor="let item of filteredCategories" [value]="item.id">
+            {{ item.libelle }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <!--      <mat-form-field>-->
-      <!--        <mat-label>Statut</mat-label>-->
-      <!--        <mat-select [(ngModel)]="statusFilter" (keyup.enter)="checher()">-->
-      <!--          <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">-->
-      <!--            {{item.libelle}}-->
-      <!--          </mat-option>-->
-      <!--        </mat-select>-->
-      <!--      </mat-form-field>-->
-
-      <button (click)="checher()" color="primary" mat-mini-fab>
+      <button mat-mini-fab color="primary" (click)="checher()" fxFlex="none" matTooltip="Rechercher">
         <mat-icon>search</mat-icon>
       </button>
-      <button (click)="reset()" color="primary" mat-mini-fab>
+      <button mat-mini-fab color="primary" (click)="reset()" fxFlex="none" matTooltip="Réinitialiser">
         <mat-icon>cached</mat-icon>
       </button>
     </div>
   </div>
+
 
   <div class="mat-elevation-z10">
     <table [dataSource]="t_ElementFacturationRecuCreeList" mat-table matSort style="width: 100%">
