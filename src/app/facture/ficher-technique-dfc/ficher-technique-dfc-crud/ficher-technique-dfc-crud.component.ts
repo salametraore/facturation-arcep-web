@@ -12,9 +12,9 @@ import {CategorieProduitService} from "../../../shared/services/categorie-produi
 import {ProduitService} from "../../../shared/services/produits.service";
 import {ClientService} from "../../../shared/services/client.service";
 import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
-import {operations} from "../../../constantes";
+import {operations,bouton_names} from "../../../constantes";
 import {Produit} from "../../../shared/models/produit";
-import {FicheTechniques} from "../../../shared/models/ficheTechniques";
+import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/ficheTechniques";
 import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
 import {FicheTechniqueProduit} from "../../../shared/models/ficheTechniquesProduits";
 
@@ -39,6 +39,10 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
   form_ficheTechnique: FormGroup;
   form_ficheTechniquesProduit: FormGroup;
   t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
+
+  public operations = operations;
+  public bouton_names = bouton_names;
+  public data_operation: string = '';
 
   displayedColumns: string[] = ['designation', 'prix_unitaire', 'quantite', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -284,4 +288,14 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
   }
 
 
+  onTransmettre(){
+    const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();
+    miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
+    miseAJourStatutFiche.statut = 2;
+    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone:MiseAJourStatutFiche)=>{
+      this.msgMessageService.success("Fiche transmise avec succès !");
+    },error => {
+      this.dialogService.alert({message:error.message});
+    });
+  }
 }

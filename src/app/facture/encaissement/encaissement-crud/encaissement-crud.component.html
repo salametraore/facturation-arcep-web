@@ -89,10 +89,9 @@
           </ng-container>
 
           <ng-container matColumnDef="date_affectation">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header> Date affectation</th>
-            <td *matCellDef="let element" mat-cell> {{element.date_affectation|date: 'dd/MM/yyyy'}} </td>
+            <th *matHeaderCellDef mat-header-cell mat-sort-header> Date échéance</th>
+            <td *matCellDef="let element" mat-cell> {{element.date_affectation|date: 'dd/mm/yyyy'}} </td>
           </ng-container>
-
           <ng-container matColumnDef="montant">
             <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant</th>
             <td *matCellDef="let element" mat-cell> {{element.montant}} </td>

@@ -5,7 +5,7 @@
     <div class="dashboard-actions">
       <button (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
         <mat-icon>add</mat-icon>
-        FT nom de domaine
+        FT service de confiance
       </button>
       <button color="warn" mat-flat-button>
         <mat-icon>print</mat-icon>
@@ -107,6 +107,14 @@
               <mat-icon color="warn">edit</mat-icon>
               Transmettre
             </button>
+
+            <button *ngIf="element.statut?.code==='FTD' "
+                    (click)="onSetAvis(element,this.operations.transmettre)"
+                    mat-menu-item>
+              <mat-icon color="warn">check</mat-icon>
+              Donner un avis
+            </button>
+
             <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
               <mat-icon color="warn">delete</mat-icon>
               Supprimer

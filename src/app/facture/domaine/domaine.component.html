@@ -22,7 +22,8 @@
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
                matInput matTooltip="Nom du client" placeholder="Nom du client">
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option *ngFor="let item of clients | search:nomClient" (click)="onGetClient(item)" [value]="item.denomination_sociale">
+          <mat-option *ngFor="let item of clients | search:nomClient" (click)="onGetClient(item)"
+                      [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>
           </mat-option>
         </mat-autocomplete>
@@ -102,17 +103,25 @@
               <mat-icon color="warn">edit</mat-icon>
               Modifier
             </button>
-            <button *ngIf="element.statut?.code==='INIT'"  (click)="crud(element,this.operations.transmettre)"
+            <button *ngIf="element.statut?.code==='INIT'" (click)="crud(element,this.operations.transmettre)"
                     mat-menu-item>
               <mat-icon color="warn">edit</mat-icon>
               Transmettre
             </button>
-            <button *ngIf="element.statut?.code==='FTD' || element.statut?.code==='GFD'"
+            <!--            <button *ngIf="element.statut?.code==='FTD' || element.statut?.code==='GFD'"
+                                (click)="onSetAvis(element,this.operations.transmettre)"
+                                mat-menu-item>
+                          <mat-icon color="warn">check</mat-icon>
+                          Donner un avis
+                        </button> -->
+
+            <button *ngIf="element.statut?.code==='FTD' "
                     (click)="onSetAvis(element,this.operations.transmettre)"
                     mat-menu-item>
               <mat-icon color="warn">check</mat-icon>
               Donner un avis
             </button>
+
             <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
               <mat-icon color="warn">delete</mat-icon>
               Supprimer

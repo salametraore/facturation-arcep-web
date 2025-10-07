@@ -9,7 +9,7 @@
         <mat-label>Client</mat-label>
         <mat-select formControlName="client" matTooltip="Client">
           <mat-option *ngFor="let item of clients" (click)="onGetClient(item)" [value]="item.id">
-            Nom:{{ item?.denomination_sociale }} -N° Compte: {{ item?.compte_comptable }}
+            {{ item?.denomination_sociale }}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -75,7 +75,7 @@
 
       <button mat-raised-button class="custom-chip-button" color="primary"
               [disabled]="form_ficheTechniquesProduit.invalid"
-              matTooltip="Ajouter à la commande"
+              matTooltip="Ajouter"
               (click)="onAdd()">
         <mat-icon>add</mat-icon>
         Ajouter
@@ -148,18 +148,21 @@
     Retour
   </button>
   &nbsp;&nbsp;
-  <button mat-raised-button class="custom-chip-button" color="primary"
+<!--  <button mat-raised-button class="custom-chip-button" color="primary"
           [disabled]="t_FicheTechniquesProduits.data?.length<1"
           (click)="onPrint()" matTooltip="Imprimer">
     <mat-icon>print</mat-icon>
     Imprimer
-  </button>
+  </button>-->
   &nbsp;&nbsp;
-  <button mat-raised-button class="custom-chip-button" color="primary" (click)="onSave()"
+  <button mat-raised-button *ngIf="this.operation===this.operations.create ||this.operation===this.operations.update" class="custom-chip-button" color="primary" (click)="onSave()"
           [disabled]="t_FicheTechniquesProduits.data?.length<1"
-          matTooltip="Enregistrer la commande">
+          matTooltip="Enregistrer">
     <mat-icon>save</mat-icon>
     Enregistrer
   </button>
+
+  <button mat-raised-button *ngIf="this.operation===this.operations.transmettre" (click)="onTransmettre()" color="warn">Transmettre</button>
+
   &nbsp;&nbsp;
 </div>

@@ -95,6 +95,7 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
   }
 
   crud(ficheTechnique: FicheTechniques, operation?: string) {
+    console.log(operation);
    this.notifyFicheTechnique.emit(ficheTechnique);
     this.notifyActionOperation.emit(operation);
   }

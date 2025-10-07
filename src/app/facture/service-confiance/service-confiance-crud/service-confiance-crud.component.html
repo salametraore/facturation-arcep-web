@@ -30,7 +30,6 @@
           <form [formGroup]="form">
 
             <div class="client-section">
-              <span class="subsection-label">Client</span>
 
               <mat-form-field>
                 <mat-label>Client</mat-label>
@@ -47,10 +46,9 @@
             </div>
 
             <div class="domiciliation-section">
-              <span class="subsection-label">Domiciliation</span>
               <mat-form-field>
-                <mat-label>Domiciliation du demandeur</mat-label>
-                <mat-select formControlName="produit" placeholder="Domiciliation" matTooltip="Domiciliation">
+                <mat-label>Service de confiance</mat-label>
+                <mat-select formControlName="produit"  matTooltip="Service de confiance">
                   <mat-option *ngFor="let item of produits" [value]="item.id">
                     {{item.libelle}}
                   </mat-option>
@@ -59,7 +57,6 @@
             </div>
 
             <div class="comment-section">
-              <span class="subsection-label">COMMENTAIRE</span>
               <mat-form-field>
                 <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
                 <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>

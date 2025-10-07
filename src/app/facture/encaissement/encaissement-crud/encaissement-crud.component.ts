@@ -172,9 +172,9 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
     this.client = client;
     if (!this.encaissementDetail) {
       this.factureService.getListFacturesByEtat(client.id,'EN_ATTENTE').subscribe((factures: Facture[]) => {
+        this.facturesImpayees = factures.filter(f => f.etat === 'EN_ATTENTE');
+        //this.facturesImpayees =factures;
         console.log(factures);
-        //this.facturesImpayees = factures.filter(f => f.etat === 'INIT');
-        this.facturesImpayees =factures;
         let affectations: Affectation[] = this.facturesImpayees.map(a => ({
           facture_id: a.id,
           date_affectation: a.date_echeance,
@@ -182,7 +182,6 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         }));
         setTimeout(() => {
           this.t_Affectation1.data = [...affectations];
-          console.log(this.t_Affectation1.data);
         }, 1000);
       });
     }
@@ -205,8 +204,6 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         date_affectation: a.date_affectation
       })) || []
     };
-
-    console.log(encaissementDetail.affectations);
 
     if (!this.encaissementDetail) {
       this.encaissementsService.create(encaissementDetail).subscribe(data => {

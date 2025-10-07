@@ -94,9 +94,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
   }
 
   crud(encaissement: RecouvListeEncaissement, operation?: string) {
-
     if(encaissement){
-      console.log(encaissement?.encaissement_id)
       this.encaissementsService.getItem(encaissement?.encaissement_id).subscribe((encaissementDetail: EncaissementDetail) => {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '1024px';
@@ -135,7 +133,6 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     } else if (this.selectedRow === row) {
       this.selectedRow = undefined;
     }
-    console.log(row)
   }
 
   getStatusColor(status: string): string {
