@@ -182,6 +182,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         }));
         setTimeout(() => {
           this.t_Affectation1.data = [...affectations];
+          console.log(this.t_Affectation1.data);
         }, 1000);
       });
     }
@@ -204,6 +205,8 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         date_affectation: a.date_affectation
       })) || []
     };
+
+    console.log(encaissementDetail.affectations);
 
     if (!this.encaissementDetail) {
       this.encaissementsService.create(encaissementDetail).subscribe(data => {

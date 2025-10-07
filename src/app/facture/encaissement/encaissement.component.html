@@ -60,35 +60,35 @@
   <div class="mat-elevation-z10">
     <table [dataSource]="t_RecouvListeEncaissement" mat-table matSort style="width: 100%">
 
-      <ng-container matColumnDef="reference">
+<!--      <ng-container matColumnDef="reference">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Référence</th>
         <td *matCellDef="let element" mat-cell> {{element.reference}} </td>
-      </ng-container>
+      </ng-container>-->
       <ng-container matColumnDef="client">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Client</th>
         <td *matCellDef="let element" mat-cell> {{element.client}} </td>
       </ng-container>
       <ng-container matColumnDef="montant">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant</th>
-        <td *matCellDef="let element" mat-cell> {{element.montant}} </td>
+        <td *matCellDef="let element" mat-cell> {{element.montant_encaisse}} </td>
       </ng-container>
       <ng-container matColumnDef="affecte">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant affecté</th>
-        <td *matCellDef="let element" mat-cell> {{element.affecte}} </td>
+        <td *matCellDef="let element" mat-cell> {{element.montant_affecte}} </td>
       </ng-container>
       <ng-container matColumnDef="solde_non_affecte">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant restant</th>
-        <td *matCellDef="let element" mat-cell> {{element.solde_non_affecte}} </td>
+        <td *matCellDef="let element" mat-cell> {{element.montant_restant}} </td>
       </ng-container>
 
       <ng-container matColumnDef="date_encaissement">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Date encaissement</th>
-        <td *matCellDef="let element" mat-cell> {{element.date_encaissement|date: 'dd/mm/yyyy'}} </td>
+        <td *matCellDef="let element" mat-cell> {{element.date_encaissement|date: 'dd/MM/yyyy'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="mode_paiement">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Mode de paiement</th>
-        <td *matCellDef="let element" mat-cell> {{element.mode_paiement}} </td>
+        <td *matCellDef="let element" mat-cell> {{element.mode_paiement_libelle}} </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">

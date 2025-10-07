@@ -30,7 +30,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
   @Input() fixeCategorie:number;
   t_RecouvListeEncaissement?: MatTableDataSource<RecouvListeEncaissement>;
 
-  displayedColumns: string[] = ['reference','client','montant','affecte','solde_non_affecte', 'date_encaissement','mode_paiement', 'actions'];
+  displayedColumns: string[] = ['client','montant','affecte','solde_non_affecte', 'date_encaissement','mode_paiement', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   public operations = operations;
