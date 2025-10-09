@@ -156,11 +156,20 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     console.log(payload.toString())
     console.log(this.ficheTechniqueAFacturer.toString())
 
-    if(this.ficheTechniqueAFacturer?.type_frais==='FD'){
+    const type = this.ficheTechniqueAFacturer?.type_frais;
+
+    const redevanceTypes = new Set(['RD', 'LO', 'EL', 'IN', 'RA', 'DA']);
+
+    if (type === 'FD') {
       this.genererDossierFacture(payload);
-    }else if(this.ficheTechniqueAFacturer?.type_frais==='RD'){
+    } else if (redevanceTypes.has(type)) {
       this.genererRedevanceFacture(payload);
+    } else {
+      // éventuellement : gérer les types inconnus
+      // this.toast.warn('Type de frais non supporté');
+      console.log('Type de frais non supporté');
     }
+
   }
 
   genererDossierFacture(payload: RequestGenererFacture) {

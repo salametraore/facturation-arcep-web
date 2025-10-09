@@ -125,5 +125,6 @@ export const TYPE_FRAIS = [
   { code: 'LO', label: 'Loyer' },
   { code: 'IN', label: 'Inscription' },
   { code: 'RA', label: 'Restauration' },
-  { code: 'DA', label: "Dossier d'Appel d'Offre" }
+  { code: 'DA', label: "Dossier d'Appel d'Offre" },
+  { code: 'DI', label: "Prestations diverses" }
 ];
