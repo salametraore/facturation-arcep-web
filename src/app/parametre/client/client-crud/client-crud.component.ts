@@ -22,30 +22,37 @@ import {RecouvDashboardClient} from "../../../shared/models/recouv-dashboard-cli
 @Component({
   selector: 'app-client-crud',
   templateUrl: './client-crud.component.html',
-  styleUrl: './client-crud.component.scss'
+  styleUrls: ['./client-crud.component.scss'] // Correction ici : styleUrl → styleUrls
 })
-export class ClientCrudComponent implements OnInit,AfterViewInit {
+export class ClientCrudComponent implements OnInit, AfterViewInit {
 
+  // -------------------
+  // 1️⃣ Propriétés TS initialisées
+  // -------------------
   recouvDashboardClient?: RecouvDashboardClient;
   fixeCategorie?: number;
-  form: FormGroup;
+  form: FormGroup = {} as FormGroup; // initialisation
   mode: string = '';
   title: string = '';
-  categories: CategorieProduit[];
-  produits: Produit[];
-  clients: Client[];
-  client: Client;
+  categories: CategorieProduit[] = []; // initialisation
+  produits: Produit[] = [];
+  clients: Client[] = [];
+  client: Client = {} as Client;
   public operations = operations;
   public data_operation: string = '';
   errorMessage: any;
-  nomClient: any;
-  t_ReleveCompteClient?: MatTableDataSource<ReleveCompteClient>;
+  nomClient: string = '';
+  t_ReleveCompteClient: MatTableDataSource<ReleveCompteClient> = new MatTableDataSource<ReleveCompteClient>([]);
 
-  displayedColumns: string[] = ['reference','date_echeance', 'montant_facture','montant_encaissement'];
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  displayedColumns: string[] = ['reference', 'date_echeance', 'montant_facture', 'montant_encaissement'];
 
-   date = new Date();
+  // -------------------
+  // 2️⃣ ViewChild avec "!"
+  // -------------------
+  @ViewChild(MatPaginator, {static: true}) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  date = new Date();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -63,7 +70,6 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
     this.recouvDashboardClient = data.recouvDashboardClient;
     this.data_operation = data.operation;
     this.fixeCategorie = data.fixeCategorie;
-    this.t_ReleveCompteClient = new MatTableDataSource<ReleveCompteClient>([]);
   }
 
   ngOnInit(): void {
@@ -71,45 +77,50 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.t_ReleveCompteClient.paginator = this.paginator;
-    this.t_ReleveCompteClient.sort = this.sort;
+    // -------------------
+    // 3️⃣ Vérification avant d'assigner paginator et sort
+    // -------------------
+    if (this.t_ReleveCompteClient && this.paginator && this.sort) {
+      this.t_ReleveCompteClient.paginator = this.paginator;
+      this.t_ReleveCompteClient.sort = this.sort;
+    }
   }
 
   reloadData() {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
 
-      if(this.recouvDashboardClient){
-        this.client = clients?.find(c=>c.id ===this.recouvDashboardClient?.client_id);
-        this.nomClient = this.client?.denomination_sociale;
+      if (this.recouvDashboardClient) {
+        // -------------------
+        // 4️⃣ Protection contre undefined
+        // -------------------
+        this.client = clients.find(c => c.id === this.recouvDashboardClient?.client_id) ?? {} as Client;
+        this.nomClient = this.client?.denomination_sociale ?? '';
+
         this.clientService.getReleveCompteClientByIdClient(this.client?.id).subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
-          this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+          this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c => c.id === this.recouvDashboardClient?.client_id);
         });
-      }else{
+      } else {
         this.clientService.getReleveCompteClient().subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
-          this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+          this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c => c.id === this.recouvDashboardClient?.client_id);
         });
       }
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
+      this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie) ?? [];
     });
-
   }
 
   onSubmit() {
-    // Logique pour soumettre la fiche technique
     console.log('this.techSheetForm.value');
   }
 
   onImport() {
-    // Logique pour importer des documents
     console.log('Importer des documents');
   }
 
   onNewClient() {
-    // Logique pour ajouter un nouveau client
     console.log('Ajouter un nouveau client');
   }
 

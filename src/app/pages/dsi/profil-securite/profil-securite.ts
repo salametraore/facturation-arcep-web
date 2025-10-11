@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profil-securite',
-  imports: [],
   templateUrl: './profil-securite.html',
-  styleUrl: './profil-securite.css'
+  styleUrls: ['./profil-securite.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule]
 })
-export class ProfilSecurite {
-
-}
+export class ProfilSecurite {}

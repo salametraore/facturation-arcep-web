@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-notification',
-  imports: [],
   templateUrl: './notification.html',
-  styleUrl: './notification.css'
+  styleUrls: ['./notification.css'],
+  standalone: true,
+  imports: [CommonModule]
 })
-export class Notification {
-
-}
+export class Notification {}
