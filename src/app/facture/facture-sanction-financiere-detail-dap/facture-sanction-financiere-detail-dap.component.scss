@@ -1,0 +1,103 @@
+.facture-container {
+  padding: 20px;
+  max-width: 100%;
+}
+
+.header {
+  margin-bottom: 20px;
+
+  h2 {
+    color: #3f51b5;
+    font-size: 24px;
+  }
+
+  .etapes {
+    display: flex;
+    margin-top: 10px;
+    gap: 10px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: #ccc;
+      z-index: 1;
+    }
+
+    .etape {
+      padding: 8px 16px;
+      background-color: white;
+      border-radius: 20px;
+      font-size: 12px;
+      position: relative;
+      z-index: 2;
+      border: 2px solid #ccc;
+
+      &.active {
+        background-color: #ff5252;
+        color: white;
+        border-color: #ff5252;
+      }
+    }
+  }
+}
+
+.import-annexes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  h3 {
+    color: #666;
+    font-size: 14px;
+  }
+
+  h4 {
+    font-size: 16px;
+  }
+}
+
+.section {
+  margin-bottom: 20px;
+
+  .section-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+
+  .caracteristiques {
+    background-color: #f5f5f5;
+    padding: 16px;
+    border-radius: 4px;
+
+    .caracteristique {
+      background-color: #e8f5e9;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 20px;
+}

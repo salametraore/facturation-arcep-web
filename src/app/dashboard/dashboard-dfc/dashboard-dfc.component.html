@@ -1,0 +1,91 @@
+<div class="dashboard-container">
+
+
+  <!-- Cartes de statistiques -->
+  <div class="stats-cards">
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <mat-icon class="stat-icon">{{ stats.frequencesLivrees.icone }}</mat-icon>
+        <div class="stat-details">
+          <p class="stat-description">{{ stats.frequencesLivrees.description }}</p>
+          <h2 class="stat-value">{{ stats.frequencesLivrees.valeur }}</h2>
+        </div>
+      </div>
+      <mat-select placeholder="Janvier" class="month-select">
+        <mat-option value="janvier">Janvier</mat-option>
+        <mat-option value="février">Février</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+        <mat-option value="mars">Mars</mat-option>
+      </mat-select>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <mat-icon class="stat-icon">{{ stats.totalFactures.icone }}</mat-icon>
+        <div class="stat-details">
+          <p class="stat-description">{{ stats.totalFactures.description }}</p>
+          <h2 class="stat-value">{{ stats.totalFactures.valeur }}</h2>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <mat-icon class="stat-icon">{{ stats.recouvrementsEnAttente.icone }}</mat-icon>
+        <div class="stat-details">
+          <p class="stat-description">{{ stats.recouvrementsEnAttente.description }}</p>
+          <h2 class="stat-value">{{ stats.recouvrementsEnAttente.valeur }}</h2>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Tableau des factures récentes -->
+  <div class="recent-invoices">
+    <h2>Factures récemment enregistrées</h2>
+    <table mat-table [dataSource]="facturesRecentes" class="mat-elevation-z8">
+      <!-- Colonne Icône -->
+      <ng-container matColumnDef="icone">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let facture">
+          <mat-icon>{{ facture.icone }}</mat-icon>
+        </td>
+      </ng-container>
+
+      <!-- Colonne Objet -->
+      <ng-container matColumnDef="objet">
+        <th mat-header-cell *matHeaderCellDef>Objet de la facture</th>
+        <td mat-cell *matCellDef="let facture">{{ facture.objet }}</td>
+      </ng-container>
+
+      <!-- Colonne Numéro -->
+      <ng-container matColumnDef="numero">
+        <th mat-header-cell *matHeaderCellDef>N° de facture</th>
+        <td mat-cell *matCellDef="let facture">{{ facture.numero }}</td>
+      </ng-container>
+
+      <!-- Colonne Date -->
+      <ng-container matColumnDef="dateEnregistrement">
+        <th mat-header-cell *matHeaderCellDef>Date d'enregistrement</th>
+        <td mat-cell *matCellDef="let facture">{{ facture.dateEnregistrement }}</td>
+      </ng-container>
+
+      <!-- Colonne Téléphone -->
+      <ng-container matColumnDef="telephone">
+        <th mat-header-cell *matHeaderCellDef>Téléphone</th>
+        <td mat-cell *matCellDef="let facture">{{ facture.telephone }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colonnesAffichees"></tr>
+      <tr mat-row *matRowDef="let row; columns: colonnesAffichees;"></tr>
+    </table>
+  </div>
+</div>

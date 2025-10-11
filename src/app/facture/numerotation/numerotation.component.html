@@ -1,0 +1,7 @@
+
+<numerotation-table *ngIf="operation===operations.table" (notifyActionOperation)="onGetOperation($event)"
+                               (notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></numerotation-table>
+
+
+<numerotation-crud *ngIf="operation!=operations.table" [operation]="operation"  [ficheTechnique]="fichetTechnique"   (notifyActionOperation)="onGetOperation($event)"
+                              (notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></numerotation-crud>

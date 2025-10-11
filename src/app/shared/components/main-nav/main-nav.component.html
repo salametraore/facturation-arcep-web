@@ -1,0 +1,104 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+               [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+               [mode]="(isHandset$ | async) ? 'over' : 'side'"
+               [opened]="(isHandset$ | async) === false">
+
+    <mat-toolbar>Menu</mat-toolbar>
+    <mat-divider></mat-divider>
+
+    <mat-accordion>
+      <mat-nav-list>
+        <div *ngFor="let menuItem of menuItems">
+          <!-- Cas sans sous-menus -->
+          <a
+            mat-list-item
+            *ngIf="!menuItem.sous_menus || menuItem.sous_menus.length === 0"
+            (click)="onNavigate(menuItem.url || '')"
+          >
+            <mat-icon matListIcon fontSet="material-symbols-outlined">
+              {{ menuItem.icone || 'folder' }}
+            </mat-icon>
+            <span matLine>{{ menuItem.titre }}</span>
+          </a>
+
+          <!-- Cas avec sous-menus -->
+          <mat-expansion-panel *ngIf="menuItem.sous_menus && menuItem.sous_menus.length > 0">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon fontSet="material-symbols-outlined">
+                  {{ menuItem.icone || 'folder' }}
+                </mat-icon>
+                <span>{{ menuItem.titre }}</span>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <ng-template matExpansionPanelContent>
+              <mat-nav-list>
+                <a
+                  mat-list-item
+                  *ngFor="let sousMenu of menuItem.sous_menus"
+                  (click)="onNavigate(sousMenu.url || '')"
+                >
+                  <mat-icon matListIcon fontSet="material-symbols-outlined">
+                    {{ sousMenu.icone }}
+                  </mat-icon>
+                  <span matLine>{{ sousMenu.titre }}</span>
+                </a>
+              </mat-nav-list>
+            </ng-template>
+          </mat-expansion-panel>
+        </div>
+      </mat-nav-list>
+    </mat-accordion>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="app-toolbar">
+      <button type="button" aria-label="Toggle sidenav"
+              mat-icon-button (click)="drawer?.toggle()">
+        <mat-icon fontSet="material-symbols-outlined" aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+
+      <span class="app-title">GESTION DE LA FACTURATION ET DU RECOUVREMENT</span>
+
+      <!-- pousse tout ce qui suit à droite -->
+      <span class="spacer"></span>
+
+      <div class="toolbar-actions">
+        <button *ngIf="!isFullScreen" (click)="enterFullScreen()" mat-icon-button matTooltip="Plein écran">
+          <mat-icon fontSet="material-symbols-outlined">fullscreen</mat-icon>
+        </button>
+        <button *ngIf="isFullScreen" (click)="exitFullScreen()" mat-icon-button matTooltip="Quitter le plein écran">
+          <mat-icon fontSet="material-symbols-outlined">fullscreen_exit</mat-icon>
+        </button>
+        <button (click)="onGoHome()" mat-icon-button matTooltip="Accueil">
+          <mat-icon fontSet="material-symbols-outlined">home</mat-icon>
+        </button>
+
+        <button mat-button [matMenuTriggerFor]="authMenu" class="auth-btn">
+          <mat-icon fontSet="material-symbols-outlined">account_circle</mat-icon>
+        </button>
+        <mat-menu #authMenu="matMenu" xPosition="after" yPosition="below" [overlapTrigger]="false">
+          <button *ngIf="this.user" mat-menu-item (click)="connect_deconnect()">
+            <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
+            <span>Se déconnecter</span>
+          </button>
+          <button *ngIf="!this.user" mat-menu-item (click)="connect_deconnect()">
+            <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
+            <span>Se connecter</span>
+          </button>
+          <button mat-menu-item (click)="changePassword()">
+            <mat-icon fontSet="material-symbols-outlined">edit</mat-icon>
+            <span>Changer de mot de passe</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-toolbar>
+
+    <div style="margin-left: 5px; margin-right: 5px">
+      <router-outlet></router-outlet>
+      <app-footer></app-footer>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

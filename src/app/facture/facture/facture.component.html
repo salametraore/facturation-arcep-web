@@ -1,0 +1,163 @@
+<div class="container">
+  <mat-tab-group [(selectedIndex)]="ongletActif">
+    <!-- Onglet Reçues -->
+    <mat-tab label="Reçues">
+      <div class="mat-elevation-z8">
+        <h2>Factures reçues</h2>
+        <table mat-table [dataSource]="getFacturesParOnglet()">
+          <!-- Colonne Nom du client -->
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef>Nom du client</th>
+            <td mat-cell *matCellDef="let facture">
+              <div class="client-info">
+                <img
+                  alt="Logo"
+                  class="client-logo"
+                />
+                {{ facture.nom }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Colonne Date soumission -->
+          <ng-container matColumnDef="dateSoumission">
+            <th mat-header-cell *matHeaderCellDef>Date soumission</th>
+            <td mat-cell *matCellDef="let facture">{{ facture.dateSoumission }}</td>
+          </ng-container>
+
+          <!-- Colonne Catégorie de service -->
+          <ng-container matColumnDef="categorie">
+            <th mat-header-cell *matHeaderCellDef>Catégorie de service</th>
+            <td mat-cell *matCellDef="let facture">{{ facture.categorie }}</td>
+          </ng-container>
+
+          <!-- Colonne Statut -->
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let facture">
+              <div class="statut-container">
+                <mat-icon color="warn">schedule</mat-icon>
+                {{ facture.statut }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Colonne Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let facture">
+              <button mat-raised-button color="accent">Traiter</button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnesAffichees"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnesAffichees;"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Vérifiées -->
+    <mat-tab label="Vérifiées">
+      <div class="mat-elevation-z8">
+        <h2>Factures vérifiées</h2>
+        <table mat-table [dataSource]="getFacturesParOnglet()">
+          <!-- Réutilise les mêmes colonnes que pour l'onglet Reçues -->
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef>Nom du client</th>
+            <td mat-cell *matCellDef="let facture">
+              <div class="client-info">
+                <img
+                  alt="Logo"
+                  class="client-logo"
+                />
+                {{ facture.nom }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="dateSoumission">
+            <th mat-header-cell *matHeaderCellDef>Date soumission</th>
+            <td mat-cell *matCellDef="let facture">{{ facture.dateSoumission }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="categorie">
+            <th mat-header-cell *matHeaderCellDef>Catégorie de service</th>
+            <td mat-cell *matCellDef="let facture">{{ facture.categorie }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let facture">
+              <div class="statut-container">
+                <mat-icon color="primary">check_circle</mat-icon>
+                {{ facture.statut }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let facture">
+              <button mat-raised-button color="primary">Consulter</button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnesAffichees"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnesAffichees;"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Envoyées -->
+    <mat-tab label="Envoyées">
+      <div class="mat-elevation-z8">
+        <h2>Factures envoyées</h2>
+        <table mat-table [dataSource]="getFacturesParOnglet()">
+          <!-- Réutilise les mêmes colonnes que pour les autres onglets -->
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef>Nom du client</th>
+            <td mat-cell *matCellDef="let facture">
+              <div class="client-info">
+                <img
+                  alt="Logo"
+                  class="client-logo"
+                />
+                {{ facture.nom }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="dateSoumission">
+            <th mat-header-cell *matHeaderCellDef>Date soumission</th>
+            <td mat-cell *matCellDef="let facture">{{ facture.dateSoumission }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="categorie">
+            <th mat-header-cell *matHeaderCellDef>Catégorie de service</th>
+            <td mat-cell *matCellDef="let facture">{{ facture.categorie }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let facture">
+              <div class="statut-container">
+                <mat-icon color="accent">send</mat-icon>
+                {{ facture.statut }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let facture">
+              <button mat-raised-button color="warn">Archiver</button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnesAffichees"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnesAffichees;"></tr>
+        </table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

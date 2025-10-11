@@ -1,0 +1,83 @@
+<div class="dashboard-container">
+  <h5 class="dashboard-title" style="color: #030303">Saisie mise à jour fiche technique - Service de confiance</h5>
+
+  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
+  <!--  <div class="demand-status">-->
+  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
+  <!--    <mat-stepper [linear]="true" #stepper>-->
+  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
+  <!--        <ng-template matStepLabel>-->
+  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
+  <!--        </ng-template>-->
+  <!--      </mat-step>-->
+  <!--    </mat-stepper>-->
+  <!--  </div>-->
+
+  <!-- Documents -->
+  <!--  <div class="documents-section">-->
+  <!--    <span class="section-label">DOCUMENTS</span>-->
+  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
+  <!--  </div>-->
+
+  <!-- Fiche technique -->
+
+
+  <div fxLayout="row" fxLayoutGap="20px">
+    <!-- Colonne de gauche : Fiche Technique -->
+    <div fxFlex="75%">
+      <mat-card class="dark-card">
+        <div class="tech-sheet-section">
+          <form [formGroup]="form">
+
+            <div class="client-section">
+
+              <mat-form-field>
+                <mat-label>Client</mat-label>
+                <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
+                       placeholder="Cliquez et sélectionnez votre client">
+                <mat-autocomplete #auto_cl="matAutocomplete">
+                  <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
+                              [value]="item.denomination_sociale">
+                    <span>{{item.denomination_sociale}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+
+            </div>
+
+            <div class="domiciliation-section">
+              <mat-form-field>
+                <mat-label>Service de confiance</mat-label>
+                <mat-select formControlName="produit"  matTooltip="Service de confiance">
+                  <mat-option *ngFor="let item of produits" [value]="item.id">
+                    {{item.libelle}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="comment-section">
+              <mat-form-field>
+                <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
+                <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>
+              </mat-form-field>
+            </div>
+          </form>
+          <div class="actions">
+            <button mat-raised-button *ngIf="this.data_operation===this.operations.create ||this.data_operation===this.operations.update" (click)="crud()" color="warn">Enregistrer</button>
+            <button mat-raised-button *ngIf="this.data_operation===this.operations.transmettre" (click)="onTransmettre()" color="warn">Transmettre</button>
+            <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Colonne de droite : Historique de la Demande -->
+    <div fxFlex="25%">
+      <div class="section">
+        <h5>Historique de la demande</h5>
+        <historique-traitement [historiqueFicheTechniques]="historiqueFicheTechniques" ></historique-traitement>
+      </div>
+    </div>
+  </div>
+</div>

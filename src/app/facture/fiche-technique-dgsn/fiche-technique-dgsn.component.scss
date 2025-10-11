@@ -1,0 +1,87 @@
+.fiches-techniques-container {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h2 {
+    font-size: 24px;
+    color: #3f51b5;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 10px;
+
+    button {
+      border: none;
+      background: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 20px;
+
+      &.active {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+
+    button {
+      border-radius: 20px;
+    }
+  }
+}
+
+.filtres {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  align-items: center;
+
+  .search-button {
+    margin-left: 10px;
+  }
+}
+
+.table-container {
+  margin-bottom: 20px;
+
+  table {
+    width: 100%;
+  }
+
+  .client-info {
+    display: flex;
+    align-items: center;
+
+    .client-logo {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+  }
+
+  .statut-container {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.export-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}

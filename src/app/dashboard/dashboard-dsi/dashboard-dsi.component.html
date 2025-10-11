@@ -1,0 +1,71 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title">Tableau de bord</h1>
+
+  <!-- Section des cartes de statut -->
+  <div class="status-cards">
+    <mat-card class="status-card primary">
+      <mat-card-content class="card-content">
+        <div class="card-icon">🌐</div>
+        <div class="card-title">13 Bureaux d'enregistrement</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="status-card accent">
+      <mat-card-content class="card-content">
+        <div class="card-icon">📞</div>
+        <div class="card-title">8 Prestataires de services de confiance</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="status-card warn">
+      <mat-card-content class="card-content">
+        <div class="card-icon">🔗</div>
+        <div class="card-title">8 Instances</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Section tableau avec filtres -->
+  <div class="table-section">
+    <div class="filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Statut</mat-label>
+        <mat-select [(value)]="statutFilter">
+          <mat-option value="">Tous</mat-option>
+          <mat-option value="actif">Actif</mat-option>
+          <mat-option value="expire">Expire</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Serv de recommandation électronique</mat-label>
+        <mat-select [(value)]="serviceFilter">
+          <mat-option value="">Tous</mat-option>
+          <mat-option value="bureau">Bureau d'enregistrement</mat-option>
+          <mat-option value="archivage">Service d'archivage électronique</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" class="simple-table">
+      <!-- Colonnes de la table -->
+      <ng-container matColumnDef="client">
+        <th mat-header-cell *matHeaderCellDef>Nom du client</th>
+        <td mat-cell *matCellDef="let element">{{ element.client }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="categorie">
+        <th mat-header-cell *matHeaderCellDef>Catégorie de service</th>
+        <td mat-cell *matCellDef="let element">{{ element.categorie }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="expiration">
+        <th mat-header-cell *matHeaderCellDef>Date d'expiration</th>
+        <td mat-cell *matCellDef="let element">{{ element.expiration }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</div>

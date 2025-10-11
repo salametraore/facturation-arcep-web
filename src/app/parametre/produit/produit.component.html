@@ -1,0 +1,71 @@
+<mat-card>
+  <mat-toolbar color="primary">
+    <span class="title-center mat-h1">Liste des produits</span>
+  </mat-toolbar>
+</mat-card>
+<div class="search-div">
+
+  <mat-form-field class="search-form-field">
+    <mat-label>Recherche</mat-label>
+    <input appUppercase #input (keyup)="applyFilter($event)" matInput>
+  </mat-form-field>
+
+  <button (click)="crud(null,this.operations.create)" color="primary" mat-button>
+    <mat-icon>add</mat-icon>
+    {{bouton_names.add}}
+  </button>
+</div>
+
+<div class="mat-elevation-z2">
+  <table [dataSource]="t_Produit" mat-table matSort style="width: 100%">
+
+
+    <ng-container matColumnDef="libelle">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header> Libelle</th>
+      <td *matCellDef="let element" mat-cell> {{element.libelle}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header> Description</th>
+      <td *matCellDef="let element" mat-cell> {{element.description}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="categorieProduit">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header> Catégorie</th>
+      <td *matCellDef="let element" mat-cell> {{getCategorie(element.categorieProduit)}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th *matHeaderCellDef mat-header-cell>Actions
+      </th>
+      <td *matCellDef="let element" mat-cell>
+        <button [matMenuTriggerFor]="menu" color="primary" mat-icon-button>
+          <mat-icon>settings</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button color="primary" (click)="crud(element,this.operations.details)" mat-menu-item>
+            <mat-icon>visibility</mat-icon>
+            Détails
+          </button>
+          <button (click)="crud(element,this.operations.update)" color="primary" mat-menu-item>
+            <mat-icon color="accent">edit</mat-icon>
+            Modifier
+          </button>
+          <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
+            <mat-icon color="warn">delete</mat-icon>
+            Supprimer
+          </button>
+        </mat-menu>
+      </td>
+    </ng-container>
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
+        [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+
+    <!-- Row shown when there is no matching data. -->
+    <tr *matNoDataRow class="mat-row">
+      <td class="mat-cell" colspan="4">Aucune information trouvée : &nbsp; &nbsp; &nbsp;{{input.value}}</td>
+    </tr>
+  </table>
+  <mat-paginator [pageSizeOptions]="[3,5, 10, 15]" [pageSize]="5" showFirstLastButtons></mat-paginator>
+</div>

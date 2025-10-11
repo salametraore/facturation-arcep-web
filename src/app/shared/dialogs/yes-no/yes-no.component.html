@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+  <span *ngIf="data.title" class="title-center mat-h1">{{data.title}}</span>
+  <span *ngIf="!data.title" class="title-center mat-h1">{{title}}</span>
+</mat-toolbar>
+
+<div mat-dialog-content>
+  <br/> <span>{{data?.message}}</span><br/>
+</div>
+
+
+<div align="end">
+  <button (click)="oui()" color="primary" mat-button>
+    <mat-icon>check</mat-icon>
+    Oui
+  </button>
+  <button (click)="non()" color="warn" mat-button cdkFocusInitial>
+    <mat-icon>close</mat-icon>
+    Non
+  </button>
+</div>

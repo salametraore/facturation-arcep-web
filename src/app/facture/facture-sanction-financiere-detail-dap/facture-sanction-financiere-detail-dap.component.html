@@ -1,0 +1,105 @@
+<div class="facture-container">
+  <!-- En-tête avec les étapes de la démarche -->
+  <div class="header">
+    <h2>Facture – DFC</h2>
+    <p>ÉTAT DE LA DÉMARCHE</p>
+    <div class="etapes">
+      <div *ngFor="let etape of etapes; let i = index" class="etape" [class.active]="i === etapeActuelle">
+        {{ etape }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Import des annexes -->
+  <div class="import-annexes">
+    <h3>DOCUMENTS</h3>
+    <h4>Importer des annexes</h4>
+    <button mat-raised-button color="primary" (click)="importerAnnexe()">
+      <mat-icon>attach_file</mat-icon> Importer
+    </button>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="factureForm" class="facture-form">
+    <!-- Section Client -->
+    <mat-card class="section">
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Client</mat-label>
+            <input matInput formControlName="client" />
+          </mat-form-field>
+          <button mat-button color="warn">+ Importer</button>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de compte client</mat-label>
+            <input matInput formControlName="numeroCompteClient" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Type de client</mat-label>
+            <mat-select formControlName="typeClient">
+              <mat-option value="Client ordinaire">Client ordinaire</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Caractéristiques -->
+    <mat-card class="section">
+      <mat-card-content>
+        <p class="section-title">Caractéristiques</p>
+        <div class="caracteristiques">
+          <div class="caracteristique">
+            <p>001: Caractéristiques_1 de la deuxième ligne ajoutée à la facture (désignation, prix unitaire et quantité)</p>
+          </div>
+          <div class="caracteristique">
+            <p>002: Caractéristiques_2 de la deuxième ligne ajoutée à la facture (désignation, prix unitaire et quantité)</p>
+          </div>
+          <div class="caracteristique">
+            <p>003: Caractéristiques_3 de la deuxième ligne ajoutée à la facture (désignation, prix unitaire et quantité)</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Total de la facture -->
+    <mat-card class="section">
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Total de la facture</mat-label>
+          <input matInput formControlName="totalFacture" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Numéro de compte -->
+    <mat-card class="section">
+      <mat-card-content>
+        <p class="section-title">COORDONNÉES DE TRANSACTION BANCAIRE</p>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Numéro de compte</mat-label>
+          <input matInput formControlName="numeroCompte" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Nom du signataire -->
+    <mat-card class="section">
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nom du signataire</mat-label>
+          <input matInput formControlName="nomSignataire" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Boutons -->
+    <div class="actions">
+      <button mat-raised-button color="basic" (click)="annuler()">Annuler</button>
+      <button mat-raised-button color="primary" (click)="approuver()">Approuver</button>
+      <button mat-raised-button color="warn" (click)="enregistrerEtTelecharger()">Enregistrer et télécharger</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,249 @@
+:host{
+  .mat-icon{
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+}
+
+
+.sidenav-container {
+ // height: 100%;
+}
+
+.sidenav {
+  width: 240px;
+}
+
+.sidenav .mat-toolbar {
+  background: #ffebee;
+}
+
+mat-sidenav{
+  background: #ffebee;
+  height: content-box;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+mat-toolbar{
+  margin-bottom: 20px;
+}
+
+.profil-card{
+  text-align: center;
+  //padding: 0 5px 5px 5px;
+  img{
+    width: 50%;
+    height: 50%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+}
+
+.a_size{
+  font-size: 1em;
+}
+
+mat-expansion-panel{
+  background-color: #ffebee;
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+mat-expansion-panel-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  //padding: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  padding-right: 7px;
+  //border-radius: inherit;
+  transition: height 225ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+mat-icon{
+  //  margin-right: 0px;
+}
+
+.parametersPanel .mat-expansion-panel-body {
+  padding: 0;
+}
+
+mat-nav-list{
+  padding-right: 0px;
+  padding-left: 0px;
+  margin-top: -30px;
+}
+
+::ng-deep .mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+
+mat-toolbar{
+  height: 50px;
+}
+
+ul li {
+  list-style: none;
+}
+
+li{
+  cursor: pointer;
+}
+
+/* Icône/texte mieux alignés */
+:host .mat-icon {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* État actif doux */
+a.mat-list-item.active-link,
+a.mat-list-item:hover {
+  background: rgba(0,0,0,.04);
+  border-radius: 8px;
+}
+
+/* Panneau plus “carte” */
+mat-expansion-panel {
+  background-color: #ffebee;
+  border-radius: 12px;
+  margin: 4px 6px;
+}
+
+/* Titres des modules (en-tête des panneaux) en gras */
+.sidenav .mat-expansion-panel-header-title {
+  font-weight: 700; /* ou 600 si tu veux un peu plus léger */
+}
+
+/* Items de 1er niveau (modules SANS sous-menus) en gras */
+.sidenav mat-nav-list > div > a.mat-mdc-list-item .mdc-list-item__primary-text {
+  font-weight: 700;
+}
+
+/* Sous-menus : garder un poids normal pour la hiérarchie visuelle */
+.sidenav mat-expansion-panel .mat-nav-list a.mat-mdc-list-item .mdc-list-item__primary-text {
+  font-weight: 500; /* ajuste à 400/600 selon ton goût */
+}
+
+/* Titre de la navbar en gras */
+.app-toolbar .app-title {
+  font-weight: 700;         /* gras */
+  letter-spacing: .2px;
+}
+
+/* Regroupe proprement la zone d'actions à droite */
+.app-toolbar .toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+/* Bouton "Se connecter" : lisible et compact */
+.app-toolbar .auth-btn {
+  text-transform: none;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+/* Chevron plus discret */
+.app-toolbar .auth-btn .chevron {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Ouvrir le menu légèrement plus bas pour ne pas coller au bouton */
+.auth-menu .mat-mdc-menu-panel {
+  margin-top: 6px;
+}
+
+.app-toolbar {
+  display: flex;              /* s’assure que la toolbar est en flex */
+  align-items: center;
+}
+
+.app-title {                  /* titre en gras */
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.spacer {                     /* pousse le bloc d’actions à droite */
+  flex: 1 1 auto;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.auth-btn {
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  font-weight: 600;
+}
+
+.auth-btn .chevron {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* --- Toolbar en flex + hauteur uniforme --- */
+.app-toolbar {
+  display: flex;
+  align-items: center;     /* centre verticalement tout le contenu */
+  min-height: 50px;        /* ta barre fait ~50px */
+  padding: 0 8px;
+}
+
+/* Pousse le bloc d’actions à droite (si tu utilises .spacer) */
+.spacer { flex: 1 1 auto; }
+
+/* --- Bloc d’actions (à droite) --- */
+.toolbar-actions {
+  display: flex;
+  align-items: center;     /* centre les enfants verticalement */
+  gap: .5rem;
+}
+
+/* --- Icônes rondes (fullscreen, home, etc.) --- */
+.app-toolbar .mat-mdc-icon-button {
+  display: inline-flex;
+  align-items: center;     /* centre l’icône dans le bouton */
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+/* --- Bouton "Se connecter" (texte + 2 icônes) --- */
+.app-toolbar .auth-btn {
+  display: inline-flex;
+  align-items: center;     /* centre les deux icônes et le texte sur la hauteur de la navbar */
+  gap: .25rem;
+  height: 40px;            /* même hauteur que les icon-buttons */
+  line-height: 1;          /* évite le décalage vertical du texte */
+  text-transform: none;
+  font-weight: 600;        /* si tu veux le texte légèrement plus fort */
+}
+
+/* Icônes à l'intérieur des boutons : pas de décalage baseline */
+.app-toolbar .mat-icon {
+  vertical-align: middle;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,154 @@
+<div class="facture-container">
+  <!-- En-tête -->
+  <div class="header">
+    <h2>Facture – OFC</h2>
+    <p>Étape de la démarche</p>
+    <div class="etapes">
+      <div *ngFor="let etape of etapes; let i = index" class="etape" [class.active]="i === etapeActuelle">
+        {{ etape }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Import des annexes -->
+  <div class="import-annexes">
+    <h3>Importer des annexes</h3>
+    <button mat-raised-button color="primary" (click)="importerAnnexe()">
+      <mat-icon>attach_file</mat-icon> Importer
+    </button>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="factureForm" class="facture-form">
+    <!-- Section Client -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Client</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Saisissez le nom du client, numéro de compte, télécentre</mat-label>
+            <input matInput formControlName="client" />
+          </mat-form-field>
+          <button mat-button color="warn">+ Nouveau</button>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de compte client</mat-label>
+            <input matInput formControlName="numeroCompteClient" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Type de client</mat-label>
+            <mat-select formControlName="typeClient">
+              <mat-option value="Client ordinaire">Client ordinaire</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Objet de la facture -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Objet de la facture</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>1 ligne(s) de fourniture d'énergie du mois de</mat-label>
+          <input matInput formControlName="objetFacture" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Désignation -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Désignation</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="designations">
+          <div *ngFor="let designation of designations.controls; let i = index" [formGroupName]="i" class="designation-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Désignation technique de la prestation</mat-label>
+              <input matInput formControlName="designation" />
+            </mat-form-field>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Prix unitaire</mat-label>
+                <input matInput formControlName="prixUnitaire" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Quantité</mat-label>
+                <input matInput formControlName="quantite" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Éléments -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Éléments</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div formArrayName="elements">
+          <div *ngFor="let element of elements.controls; let i = index" [formGroupName]="i" class="element-row">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Élément {{ i + 1 }}</mat-label>
+                <input matInput formControlName="element" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Valeur</mat-label>
+                <input matInput formControlName="valeur" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <button mat-button color="warn" (click)="ajouterElement()">
+          <mat-icon>add</mat-icon> Ajouter une ligne
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Numéro de compte -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Numéro de compte</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Numéro de compte</mat-label>
+          <input matInput formControlName="numeroCompte" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section Nom du signataire -->
+    <mat-card class="section">
+      <mat-card-header>
+        <mat-card-title>Nom du signataire</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nom du signataire</mat-label>
+          <input matInput formControlName="nomSignataire" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cachet et signature du signataire</mat-label>
+          <input matInput />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Boutons -->
+    <div class="actions">
+      <button mat-raised-button color="basic" (click)="annuler()">Annuler</button>
+      <button mat-raised-button color="primary" (click)="approuver()">Approuver</button>
+      <button mat-raised-button color="warn" (click)="enregistrer()">Enregistrer</button>
+    </div>
+  </form>
+</div>

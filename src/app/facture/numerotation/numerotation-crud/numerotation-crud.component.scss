@@ -1,0 +1,74 @@
+
+
+/* Ligne de bas de tableau : paginator + total aligné à droite */
+:host ::ng-deep .dense-40 .table-block .table-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 0; /* petit espace au-dessus */
+}
+
+/* pousse le total à l'extrême droite */
+:host ::ng-deep .dense-40 .table-block .table-bottom .total-commande {
+  margin-left: auto;
+  color: #ff9100;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .dense-40 .table-block .table-bottom .total-commande b {
+  font-size: 1rem;
+}
+
+
+/* Titre du tableau */
+:host ::ng-deep .dense-40 .table-block .table-title {
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 8px 0 6px;
+  color: #333;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  margin-bottom: 6px;
+}
+
+/* Bas de tableau (déjà donné) */
+:host ::ng-deep .dense-40 .table-block .table-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+}
+:host ::ng-deep .dense-40 .table-block .table-bottom .total-commande {
+  margin-left: auto;
+  color: #ff9100;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Titre du tableau avec la même couleur que "Ajout de produit" */
+:host ::ng-deep .dense-40 .table-block .table-title {
+  color: #ff9100 !important;
+}
+
+/* ===== Rythme vertical pour les formulaires Angular Flex-Layout ===== */
+/* Espace entre deux lignes successives d'un formulaire */
+[mat-dialog-content] form [fxlayout="row"] + [fxlayout="row"] {
+  margin-top: 8px;           /* ajuste à 6/10px selon ton goût */
+}
+
+/* Optionnel : un peu d'air si plusieurs rangées d'inputs sur la même ligne */
+[mat-dialog-content] form [fxlayout="row"] {
+  column-gap: 10px;          /* gap horizontal (laisse ton fxLayoutGap si tu l'utilises) */
+}
+
+/* Sous-ligne Material compacte mais visible */
+.mat-mdc-form-field-subscript-wrapper {
+  margin-top: 0;             /* évite d'ajouter de l'air en plus */
+}
+
+/* Responsive : un léger resserrage sur mobile */
+@media (max-width: 599.98px) {
+  [mat-dialog-content] form [fxlayout="row"] + [fxlayout="row"] {
+    margin-top: 6px;
+  }
+}

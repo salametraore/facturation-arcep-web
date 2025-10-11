@@ -1,0 +1,123 @@
+<div class="dashboard-container">
+
+  <div class="dashboard-header">
+    <h3 class="dashboard-title" style="color: #030303">Liste des encaissements</h3>
+    <div class="dashboard-actions">
+      <button (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
+        <mat-icon>add</mat-icon>
+        Nouvel encaissement
+      </button>
+      <button color="warn" mat-flat-button>
+        <mat-icon>print</mat-icon>
+        Exporter
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-group">
+      <mat-form-field>
+        <mat-label>Nom du client</mat-label>
+        <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
+               matInput matTooltip="Nom du client"  (keyup.enter)="checher()" required>
+        <mat-autocomplete #auto_cl="matAutocomplete">
+          <mat-option  *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
+            <span>{{item.denomination_sociale}}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Date début</mat-label>
+        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (keyup.enter)="checher()">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStart></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Date fin</mat-label>
+        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (keyup.enter)="checher()">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEnd></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Mode paiement</mat-label>
+        <mat-select [(ngModel)]="modeFilter" (keyup.enter)="checher()">
+          <mat-option *ngFor="let item of modePaiements" [value]="item.id">
+            {{item.libelle}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button (click)="checher()" color="primary" mat-mini-fab>
+        <mat-icon>search</mat-icon>
+      </button>
+      <button (click)="reset()" color="primary" mat-mini-fab>
+        <mat-icon>cached</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="mat-elevation-z10">
+    <table [dataSource]="t_RecouvListeEncaissement" mat-table matSort style="width: 100%">
+
+      <!--      <ng-container matColumnDef="reference">
+             <th *matHeaderCellDef mat-header-cell mat-sort-header> Référence</th>
+             <td *matCellDef="let element" mat-cell> {{element.reference}} </td>
+           </ng-container>-->
+      <ng-container matColumnDef="client">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Client</th>
+        <td *matCellDef="let element" mat-cell> {{element.client}} </td>
+      </ng-container>
+      <ng-container matColumnDef="montant">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant</th>
+        <td *matCellDef="let element" mat-cell> {{element.montant_encaisse}} </td>
+      </ng-container>
+      <ng-container matColumnDef="affecte">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant affecté</th>
+        <td *matCellDef="let element" mat-cell> {{element.montant_affecte}} </td>
+      </ng-container>
+      <ng-container matColumnDef="solde_non_affecte">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant restant</th>
+        <td *matCellDef="let element" mat-cell> {{element.montant_restant}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date_encaissement">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Date encaissement</th>
+        <td *matCellDef="let element" mat-cell> {{element.date_encaissement|date: 'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="mode_paiement">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Mode de paiement</th>
+        <td *matCellDef="let element" mat-cell> {{element.mode_paiement_libelle}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th *matHeaderCellDef mat-header-cell>Actions
+        </th>
+        <td *matCellDef="let element" mat-cell>
+          <button [matMenuTriggerFor]="menu" color="warn" mat-icon-button>
+            <mat-icon>settings</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button (click)="crud(element,this.operations.update)" mat-menu-item>
+              <mat-icon color="warn">edit</mat-icon>
+              Modifier
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+      <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
+          [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr *matNoDataRow class="mat-row">
+        <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au critère
+          de
+          recherche
+        </td>
+      </tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[3,5, 10, 15]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+
+<mat-card>
+  <mat-card-content>
+    <div class="releve-container">
+
+      <!-- Tableau des factures -->
+      <div class="factures-table">
+        <table mat-table [dataSource]="t_ReleveCompteClient" class="mat-elevation-z0">
+          <!-- Définition des colonnes -->
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef> Référence </th>
+            <td mat-cell *matCellDef="let facture"> {{facture.reference}} </td>
+          </ng-container>
+
+
+          <ng-container matColumnDef="date_echeance">
+            <th mat-header-cell *matHeaderCellDef> Échéance </th>
+            <td mat-cell *matCellDef="let facture"> {{facture.date_echeance| date:'dd/mm/yyyy'}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="montant_facture">
+            <th mat-header-cell *matHeaderCellDef> Montant facture </th>
+            <td mat-cell *matCellDef="let facture"> {{facture.montant_facture}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="montant_encaissement">
+            <th mat-header-cell *matHeaderCellDef> Encaissement </th>
+            <td mat-cell *matCellDef="let facture"> {{facture.montant_encaissement}} </td>
+          </ng-container>
+
+          <!-- Ligne des colonnes -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <!-- Solde global -->
+      <div class="solde-global">
+        <p><b>Montant Facture :</b> 975 000 XOF</p>
+        <p><b>Montant Encaissement :</b> 1 075 000 XOF</p>
+        <p><b>Solde global :</b> 100 000 XOF</p>
+      </div>
+
+      <!-- Bouton Fermer -->
+
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,43 @@
+.container {
+  padding: 16px;
+  max-width: 100%;
+}
+
+mat-tab-group {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.mat-tab-label {
+  min-width: 120px;
+  text-align: center;
+}
+
+.mat-elevation-z8 {
+  padding: 16px;
+  margin-top: 16px;
+}
+
+table {
+  width: 100%;
+}
+
+.client-info {
+  display: flex;
+  align-items: center;
+}
+
+.client-logo {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.statut-container {
+  display: flex;
+  align-items: center;
+}
+
+.mat-column-actions {
+  flex: 0 0 120px;
+}

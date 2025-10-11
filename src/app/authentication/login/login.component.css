@@ -1,0 +1,109 @@
+.login-container {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.background-container {
+  background-image: url('/assets/images/background.png');
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-row {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.slogan-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rem;
+  color: white;
+}
+
+.slogan-content {
+  margin-top: auto;
+}
+
+.copyright {
+  margin-bottom: 2rem;
+}
+
+.form-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 450px;
+  padding: 2rem;
+}
+
+.custom-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.logo-container {
+  margin-bottom: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.logo {
+  max-width: 120px;
+  height: auto;
+}
+
+.mat-title {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.mat-subtitle {
+  font-size: 1rem;
+  margin: 0.5rem 0 1rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.mat-checkbox {
+  margin-right: auto;
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+}

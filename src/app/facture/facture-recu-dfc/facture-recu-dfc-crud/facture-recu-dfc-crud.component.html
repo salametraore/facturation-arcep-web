@@ -1,0 +1,64 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title" style="color: #030303">Tableau de bord / Nom de domaine</h1>
+
+  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
+  <!--  <div class="demand-status">-->
+  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
+  <!--    <mat-stepper [linear]="true" #stepper>-->
+  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
+  <!--        <ng-template matStepLabel>-->
+  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
+  <!--        </ng-template>-->
+  <!--      </mat-step>-->
+  <!--    </mat-stepper>-->
+  <!--  </div>-->
+
+  <!-- Documents -->
+  <!--  <div class="documents-section">-->
+  <!--    <span class="section-label">DOCUMENTS</span>-->
+  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
+  <!--  </div>-->
+
+  <!-- Fiche technique -->
+  <div class="tech-sheet-section">
+    <span class="section-label">FICHE TECHNIQUE</span>
+    <form [formGroup]="form">
+
+      <div class="client-section">
+        <span class="subsection-label">Client</span>
+        <mat-form-field>
+          <mat-label>Domiciliation du demandeur</mat-label>
+          <mat-select formControlName="client" placeholder="Cliquez et sélectionnez votre client">
+            <mat-option *ngFor="let item of clients" [value]="item.id">
+              {{item.denomination_sociale}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="domiciliation-section">
+        <span class="subsection-label">Domiciliation</span>
+        <mat-form-field>
+          <mat-label>Domiciliation du demandeur</mat-label>
+          <mat-select formControlName="produit" placeholder="Domiciliation" matTooltip="Domiciliation">
+            <mat-option *ngFor="let item of produits" [value]="item.id">
+              {{item.libelle}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="comment-section">
+        <span class="subsection-label">COMMENTAIRE</span>
+        <mat-form-field>
+          <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
+          <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+    <div class="actions">
+      <button mat-raised-button (click)="crud()" color="warn">Enregistrer</button>
+      <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
+    </div>
+  </div>
+</div>
