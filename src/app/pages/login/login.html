@@ -1,0 +1,62 @@
+<div class="login-page d-flex align-items-center justify-content-center min-vh-100">
+  <div class="login-background position-relative w-100 h-100">
+    <img src="assets/images/bg-login.png" alt="Background" class="background-image" />
+
+    <div class="login-content container position-absolute top-50 start-50 translate-middle">
+      <div class="row g-4">
+        <!-- Partie gauche -->
+        <div class="col-md-7 text-white d-flex flex-column align-items-start justify-content-center">
+          <img src="assets/images/radio_icon.png" alt="ARCEP Logo" class="img-fluid mb-4" style="max-width: 150px;">
+          <h2 class="fw-semibold">
+            Un seul accès,<br />
+            toutes vos factures<br />
+            à portée de main.
+          </h2>
+        </div>
+
+        <!-- Partie droite -->
+        <div class="col-md-5">
+          <div class="card shadow-lg p-4">
+            <div class="text-center mb-3">
+              <img src="assets/images/logo-arcep.png" alt="ARCEP Logo" class="img-fluid" style="max-width: 120px;">
+            </div>
+            <h1 class="h4 mb-2 text-center">Connectez-vous à votre compte</h1>
+            <p class="text-muted text-center mb-4">Bienvenue, entrez vos informations de connexion</p>
+
+            <form (ngSubmit)="login(); $event.preventDefault()">
+              <div class="mb-3">
+                <label for="username" class="form-label">Adresse mail</label>
+                <input type="text" id="username" [(ngModel)]="username" class="form-control"  name="username" required>
+              </div>
+
+              <div class="mb-3 position-relative">
+                <label for="password">Mot de passe</label>
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password" class="form-control"/>
+                    <i class="fa-solid" type="button" (click)="togglePasswordVisibility()" >👁</i>
+
+                  <!-- <span class="input-group-text bg-white" (click)="togglePasswordVisibility()" style="cursor: pointer;">
+                    <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  </span> -->
+                </div>
+        
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="remember">
+                  <label class="form-check-label" for="remember">Restez connecté</label>
+                </div>
+                <a href="#" class="text-decoration-none small text-danger">Mot de passe oublié ?</a>
+              </div>
+
+              <button type="submit" class="btn btn-danger w-100 login-button">Connexion</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-left text-white mt-4">
+        © ARCEP 2025. Tous droits réservés.
+      </div>
+    </div>
+  </div>
+</div>

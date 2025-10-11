@@ -1,0 +1,77 @@
+<div class="detail-container">
+  <!-- Titre -->
+  <h2 class="page-title">Créer une nouvelle demande de service de confiance</h2>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <div
+      *ngFor="let step of steps; let i = index"
+      class="step"
+      [class.active]="i === currentStep"
+      [class.completed]="i < currentStep"
+      (click)="goToStep(i)"
+      [matTooltip]="step.tooltip"
+      matTooltipPosition="above"
+    >
+      <div class="step-circle">{{ i + 1 }}</div>
+      <div class="step-label">{{ step.label }}</div>
+      <div class="step-line" *ngIf="i < steps.length - 1"></div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="content-wrapper">
+    <!-- Colonne gauche -->
+    <div class="left-panel">
+      <h3>Fiche de création</h3>
+
+      <!-- Ligne Prestataire + bouton Nouveau -->
+      <div class="domain-row">
+        <mat-form-field appearance="outline" class="domain-input">
+          <mat-label>Prestataire</mat-label>
+          <input
+            matInput
+            [(ngModel)]="prestataire"
+            placeholder="cliquez/saisissez pour sélectionner le prestataire"
+          />
+        </mat-form-field>
+
+        <button mat-button color="primary" (click)="newForm()">+ Nouveau</button>
+      </div>
+
+      <!-- Sélecteur de type de service -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Type de service</mat-label>
+        <mat-select [(ngModel)]="formData.typeService">
+          <mat-option *ngFor="let type of serviceTypes" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Bénéficiaire -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Bénéficiaire</mat-label>
+        <input matInput [(ngModel)]="formData.beneficiaire" />
+      </mat-form-field>
+
+      <!-- Commentaire -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput rows="3" [(ngModel)]="formData.commentaire"></textarea>
+      </mat-form-field>
+
+      <!-- Boutons -->
+      <div class="button-row">
+        <button mat-stroked-button color="warn" (click)="cancel()">Annuler</button>
+        <button mat-flat-button color="primary" (click)="save()">Ajouter</button>
+      </div>
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="right-panel">
+      <h3>Instructions</h3>
+      <p>Veuillez remplir les champs ci-contre pour créer une nouvelle demande de service de confiance.</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+/* Sidebar : styles compatibles avec le theme que tu as déjà */
+.sidebar {
+  width: 280px;
+  background: var(--sidebar-bg, #fff);
+  border-right: 1px solid #eee;
+  padding: 24px 12px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+  height: 100vh;
+  /* position: relative; */
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.sidebar .logo { text-align: center; margin-bottom: 20px; }
+.sidebar .logo img { max-width: 140px; display:block; margin:0 auto; }
+
+.menu { list-style: none; margin: 0; padding: 0; }
+.menu li { margin-bottom: 6px; }
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #333;
+  text-decoration: none;
+  transition: background .15s, color .15s, transform .08s;
+  font-weight: 500;
+}
+
+.menu a i { width: 20px; text-align: center; font-size: 16px; }
+
+/* hover / active (match ton style existant) */
+.menu a:hover {
+  background: #FFE0E0;
+  color: #C12C2A;
+  transform: translateX(3px);
+}
+
+.menu a.active {
+  background: #C12C2A;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+/* responsive : cacher la sidebar par défaut sur petits écrans */
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    position: fixed;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}

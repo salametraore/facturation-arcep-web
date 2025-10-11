@@ -1,0 +1,103 @@
+<div class="detail-container">
+  <!-- Titre -->
+  <h2 class="page-title">Traiter la demande de {{ item.name }}</h2>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <div
+      *ngFor="let step of steps; let i = index"
+      class="step"
+      [class.active]="i === currentStep"
+      [class.completed]="i < currentStep"
+      (click)="goToStep(i)"
+      [matTooltip]="step.tooltip"
+      matTooltipPosition="above"
+    >
+      <div class="step-circle">{{ i + 1 }}</div>
+      <div class="step-label">{{ step.label }}</div>
+      <div class="step-line" *ngIf="i < steps.length - 1"></div>
+    </div>
+  </div>
+
+  <!-- Contenu principal en deux colonnes -->
+  <div class="content-wrapper">
+    <!-- Fiche technique -->
+    <div class="left-panel">
+      <h3>Fiche technique</h3>
+
+      <!-- Fichiers attachés -->
+      <div class="attachments">
+        <h4>Fichiers attachés</h4>
+        <div class="cards">
+          <mat-card class="file-card word">
+            <mat-icon>description</mat-icon>
+            <span>Word</span>
+          </mat-card>
+          <mat-card class="file-card pdf">
+            <mat-icon>picture_as_pdf</mat-icon>
+            <span>PDF</span>
+          </mat-card>
+          <mat-card class="file-card excel">
+            <mat-icon>grid_on</mat-icon>
+            <span>Excel</span>
+          </mat-card>
+        </div>
+      </div>
+
+      <!-- Sélecteur et commentaire -->
+      <div class="form-section">
+        <!-- <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Catégorie de service</mat-label>
+          <mat-select [(ngModel)]="newStatus">
+            <mat-option value="Service de certification électronique">Service de certification électronique</mat-option>
+            <mat-option value="Service d'archivage électronique">Service d'archivage électronique</mat-option>
+            <mat-option value="Service horodatage électronique">Service horodatage électronique</mat-option>
+            <mat-option value="Service de recommandé électronique">Service de recommandé électronique</mat-option>
+            <mat-option value="Service de numérisation de documents">Service de numérisation de documents</mat-option>
+            <mat-option value="Système horodatage électronique">Système horodatage électronique</mat-option>
+            <mat-option value="Système d'archivage électronique">Service d'archivage électronique</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+
+        
+      <label class="form-label">Zone géographique</label>
+        <mat-radio-group [(ngModel)]="newStatus" class="radio-group">
+          <mat-radio-button value="burkina_faso">Burkina Faso</mat-radio-button>
+          <mat-radio-button value="afrique">Afrique</mat-radio-button>
+          <mat-radio-button value="hors_afrique">Hors Afrique</mat-radio-button>
+        </mat-radio-group>
+
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Commentaire</mat-label>
+          <textarea matInput rows="3" [(ngModel)]="processingNote"></textarea>
+        </mat-form-field>
+
+        <!-- Boutons -->
+        <div class="button-row">
+          <button mat-stroked-button color="warn" (click)="openRejectNotify()">Rejeter / Notifier client</button>
+          <button mat-flat-button color="primary" (click)="save()">Transmettre</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique -->
+    <div class="right-panel">
+      <h3>Historique de la demande</h3>
+      <div class="history-box">
+        <div *ngFor="let h of history" class="history-item">
+          <div class="history-header">
+            <span class="history-date">{{ h.date }}</span>
+            <span class="history-action">{{ h.action }}</span>
+          </div>
+          <p class="history-note">{{ h.note }}</p>
+          <mat-divider></mat-divider>
+        </div>
+        <div *ngIf="history.length === 0" class="empty-state">
+          Aucune action enregistrée pour le moment
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  

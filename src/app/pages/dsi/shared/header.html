@@ -1,0 +1,45 @@
+<header class="header-container">
+  <!-- GAUCHE -->
+  <div class="header-left">
+    <h1 class="welcome-text">Bienvenue Silemané</h1>
+  </div>
+
+  <!-- DROITE -->
+  <div class="header-right">
+    <!-- Barre de recherche -->
+    <div class="search-box">
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <input type="text" placeholder="Rechercher..." [(ngModel)]="searchText" />
+    </div>
+
+    <!-- Notifications -->
+    <div class="dropdown">
+      <button type="button" class="icon-btn" (click)="toggleNotifications($event)">
+        <i class="fa-solid fa-bell" aria-hidden="true"></i>
+      </button>
+
+      <!-- stopPropagation pour éviter que le HostListener document:click ferme immédiatement -->
+      <div class="dropdown-menu" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+        <div *ngFor="let notif of notifications" class="dropdown-item">
+          <div class="item-left">
+            <strong>{{ notif.title }}</strong>
+            <p class="desc">{{ notif.message }}</p>
+          </div>
+          <div class="item-right">{{ notif.time }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profil -->
+    <div class="dropdown">
+      <button type="button" class="avatar-btn" (click)="toggleProfile($event)">
+        <img class="avatar" src="https://i.pravatar.cc/40" alt="Profil" />
+      </button>
+
+      <div class="dropdown-menu" *ngIf="showProfile" (click)="$event.stopPropagation()">
+        <p class="dropdown-item">Mon profil</p>
+        <p class="dropdown-item">Déconnexion</p>
+      </div>
+    </div>
+  </div>
+</header>

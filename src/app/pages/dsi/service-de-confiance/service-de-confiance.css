@@ -1,0 +1,149 @@
+.page-container {
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.filter-bar mat-form-field { width: 220px; }
+
+.filter-bar button { height: 56px; }
+
+.upload-action-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.upload-label-reset {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  color: #7a7a7a;
+  border: none !important; 
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-label-reset:hover { background-color: #686868; color: #fff; }
+
+.upload-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px dashed #3f51b5;
+  color: #3f51b5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-label:hover { background-color: #3f51b5; color: #fff; }
+
+
+.upload-label-print {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px dashed #b53f3f;
+  color: #b53f3f;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-label-print:hover { background-color: #b53f3f; color: #fff; }
+
+.upload-label-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px dashed #1a9900;
+  color: #1a9900;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-label-export:hover { background-color: #1a9900; color: #fff; }
+
+
+
+
+.file-name { font-size: 0.95rem; color: #555; }
+
+.table-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th, .custom-table td { padding: 14px 18px; text-align: left; }
+.custom-table th { background: #f0f0f5; color: #333; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; }
+.custom-table td { border-bottom: 1px solid #eee; font-size: 0.95rem; color: #333; }
+
+.status-chip { display: inline-block; padding: 4px 10px; border-radius: 16px; font-weight: 500; font-size: 0.85rem; text-transform: capitalize; }
+.status-new { background: #e3f2fd; color: #1565c0; }
+.status-progress { background: #fff8e1; color: #f57f17; }
+.status-valid { background: #e8f5e9; color: #2e7d32; }
+
+button[mat-flat-button] mat-icon,
+button[mat-stroked-button] mat-icon { margin-right: 6px; }
+
+.empty-row { text-align: center; color: #777; padding: 24px; font-style: italic; }
+
+@media (max-width: 900px) {
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-bar mat-form-field { width: 100%; }
+  .custom-table th, .custom-table td { padding: 10px; }
+}
+/* ✅ Bouton rouge pour création FT */
+.upload-label-create {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  background-color: #c62828;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-label-create:hover {
+  background-color: #a92424;
+}

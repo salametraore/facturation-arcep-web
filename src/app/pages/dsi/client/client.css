@@ -1,0 +1,105 @@
+.page-container {
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.filter-bar mat-form-field { width: 220px; }
+.filter-bar button { height: 56px; }
+
+.upload-action-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.upload-label-reset, .upload-label, .upload-label-print, .upload-label-export, .upload-label-create {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-label-reset { color: #7a7a7a; border: none !important; }
+.upload-label-reset:hover { background-color: #686868; color: #fff; }
+
+.upload-label { border: 1px dashed #3f51b5; color: #3f51b5; }
+.upload-label:hover { background-color: #3f51b5; color: #fff; }
+
+.upload-label-print { border: 1px dashed #b53f3f; color: #b53f3f; }
+.upload-label-print:hover { background-color: #b53f3f; color: #fff; }
+
+.upload-label-export { border: 1px dashed #1a9900; color: #1a9900; }
+.upload-label-export:hover { background-color: #1a9900; color: #fff; }
+
+.upload-label-create { border: 1px dashed #e49503; color: #e49503; }
+.upload-label-create:hover { background-color: #e49503; color: #fff; }
+
+
+.file-name { font-size: 0.95rem; color: #555; }
+
+.table-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th, .custom-table td { padding: 14px 18px; text-align: left; }
+.custom-table th { background: #f0f0f5; color: #333; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; }
+.custom-table td { border-bottom: 1px solid #eee; font-size: 0.95rem; color: #333; }
+
+.client-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.client-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.client-name { font-weight: 500; }
+.client-email { font-size: 12px; color: #777; }
+
+.empty-row { text-align: center; color: #777; padding: 24px; font-style: italic; }
+
+@media (max-width: 900px) {
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-bar mat-form-field { width: 100%; }
+  .custom-table th, .custom-table td { padding: 10px; }
+}

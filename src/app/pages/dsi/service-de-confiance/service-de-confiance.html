@@ -1,0 +1,109 @@
+<div class="page-container">
+  <h2 class="page-title">Liste des demandes Services de Confiance</h2>
+
+  <!-- 🔍 Zone de filtres -->
+  <div class="filter-bar">
+    <mat-form-field appearance="outline">
+      <mat-label>Recherche</mat-label>
+      <input matInput placeholder="Rechercher un prestataire ou une catégorie..." [(ngModel)]="search" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Statut</mat-label>
+      <mat-select [(ngModel)]="statusFilter">
+        <mat-option value="">Tous</mat-option>
+        <mat-option value="nouveau">Nouveau</mat-option>
+        <mat-option value="en_cours">En cours</mat-option>
+        <mat-option value="validé">Validé</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Du</mat-label>
+      <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+      <mat-datepicker #fromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Au</mat-label>
+      <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+      <mat-datepicker #toPicker></mat-datepicker>
+    </mat-form-field>
+
+    <button class="upload-label-reset" (click)="resetFilters()">
+      <mat-icon>refresh</mat-icon>
+      Réinitialiser
+    </button>
+
+    <button class="upload-label-create" (click)="goToCreate()">
+      <mat-icon>add_circle_outline</mat-icon>
+      FT service de confiance
+    </button>
+  </div>
+
+  <!-- 📁 Zone import / actions -->
+  <div class="upload-action-section">
+    <label for="fileUpload" class="upload-label">
+      <mat-icon>cloud_upload</mat-icon>
+      Importer un fichier
+    </label>
+    <input id="fileUpload" type="file" hidden (change)="onFileSelected($event)" />
+    <span *ngIf="selectedFileName" class="file-name">{{ selectedFileName }}</span>
+
+    <button class="upload-label-print" (click)="printSelected()">
+      <mat-icon>print</mat-icon>
+      Imprimer
+    </button>
+
+    <button class="upload-label-export" (click)="exportSelected()">
+      <mat-icon>file_download</mat-icon>
+      Exporter
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- 🗂️ Liste des demandes avec checkbox -->
+  <div class="table-container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th><mat-checkbox [(ngModel)]="selectAll" (change)="toggleSelectAll()"></mat-checkbox></th>
+          <th>Nom du Prestataire</th>
+          <th>Catégorie de Service</th>
+          <th>Date de Réception</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of filteredDemandes">
+          <td><mat-checkbox [(ngModel)]="d.selected"></mat-checkbox></td>
+          <td>{{ d.name }}</td>
+          <td>{{ d.serviceCategory }}</td>
+          <td>{{ d.receivedAt }}</td>
+          <td>
+            <span class="status-chip" [ngClass]="{
+              'status-new': d.status === 'nouveau',
+              'status-progress': d.status === 'en_cours',
+              'status-valid': d.status === 'validé'
+            }">
+              {{ d.status | titlecase }}
+            </span>
+          </td>
+          <td>
+            <button mat-flat-button color="primary" (click)="openDetail(d.id)">
+              <mat-icon>visibility</mat-icon>
+              Traiter
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredDemandes.length === 0">
+          <td colspan="6" class="empty-row">Aucune demande trouvée.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

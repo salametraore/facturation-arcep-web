@@ -1,0 +1,107 @@
+<div class="nom-de-domaine-page">
+  <div class="top-actions">
+    <div class="filters">
+      <input type="text" placeholder="Rechercher par client / domaine" [(ngModel)]="search" />
+      <select [(ngModel)]="statusFilter">
+        <option value="">Tous les statuts</option>
+        <option value="nouveau">Nouveau</option>
+        <option value="en_cours">En cours</option>
+        <option value="traité">Traité</option>
+        <option value="rejeté">Rejeté</option>
+      </select>
+      <input type="date" [(ngModel)]="fromDate" />
+      <input type="date" [(ngModel)]="toDate" />
+    </div>
+
+    <div class="actions">
+      <label class="btn">
+        <i class="fas fa-file-import"></i>
+        <input type="file" accept=".csv" (change)="importCSV($any($event.target).files?.[0])" />
+        Importer
+      </label>
+
+      <button class="btn" (click)="exportCSV()"><i class="fas fa-file-export"></i> Exporter</button>
+      <button class="btn" (click)="printTable()"><i class="fas fa-print"></i> Imprimer</button>
+      <button class="btn primary" (click)="goToCreate()"><i class="fas fa-plus"></i>FT nom de domaine</button>
+    </div>
+  </div>
+
+  <div class="content-split">
+    <!-- LEFT : stats cards (empilées)
+    <div class="left-cards">
+      
+      <div class="card stat-card">
+        <select>
+          <option>Statut</option>
+        </select>
+        <div class="stat-content">
+          <div class="icon"><i class="fas fa-globe"></i></div>
+          <div class="label"><strong>13</strong> Bureaux d’enregistrement</div>
+        </div>
+      </div>
+
+      
+      <div class="card stat-card">
+        <div class="two-filters">
+          <select>
+            <option>Statut</option>
+          </select>
+          <select>
+            <option>Serv de recommandé électronique</option>
+          </select>
+        </div>
+        <div class="stat-content">
+          <div class="icon"><i class="fas fa-user-shield"></i></div>
+          <div class="label"><strong>8</strong> Prestataires de services de confiance</div>
+        </div>
+      </div>
+
+      
+      <div class="card stat-card">
+        <select>
+          <option>Service</option>
+        </select>
+        <div class="stat-content">
+          <div class="icon"><i class="fas fa-sitemap"></i></div>
+          <div class="label"><strong>8</strong> Instances</div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- RIGHT : TABLE -->
+    <div class="right-table">
+      <div class="table-card">
+        <h6>Liste des demandes reçues</h6>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Catégorie</th>
+              <th>Reçue le</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of filteredRequests">
+              <td>{{ r.name }}</td>
+              <td>{{ r.serviceCategory }}</td>
+              <td>{{ r.receivedAt }}</td>
+              <td>{{ r.status }}</td>
+              <td>
+                <button class="btn small" (click)="goToDetail(r.id)">
+                  <i class="fas fa-play"></i> Traiter
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredRequests.length === 0">
+              <td colspan="5" class="empty">Aucune demande trouvée</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>

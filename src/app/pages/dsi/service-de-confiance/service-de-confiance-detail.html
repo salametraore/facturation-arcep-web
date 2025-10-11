@@ -1,0 +1,98 @@
+<div *ngIf="item; else loading" class="detail-container">
+  <h2 class="page-title">Traiter la demande de {{ item.name }}</h2>
+
+  <!-- Étapes de traitement -->
+  <div class="stepper">
+    <div *ngFor="let step of steps; let i = index"
+         class="step"
+         [class.active]="i === currentStep"
+         [class.completed]="i < currentStep"
+         [attr.title]="step.description"
+         (click)="goToStep(i)">
+      <div class="step-circle">{{ i + 1 }}</div>
+      <div class="step-label">{{ step.label }}</div>
+      <div class="step-line" *ngIf="i < steps.length - 1"></div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- 📄 Fiche technique -->
+    <div class="left-panel">
+      <h3>Fiche technique</h3>
+
+      <!-- <mat-card class="info-card">
+        <mat-card-content>
+          <p><strong>Nom du prestataire :</strong> {{ item.name }}</p>
+          <p><strong>Catégorie actuelle :</strong> {{ item.serviceCategory }}</p>
+          <p><strong>Date de réception :</strong> {{ item.receivedAt | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Statut :</strong>
+            <span class="status" [ngClass]="item.status">{{ item.status | titlecase }}</span>
+          </p>
+        </mat-card-content>
+      </mat-card> -->
+
+      <!-- Fichiers attachés -->
+      <div class="attachments">
+        <h4>Fichiers attachés</h4>
+        <div class="cards">
+          <mat-card class="file-card word"><mat-icon>description</mat-icon><span>Word</span></mat-card>
+          <mat-card class="file-card pdf"><mat-icon>picture_as_pdf</mat-icon><span>PDF</span></mat-card>
+          <mat-card class="file-card excel"><mat-icon>grid_on</mat-icon><span>Excel</span></mat-card>
+        </div>
+      </div>
+
+      <!-- Zone de traitement -->
+      <div class="form-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nouvelle catégorie</mat-label>
+          <mat-select [(ngModel)]="newStatus">
+            <mat-option value="Service de certification électronique">Service de certification électronique</mat-option>
+            <mat-option value="Service d'archivage électronique">Service d'archivage électronique</mat-option>
+            <mat-option value="Service horodatage électronique">Service horodatage électronique</mat-option>
+            <mat-option value="Service de recommandé électronique">Service de recommandé électronique</mat-option>
+            <mat-option value="Service de numérisation de documents">Service de numérisation de documents</mat-option>
+            <mat-option value="Système horodatage électronique">Système horodatage électronique</mat-option>
+            <mat-option value="Système d'archivage électronique">Système d'archivage électronique</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Commentaire</mat-label>
+          <textarea matInput rows="3" [(ngModel)]="processingNote"></textarea>
+        </mat-form-field>
+
+        <div class="button-row">
+          <button mat-stroked-button color="warn" (click)="openRejectNotify()">
+            <mat-icon>cancel</mat-icon> Rejeter / Notifier client
+          </button>
+          <button mat-flat-button color="primary" (click)="save()">
+            <mat-icon>send</mat-icon> Transmettre
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📜 Historique -->
+    <div class="right-panel">
+      <h3>Historique de la demande</h3>
+      <div class="history-box">
+        <div *ngFor="let h of history" class="history-item">
+          <div class="history-header">
+            <span class="history-date">{{ h.date | date:'dd/MM/yyyy' }}</span>
+            <span class="history-action">{{ h.action }}</span>
+          </div>
+          <p class="history-note">{{ h.note }}</p>
+          <mat-divider></mat-divider>
+        </div>
+
+        <div *ngIf="history.length === 0" class="empty-state">
+          Aucune action enregistrée pour le moment.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <p class="loading-text">Chargement des données...</p>
+</ng-template>

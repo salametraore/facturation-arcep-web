@@ -1,0 +1,49 @@
+<div class="login-page d-flex align-items-center justify-content-center min-vh-100">
+  <div class="login-background position-relative w-100 h-100">
+    <img src="assets/images/bg-login.png" alt="Background" class="background-image" />
+
+    <div class="login-content container position-absolute top-50 start-50 translate-middle">
+      <div class="row g-4">
+        <!-- Partie gauche -->
+        <div class="col-md-7 text-white d-flex flex-column align-items-start justify-content-center">
+          <img src="assets/images/radio_icon.png" alt="ARCEP Logo" class="img-fluid mb-4" style="max-width: 150px;">
+          <h2 class="fw-semibold">
+            Un seul accès,<br />
+            toutes vos factures<br />
+            à portée de main.
+          </h2>
+        </div>
+
+        <!-- Partie droite -->
+        <div class="col-md-5">
+          <div class="card shadow-lg p-4">
+            <div class="text-center mb-3">
+              <img src="assets/images/logo-arcep.png" alt="ARCEP Logo" class="img-fluid" style="max-width: 120px;">
+            </div>
+            <h1 class="h4 mb-2 text-center">Vérification de votre identité</h1>
+            <p class="text-muted text-center mb-4">Un code de sécurité a été envoyé à votre adresse mail.
+Veuillez le saisir ci-dessous.</p>
+
+    
+    <form>
+      <div class="mb-3">
+        <label for="otp" class="form-label">Entrez le code OTP</label>
+        <input type="text" id="otp" class="form-control" [(ngModel)]="otpCode" name="otp" required maxlength="6">
+      </div>
+
+      <button type="button" class="btn btn-danger w-100" (click)="submitOtp()">Valider</button>
+    </form>
+
+
+    <div class="text-center mt-3">
+      <small>Vous n'avez pas reçu le code ? <a href="#" (click)="resendOtp()">Renvoyer</a></small>
+    </div>
+  </div>
+</div>
+ <div class="text-left text-white mt-4">
+        © ARCEP 2025. Tous droits réservés.
+      </div>
+    </div>
+  </div>
+</div>
+

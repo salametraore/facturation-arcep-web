@@ -1,0 +1,73 @@
+<div class="detail-container">
+  <!-- Titre -->
+  <h2 class="page-title">Créer une nouvelle demande de nom de domaine</h2>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <div
+      *ngFor="let step of steps; let i = index"
+      class="step"
+      [class.active]="i === currentStep"
+      [class.completed]="i < currentStep"
+      (click)="goToStep(i)"
+      [matTooltip]="step.tooltip"
+      matTooltipPosition="above"
+    >
+      <div class="step-circle">{{ i + 1 }}</div>
+      <div class="step-label">{{ step.label }}</div>
+      <div class="step-line" *ngIf="i < steps.length - 1"></div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="content-wrapper">
+    <!-- Colonne gauche -->
+    <div class="left-panel">
+      <h3>Fiche de création</h3>
+
+      <!-- Ligne Nom de domaine + bouton Nouveau -->
+      <div class="domain-row">
+        <mat-form-field appearance="outline" class="domain-input">
+          <mat-label>Client</mat-label>
+          <input matInput [(ngModel)]="domainName" placeholder="cliquez/saisissez pour selectionner le client" />
+        </mat-form-field>
+
+        <button mat-button color="primary" (click)="newForm()">+ Nouveau</button>
+      </div>
+
+      <!-- Sélecteur de service -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Service concerné</mat-label>
+        <mat-select [(ngModel)]="selectedService">
+          <mat-option *ngFor="let s of services" [value]="s.value">{{ s.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Zone géographique -->
+      <label class="form-label">Zone géographique</label>
+      <mat-radio-group [(ngModel)]="newStatus" class="radio-group">
+        <mat-radio-button value="burkina_faso">Burkina Faso</mat-radio-button>
+        <mat-radio-button value="afrique">Afrique</mat-radio-button>
+        <mat-radio-button value="hors_afrique">Hors Afrique</mat-radio-button>
+      </mat-radio-group>
+
+      <!-- Commentaire -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput rows="3" [(ngModel)]="processingNote"></textarea>
+      </mat-form-field>
+
+      <!-- Boutons -->
+      <div class="button-row">
+        <button mat-stroked-button color="warn" (click)="cancel()">Annuler</button>
+        <button mat-flat-button color="primary" (click)="save()">Transmettre</button>
+      </div>
+    </div>
+
+    <!-- Colonne droite (vide ou instructions) -->
+    <div class="right-panel">
+      <h3>Instructions</h3>
+      <p>Veuillez remplir les champs ci-contre pour créer une nouvelle demande de nom de domaine.</p>
+    </div>
+  </div>
+</div>
