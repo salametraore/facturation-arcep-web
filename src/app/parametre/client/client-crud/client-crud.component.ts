@@ -15,8 +15,7 @@ import {bouton_names, operations} from "../../../constantes";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
-import {LigneReleveCompteClient, ReleveCompteClient} from "../../../shared/models/ligne-releve-compte-client";
-import {DetailFicheClient} from "../../../shared/models/detail-fiche-client";
+import { ReleveCompteClient} from "../../../shared/models/ligne-releve-compte-client";
 import {RecouvDashboardClient} from "../../../shared/models/recouv-dashboard-client";
 
 @Component({
@@ -41,7 +40,13 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
   nomClient: any;
   t_ReleveCompteClient?: MatTableDataSource<ReleveCompteClient>;
 
-  displayedColumns: string[] = ['reference','date_echeance', 'montant_facture','montant_encaissement'];
+  // Totaux à afficher
+  totalFacture = 0;
+  totalEncaissement = 0;
+  soldeGlobal = 0; // Montant Facture + Montant Encaissement ( Montant Encaissement  etant negatif)
+
+
+  displayedColumns: string[] = ['type_ligne','reference','date_echeance', 'montant_facture','montant_encaissement'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -76,18 +81,27 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
   }
 
   reloadData() {
+    const toTime = (d: any) => d ? new Date(d).getTime() : Number.MAX_SAFE_INTEGER;
+
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
-
+      console.log(this.recouvDashboardClient)
       if(this.recouvDashboardClient){
         this.client = clients?.find(c=>c.id ===this.recouvDashboardClient?.client_id);
         this.nomClient = this.client?.denomination_sociale;
-        this.clientService.getReleveCompteClientByIdClient(this.client?.id).subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
-          this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+
+        this.clientService.getReleveCompteClientByIdClient(this.recouvDashboardClient?.client_id).subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
+          //this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+          console.log(ligneReleveCompteClients);
+          const sorted = [...ligneReleveCompteClients].sort((a, b) => toTime(a?.date_echeance) - toTime(b?.date_echeance));
+          this.t_ReleveCompteClient.data = sorted;
+          this.paginator?.firstPage?.();
+          this.recomputeTotals(); // <-- recalcul après chargement
         });
       }else{
         this.clientService.getReleveCompteClient().subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
           this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+          this.recomputeTotals();
         });
       }
     });
@@ -96,6 +110,13 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
+  }
+
+  private recomputeTotals(): void {
+    const data = this.t_ReleveCompteClient?.filteredData ?? this.t_ReleveCompteClient?.data ?? [];
+    this.totalFacture = data.reduce((sum, row: any) => sum + (Number(row?.montant_facture) || 0), 0);
+    this.totalEncaissement = data.reduce((sum, row: any) => sum + (Number(row?.montant_encaissement) || 0), 0);
+    this.soldeGlobal = this.totalFacture + this.totalEncaissement; // totalEncaissement etant negatif
   }
 
   onSubmit() {

@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <div class="mat-elevation-z10">
+  <div class="table-frame mat-elevation-z10 compact-table">
     <table [dataSource]="ficheTechniques" mat-table matSort style="width: 100%">
 
       <ng-container matColumnDef="client_nom">
@@ -107,6 +107,14 @@
               <mat-icon color="warn">edit</mat-icon>
               Transmettre
             </button>
+
+            <button *ngIf="element.statut?.code==='FTD' "
+                    (click)="onSetAvis(element,this.operations.transmettre)"
+                    mat-menu-item>
+              <mat-icon color="warn">check</mat-icon>
+              Donner un avis
+            </button>
+
             <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
               <mat-icon color="warn">delete</mat-icon>
               Supprimer

@@ -12,10 +12,11 @@ import {CategorieProduitService} from "../../../shared/services/categorie-produi
 import {ProduitService} from "../../../shared/services/produits.service";
 import {ClientService} from "../../../shared/services/client.service";
 import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
-import {MatDialog} from "@angular/material/dialog";
+import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {DialogService} from "../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {operations} from "../../../constantes";
+import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 
 @Component({
   selector: 'numerotation-table',
@@ -157,4 +158,16 @@ export class NumerotationTableComponent implements OnInit, AfterViewInit {
     return this.statutFicheTechniques?.find(st => st.id === id).libelle;
   }
 
+  onSetAvis(ficheTechnique: FicheTechniques, operation?: string) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '800px';
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {ficheTechnique, operation};
+    dialogConfig.disableClose = true;
+    let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    ref.afterClosed().subscribe(() => {
+      this.reloadData();
+    }, error => {
+    });
+  }
 }

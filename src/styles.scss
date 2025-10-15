@@ -259,3 +259,43 @@ form [fxlayout="row"] + [fxlayout="row"] {
 @media (max-width: 599.98px) {
   :root { --app-field-gap: 8px; }
 }
+
+/* ===== Mat-Select & Autocomplete (global overlay) ===== */
+
+/* État sélectionné / activé (clavier) — fond bleu clair + texte noir gras */
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--selected,
+.mat-mdc-select-panel .mat-mdc-option.mat-mdc-option-active,
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--activated,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item--selected,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mat-mdc-option-active,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item--activated {
+  background-color: #cce4ff !important;   /* bleu clair */
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+/* Renforcer la couleur/gras sur le texte interne */
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text,
+.mat-mdc-select-panel .mat-mdc-option.mat-mdc-option-active .mdc-list-item__primary-text,
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--activated .mdc-list-item__primary-text,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mat-mdc-option-active .mdc-list-item__primary-text,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item--activated .mdc-list-item__primary-text {
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+/* Survol souris — bleu très clair */
+.mat-mdc-select-panel .mat-mdc-option:hover,
+.mat-mdc-autocomplete-panel .mat-mdc-option:hover {
+  background-color: #e0f0ff !important;
+  color: #000 !important;
+}
+
+/* Option désactivée : lisible mais grisée, sans bleu */
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--disabled,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item--disabled {
+  color: rgba(0,0,0,0.38) !important;
+  background: transparent !important;
+  font-weight: 400 !important;
+}

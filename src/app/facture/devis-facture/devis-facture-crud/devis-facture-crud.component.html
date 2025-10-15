@@ -31,8 +31,11 @@
 
             <div>
               <span class="subsection-label">Factures</span>
+            </div>
 
-              <mat-form-field>
+            <!-- Ligne 1 : Client (70%) + Compte comptable (30%) -->
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+              <mat-form-field fxFlex="70" fxFlex.xs="100">
                 <mat-label>Client</mat-label>
                 <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client">
                 <mat-autocomplete #auto_cl="matAutocomplete">
@@ -43,22 +46,22 @@
                 </mat-autocomplete>
               </mat-form-field>
 
-            </div>
-            <div>
-              <mat-form-field>
+              <mat-form-field fxFlex="30" fxFlex.xs="100">
                 <mat-label>Compte comptable</mat-label>
-                <input matInput formControlName="numenroCompte" >
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Signataire</mat-label>
-                <input matInput formControlName="signataire" >
+                <input matInput formControlName="numenroCompte">
               </mat-form-field>
             </div>
 
-            <div>
-              <mat-form-field>
+            <!-- Ligne 2 : Objet (70%) + Signataire (30%) -->
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+              <mat-form-field fxFlex="70" fxFlex.xs="100">
                 <mat-label>Objet</mat-label>
-                <input matInput formControlName="objet" >
+                <input matInput formControlName="objet">
+              </mat-form-field>
+
+              <mat-form-field fxFlex="30" fxFlex.xs="100">
+                <mat-label>Signataire</mat-label>
+                <input matInput formControlName="signataire">
               </mat-form-field>
             </div>
 

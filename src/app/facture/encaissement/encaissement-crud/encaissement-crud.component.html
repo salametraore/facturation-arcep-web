@@ -23,7 +23,7 @@
     <mat-step [stepControl]="firstFormGroup">
       <form [formGroup]="firstFormGroup">
         <ng-template matStepLabel>Entête encaissement</ng-template>
-
+        <br>
         <mat-form-field>
           <mat-label>Nom du client</mat-label>
           <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
@@ -41,31 +41,37 @@
           <input matInput formControlName="objet"  >
         </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Date d'encaissement</mat-label>
-          <input matInput formControlName="date_encaissement" [matDatepicker]="pickerEnd">
-          <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-          <mat-datepicker #pickerEnd></mat-datepicker>
-        </mat-form-field>
+        <!-- LIGNE 1 : Date d'encaissement (50%) | Mode de paiement (50%) -->
+        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+          <mat-form-field fxFlex="50" fxFlex.xs="100">
+            <mat-label>Date d'encaissement</mat-label>
+            <input matInput formControlName="date_encaissement" [matDatepicker]="pickerEnd">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+            <mat-datepicker #pickerEnd></mat-datepicker>
+          </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Mode de paiement</mat-label>
-          <mat-select formControlName="mode_paiement" >
-            <mat-option *ngFor="let item of modePaiements" [value]="item.id">
-              {{item.libelle}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field fxFlex="50" fxFlex.xs="100">
+            <mat-label>Mode de paiement</mat-label>
+            <mat-select formControlName="mode_paiement">
+              <mat-option *ngFor="let item of modePaiements" [value]="item.id">
+                {{ item.libelle }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-        <mat-form-field>
-          <mat-label>Référence</mat-label>
-          <input matInput formControlName="reference" >
-        </mat-form-field>
+        <!-- LIGNE 2 : Référence (50%) | Montant (50%) -->
+        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+          <mat-form-field fxFlex="50" fxFlex.xs="100">
+            <mat-label>Référence</mat-label>
+            <input matInput formControlName="reference">
+          </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Montant</mat-label>
-          <input matInput formControlName="montant" >
-        </mat-form-field>
+          <mat-form-field fxFlex="50" fxFlex.xs="100">
+            <mat-label>Montant</mat-label>
+            <input matInput formControlName="montant" type="number" inputmode="decimal">
+          </mat-form-field>
+        </div>
 
         <div class="action-buttons">
           <button mat-button matStepperNext>Suivant</button>
@@ -75,8 +81,8 @@
     <mat-step>
       <ng-template matStepLabel>Affectation aux factures</ng-template>
       <div>
-        <button mat-raised-button (click)="onAncinnete()">Affectation automatique (par ancinneté)</button>&nbsp;&nbsp;
-        <button mat-raised-button (click)="onVider()" >Vider</button>
+        <button mat-raised-button color="warn"  (click)="onAnciennete()">Affectation automatique (par ancinneté)</button>&nbsp;&nbsp;
+        <button mat-raised-button color="warn" (click)="onVider()" >Vider</button>
       </div>
 
 

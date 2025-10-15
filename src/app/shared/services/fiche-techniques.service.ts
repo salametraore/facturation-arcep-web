@@ -13,6 +13,7 @@ import {FicheTechniqueAFacturer} from "../models/fiche-technique-a-facturer";
 import {Client} from "../models/client";
 import {WorkflowHistory} from "../models/workflowHistory";
 import {HistoriqueFicheTechnique} from "../models/historique-traitement-fiche-technique";
+import {RecouvListeEncaissement} from "../models/recouv-liste-encaissement";
 
 @Injectable({providedIn: 'root',})
 export class FicheTechniquesService {
@@ -90,4 +91,7 @@ export class FicheTechniquesService {
     return  this.http.get<HistoriqueFicheTechnique[]>(`${environment.baseUrl}/api/historique-fiche/${ficheId}/`);
   }
 
+  getListeFichesTechniquesByClientId(id:number) : Observable<FicheTechniques[]> {
+    return this.http.get<FicheTechniques[]>(`${this.baseUrl}/clients/${id}/`);
+  }
 }

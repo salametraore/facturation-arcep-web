@@ -18,6 +18,7 @@ import {FactureService} from "../../../shared/services/facture.service";
 import {RequestGenererFacture} from "../../../shared/models/ficheTechniques";
 import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
+import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 
 @Component({
   selector: 'app-elements-facture-recu-crud',
@@ -26,7 +27,7 @@ import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traite
 })
 export class ElementsFactureRecuCrudComponent implements OnInit {
 
-  displayedColumns: string[] = ['produit_nom','quantite', 'prix_unitaire','total'];
+  displayedColumns: string[] = ['produit_nom', 'quantite', 'prix_unitaire', 'total'];
   t_ProduitFiche?: MatTableDataSource<ProduitFiche>;
 
   ficheTechniqueAFacturer?: FicheTechniqueAFacturer;
@@ -34,6 +35,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   form: FormGroup;
   mode: string = '';
   title: string = '';
+
   window_name = ' FicheTechnique';
   categories: CategorieProduit[];
   produits: Produit[];
@@ -44,7 +46,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
-  historiqueFicheTechniques:HistoriqueFicheTechnique[];
+  historiqueFicheTechniques: HistoriqueFicheTechnique[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -67,7 +69,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.ficheTechniqueAFacturer)
+    console.log(this.ficheTechniqueAFacturer);
     this.init();
     this.reloadData();
   }
@@ -85,6 +87,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       this.mode = this.data_operation;
       this.title = 'Détails';
       this.initForm_update();
+      console.log(this.ficheTechniqueAFacturer);
     }
     this.title = this.title + ' - ' + this.window_name;
   }
@@ -92,33 +95,39 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   reloadData() {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
-      if(this.ficheTechniqueAFacturer){
-
-        this.client = clients?.find(c=>c.id ===this.ficheTechniqueAFacturer?.client_id);
+      if (this.ficheTechniqueAFacturer) {
+        this.client = clients?.find(c => c.id === this.ficheTechniqueAFacturer?.client_id);
         this.nomClient = this.client?.denomination_sociale;
-        this.form.get('numenroCompte').setValue( this.client?.compte_comptable);
+        this.form.get('numenroCompte')?.setValue(this.client?.compte_comptable);
       }
-      if(this.ficheTechniqueAFacturer?.liste_produits?.length>0){
-        this.t_ProduitFiche.data = [...this.ficheTechniqueAFacturer?.liste_produits];
+      if (this.ficheTechniqueAFacturer?.liste_produits?.length > 0) {
+        this.t_ProduitFiche!.data = [...this.ficheTechniqueAFacturer?.liste_produits];
       }
+      // PATCH: calcul total supprimé ici — le getter ci-dessous s’en charge dynamiquement
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechniqueAFacturer?.fiche_technique_id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
+    this.ficheTechniquesService
+      .getHistoriqueTraitementFicheTechnique(this.ficheTechniqueAFacturer?.fiche_technique_id)
+      .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+        this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+      });
+  }
 
 
+  get totalGeneral(): number {
+    const data = this.t_ProduitFiche?.data ?? [];
+    return data.reduce((sum: number, e: any) => sum + (Number(e?.total) || 0), 0);
   }
 
   initForm_update() {
     this.form = this.formBuilder.group({
       id: [this.ficheTechniqueAFacturer?.fiche_technique_id],
       client: [this.ficheTechniqueAFacturer?.client_id],
-      objet: [this.ficheTechniqueAFacturer?.objet],
+      objet: [this.ficheTechniqueAFacturer?.type_frais_description],
       numenroCompte: [],
       signataire: [this.ficheTechniqueAFacturer?.signataire],
       produit: [],
@@ -148,58 +157,49 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   crud() {
     const payload: RequestGenererFacture = {
       fiche_technique_id: this.ficheTechniqueAFacturer?.fiche_technique_id,
-      commentaire: this.form.get('commentaire').value,
-      objet: this.form.get('objet').value,
-      signataire: this.form.get('signataire').value
+      commentaire: this.form.get('commentaire')?.value,
+      objet: this.form.get('objet')?.value,
+      signataire: this.form.get('signataire')?.value
     };
 
-    console.log(payload.toString())
-    console.log(this.ficheTechniqueAFacturer.toString())
+    console.log(payload.toString());
+    console.log(this.ficheTechniqueAFacturer?.toString());
 
     const type = this.ficheTechniqueAFacturer?.type_frais;
-
     const redevanceTypes = new Set(['RD', 'LO', 'EL', 'IN', 'RA', 'DA']);
 
     if (type === 'FD') {
       this.genererDossierFacture(payload);
-    } else if (redevanceTypes.has(type)) {
+    } else if (redevanceTypes.has(type!)) {
       this.genererRedevanceFacture(payload);
     } else {
-      // éventuellement : gérer les types inconnus
-      // this.toast.warn('Type de frais non supporté');
       console.log('Type de frais non supporté');
     }
-
   }
 
   genererDossierFacture(payload: RequestGenererFacture) {
-    this.factureService.genererFraisDossier(payload).subscribe(data=>{
-      this.msgMessageService.success('Facture générée avec succès !')
-    },error=>{
-      this.dialogService.alert({message:error.error.message});
+    this.factureService.genererFraisDossier(payload).subscribe({
+      next: () => this.msgMessageService.success('Facture générée avec succès !'),
+      error: (error) => this.dialogService.alert({ message: error?.error?.message })
     });
   }
 
   genererRedevanceFacture(payload: RequestGenererFacture) {
-    this.factureService.genererFraisRedevance(payload).subscribe(data=>{
-      this.msgMessageService.success('Facture générée avec succès !')
-    },error=>{
-      this.dialogService.alert({message:error.error.message});
+    this.factureService.genererFraisRedevance(payload).subscribe({
+      next: () => this.msgMessageService.success('Facture générée avec succès !'),
+      error: (error) => this.dialogService.alert({ message: error?.error?.message })
     });
   }
 
   onSubmit() {
-    // Logique pour soumettre la fiche technique
     console.log('this.techSheetForm.value');
   }
 
   onImport() {
-    // Logique pour importer des documents
     console.log('Importer des documents');
   }
 
   onNewClient() {
-    // Logique pour ajouter un nouveau client
     console.log('Ajouter un nouveau client');
   }
 

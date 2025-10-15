@@ -1,49 +1,188 @@
+/* ===========================
+   Relevé de compte — Styles
+   =========================== */
+
+/* ---------- Conteneur & typo ---------- */
 .releve-container {
   padding: 20px;
   font-family: Arial, sans-serif;
 }
 
-.releve-title {
-  color: #333;
-  margin-bottom: 20px;
+/* ---------- Header centré & sticky ---------- */
+.doc-header {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+.doc-header .mat-mdc-card-header-text {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+.doc-header .mat-mdc-card-title {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+.doc-header.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding-bottom: 4px;
 }
 
-.releve-info {
-  margin-bottom: 20px;
+/* Colonne pour les 2 lignes du header */
+.header-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.title-center {
+  margin: 0;
+  line-height: 1.2;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
-.releve-info p {
-  margin: 5px 0;
+/* 2e ligne (Client / Date) centrée + espace entre blocs */
+.meta-stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;                /* espace entre "Client" et "Relevé..." */
+}
+.meta-row .pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;                 /* espace label/valeur */
+}
+.meta-value { font-weight: 500; }
+
+/* ---------- Zone contenu (pas de scroll ici) ---------- */
+.releve-card {
+  max-height: 80vh;         /* optionnel si tu veux borner la carte globale */
+  display: flex;
+  flex-direction: column;
+}
+.content-scroll {
+  overflow: visible;         /* PAS de 2e scrollbar */
+  flex: 1 1 auto;
+  padding-top: 6px;          /* resserre l’espace sous le header */
+}
+
+/* ---------- Tableau factures ---------- */
+/* conteneur scrollable du tableau */
+.table-scroll {
+  max-height: 60vh;         /* ajuste 50–70vh selon besoin */
+  overflow: auto;           /* barre de défilement */
 }
 
 .factures-table {
   width: 100%;
+  margin-top: 4px;
   margin-bottom: 20px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
-table {
-  width: 100%;
-}
+table { width: 100%; }
 
 th, td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
+th { background-color: #f5f5f5; }
 
-th {
-  background-color: #f5f5f5;
+/* En-têtes du tableau en gras (Angular Material MDC + fallback) */
+.mat-mdc-table .mat-mdc-header-cell {
+  font-weight: 700;
+  color: #000;
+}
+th[mat-header-cell] {
+  font-weight: 700;
 }
 
+/* Hauteur compacte des lignes (Angular Material MDC) */
+.mat-mdc-table .mdc-data-table__header-row,
+.mat-mdc-table .mdc-data-table__row {
+  height: 34px;
+}
+.mat-mdc-header-cell,
+.mat-mdc-cell {
+  padding: 6px 12px;
+}
+
+/* Entête du tableau sticky SANS décalage */
+tr[mat-header-row] {
+  top: 0 !important;
+  background: #fff;
+  z-index: 5;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+  /* ne pas remettre position: sticky ici si tu utilises sticky: true dans le template */
+}
+
+/* ---------- Totaux (2 lignes, alignés à droite) ---------- */
 .solde-global {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;  /* tout le bloc à droite */
+  gap: 6px;
   margin-top: 10px;
   font-weight: bold;
 }
+.solde-l1 {
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 24px;              /* espace entre Montant Facture / Encaissement */
+  flex-wrap: wrap;
+  text-align: right;
+}
+.solde-l2 {
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: right;
+}
+.solde-global .pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;               /* espace label/valeur */
+  white-space: nowrap;
+}
+.solde-global .val { font-weight: 600; }
 
-.close-button {
+/* ---------- Bouton fermer à droite ---------- */
+mat-card-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
+  padding-top: 8px;
+}
+mat-card-actions .actions {
+  display: inline-flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+/* ---------- Impression / export PDF ---------- */
+@media print {
+  .releve-card { max-height: none; }
+  .content-scroll { overflow: visible; }
+  .doc-header.sticky {
+    position: static;
+    border-bottom: 1px solid #000;
+  }
+  mat-card { box-shadow: none !important; }
 }

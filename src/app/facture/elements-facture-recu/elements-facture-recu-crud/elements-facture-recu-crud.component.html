@@ -1,26 +1,4 @@
 <div class="dashboard-container">
-<!--  <h5 class="dashboard-title" style="color: #030303">Factures</h5>-->
-
-  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
-  <!--  <div class="demand-status">-->
-  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
-  <!--    <mat-stepper [linear]="true" #stepper>-->
-  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
-  <!--        <ng-template matStepLabel>-->
-  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
-  <!--        </ng-template>-->
-  <!--      </mat-step>-->
-  <!--    </mat-stepper>-->
-  <!--  </div>-->
-
-  <!-- Documents -->
-  <!--  <div class="documents-section">-->
-  <!--    <span class="section-label">DOCUMENTS</span>-->
-  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
-  <!--  </div>-->
-
-  <!-- Fiche technique -->
-
 
   <div fxLayout="row" fxLayoutGap="20px">
     <!-- Colonne de gauche : Fiche Technique -->
@@ -29,79 +7,97 @@
         <div class="tech-sheet-section">
           <form [formGroup]="form">
 
-            <div>
-              <span class="subsection-label">Factures</span>
+            <div align="center">
+              <span class="subsection-label">Génération de Factures/Dévis</span>
+            </div>
 
-              <mat-form-field>
+            <!-- Ligne 1 : Client (70%) | Compte comptable (30%) -->
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start start">
+              <mat-form-field fxFlex="70" fxFlex.xs="100">
                 <mat-label>Client</mat-label>
                 <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
                        placeholder="Cliquez et sélectionnez votre client">
                 <mat-autocomplete #auto_cl="matAutocomplete">
                   <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
                               [value]="item.denomination_sociale">
-                    <span>{{item.denomination_sociale}}</span>
+                    <span>{{ item.denomination_sociale }}</span>
                   </mat-option>
                 </mat-autocomplete>
               </mat-form-field>
 
-            </div>
-            <div>
-              <mat-form-field>
+              <mat-form-field fxFlex="30" fxFlex.xs="100">
                 <mat-label>Compte comptable</mat-label>
                 <input matInput formControlName="numenroCompte" placeholder="Compte comptable">
               </mat-form-field>
-              <mat-form-field>
+            </div>
+
+            <!-- Ligne 2 : Objet (70%) en premier | Signataire (30%) -->
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start start">
+              <mat-form-field fxFlex="70" fxFlex.xs="100">
+                <mat-label>Objet</mat-label>
+                <input matInput formControlName="objet" placeholder="Objet">
+              </mat-form-field>
+
+              <mat-form-field fxFlex="30" fxFlex.xs="100">
                 <mat-label>Signataire</mat-label>
                 <input matInput formControlName="signataire" placeholder="Signataire">
               </mat-form-field>
             </div>
 
+            <!-- Commentaire (pleine largeur) -->
             <div>
-              <mat-form-field>
-                <mat-label>Objet</mat-label>
-                <input matInput formControlName="objet" placeholder="Objet">
-              </mat-form-field>
-            </div>
-
-            <div>
-<!--              <span class="subsection-label">COMMENTAIRE</span>-->
               <mat-form-field>
                 <mat-label>Commentaire</mat-label>
                 <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>
               </mat-form-field>
             </div>
+
           </form>
 
-          <div class="mat-elevation-z10">
-            <table [dataSource]="t_ProduitFiche" mat-table matSort style="width: 100%">
+          <div class="mat-elevation-z10" >
+            <table mat-table [dataSource]="t_ProduitFiche" matSort style="width: 100%">
 
+              <!-- Elément technique -->
               <ng-container matColumnDef="produit_nom">
-                <th *matHeaderCellDef mat-header-cell mat-sort-header> Elément technique</th>
-                <td *matCellDef="let element" mat-cell> {{element.produit_nom}} </td>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Élément technique</th>
+                <td mat-cell *matCellDef="let element">{{ element.produit_nom }}</td>
+                <td mat-footer-cell *matFooterCellDef><strong>Total général</strong></td>
               </ng-container>
 
+              <!-- Quantité -->
               <ng-container matColumnDef="quantite">
-                <th *matHeaderCellDef mat-header-cell mat-sort-header> Quantité</th>
-                <td *matCellDef="let element" mat-cell> {{element.quantite}} </td>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantité</th>
+                <td mat-cell *matCellDef="let element">{{ element.quantite }}</td>
+                <td mat-footer-cell *matFooterCellDef></td>
               </ng-container>
+
+              <!-- Prix unitaire -->
               <ng-container matColumnDef="prix_unitaire">
-                <th *matHeaderCellDef mat-header-cell mat-sort-header> Prix unitaire</th>
-                <td *matCellDef="let element" mat-cell> {{element.prix_unitaire}} </td>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Prix unitaire</th>
+                <td mat-cell *matCellDef="let element">{{ element.prix_unitaire | number:'1.0-0' }}</td>
+                <td mat-footer-cell *matFooterCellDef></td>
               </ng-container>
+
+              <!-- Total -->
               <ng-container matColumnDef="total">
-                <th *matHeaderCellDef mat-header-cell mat-sort-header> Total</th>
-                <td *matCellDef="let element" mat-cell> {{element.total}} </td>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+                <td mat-cell *matCellDef="let element">{{ element.total | number:'1.0-0' }}</td>
+                <td mat-footer-cell *matFooterCellDef>
+                  <strong>{{ totalGeneral | number:'1.0-0' }}</strong>
+                </td>
               </ng-container>
 
-              <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-              <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
-                  [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+              <!-- Header / Rows / Footer -->
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                  (click)="onRowClicked(element)"
+                  [ngClass]="{ 'selected': element === selectedRow }"></tr>
+              <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
 
-              <!-- Row shown when there is no matching data. -->
-              <tr *matNoDataRow class="mat-row">
-                <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au critère
-                  de
-                  recherche
+              <!-- Aucun résultat -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4">
+                  Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
                 </td>
               </tr>
             </table>

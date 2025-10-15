@@ -5,7 +5,7 @@ export class FicheTechniqueAFacturer {
   compte_comptable: string;
   categorie_produit_id: number;
   categorie_produit_libelle: string;
-  type_frais_descrption: string;
+  type_frais_description: string;
   type_frais: string;
   objet?: string | null;
   signataire: string;

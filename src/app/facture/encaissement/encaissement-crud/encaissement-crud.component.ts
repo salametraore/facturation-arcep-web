@@ -306,7 +306,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
     this.crud();
   }
 
-  onAncinnete(): void {
+  onAnciennete(): void {
     if (!this.t_Affectation1?.data?.length) return;
 
     let montantRestant:number = Number(this.firstFormGroup.get('montant').value);

@@ -17,6 +17,7 @@ import {DialogService} from "../../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../../shared/services/msg-message-service.service";
 import {AuthService} from "../../../../authentication/auth.service";
 import {operations} from "../../../../constantes";
+import {RecouvDashboardClient} from "../../../../shared/models/recouv-dashboard-client";
 
 @Component({
   selector: 'client-releve-compte',
@@ -25,13 +26,13 @@ import {operations} from "../../../../constantes";
 })
 export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
 
-  detailFicheClient?: DetailFicheClient;
+
+  recouvDashboardClient?: RecouvDashboardClient;
   fixeCategorie?: number;
   form: FormGroup;
   mode: string = '';
   title: string = '';
   categories: CategorieProduit[];
-  produits: Produit[];
   clients: Client[];
   client: Client;
   public operations = operations;
@@ -40,7 +41,12 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
   nomClient: any;
   t_ReleveCompteClient?: MatTableDataSource<ReleveCompteClient>;
 
-  displayedColumns: string[] = ['date_echeance', 'reference','montant_facture','montant_encaissement'];
+  // Totaux à afficher
+  totalFacture = 0;
+  totalEncaissement = 0;
+  soldeGlobal = 0; // Montant Facture + Montant Encaissement ( Montant Encaissement  etant negatif)
+
+  displayedColumns: string[] = ['type_ligne','reference','date_echeance', 'montant_facture','montant_encaissement'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -50,7 +56,7 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
     private formBuilder: FormBuilder,
     private ficheTechniquesService: FicheTechniquesService,
     private categorieProduitService: CategorieProduitService,
-    private produitService: ProduitService,
+
     private clientService: ClientService,
     public dialog: MatDialog,
     public dialogService: DialogService,
@@ -59,7 +65,7 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private authServiceService: AuthService,
   ) {
-    this.detailFicheClient = data.detailFicheClient;
+    this.recouvDashboardClient = data.detailFicheClient;
     this.data_operation = data.operation;
     this.fixeCategorie = data.fixeCategorie;
     this.t_ReleveCompteClient = new MatTableDataSource<ReleveCompteClient>([]);
@@ -75,26 +81,35 @@ export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
   }
 
   reloadData() {
+    const toTime = (d: any) => d ? new Date(d).getTime() : Number.MAX_SAFE_INTEGER;
+
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
-
-      if(this.detailFicheClient){
-        this.client = clients?.find(c=>c.id ===this.detailFicheClient?.id_client);
+      console.log(this.recouvDashboardClient)
+      if(this.recouvDashboardClient){
+        this.client = clients?.find(c=>c.id ===this.recouvDashboardClient?.client_id);
         this.nomClient = this.client?.denomination_sociale;
-        this.clientService.getReleveCompteClientByIdClient(this.client?.id).subscribe((ReleveCompteClients: ReleveCompteClient[]) => {
-          this.t_ReleveCompteClient.data = ReleveCompteClients.filter(c=>c.id===this.detailFicheClient.id_client);
-        });
-      }else{
-        this.clientService.getReleveCompteClient().subscribe((ReleveCompteClients: ReleveCompteClient[]) => {
-          this.t_ReleveCompteClient.data = ReleveCompteClients.filter(c=>c.id===this.detailFicheClient.id_client);
+        console.log(this.recouvDashboardClient);
+        this.clientService.getReleveCompteClientByIdClient(this.recouvDashboardClient?.client_id).subscribe((ligneReleveCompteClients: ReleveCompteClient[]) => {
+          //this.t_ReleveCompteClient.data = ligneReleveCompteClients.filter(c=>c.id===this.recouvDashboardClient.client_id);
+          console.log(ligneReleveCompteClients);
+          const sorted = [...ligneReleveCompteClients].sort((a, b) => toTime(a?.date_echeance) - toTime(b?.date_echeance));
+          this.t_ReleveCompteClient.data = sorted;
+          this.paginator?.firstPage?.();
+          this.recomputeTotals(); // <-- recalcul après chargement
         });
       }
     });
 
-    this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
-    });
 
+
+  }
+
+  private recomputeTotals(): void {
+    const data = this.t_ReleveCompteClient?.filteredData ?? this.t_ReleveCompteClient?.data ?? [];
+    this.totalFacture = data.reduce((sum, row: any) => sum + (Number(row?.montant_facture) || 0), 0);
+    this.totalEncaissement = data.reduce((sum, row: any) => sum + (Number(row?.montant_encaissement) || 0), 0);
+    this.soldeGlobal = this.totalFacture + this.totalEncaissement; // totalEncaissement etant negatif
   }
 
   onSubmit() {

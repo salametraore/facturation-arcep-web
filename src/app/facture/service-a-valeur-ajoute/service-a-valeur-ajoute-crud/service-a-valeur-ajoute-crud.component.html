@@ -9,7 +9,7 @@
         <mat-label>Client</mat-label>
         <mat-select formControlName="client" matTooltip="Client">
           <mat-option *ngFor="let item of clients" (click)="onGetClient(item)" [value]="item.id">
-            Nom:{{ item?.denomination_sociale }} -N° Compte: {{ item?.compte_comptable }}
+            {{ item?.denomination_sociale }}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -24,11 +24,11 @@
     </div>
   </form>
 
-  <b><span style="color: #ff9100">Ajout d'un service</span></b>
+  <b><span >Ajout d'un service</span></b>
   <form [formGroup]="form_ficheTechniquesProduit">
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px" fxLayoutGap.xs="10px">
 
-      <mat-form-field appearance="outline" floatLabel="always" fxFlex="30" fxFlex.xs="100">
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="20" fxFlex.xs="100">
         <mat-label>Catégorie de service</mat-label>
         <mat-select formControlName="produit" matTooltip="Catégorie de service">
           <mat-option *ngFor="let item of produits" [value]="item.id">
@@ -37,20 +37,16 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" floatLabel="always" fxFlex="33" fxFlex.xs="100">
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="40" fxFlex.xs="100">
+        <mat-label>Description du service</mat-label>
+        <input type="text" min="1" matInput formControlName="designation"
+               matTooltip="Description du service" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="20" fxFlex.xs="100">
         <mat-label>Quantité</mat-label>
         <input type="number" min="1" matInput (blur)="onGetTotalLigne()" formControlName="quantite" matTooltip="Quantité" required>
       </mat-form-field>
-
-
-    </div>
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px" fxLayoutGap.xs="10px">
-      <mat-form-field appearance="outline" floatLabel="always" fxFlex="70" fxFlex.xs="100">
-      <mat-label>Description du service</mat-label>
-      <input type="text" min="1" matInput formControlName="designation"
-             matTooltip="Description du service" required>
-      </mat-form-field>
-
 
       <button mat-raised-button class="custom-chip-button" color="primary"
               [disabled]="form_ficheTechniquesProduit.invalid"
@@ -59,11 +55,13 @@
         <mat-icon>add</mat-icon>
         Ajouter
       </button>
+
     </div>
+
   </form>
 
-  <div class="mat-elevation-z2 table-block">
-    <div class="table-title">Liste des services sélectionnés</div>
+  <div class="table-frame mat-elevation-z10 dense-table">
+   <!-- <b><span >Liste des services sélectionnés</span></b>-->
     <table style="width: 100%" mat-table [dataSource]="t_FicheTechniquesProduits" matSort>
 
       <ng-container matColumnDef="produit">
@@ -84,7 +82,7 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button [matMenuTriggerFor]="menu" color="primary">
+          <button mat-icon-button [matMenuTriggerFor]="menu" color="warn">
             <mat-icon>settings</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
@@ -111,34 +109,33 @@
     </table>
 
     <!-- Ligne de bas de tableau : paginator (à gauche) + total (à droite) -->
-    <div class="table-bottom">
+<!--    <div class="table-bottom">
       <mat-paginator [pageSize]="10" [pageSizeOptions]="[3,5, 10, 15]" showFirstLastButtons></mat-paginator>
-      <div class="total-commande">
-        Total global:&nbsp;<b>{{ montant_de_la_commade?.toLocaleString('fr-FR') | thousandSeparator }} FCFA</b>
-      </div>
-    </div>
+    </div>-->
   </div>
 </div>
 <br>
 <div align="end" mat-dialog-actions>
   &nbsp;&nbsp;
-  <button mat-raised-button class="custom-chip-button" color="primary" (click)="onRetour()" matTooltip="Imprimer">
+  <button mat-raised-button class="custom-chip-button" color="warn" (click)="onRetour()" matTooltip="Imprimer">
     <mat-icon>undo</mat-icon>
     Retour
   </button>
   &nbsp;&nbsp;
-  <button mat-raised-button class="custom-chip-button" color="primary"
+<!--  <button mat-raised-button class="custom-chip-button" color="primary"
           [disabled]="t_FicheTechniquesProduits.data?.length<1"
           (click)="onPrint()" matTooltip="Imprimer">
     <mat-icon>print</mat-icon>
     Imprimer
-  </button>
+  </button>-->
   &nbsp;&nbsp;
-  <button mat-raised-button class="custom-chip-button" color="primary" (click)="onSave()"
+  <button mat-raised-button *ngIf="this.operation===this.operations.create ||this.operation===this.operations.update" class="custom-chip-button" color="primary" (click)="onSave()"
           [disabled]="t_FicheTechniquesProduits.data?.length<1"
-          matTooltip="Enregistrer la commande">
+          matTooltip="Enregistrer ">
     <mat-icon>save</mat-icon>
     Enregistrer
   </button>
   &nbsp;&nbsp;
+
+  <button mat-raised-button *ngIf="this.operation===this.operations.transmettre" (click)="onTransmettre()" color="warn">Transmettre</button>
 </div>

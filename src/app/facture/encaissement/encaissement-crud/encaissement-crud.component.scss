@@ -1,137 +1,210 @@
-.dashboard-container {
-  padding: 20px;
+/* =========================
+   Thème local (noir)
+   ========================= */
+:host {
+  --brand-primary: #000;                  /* noir */
+  --focus-overlay: rgba(0,0,0,0.06);      /* halo focus */
 }
 
-.dashboard-title {
-  color: red;
-  font-size: 24px;
-  margin-bottom: 20px;
+/* =========================
+   Form fields (Material MDC)
+   ========================= */
+
+/* Outline en focus */
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--brand-primary) !important;
 }
 
-.demand-status {
-  margin-bottom: 20px;
+/* Halo de focus */
+:host ::ng-deep .mat-mdc-form-field-focus-overlay {
+  background-color: var(--focus-overlay) !important;
 }
 
-.status-label, .section-label, .subsection-label {
-  font-weight: bold;
-  margin-bottom: 10px;
-  display: block;
+/* Label (repos + focus/flottant) */
+:host ::ng-deep .mdc-floating-label { color: #333 !important; opacity: .95; }
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label,
+:host ::ng-deep .mdc-floating-label--float-above {
+  color: var(--brand-primary) !important;
+  opacity: 1 !important;
+  font-weight: 600;
 }
 
-.active-step {
-  color: red;
-  font-weight: bold;
+/* Notch/label : pas de décalage personnalisé (position Material par défaut) */
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch {
+  padding-inline-start: 0 !important;
+  padding-inline-end: 0 !important;
+  background: transparent !important;
+  display: block !important;
+}
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch .mdc-floating-label {
+  background: transparent !important;
+  padding: 0 !important;
 }
 
-mat-stepper {
-  background: none;
-  border: none;
-  padding: 0;
+/* Texte & placeholder */
+:host ::ng-deep .mat-mdc-input-element { color: #111 !important; }
+:host ::ng-deep .mat-mdc-form-field .mat-mdc-input-element::placeholder { color: #666 !important; opacity: 1 !important; }
+
+/* Marqueur (requis) */
+:host ::ng-deep .mat-mdc-form-field-required-marker {
+  color: var(--brand-primary) !important;
+  opacity: 1 !important;
+  font-weight: 700;
 }
 
-.documents-section {
-  margin-bottom: 20px;
+/* =========================
+   Mat-select & Autocomplete
+   ========================= */
+/* NB: les styles du panneau overlay (sélection bleu/gras) sont à mettre dans styles.scss
+   car le CDK Overlay est hors du composant. Ici, on garde la cohérence d'outline. */
+:host ::ng-deep .mat-mdc-select.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .mat-mdc-select.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .mat-mdc-select.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--brand-primary) !important;
 }
+
+/* =========================
+   Stepper (si utilisé)
+   ========================= */
+:host ::ng-deep .mat-step-icon-selected,
+:host ::ng-deep .mat-step-icon-state-edit { background-color: var(--brand-primary) !important; color: #fff !important; }
+:host ::ng-deep .mat-step-label.mat-step-label-active { color: var(--brand-primary) !important; font-weight: 600; }
+
+/* =========================
+   Cartes & Layout
+   ========================= */
+.dark-card {
+  background-color: #efebeb;
+  margin: 10px 0;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.dark-card .mat-card-content { padding: 16px; }
+
+.dashboard-container { padding: 20px; }
+.dashboard-title { color: #030303; font-size: 24px; margin-bottom: 20px; }
+
+.demand-status { margin-bottom: 20px; }
+.status-label, .section-label, .subsection-label { font-weight: bold; margin-bottom: 10px; display: block; }
+
+.active-step { color: var(--brand-primary); font-weight: bold; }
 
 .tech-sheet-section {
   background: #fff;
-  padding: 20px;
+  padding: 8px 20px 20px; /* padding-top réduit */
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.domiciliation-section, .comment-section {
-  margin-bottom: 20px;
+.domiciliation-section, .comment-section { margin-bottom: 20px; }
+
+/* Champs */
+mat-form-field { width: 100%; }
+
+/* Actions */
+.actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Radios */
+.radio-group { display: flex; flex-direction: row; gap: 20px; }
+mat-radio-group { margin-top: 10px; }
+
+/* Titre de sous-section compact */
+.subsection-label { display: block; text-align: center; margin: 4px 0 12px; font-weight: 600; }
+
+/* =========================
+   MatTable : outline + sticky + elevation
+   ========================= */
+
+/* Le conteneur .mat-elevation-z10 devient le cadre (bordure façon form-field) et zone scroll */
+:host ::ng-deep .mat-elevation-z10 {
+  border: 1px solid rgba(0,0,0,0.24);
+  border-radius: 8px;
+  background: #fff;
+  max-height: 360px;     /* ajuste selon besoin */
+  overflow: auto;        /* nécessaire pour sticky */
 }
 
-mat-form-field {
+/* Table interne */
+:host ::ng-deep .mat-elevation-z10 table.mat-mdc-table,
+:host ::ng-deep .mat-elevation-z10 table.mat-table {
   width: 100%;
-  margin-bottom: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
 }
 
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+/* En-tête sticky + contraste */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-row,
+:host ::ng-deep .mat-elevation-z10 .mat-header-row {
+  background: #f7f7f7;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.06);
 }
 
-.radio-group {
-  display: flex;
-  flex-direction: row; /* Alignement horizontal */
-  gap: 20px; /* Espacement entre les radio buttons */
+/* Entêtes en gras */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-header-cell { font-weight: 700; }
+
+/* Corps : lignes & zébrage */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-row,
+:host ::ng-deep .mat-elevation-z10 .mat-row { border-bottom: 1px solid #f0f0f0; }
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-row:nth-child(even),
+:host ::ng-deep .mat-elevation-z10 .mat-row:nth-child(even) { background-color: #fafafa; }
+
+/* Cellules : padding propre, pas de grilles verticales */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-header-cell {
+  padding: 12px 16px;
+  border-right: none;
+  vertical-align: middle;
+  color: #111;
 }
 
-mat-radio-group {
-  margin-top: 10px;
-}
-.confirmation-container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
+/* Hover discret */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-row:hover,
+:host ::ng-deep .mat-elevation-z10 .mat-row:hover { background-color: rgba(0,0,0,0.03); }
+
+/* Footer (total) : sticky optionnel */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-footer-row,
+:host ::ng-deep .mat-elevation-z10 .mat-footer-row {
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  font-weight: 600;
+  position: sticky;   /* retire si non souhaité */
+  bottom: 0;
+  z-index: 3;
+  box-shadow: 0 -2px 3px rgba(0,0,0,0.04);
 }
 
-.step-title {
-  color: #333;
-  margin-bottom: 20px;
-}
+/* =========================
+   Section confirmation (si utilisée)
+   ========================= */
+.confirmation-container { padding: 20px; font-family: Arial, sans-serif; }
+.step-title { color: #333; margin-bottom: 20px; }
 
 .general-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; padding: 10px; background-color: #f5f5f5; border-radius: 4px;
 }
+.amount-info span { margin-right: 20px; }
 
-.amount-info span {
-  margin-right: 20px;
-}
-
-.invoice-table {
-  width: 100%;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
+.invoice-table { width: 100%; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; }
 .table-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #ddd;
-  font-weight: bold;
+  display: flex; justify-content: space-between; padding: 10px;
+  background-color: #f5f5f5; border-bottom: 1px solid #ddd; font-weight: bold;
 }
+.table-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+.table-row:last-child { border-bottom: none; }
 
-.table-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.table-row:last-child {
-  border-bottom: none;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.return-button {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-.register-print-button {
-  background-color: #ffc107;
-  color: #333;
-}
-
-.register-button {
-  background-color: #d32f2f;
-  color: white;
-}
+.action-buttons { display: flex; justify-content: flex-end; gap: 10px; }
+.return-button { background-color: #e0e0e0; color: #333; }
+.register-print-button { background-color: #ffc107; color: #333; }
+.register-button { background-color: #d32f2f; color: #fff; }

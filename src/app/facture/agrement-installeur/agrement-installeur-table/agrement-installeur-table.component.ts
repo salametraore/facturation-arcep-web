@@ -12,10 +12,11 @@ import {CategorieProduitService} from "../../../shared/services/categorie-produi
 import {ProduitService} from "../../../shared/services/produits.service";
 import {ClientService} from "../../../shared/services/client.service";
 import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
-import {MatDialog} from "@angular/material/dialog";
+import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {DialogService} from "../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {operations} from "../../../constantes";
+import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 
 @Component({
   selector: 'agrement-installeur-table',
@@ -83,9 +84,21 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
       this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
-    });
+/*    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
+        this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
+      });*/
+
+    this.ficheTechniquesService.getFicheTechniques()
+      .subscribe((lignes: FicheTechniques[]) => {
+        const allowed = new Set<number>([75]); // productAllowedIds
+        this.ficheTechniques.data = lignes.filter(f =>
+          f.categorie_produit === this.fixeCategorie &&
+          (
+            (f.produits_detail?.some(p => p && allowed.has(p.produit)))
+          )
+        );
+      });
+
   }
 
   applyFilter(event: Event) {
@@ -96,6 +109,19 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
   crud(ficheTechnique: FicheTechniques, operation?: string) {
     this.notifyFicheTechnique.emit(ficheTechnique);
     this.notifyActionOperation.emit(operation);
+  }
+
+  onSetAvis(ficheTechnique: FicheTechniques, operation?: string) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '800px';
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {ficheTechnique, operation};
+    dialogConfig.disableClose = true;
+    let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    ref.afterClosed().subscribe(() => {
+      this.reloadData();
+    }, error => {
+    });
   }
 
   onDelete(ficheTechniques: FicheTechniques) {

@@ -45,30 +45,28 @@
     </div>
   </form>
 
-  <b><span style="color: #ff9100">Ajout de produit</span></b>
+  <b><span >Ajout de produit</span></b>
   <form [formGroup]="form_ficheTechniquesProduit">
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px" fxLayoutGap.xs="10px">
 
-      <mat-form-field appearance="outline" floatLabel="always" fxFlex="100" fxFlex.xs="100">
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="55" fxFlex.xs="100">
         <mat-label>Désignation</mat-label>
         <input type="text" min="1" matInput formControlName="designation"
                matTooltip="Désignation" required>
       </mat-form-field>
-    </div>
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px" fxLayoutGap.xs="10px">
 
-      <mat-form-field appearance="outline" floatLabel="always" fxFlex="33" fxFlex.xs="100">
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="15" fxFlex.xs="100">
         <mat-label>Prix Unit.</mat-label>
         <input thousandsSeparator matInput min="1" (blur)="onGetTotalLigne()" formControlName="prix_unitaire"
                matTooltip="Prix Unit." required>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" floatLabel="always" fxFlex="33" fxFlex.xs="100">
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="15" fxFlex.xs="100">
         <mat-label>Quantité</mat-label>
         <input type="number" min="1" matInput (blur)="onGetTotalLigne()" formControlName="quantite" matTooltip="Quantité" required>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" floatLabel="always" fxFlex="33" fxFlex.xs="100">
+      <mat-form-field appearance="outline" floatLabel="always" fxFlex="15" fxFlex.xs="100">
         <mat-label>Total</mat-label>
         <input type="number" min="1" matInput formControlName="total" matTooltip="Total" readonly>
       </mat-form-field>
@@ -83,8 +81,8 @@
     </div>
   </form>
 
-  <div class="mat-elevation-z2 table-block">
-    <div class="table-title">Liste des produits sélectionnés</div>
+  <div class="table-frame mat-elevation-z10 dense-table">
+<!--    <b><span >Liste des services</span></b>-->
     <table style="width: 100%" mat-table [dataSource]="t_FicheTechniquesProduits" matSort>
 
       <ng-container matColumnDef="designation">
@@ -133,9 +131,9 @@
 
     <!-- Ligne de bas de tableau : paginator (à gauche) + total (à droite) -->
     <div class="table-bottom">
-      <mat-paginator [pageSize]="10" [pageSizeOptions]="[3,5, 10, 15]" showFirstLastButtons></mat-paginator>
+      <!-- mat-paginator [pageSize]="10" [pageSizeOptions]="[3,5, 10, 15]" showFirstLastButtons></mat-paginator-->
       <div class="total-commande">
-        Total global:&nbsp;<b>{{ montant_de_la_commade?.toLocaleString('fr-FR') | thousandSeparator }} FCFA</b>
+        Total global:&nbsp;<b>{{ totalGeneral?.toLocaleString('fr-FR') | thousandSeparator }} FCFA</b>
       </div>
     </div>
   </div>

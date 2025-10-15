@@ -18,7 +18,7 @@ import {ClientReleveCompteComponent} from "./client/client-tables/client-releve-
 import {ClientPromessesComponent} from "./client/client-tables/client-promesses/client-promesses.component";
 import {ClientFacturesComponent} from "./client/client-tables/client-factures/client-factures.component";
 import {ClientEncaissementsComponent} from "./client/client-tables/client-encaissements/client-encaissements.component";
-import {ClientAvancesComponent} from "./client/client-tables/client-avances/client-avances.component";
+import {ClientFichesTechniques} from "./client/client-tables/client-fiches-techniques/client-fiches-techniques";
 import {CategorieProduitComponent} from "./categorie-produit/categorie-produit.component";
 import {
   CategorieProduitCrudComponent
@@ -60,7 +60,7 @@ import {CategorieStationComponent} from "./categorie-station/categorie-station.c
     ClientPromessesComponent,
     ClientFacturesComponent,
     ClientEncaissementsComponent,
-    ClientAvancesComponent,
+    ClientFichesTechniques,
     CategorieProduitComponent,
     CategorieProduitCrudComponent,
     CategorieStationCrudComponent,

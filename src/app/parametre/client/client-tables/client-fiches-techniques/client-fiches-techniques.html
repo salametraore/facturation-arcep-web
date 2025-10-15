@@ -1,0 +1,32 @@
+<!-- Tableau des fiches techniques (scrollable + header sticky) -->
+<div class="table-container table-scroll">
+  <table mat-table [dataSource]="ficheTechniques" matSort class="mat-elevation-z8" style="width: 100%">
+
+    <ng-container matColumnDef="objet">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Objet</th>
+      <td mat-cell *matCellDef="let element">{{ element.objet }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="date_creation">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date soumission</th>
+      <td mat-cell *matCellDef="let element">{{ element.date_creation | date:'dd/MM/yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="categorie_produit">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
+      <td mat-cell *matCellDef="let element">{{ getCategorie(element.categorie_produit) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="statut.libelle">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+      <td mat-cell *matCellDef="let element">{{ element.statut?.libelle }}</td>
+    </ng-container>
+
+    <!-- Lignes -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+<!-- Pagination (optionnelle si tu gardes le scroll) -->
+<!-- <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator> -->

@@ -2,7 +2,6 @@
   <form (ngSubmit)="crud()" [formGroup]="form">
     <div mat-dialog-content>
       <h2>Avis sur fiche technique</h2>
-
       <div>
         <mat-form-field>
           <mat-label>Client</mat-label>
@@ -69,7 +68,7 @@
 
     </div>
     <div align="end" mat-dialog-actions>
-      <button [disabled]="form.invalid" color="primary" mat-button type="submit">
+      <button [disabled]="form.invalid"color="warn" mat-button type="submit">
         <mat-icon>save</mat-icon>
         {{this.bouton_names.save}}
       </button>

@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FicheTechniques} from "../../../shared/models/ficheTechniques";
+import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/ficheTechniques";
 import {Client} from "../../../shared/models/client";
 import {CategorieProduit} from "../../../shared/models/categorie-produit";
 import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
@@ -16,7 +16,7 @@ import {ClientService} from "../../../shared/services/client.service";
 import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {DialogService} from "../../../shared/services/dialog.service";
-import {operations} from "../../../constantes";
+import {operations,bouton_names} from "../../../constantes";
 
 @Component({
   selector: 'numerotation-crud',
@@ -39,6 +39,10 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   form_ficheTechnique: FormGroup;
   form_ficheTechniquesProduit: FormGroup;
   t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
+
+  public operations = operations;
+  public bouton_names = bouton_names;
+  public data_operation: string = '';
 
   displayedColumns: string[] = ['produit','plage_numero','quantite', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -115,6 +119,18 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   onGetClient(item: Client) {
     this.client = item;
   }
+
+  onTransmettre(){
+    const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();
+    miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
+    miseAJourStatutFiche.statut = 2;
+    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone:MiseAJourStatutFiche)=>{
+      this.msgMessageService.success("Fiche transmise avec succès !");
+    },error => {
+      this.dialogService.alert({message:error.message});
+    });
+  }
+
 
   initFormFicheTechniquesProduit_create() {
     this.form_ficheTechniquesProduit = this.formBuilder.group({

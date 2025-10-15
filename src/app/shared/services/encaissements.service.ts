@@ -7,6 +7,7 @@
   import {EncaissementDTO} from "../models/encaissementDTO";
   import {RecouvListeEncaissement} from "../models/recouv-liste-encaissement";
   import {Encaissement} from "../models/encaissement";
+  import {Facture} from "../models/facture";
   @Injectable({  providedIn:  'root',})
 export class EncaissementsService {
       private baseUrl = environment.baseUrl + '/encaissements';
@@ -44,4 +45,9 @@ export class EncaissementsService {
     getListencaissement() : Observable<RecouvListeEncaissement[]> {
       return this.http.get<RecouvListeEncaissement[]>(`${this.baseUrl_2}`);
     }
+
+    getListeEncaissementsByClientId(id:number) : Observable<RecouvListeEncaissement[]> {
+      return this.http.get<RecouvListeEncaissement[]>(`${this.baseUrl}/clients/${id}/`);
+    }
+
   }

@@ -114,11 +114,12 @@ export class ClientComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onViewfiche(detailFicheClient: DetailFicheClient, operation?: string) {
+  onViewfiche(detailFicheClient: RecouvDashboardClient, operation?: string) {
     const dialogConfig = new MatDialogConfig();
     const fixeCategorie = this.fixeCategorie;
     dialogConfig.width = '1024px';
     dialogConfig.autoFocus = true;
+    console.log(detailFicheClient);
     dialogConfig.data = {detailFicheClient, fixeCategorie, operation};
     dialogConfig.disableClose = true;
     let ref = this.dialog.open(ClientTablesComponent, dialogConfig);
@@ -181,8 +182,9 @@ export class ClientComponent implements OnInit, AfterViewInit {
   }
 
   checher() {
-    this.clientService.getReleveCompteClientByIdClient(this.client?.id).subscribe((detailFicheClients: RecouvDashboardClient[]) => {
-      this.t_RecouvDashboardClient.data = detailFicheClients;
+    this.clientService.getDetailFicheClients().subscribe((detailClients: RecouvDashboardClient[]) => {
+      const rows = detailClients.filter(l => l?.client_id === this.client?.id);
+      this.t_RecouvDashboardClient.data =rows;
     });
   }
 

@@ -101,6 +101,12 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
     });
   }
 
+  get totalGeneral(): number {
+    const data = this.t_FicheTechniquesProduits?.data ?? [];
+    return data.reduce((sum: number, e: any) => sum + (Number(e?.total) || 0), 0);
+  }
+
+
   initFormCommandeClient_create() {
     this.form_ficheTechnique = this.formBuilder.group({
       id: [],
