@@ -14,22 +14,25 @@
         <!-- Client -->
         <mat-form-field>
           <mat-label>Nom du client</mat-label>
+
           <input
-            [(ngModel)]="nomClient"
-            [matAutocomplete]="auto_cl"
-            formControlName="client"
             matInput
-            matTooltip="Nom du client"
-            required
+            [formControl]="clientDisplay"
+          [matAutocomplete]="auto_cl"
+          matTooltip="Nom du client"
+          required
           >
-          <mat-autocomplete #auto_cl="matAutocomplete">
-            <mat-option
-              *ngFor="let item of clients | search: nomClient"
-              (click)="onClientPicked(item)"
-              [value]="item.denomination_sociale"
-            >
-              <span>{{ item.denomination_sociale }}</span>
-            </mat-option>
+
+          <mat-autocomplete
+              #auto_cl="matAutocomplete"
+              (optionSelected)="onClientPicked($event.option.value)"
+          >
+          <mat-option
+            *ngFor="let item of clients | search: clientDisplay.value"
+            [value]="item"                                       >
+          >
+          {{ item.denomination_sociale }}
+          </mat-option>
           </mat-autocomplete>
         </mat-form-field>
 

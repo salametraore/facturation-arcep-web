@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl,FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
@@ -39,6 +39,8 @@ export class EncaissementDirectCrudComponent implements OnInit {
   ficheForm!: FormGroup;
   produitsDS = new MatTableDataSource<FormGroup>([]);
   displayedColumns = ['produit', 'designation', 'quantite', 'prix_unitaire', 'total', 'actions'];
+
+  clientDisplay = new FormControl<string>('');
 
   categories: CategorieProduit[] = [];
   produitsAll: Produit[] = [];
@@ -118,6 +120,12 @@ export class EncaissementDirectCrudComponent implements OnInit {
 
     this.modePaiementService.getItems()
       .subscribe((modes: ModePaiement[]) => this.modePaiements = modes);
+
+    const id = this.encaissementForm.get('client')!.value;
+    if (id) {
+      const c = this.clients.find(x => x.id === id);
+      if (c) this.clientDisplay.setValue(c.denomination_sociale, { emitEvent: false });
+    }
   }
 
   /** --------- SYNCHRONISATION CLIENT --------- */
@@ -205,6 +213,17 @@ export class EncaissementDirectCrudComponent implements OnInit {
     this.produitsDS.data = this.produitsFormArray.controls as FormGroup[];
   }
 
+  onClientPicked(c: Client) {
+    // affiche le nom dans l’input
+    this.clientDisplay.setValue(c.denomination_sociale, { emitEvent: false });
+
+    // met l’ID dans les formulaires
+    this.encaissementForm.patchValue({ client: c.id }, { emitEvent: false });
+    this.ficheForm.patchValue({ client: c.id }, { emitEvent: false });
+
+    // (facultatif) garder un libellé pour résumé
+    this.nomClient = c.denomination_sociale;
+  }
   /** --------- VALIDATION ET ENVOI --------- */
   submit(): void {
     if (this.encaissementForm.invalid || this.ficheForm.invalid) {

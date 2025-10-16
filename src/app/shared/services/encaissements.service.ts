@@ -12,6 +12,7 @@
   @Injectable({  providedIn:  'root',})
 export class EncaissementsService {
       private baseUrl = environment.baseUrl + '/encaissements';
+      private baseUrl3 = environment.baseUrl + '/encaissement-direct';
       private baseUrl_2 = environment.baseUrl + '/recouv/liste-encaissements/';
 
       constructor(private http: HttpClient) {}
@@ -53,7 +54,7 @@ export class EncaissementsService {
 
     createEncaissementDirect(data: EncaissementDirectFicheTechniqueRequest ): Observable<EncaissementDirectFicheTechniqueRequest> {
       console.log(data)
-      return this.http.post< EncaissementDirectFicheTechniqueRequest>(`${this.baseUrl}/`,data);
+      return this.http.post< EncaissementDirectFicheTechniqueRequest>(`${this.baseUrl3}/`,data);
     }
 
   }
