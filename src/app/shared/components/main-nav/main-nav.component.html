@@ -7,50 +7,42 @@
     <mat-toolbar>Menu</mat-toolbar>
     <mat-divider></mat-divider>
 
-    <mat-accordion>
-      <mat-nav-list>
-        <div *ngFor="let menuItem of menuItems">
-          <!-- Cas sans sous-menus -->
-          <a
-            mat-list-item
-            *ngIf="!menuItem.sous_menus || menuItem.sous_menus.length === 0"
-            (click)="onNavigate(menuItem.url || '')"
-          >
+    <div class="menu-scroll">
+      <ng-container *ngFor="let item of menuItems">
+        <!-- 1) Items SANS sous-menus : ils doivent être dans un mat-nav-list -->
+        <mat-nav-list *ngIf="!item.sous_menus || item.sous_menus.length === 0">
+          <a mat-list-item (click)="onNavigate(item.url || '')">
             <mat-icon matListIcon fontSet="material-symbols-outlined">
-              {{ menuItem.icone || 'folder' }}
+              {{ item.icone || 'folder' }}
             </mat-icon>
-            <span matLine>{{ menuItem.titre }}</span>
+            <span matLine>{{ item.titre }}</span>
           </a>
+        </mat-nav-list>
 
-          <!-- Cas avec sous-menus -->
-          <mat-expansion-panel *ngIf="menuItem.sous_menus && menuItem.sous_menus.length > 0">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <mat-icon fontSet="material-symbols-outlined">
-                  {{ menuItem.icone || 'folder' }}
+        <!-- 2) Items AVEC sous-menus : utiliser un panneau séparé (pas dans un mat-nav-list parent) -->
+        <mat-expansion-panel *ngIf="item.sous_menus?.length" class="menu-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="menu-header">
+              <mat-icon fontSet="material-symbols-outlined" class="mr-2">
+                {{ item.icone || 'folder' }}
+              </mat-icon>
+              <span>{{ item.titre }}</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <mat-nav-list>
+            <ng-container *ngFor="let sm of visibleSousMenus(item)">
+              <a mat-list-item (click)="onNavigate(sm.url || '')">
+                <mat-icon matListIcon fontSet="material-symbols-outlined">
+                  {{ sm.icone || 'description' }}
                 </mat-icon>
-                <span>{{ menuItem.titre }}</span>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-
-            <ng-template matExpansionPanelContent>
-              <mat-nav-list>
-                <a
-                  mat-list-item
-                  *ngFor="let sousMenu of menuItem.sous_menus"
-                  (click)="onNavigate(sousMenu.url || '')"
-                >
-                  <mat-icon matListIcon fontSet="material-symbols-outlined">
-                    {{ sousMenu.icone }}
-                  </mat-icon>
-                  <span matLine>{{ sousMenu.titre }}</span>
-                </a>
-              </mat-nav-list>
-            </ng-template>
-          </mat-expansion-panel>
-        </div>
-      </mat-nav-list>
-    </mat-accordion>
+                <span matLine>{{ sm.titre }}</span>
+              </a>
+            </ng-container>
+          </mat-nav-list>
+        </mat-expansion-panel>
+      </ng-container>
+    </div>
   </mat-sidenav>
 
   <mat-sidenav-content>
@@ -80,11 +72,11 @@
           <mat-icon fontSet="material-symbols-outlined">account_circle</mat-icon>
         </button>
         <mat-menu #authMenu="matMenu" xPosition="after" yPosition="below" [overlapTrigger]="false">
-          <button *ngIf="this.user" mat-menu-item (click)="connect_deconnect()">
+          <button *ngIf="this.utilisateurConnecte" mat-menu-item (click)="connect_deconnect()">
             <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
             <span>Se déconnecter</span>
           </button>
-          <button *ngIf="!this.user" mat-menu-item (click)="connect_deconnect()">
+          <button *ngIf="!this.utilisateurConnecte" mat-menu-item (click)="connect_deconnect()">
             <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
             <span>Se connecter</span>
           </button>

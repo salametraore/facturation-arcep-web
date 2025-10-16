@@ -8,6 +8,7 @@
   import {RecouvListeEncaissement} from "../models/recouv-liste-encaissement";
   import {Encaissement} from "../models/encaissement";
   import {Facture} from "../models/facture";
+  import {EncaissementDirectFicheTechniqueRequest} from "../models/encaissement-direct-request";
   @Injectable({  providedIn:  'root',})
 export class EncaissementsService {
       private baseUrl = environment.baseUrl + '/encaissements';
@@ -48,6 +49,11 @@ export class EncaissementsService {
 
     getListeEncaissementsByClientId(id:number) : Observable<RecouvListeEncaissement[]> {
       return this.http.get<RecouvListeEncaissement[]>(`${this.baseUrl}/clients/${id}/`);
+    }
+
+    createEncaissementDirect(data: EncaissementDirectFicheTechniqueRequest ): Observable<EncaissementDirectFicheTechniqueRequest> {
+      console.log(data)
+      return this.http.post< EncaissementDirectFicheTechniqueRequest>(`${this.baseUrl}/`,data);
     }
 
   }

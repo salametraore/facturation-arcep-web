@@ -1,23 +1,7 @@
+<!--encaissement-crud.html-->
+
 <div class="dashboard-container">
   <h1 class="dashboard-title" style="color: #030303">Saisie mise à jour des encaissements</h1>
-
-  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
-  <!--  <div class="demand-status">-->
-  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
-  <!--    <mat-stepper [linear]="true" #stepper>-->
-  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
-  <!--        <ng-template matStepLabel>-->
-  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
-  <!--        </ng-template>-->
-  <!--      </mat-step>-->
-  <!--    </mat-stepper>-->
-  <!--  </div>-->
-
-  <!-- Documents -->
-  <!--  <div class="documents-section">-->
-  <!--    <span class="section-label">DOCUMENTS</span>-->
-  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
-  <!--  </div>-->
 
   <mat-stepper #stepper (selectionChange)="onStepChange($event)">
     <mat-step [stepControl]="firstFormGroup">

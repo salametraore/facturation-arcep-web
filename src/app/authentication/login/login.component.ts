@@ -3,6 +3,10 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup,  Validators } from '@angular/forms';
 import { LoginPayload } from '../auth.models';
 import { Router } from '@angular/router';
+import {UtilisateurService} from "../../shared/services/utilisateur.service";
+import {Client} from "../../shared/models/client";
+import {Utilisateur} from "../../shared/models/utilisateur";
+import {UtilisateurRole} from "../../shared/models/droits-utilisateur";
 
 @Component({
   selector: 'app-login',
@@ -17,11 +21,15 @@ export class LoginComponent implements OnInit {
   show2faForm: boolean = false; // Variable pour contrôler l'affichage
 
   errorMessage: string = ''; // Pour afficher les erreurs de l'API
+  utilisateur:Utilisateur;
+  utilisateurs:Utilisateur[];
+  utilisateurRole:UtilisateurRole;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
+    private utilisateurService:UtilisateurService,
     private router: Router
   ) {}
 
@@ -90,6 +98,18 @@ export class LoginComponent implements OnInit {
         this.isLoading = false;
         if (response.token) {
           // this.authService.setToken(response.token);
+
+          this.utilisateurService.getItem(1).subscribe((ligneUtilisateur: Utilisateur) => {
+            this.utilisateur = ligneUtilisateur;
+            this.authService.setConnectedUser(ligneUtilisateur);
+          });
+
+          this.utilisateurService.getUtilisateurRoles(1).subscribe((ligneUtilisateurRole: UtilisateurRole) => {
+            this.utilisateurRole = ligneUtilisateurRole;
+            console.log
+            this.authService.setConnectedUtilisateurRole(ligneUtilisateurRole);
+          });
+
           this.router.navigate(['/dashboard']); // Redirection vers la page d'accueil
         }
         this.cdr.detectChanges();

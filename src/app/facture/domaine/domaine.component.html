@@ -108,12 +108,6 @@
               <mat-icon color="warn">edit</mat-icon>
               Transmettre
             </button>
-            <!--            <button *ngIf="element.statut?.code==='FTD' || element.statut?.code==='GFD'"
-                                (click)="onSetAvis(element,this.operations.transmettre)"
-                                mat-menu-item>
-                          <mat-icon color="warn">check</mat-icon>
-                          Donner un avis
-                        </button> -->
 
             <button *ngIf="element.statut?.code==='FTD' "
                     (click)="onSetAvis(element,this.operations.transmettre)"

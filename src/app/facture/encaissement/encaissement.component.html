@@ -7,10 +7,16 @@
         <mat-icon>add</mat-icon>
         Nouvel encaissement
       </button>
-      <button color="warn" mat-flat-button>
+
+      <button (click)="openEncaissementDirect()" color="warn" mat-flat-button>
+        <mat-icon>point_of_sale</mat-icon>
+        Encaissement direct
+      </button>
+
+<!--      <button color="warn" mat-flat-button>
         <mat-icon>print</mat-icon>
         Exporter
-      </button>
+      </button>-->
     </div>
   </div>
 

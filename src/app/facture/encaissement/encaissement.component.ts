@@ -19,6 +19,7 @@ import {EncaissementCrudComponent} from "./encaissement-crud/encaissement-crud.c
 import {RecouvListeEncaissement} from "../../shared/models/recouv-liste-encaissement";
 import {EncaissementDetail} from "../../shared/models/encaissementDetail";
 import {Encaissement} from "../../shared/models/encaissement";
+import {EncaissementDirectCrudComponent} from "../encaissement-direct/encaissement-direct-crud/encaissement-direct-crud.component";
 
 @Component({
   selector: 'app-encaissement',
@@ -121,8 +122,6 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
 
       });
     }
-
-
   }
 
   onRowClicked(row) {
@@ -162,5 +161,20 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     return this.categories?.find(cat=>cat.id===id).libelle;
   }
 
-}
+
+  openEncaissementDirect(): void {
+    const dialogRef = this.dialog.open(EncaissementDirectCrudComponent, {
+      width: '1200px',
+      maxWidth: '95vw',
+      disableClose: false,
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      // rafraîchir si nécessaire
+      this.checher?.();
+    });
+  }
+
+
+  }
 

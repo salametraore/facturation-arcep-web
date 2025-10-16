@@ -5,9 +5,12 @@ import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import {AuthService} from "../../../authentication/auth.service";
 import {User} from "../../../authentication/auth.models";
+import {Utilisateur} from "../../models/utilisateur";
+import {UtilisateurRole} from "../../models/droits-utilisateur";
 
 interface MenuItem {
   id: number;
+  direction: number;
   titre: string;
   description: string;
   icone?: string;
@@ -45,10 +48,15 @@ export class MainNavComponent implements OnInit {
   isHandset$: Observable<boolean>;
   isMenuVisible = false;
   isFloating = false;
+  utilisateurConnecte:Utilisateur;
+  roleUtilisateurConnecte:UtilisateurRole;
 
   user:User;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router,private authService:AuthService) {
+  constructor(private breakpointObserver: BreakpointObserver,
+              private router: Router,
+              private authService:AuthService)
+  {
     this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset)
       .pipe(map(r => r.matches), shareReplay());
   }
@@ -56,51 +64,51 @@ export class MainNavComponent implements OnInit {
   /* ---------------- MENU DATA ---------------- */
   menuItems: MenuItem[] = [
     {
-      id: 10, titre: 'Paramétrage', description: 'Paramétrage',
+      id: 10,direction:0,  titre: 'Paramétrage', description: 'Paramétrage',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        { id: 1005, titre: 'Les catégories de station', description: 'Les catégories de station', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/categorie-stations' },
-        { id: 1010, titre: 'Les zones de couverture des radio', description: 'Les zones de couverture des radio', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/zone-couvertures' },
-        { id: 1015, titre: 'Les zones postales', description: 'Les zones postales', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/zone-postales' },
-        { id: 1020, titre: 'Les catégories de produits', description: 'Les catégories de produits', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/categorie-produits' },
-        { id: 1025, titre: 'Les produits', description: 'Les produits', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/produits' },
-        { id: 1030, titre: 'Les tarifs frais de dossier', description: 'Les tarifs frais de dossier', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/tarif-frais-dossiers' },
-        { id: 1035, titre: 'Les tarifs des redevances annuelles de gestion', description: 'Les tarifs des redevances annuelles de gestion', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/tarif-frais-redevances' },
-        { id: 1040, titre: 'Les garanties', description: 'Les garanties', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/garanties' },
-        { id: 1045, titre: 'Les tarifs des fréquences', description: 'Les tarifs des fréquences', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/tarif-frequences' },
+        { id: 1005,direction:0,  titre: 'Les catégories de station', description: 'Les catégories de station', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/categorie-stations' },
+        { id: 1010,direction:0,  titre: 'Les zones de couverture des radio', description: 'Les zones de couverture des radio', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/zone-couvertures' },
+        { id: 1015,direction:0,  titre: 'Les zones postales', description: 'Les zones postales', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/zone-postales' },
+        { id: 1020,direction:0,  titre: 'Les catégories de produits', description: 'Les catégories de produits', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/categorie-produits' },
+        { id: 1025,direction:0,  titre: 'Les produits', description: 'Les produits', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/produits' },
+        { id: 1030,direction:0,  titre: 'Les tarifs frais de dossier', description: 'Les tarifs frais de dossier', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/tarif-frais-dossiers' },
+        { id: 1035,direction:0,  titre: 'Les tarifs des redevances annuelles de gestion', description: 'Les tarifs des redevances annuelles de gestion', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/tarif-frais-redevances' },
+        { id: 1040,direction:0,  titre: 'Les garanties', description: 'Les garanties', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/garanties' },
+        { id: 1045,direction:0,  titre: 'Les tarifs des fréquences', description: 'Les tarifs des fréquences', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/tarif-frequences' },
       ]
     },
     {
-      id: 20, titre: 'Fiches Techniques', description: 'Fiches Techniques',
+      id: 20,direction:0,  titre: 'Fiches Techniques', description: 'Fiches Techniques',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        { id: 2005, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-fiche-technique' },
-        { id: 2010, titre: 'Noms de domaine', description: 'Noms de domaine', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/domaines' },
-        { id: 2015, titre: 'Service de confiance', description: 'Service de confiance', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-confiance' },
-        { id: 2020, titre: 'Prestations diverses', description: 'Prestations diverses', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/prestations-divers' },
-        { id: 2025, titre: 'Services à valeur ajoutée', description: 'Services à valeur ajoutée', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-a-valeur-ajoute' },
-        { id: 2030, titre: 'Autorisation générale', description: 'Autorisation générale', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/autorisation-generale' },
-        { id: 2040, titre: 'Agrement installateur', description: 'Agrement d\'installateur', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-installeur' },
-        { id: 2045, titre: 'Numérotation', description: 'Numérotation', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/numerotation' },
-        { id: 2050, titre: 'Agrément equipement', description: 'Agrément equipement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-equipement' },
+        { id: 2005, direction:0, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-fiche-technique' },
+        { id: 2010, direction:2, titre: 'Noms de domaine', description: 'Noms de domaine', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/domaines' },
+        { id: 2015, direction:2, titre: 'Service de confiance', description: 'Service de confiance', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-confiance' },
+        { id: 2020, direction:1, titre: 'Prestations diverses', description: 'Prestations diverses', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/prestations-divers' },
+        { id: 2025, direction:5, titre: 'Services à valeur ajoutée', description: 'Services à valeur ajoutée', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-a-valeur-ajoute' },
+        { id: 2030, direction:5, titre: 'Autorisation générale', description: 'Autorisation générale', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/autorisation-generale' },
+        { id: 2040, direction:5, titre: 'Agrement installateur', description: 'Agrement d\'installateur', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-installeur' },
+        { id: 2045, direction:3, titre: 'Numérotation', description: 'Numérotation', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/numerotation' },
+        { id: 2050, direction:5, titre: 'Agrément equipement', description: 'Agrément equipement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-equipement' },
       ]
     },
     {
-      id: 30, titre: 'Facturation/Devis', description: 'Facturation/Devis',
+      id: 30,direction:0,  titre: 'Facturation/Devis', description: 'Facturation/Devis',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        { id: 3005, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-dfc' },
-        { id: 3010, titre: 'Fiches techniques reçues', description: 'Fiches techniques reçues', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/elements-recu-dsi' },
-        { id: 3015, titre: 'Factures/Devis', description: 'Factures/Devis', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/devis-facure' },
+        { id: 3005,direction:0, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-dfc' },
+        { id: 3010,direction:0, titre: 'Fiches techniques reçues', description: 'Fiches techniques reçues', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/elements-recu-dsi' },
+        { id: 3015,direction:0, titre: 'Factures/Devis', description: 'Factures/Devis', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/devis-facure' },
       ]
     },
     {
-      id: 40, titre: 'Recouvrement', description: 'Recouvrement',
+      id: 40,direction:0,  titre: 'Recouvrement', description: 'Recouvrement',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        { id: 4005, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/recouvrement' },
-        { id: 4010, titre: 'Encaissement', description: 'Encaissement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/encaissement' },
-        { id: 4015, titre: 'Clients', description: 'Clients', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/clients' },
+        { id: 4005,direction:0, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/recouvrement' },
+        { id: 4010,direction:0, titre: 'Encaissement', description: 'Encaissement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/encaissement' },
+        { id: 4015,direction:0, titre: 'Clients', description: 'Clients', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/clients' },
       ]
     }
   ];
@@ -108,7 +116,9 @@ export class MainNavComponent implements OnInit {
   ngOnInit(): void {
     // applique les icônes de groupe et par défaut des sous-menus
     this.applyGroupAndSubIcons(this.menuItems);
-    this.user = this.authService.getConnectedUser();
+    this.utilisateurConnecte=this.authService.getConnectedUser();
+    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
+    console.log(this.utilisateurConnecte);
   }
 
   /* ------- mapping d'icônes (méthode de classe, PAS de "function") ------- */
@@ -170,4 +180,13 @@ export class MainNavComponent implements OnInit {
   onNavigate(url: string) {
     if (url) this.router.navigate([url]);
   }
+
+  visibleSousMenus(item: any) {
+    const dir = this.utilisateurConnecte?.direction;
+    return (item.sous_menus || []).filter(
+      (sm: any) => sm.direction === 0 || sm.direction === dir
+    );
+  }
+
+
 }

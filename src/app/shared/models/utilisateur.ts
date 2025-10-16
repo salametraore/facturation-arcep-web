@@ -10,7 +10,7 @@
 import { RoleEnum } from './roleEnum';
 
 
-export interface Utilisateur {
+export class Utilisateur {
   readonly id: number;
   /**
    * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
@@ -24,7 +24,6 @@ export interface Utilisateur {
   direction?: number | null;
   password: string;
 }
-export namespace Utilisateur {
-}
+
 
 

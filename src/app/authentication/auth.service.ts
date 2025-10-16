@@ -6,7 +6,9 @@ import { catchError, tap } from 'rxjs/operators';
 
 // Modèles pour le typage des données
 import { LoginPayload, LoginResponse, TwoFaPayload, AuthState, User, PasswordResetPayload, PasswordResetConfirmPayload, VerifyResetCodePayload } from './auth.models';
-import {environment} from "../../environments/environment"; // À créer
+import {environment} from "../../environments/environment";
+import {Utilisateur} from "../shared/models/utilisateur";
+import {UtilisateurRole} from "../shared/models/droits-utilisateur"; // À créer
 
 @Injectable({
   providedIn: 'root',
@@ -68,9 +70,23 @@ export class AuthService {
     return localStorage.getItem('auth_token');
   }
 
-  getConnectedUser(): User {
+  setConnectedUser(utilisateur: Utilisateur): void {
+    sessionStorage.setItem('UtilisateurConnecte', JSON.stringify(utilisateur));
+  }
+
+  getConnectedUser(): Utilisateur {
     if (sessionStorage.getItem('UtilisateurConnecte')) {
-      return JSON.parse(sessionStorage.getItem('user') as string);
+      return JSON.parse(sessionStorage.getItem('UtilisateurConnecte') as string);
+    }
+  }
+
+  setConnectedUtilisateurRole(utilisateurRole: UtilisateurRole): void {
+    sessionStorage.setItem('utilisateurRole', JSON.stringify(utilisateurRole));
+  }
+
+  getConnectedUtilisateurRole(): UtilisateurRole {
+    if (sessionStorage.getItem('utilisateurRole')) {
+      return JSON.parse(sessionStorage.getItem('utilisateurRole') as string);
     }
   }
 

@@ -66,7 +66,8 @@ import {
 import {AvisEtuteTechniqueDialodComponent} from "./avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 import {HistoriqueTraitementComponent} from "./historique-traitement/historique-traitement.component";
 import {AvisTechniqueInfosComponent} from "./avis-technique-infos/avis-technique-infos.component";
-
+import { EncaissementDirectComponent } from './encaissement-direct/encaissement-direct.component';
+import { EncaissementDirectCrudComponent } from './encaissement-direct/encaissement-direct-crud/encaissement-direct-crud.component';
 
 @NgModule({
   declarations: [
@@ -110,7 +111,9 @@ import {AvisTechniqueInfosComponent} from "./avis-technique-infos/avis-technique
     AgrementEquipementCrudComponent,
     AvisEtuteTechniqueDialodComponent,
     HistoriqueTraitementComponent,
-    AvisTechniqueInfosComponent
+    AvisTechniqueInfosComponent,
+    EncaissementDirectComponent,
+    EncaissementDirectCrudComponent,
   ],
   imports: [
     CommonModule,
