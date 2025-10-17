@@ -18,6 +18,9 @@ import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-techniqu
 import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
 import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
+import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
+import {AuthService} from "../../../authentication/auth.service";
+import {Utilisateur} from "../../../shared/models/utilisateur";
 
 @Component({
   selector: 'autorisation-generale-table',
@@ -46,6 +49,9 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+  utilisateurConnecte:Utilisateur;
+  roleUtilisateurConnecte:UtilisateurRole;
+
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -55,6 +61,7 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
     private statutFicheTechniqueService: StatutFicheTechniqueService,
     public dialog: MatDialog,
     public dialogService: DialogService,
+    private authService:AuthService,
     private msgMessageService: MsgMessageServiceService,
   ) {
     this.ficheTechniques = new MatTableDataSource<FicheTechniques>([]);
@@ -67,6 +74,10 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
 
   ngOnInit(): void {
     this.reloadData();
+
+    this.utilisateurConnecte=this.authService.getConnectedUser();
+    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
+    console.log(this.utilisateurConnecte);
   }
 
   reloadData() {
@@ -86,8 +97,12 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
     });
 
     this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
+      this.ficheTechniques.data = response
+        .filter(f => f.categorie_produit === this.fixeCategorie)
+        .sort((a, b) => b.id - a.id);  // Tri décroissant sur le champ id
     });
+
+
   }
 
   applyFilter(event: Event) {
@@ -184,5 +199,27 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
     }, error => {
     });
   }
+  hasOperationCode( opCode: string): boolean {
+    const  user=this.roleUtilisateurConnecte;
+
+    if (!user || !opCode) return false;
+
+    const needle = opCode.trim().toLowerCase();
+
+    // Normaliser: accepter user.role = Role | Role[]
+    const roles: Role[] = Array.isArray((user as any).role)
+      ? (user as any).role
+      : (user as any).role
+        ? [ (user as any).role ]
+        : [];
+
+    for (const role of roles) {
+      for (const op of (role?.operations ?? [])) {
+        if ((op.code ?? '').trim().toLowerCase() === needle) return true;
+      }
+    }
+    return false;
+  }
+
 }
 

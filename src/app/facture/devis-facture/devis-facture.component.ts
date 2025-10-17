@@ -88,7 +88,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     });
 
     this.factureService.getListItems().subscribe((response: Facture[]) => {
-      this.t_Facture.data = response;
+      this.t_Facture.data = response.sort((a, b) => b.id - a.id); // 🔽 Tri décroissant par id
     });
   }
 
@@ -183,6 +183,14 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
       })
   }
 
+  onPrintDevis(facture: Facture) {
+    this.factureService.genererDevisPDF(facture?.id).subscribe((response: HttpResponse<Blob>)=>{
+        this.pdfViewService.printDirectly(response);
+      },
+      error => {
+        this.dialogService.alert({message: error});
+      })
+  }
   openGenererRedevancesAnnuelles(): void {
     const dialogRef = this.dialog.open(GenerationRedevanceCrudComponent, {
       width: '1200px',

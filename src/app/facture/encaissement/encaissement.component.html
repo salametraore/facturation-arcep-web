@@ -3,12 +3,13 @@
   <div class="dashboard-header">
     <h3 class="dashboard-title" style="color: #030303">Liste des encaissements</h3>
     <div class="dashboard-actions">
-      <button (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
+
+      <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
         <mat-icon>add</mat-icon>
         Nouvel encaissement
       </button>
 
-      <button (click)="openEncaissementDirect()" color="warn" mat-flat-button>
+      <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="openEncaissementDirect()" color="warn" mat-flat-button>
         <mat-icon>point_of_sale</mat-icon>
         Encaissement direct
       </button>
@@ -105,11 +106,15 @@
             <mat-icon>settings</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button (click)="crud(element,this.operations.update)" mat-menu-item>
+            <button *ngIf="  hasOperationCode('ENCAISSER')" (click)="crud(element,this.operations.update)" mat-menu-item>
               <mat-icon color="warn">edit</mat-icon>
               Modifier
             </button>
           </mat-menu>
+<!--          <button (click)="onPrintRecu(element)" mat-menu-item>
+            <mat-icon color="primary">print</mat-icon>
+            Editer Reçu
+          </button>-->
         </td>
       </ng-container>
       <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>

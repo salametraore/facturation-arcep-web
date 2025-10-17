@@ -57,4 +57,12 @@ export class EncaissementsService {
       return this.http.post< EncaissementDirectFicheTechniqueRequest>(`${this.baseUrl3}/`,data);
     }
 
+
+    genererRecuPDF(encaissement_id: number) {
+      const url = `${environment.baseUrl}/encaissement/generate-recu-pdf/${encaissement_id}/`
+      const httpOptions = {
+        'responseType': 'arraybuffer' as 'json'
+      };
+      return this.http.get<any>(url, httpOptions);
+    }
   }

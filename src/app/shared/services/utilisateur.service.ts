@@ -40,4 +40,12 @@ export class UtilisateurService {
     return this.http.get<UtilisateurRole>(`${this.baseUrl2}/${id}/`);
   }
 
+  getUtilisateursRoles(): Observable<UtilisateurRole> {
+    return this.http.get<UtilisateurRole>(`${this.baseUrl2}/`);
+  }
+
+  getUtisateurByUsername(username: string): Observable<Utilisateur> {
+    return this.http.get<Utilisateur>(`${this.baseUrl}/${username}/`);
+  }
+
 }

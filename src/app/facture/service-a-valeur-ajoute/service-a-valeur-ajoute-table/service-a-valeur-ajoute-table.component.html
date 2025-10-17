@@ -108,14 +108,14 @@
               Transmettre
             </button>
 
-            <button *ngIf="element.statut?.code==='FTD' && hasOperationCode('TRANSMETTRE_FICHE')"
+            <button *ngIf="element.statut?.code==='FTD' && hasOperationCode('AVIS_TECHNIQUE_FICHE')"
                     (click)="onSetAvis(element,this.operations.transmettre)"
                     mat-menu-item>
               <mat-icon color="warn">check</mat-icon>
               Donner un avis
             </button>
 
-            <button *ngIf="element.statut?.id>5 "
+            <button *ngIf="element.statut?.id>5 && hasOperationCode('RETRAIT_FICHE') "
                     (click)="onRetraitAutorisation(element,this.operations.transmettre)"
                     mat-menu-item>
               <mat-icon color="warn">check</mat-icon>

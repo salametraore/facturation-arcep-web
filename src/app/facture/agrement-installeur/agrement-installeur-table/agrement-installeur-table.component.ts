@@ -18,6 +18,9 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 import {operations} from "../../../constantes";
 import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
+import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
+import {Utilisateur} from "../../../shared/models/utilisateur";
+import {AuthService} from "../../../authentication/auth.service";
 
 @Component({
   selector: 'agrement-installeur-table',
@@ -46,6 +49,8 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+  utilisateurConnecte:Utilisateur;
+  roleUtilisateurConnecte:UtilisateurRole;
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -55,6 +60,7 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
     private statutFicheTechniqueService: StatutFicheTechniqueService,
     public dialog: MatDialog,
     public dialogService: DialogService,
+    private authService:AuthService,
     private msgMessageService: MsgMessageServiceService,
   ) {
     this.ficheTechniques = new MatTableDataSource<FicheTechniques>([]);
@@ -67,6 +73,9 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.reloadData();
+    this.utilisateurConnecte=this.authService.getConnectedUser();
+    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
+    console.log(this.utilisateurConnecte);
   }
 
   reloadData() {
@@ -92,12 +101,12 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
     this.ficheTechniquesService.getFicheTechniques()
       .subscribe((lignes: FicheTechniques[]) => {
         const allowed = new Set<number>([75]); // productAllowedIds
-        this.ficheTechniques.data = lignes.filter(f =>
-          f.categorie_produit === this.fixeCategorie &&
-          (
-            (f.produits_detail?.some(p => p && allowed.has(p.produit)))
+        this.ficheTechniques.data = lignes
+          .filter(f =>
+            f.categorie_produit === this.fixeCategorie &&
+            f.produits_detail?.some(p => p && allowed.has(p.produit))
           )
-        );
+          .sort((a, b) => (+(b as any).id ?? 0) - (+(a as any).id ?? 0)); // tri décroissant par id
       });
 
   }
@@ -196,5 +205,28 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
     }, error => {
     });
   }
+
+  hasOperationCode( opCode: string): boolean {
+    const  user=this.roleUtilisateurConnecte;
+
+    if (!user || !opCode) return false;
+
+    const needle = opCode.trim().toLowerCase();
+
+    // Normaliser: accepter user.role = Role | Role[]
+    const roles: Role[] = Array.isArray((user as any).role)
+      ? (user as any).role
+      : (user as any).role
+        ? [ (user as any).role ]
+        : [];
+
+    for (const role of roles) {
+      for (const op of (role?.operations ?? [])) {
+        if ((op.code ?? '').trim().toLowerCase() === needle) return true;
+      }
+    }
+    return false;
+  }
+
 
 }

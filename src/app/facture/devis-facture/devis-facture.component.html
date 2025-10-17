@@ -67,7 +67,7 @@
 
       <button (click)="openGenererRedevancesAnnuelles()" color="warn" mat-flat-button>
         <mat-icon>point_of_sale</mat-icon>
-        Générer Redevances Annuelles
+        Générer Redevances
       </button>
 
     </div>
@@ -123,9 +123,14 @@
               Modifier
             </button>
 
+            <button (click)="onPrintDevis(element)" mat-menu-item>
+              <mat-icon color="primary">print</mat-icon>
+              Editer Devis
+            </button>
+
             <button (click)="onPrint(element)" mat-menu-item>
               <mat-icon color="primary">print</mat-icon>
-              Editer PDF
+              Editer facture
             </button>
 
             <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>

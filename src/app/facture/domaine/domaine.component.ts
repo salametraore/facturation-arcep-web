@@ -19,6 +19,9 @@ import {ClientService} from "../../shared/services/client.service";
 import {DomaineCrudComponent} from "./domaine-crud/domaine-crud.component";
 import {AvisEtuteTechniqueDialodComponent} from "../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 import {RetraitAutorisationDialogComponent} from "../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
+import {Role, UtilisateurRole} from "../../shared/models/droits-utilisateur";
+import {Utilisateur} from "../../shared/models/utilisateur";
+import {AuthService} from "../../authentication/auth.service";
 
 @Component({
   selector: 'app-domaine',
@@ -45,6 +48,8 @@ export class DomaineComponent implements OnInit, AfterViewInit {
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
   client: Client;
+  utilisateurConnecte:Utilisateur;
+  roleUtilisateurConnecte:UtilisateurRole;
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -53,6 +58,7 @@ export class DomaineComponent implements OnInit, AfterViewInit {
     private clientService: ClientService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
     public dialog: MatDialog,
+    private authService:AuthService,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
   ) {
@@ -67,6 +73,10 @@ export class DomaineComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.reloadData();
     this.fixeCategorie = 9;
+
+    this.utilisateurConnecte=this.authService.getConnectedUser();
+    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
+    console.log(this.utilisateurConnecte);
   }
 
   reloadData() {
@@ -85,8 +95,13 @@ export class DomaineComponent implements OnInit, AfterViewInit {
       this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
+/*    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
       this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
+    });*/
+    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
+      this.ficheTechniques.data = response
+        .filter(f => f.categorie_produit === this.fixeCategorie)
+        .sort((a, b) => b.id - a.id);  // tri décroissant sur le champ id
     });
   }
 
@@ -215,4 +230,28 @@ export class DomaineComponent implements OnInit, AfterViewInit {
   onGetClient(item: Client) {
     this.client = item;
   }
+
+  hasOperationCode( opCode: string): boolean {
+    const  user=this.roleUtilisateurConnecte;
+
+    if (!user || !opCode) return false;
+
+    const needle = opCode.trim().toLowerCase();
+
+    // Normaliser: accepter user.role = Role | Role[]
+    const roles: Role[] = Array.isArray((user as any).role)
+      ? (user as any).role
+      : (user as any).role
+        ? [ (user as any).role ]
+        : [];
+
+    for (const role of roles) {
+      for (const op of (role?.operations ?? [])) {
+        if ((op.code ?? '').trim().toLowerCase() === needle) return true;
+      }
+    }
+    return false;
+  }
+
+
 }

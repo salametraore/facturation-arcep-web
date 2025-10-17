@@ -82,32 +82,32 @@ export class MainNavComponent implements OnInit {
       id: 20,direction:0,  titre: 'Fiches Techniques', description: 'Fiches Techniques',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        { id: 2005, direction:0, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-fiche-technique' },
-        { id: 2010, direction:0, titre: 'Noms de domaine', description: 'Noms de domaine', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/domaines' },
-        { id: 2015, direction:0, titre: 'Service de confiance', description: 'Service de confiance', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-confiance' },
-        { id: 2020, direction:0, titre: 'Prestations diverses', description: 'Prestations diverses', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/prestations-divers' },
-        { id: 2025, direction:0, titre: 'Services à valeur ajoutée', description: 'Services à valeur ajoutée', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-a-valeur-ajoute' },
-        { id: 2030, direction:0, titre: 'Autorisation générale', description: 'Autorisation générale', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/autorisation-generale' },
-        { id: 2040, direction:0, titre: 'Agrement installateur', description: 'Agrement d\'installateur', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-installeur' },
-        { id: 2045, direction:0, titre: 'Numérotation', description: 'Numérotation', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/numerotation' },
-        { id: 2050, direction:0, titre: 'Agrément equipement', description: 'Agrément equipement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-equipement' },
+        { id: 2005, direction:100, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-fiche-technique' },
+        { id: 2010, direction:2, titre: 'Noms de domaine', description: 'Noms de domaine', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/domaines' },
+        { id: 2015, direction:2, titre: 'Service de confiance', description: 'Service de confiance', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-confiance' },
+        { id: 2020, direction:1, titre: 'Prestations diverses', description: 'Prestations diverses', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/prestations-divers' },
+        { id: 2025, direction:5, titre: 'Services à valeur ajoutée', description: 'Services à valeur ajoutée', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/service-a-valeur-ajoute' },
+        { id: 2030, direction:5, titre: 'Autorisation générale', description: 'Autorisation générale', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/autorisation-generale' },
+        { id: 2040, direction:3, titre: 'Agrement installateur', description: 'Agrement d\'installateur', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-installeur' },
+        { id: 2045, direction:3, titre: 'Numérotation', description: 'Numérotation', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/numerotation' },
+        { id: 2050, direction:3, titre: 'Agrément equipement', description: 'Agrément equipement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/agrement-equipement' },
       ]
     },
     {
       id: 30,direction:0,  titre: 'Facturation/Devis', description: 'Facturation/Devis',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        { id: 3005,direction:0, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-dfc' },
-        { id: 3010,direction:0, titre: 'Fiches techniques reçues', description: 'Fiches techniques reçues', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/elements-recu-dsi' },
-        { id: 3015,direction:0, titre: 'Factures/Devis', description: 'Factures/Devis', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/devis-facure' },
+        { id: 3005,direction:100, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/dashboard-dfc' },
+        { id: 3010,direction:1 ,titre: 'Fiches techniques reçues', description: 'Fiches techniques reçues', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/elements-recu-dsi' },
+        { id: 3015,direction:1, titre: 'Factures/Devis', description: 'Factures/Devis', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/devis-facure' },
       ]
     },
     {
       id: 40,direction:0,  titre: 'Recouvrement', description: 'Recouvrement',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        { id: 4005,direction:0, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/recouvrement' },
-        { id: 4010,direction:0, titre: 'Encaissement', description: 'Encaissement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/encaissement' },
+        { id: 4005,direction:100, titre: 'Tableau de bord', description: 'Tableau de bord', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'dashboard/recouvrement' },
+        { id: 4010,direction:1, titre: 'Encaissement', description: 'Encaissement', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'facture/encaissement' },
         { id: 4015,direction:0, titre: 'Clients', description: 'Clients', actif: 'OUI', module: 0, feuille: 1, sous_menus: null, url: 'parametre/clients' },
       ]
     }

@@ -20,6 +20,11 @@ import {RecouvListeEncaissement} from "../../shared/models/recouv-liste-encaisse
 import {EncaissementDetail} from "../../shared/models/encaissementDetail";
 import {Encaissement} from "../../shared/models/encaissement";
 import {EncaissementDirectCrudComponent} from "../encaissement-direct/encaissement-direct-crud/encaissement-direct-crud.component";
+import {Utilisateur} from "../../shared/models/utilisateur";
+import {Role, UtilisateurRole} from "../../shared/models/droits-utilisateur";
+import {AuthService} from "../../authentication/auth.service";
+import {HttpResponse} from "@angular/common/http";
+import {PdfViewService} from "../../shared/services/pdf-view.service";
 
 @Component({
   selector: 'app-encaissement',
@@ -47,14 +52,19 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
   clients: Client[];
   modePaiements: ModePaiement[];
 
+  utilisateurConnecte:Utilisateur;
+  roleUtilisateurConnecte:UtilisateurRole;
+
   constructor(
     private encaissementsService: EncaissementsService,
     private categorieProduitService: CategorieProduitService,
     private produitService: ProduitService,
     private modePaiementService: ModePaiementService,
     private clientService: ClientService,
+    private pdfViewService: PdfViewService,
     public dialog: MatDialog,
     public dialogService: DialogService,
+    private authService:AuthService,
     private msgMessageService: MsgMessageServiceService,
   ) {
     this.t_RecouvListeEncaissement = new MatTableDataSource<RecouvListeEncaissement>([]);
@@ -68,6 +78,11 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.reloadData();
     this.fixeCategorie = 9;
+
+    this.utilisateurConnecte=this.authService.getConnectedUser();
+    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
+    console.log(this.utilisateurConnecte);
+
   }
 
   reloadData() {
@@ -84,8 +99,8 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
       this.clients = clients;
     });
     this.encaissementsService.getListencaissement().subscribe((response: RecouvListeEncaissement[]) => {
-      this.t_RecouvListeEncaissement.data = response;
-      console.log(response)
+      this.t_RecouvListeEncaissement.data = response.sort((a, b) => b.encaissement_id - a.encaissement_id); // 🔽 tri décroissant par id
+      console.log(this.t_RecouvListeEncaissement.data);
     });
   }
 
@@ -175,6 +190,36 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     });
   }
 
+  hasOperationCode( opCode: string): boolean {
+    const  user=this.roleUtilisateurConnecte;
 
+    if (!user || !opCode) return false;
+
+    const needle = opCode.trim().toLowerCase();
+
+    // Normaliser: accepter user.role = Role | Role[]
+    const roles: Role[] = Array.isArray((user as any).role)
+      ? (user as any).role
+      : (user as any).role
+        ? [ (user as any).role ]
+        : [];
+
+    for (const role of roles) {
+      for (const op of (role?.operations ?? [])) {
+        if ((op.code ?? '').trim().toLowerCase() === needle) return true;
+      }
+    }
+    return false;
   }
+
+
+  onPrintRecu(encaissement: Encaissement) {
+    this.encaissementsService.genererRecuPDF(encaissement?.id).subscribe((response: HttpResponse<Blob>)=>{
+        this.pdfViewService.printDirectly(response);
+      },
+      error => {
+        this.dialogService.alert({message: error});
+      })
+  }
+}
 

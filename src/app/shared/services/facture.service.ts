@@ -11,6 +11,7 @@ import {RequestGenererFacture} from "../models/ficheTechniques";
 export class FactureService {
 
   private baseUrl = environment.baseUrl + '/factures';
+  private baseUrlDevis = environment.baseUrl + '/devis';
 
   constructor(private http: HttpClient) {}
 
@@ -71,6 +72,16 @@ export class FactureService {
   genererFacturePDF(facture_id: number) {
     //const url = ${this.baseUrl}/generate-pdf/${facture_id};
     const url = `${this.baseUrl}/generate-pdf/${facture_id}`
+    const httpOptions = {
+      'responseType': 'arraybuffer' as 'json'
+    };
+    return this.http.get<any>(url, httpOptions);
+  }
+ //http://localhost:8000/facturation_api/devis/generate-pdf/35/
+
+   genererDevisPDF(devis_id: number) {
+    //const url = ${this.baseUrl}/generate-pdf/${facture_id};
+    const url = `${this.baseUrlDevis}/generate-pdf/${devis_id}/`
     const httpOptions = {
       'responseType': 'arraybuffer' as 'json'
     };
