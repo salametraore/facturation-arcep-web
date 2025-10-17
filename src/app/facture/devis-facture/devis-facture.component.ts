@@ -19,6 +19,8 @@ import {StatutFicheTechniqueService} from "../../shared/services/statut-fiche-te
 import {Facture} from "../../shared/models/facture";
 import {FactureService} from "../../shared/services/facture.service";
 import {HttpResponse} from "@angular/common/http";
+import {EncaissementDirectCrudComponent} from "../encaissement-direct/encaissement-direct-crud/encaissement-direct-crud.component";
+import {GenerationRedevanceCrudComponent} from "../generation-redevance/generation-redevance-crud/generation-redevance-crud.component";
 
 @Component({
   selector: 'app-devis-facture',
@@ -181,5 +183,17 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
       })
   }
 
+  openGenererRedevancesAnnuelles(): void {
+    const dialogRef = this.dialog.open(GenerationRedevanceCrudComponent, {
+      width: '1200px',
+      maxWidth: '95vw',
+      disableClose: false,
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      // rafraîchir si nécessaire
+      this.checher?.();
+    });
+  }
 
 }

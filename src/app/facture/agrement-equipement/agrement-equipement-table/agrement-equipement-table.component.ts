@@ -17,6 +17,7 @@ import {DialogService} from "../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {operations} from "../../../constantes";
 import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 
 
 @Component({
@@ -196,4 +197,16 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
     });
   }
 
+  onRetraitAutorisation(ficheTechnique: FicheTechniques, operation?: string) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '800px';
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {ficheTechnique, operation};
+    dialogConfig.disableClose = true;
+    let ref = this.dialog.open(RetraitAutorisationDialogComponent, dialogConfig);
+    ref.afterClosed().subscribe(() => {
+      this.reloadData();
+    }, error => {
+    });
+  }
 }

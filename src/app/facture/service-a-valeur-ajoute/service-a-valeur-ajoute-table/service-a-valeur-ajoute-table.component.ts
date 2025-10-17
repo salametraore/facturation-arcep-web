@@ -20,6 +20,7 @@ import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dial
 import {AuthService} from "../../../authentication/auth.service";
 import {Utilisateur} from "../../../shared/models/utilisateur";
 import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
+import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 
 @Component({
   selector: 'service-a-valeur-ajoute-table',
@@ -95,8 +96,11 @@ export class ServiceAValeurAjouteTableComponent implements OnInit, AfterViewInit
     });
 
     this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
+      this.ficheTechniques.data = response
+        .filter(f => f.categorie_produit === this.fixeCategorie)
+        .sort((a, b) => b.id - a.id);  // tri décroissant sur le champ id
     });
+
   }
 
   applyFilter(event: Event) {
@@ -167,6 +171,7 @@ export class ServiceAValeurAjouteTableComponent implements OnInit, AfterViewInit
   getStatut(id: number) {
     return this.statutFicheTechniques?.find(st => st.id === id).libelle;
   }
+
   onSetAvis(ficheTechnique: FicheTechniques, operation?: string) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '800px';
@@ -202,6 +207,19 @@ export class ServiceAValeurAjouteTableComponent implements OnInit, AfterViewInit
       }
     }
     return false;
+  }
+
+  onRetraitAutorisation(ficheTechnique: FicheTechniques, operation?: string) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '800px';
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {ficheTechnique, operation};
+    dialogConfig.disableClose = true;
+    let ref = this.dialog.open(RetraitAutorisationDialogComponent, dialogConfig);
+    ref.afterClosed().subscribe(() => {
+      this.reloadData();
+    }, error => {
+    });
   }
 
 }

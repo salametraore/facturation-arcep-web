@@ -6,7 +6,7 @@ import {
   AvisEtudeTechnique, ChercheFiche,
   FicheTechniques,
   MiseAJourStatutFiche,
-  RequestGenererFacture
+  RequestGenererFacture, RetraitAutorisationRequest
 } from "../models/ficheTechniques";
 import {ElementFacturationRecuCreeList} from "../models/element-facturation-recu-cree-list";
 import {FicheTechniqueAFacturer} from "../models/fiche-technique-a-facturer";
@@ -22,6 +22,7 @@ export class FicheTechniquesService {
   private baseUrl_2 = environment.baseUrl + '/elements-facturation-recu-cree';
   private baseUrl_histo = environment.baseUrl + '/api/historique/';
 
+
   constructor(private http: HttpClient) {
   }
 
@@ -31,6 +32,11 @@ export class FicheTechniquesService {
 
   setAvis(avisEtudeTechnique: AvisEtudeTechnique): Observable<AvisEtudeTechnique> {
     return this.http.post<AvisEtudeTechnique>(`${environment.baseUrl}/update-avis-fiche-technique/`, avisEtudeTechnique);
+  }
+
+  retraitAutorisation(retraitAutorisationRequest: RetraitAutorisationRequest): Observable<RetraitAutorisationRequest> {
+    return this.http.post<RetraitAutorisationRequest>(`${environment.baseUrl}/retrait-fiche/`, retraitAutorisationRequest);
+    //return this.http.post<RetraitAutorisationRequest>(`http://localhost:8000/facturation_api/retrait-fiche/`, retraitAutorisationRequest);
   }
 
   create(ficheTechniqueData: FormData): Observable<FicheTechniques> {

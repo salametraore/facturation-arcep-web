@@ -115,6 +115,13 @@
               Donner un avis
             </button>
 
+            <button *ngIf="element.statut?.id>5 "
+                    (click)="onRetraitAutorisation(element,this.operations.transmettre)"
+                    mat-menu-item>
+              <mat-icon color="warn">check</mat-icon>
+              Retrait autorisation/licence
+            </button>
+
             <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
               <mat-icon color="warn">delete</mat-icon>
               Supprimer

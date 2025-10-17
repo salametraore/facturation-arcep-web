@@ -19,6 +19,7 @@ import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
 import {DomaineCrudComponent} from "../domaine/domaine-crud/domaine-crud.component";
 import {ServiceConfianceCrudComponent} from "./service-confiance-crud/service-confiance-crud.component";
 import {AvisEtuteTechniqueDialodComponent} from "../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {RetraitAutorisationDialogComponent} from "../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 
 @Component({
   selector: 'app-service-confiance',
@@ -176,6 +177,19 @@ export class ServiceConfianceComponent implements OnInit, AfterViewInit {
     dialogConfig.data = {ficheTechnique, operation};
     dialogConfig.disableClose = true;
     let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    ref.afterClosed().subscribe(() => {
+      this.reloadData();
+    }, error => {
+    });
+  }
+
+  onRetraitAutorisation(ficheTechnique: FicheTechniques, operation?: string) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '800px';
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {ficheTechnique, operation};
+    dialogConfig.disableClose = true;
+    let ref = this.dialog.open(RetraitAutorisationDialogComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {

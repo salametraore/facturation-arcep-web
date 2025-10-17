@@ -17,6 +17,7 @@ import {MatSort} from "@angular/material/sort";
 import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
 import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
 import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 
 @Component({
   selector: 'autorisation-generale-table',
@@ -171,5 +172,17 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
     });
   }
 
+  onRetraitAutorisation(ficheTechnique: FicheTechniques, operation?: string) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '800px';
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {ficheTechnique, operation};
+    dialogConfig.disableClose = true;
+    let ref = this.dialog.open(RetraitAutorisationDialogComponent, dialogConfig);
+    ref.afterClosed().subscribe(() => {
+      this.reloadData();
+    }, error => {
+    });
+  }
 }
 

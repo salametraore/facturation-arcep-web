@@ -68,6 +68,9 @@ import {HistoriqueTraitementComponent} from "./historique-traitement/historique-
 import {AvisTechniqueInfosComponent} from "./avis-technique-infos/avis-technique-infos.component";
 import { EncaissementDirectComponent } from './encaissement-direct/encaissement-direct.component';
 import { EncaissementDirectCrudComponent } from './encaissement-direct/encaissement-direct-crud/encaissement-direct-crud.component';
+import {GenerationRedevanceComponent} from "./generation-redevance/generation-redevance.component";
+import {GenerationRedevanceCrudComponent} from "./generation-redevance/generation-redevance-crud/generation-redevance-crud.component";
+import {RetraitAutorisationDialogComponent} from "./retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 
 @NgModule({
   declarations: [
@@ -114,6 +117,9 @@ import { EncaissementDirectCrudComponent } from './encaissement-direct/encaissem
     AvisTechniqueInfosComponent,
     EncaissementDirectComponent,
     EncaissementDirectCrudComponent,
+    GenerationRedevanceComponent,
+    GenerationRedevanceCrudComponent,
+    RetraitAutorisationDialogComponent,
   ],
   imports: [
     CommonModule,

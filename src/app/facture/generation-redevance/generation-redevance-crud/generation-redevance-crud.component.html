@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>Génération des redevances annuelles</h2>
+<br>
+
+<mat-dialog-content [formGroup]="form" class="space-y-4" style="min-width: 420px;">
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Catégorie de produit</mat-label>
+    <mat-select formControlName="categorie" required>
+      <mat-option *ngFor="let c of categories" [value]="c.id">{{ c.libelle }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.controls.categorie.hasError('required')">
+      La catégorie est requise.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Année</mat-label>
+    <input matInput type="number" formControlName="annee" required>
+    <mat-error *ngIf="form.controls.annee.hasError('required')">L'année est requise.</mat-error>
+    <mat-error *ngIf="form.controls.annee.hasError('min')">Année minimale : 2000.</mat-error>
+    <mat-error *ngIf="form.controls.annee.hasError('max')">Année maximale : 2100.</mat-error>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="gap-2">
+  <button mat-stroked-button (click)="fermer()" [disabled]="isLoading">Fermer</button>
+
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="submit()"
+    [disabled]="form.invalid || isLoading || generated">
+    <span *ngIf="!isLoading">Générer</span>
+    <span *ngIf="isLoading" class="inline-flex items-center gap-2">
+      <mat-progress-spinner mode="indeterminate" [diameter]="16"></mat-progress-spinner>
+      Traitement...
+    </span>
+  </button>
+</mat-dialog-actions>

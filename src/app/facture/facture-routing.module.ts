@@ -25,6 +25,7 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import {AgrementEquipementComponent} from "./agrement-equipement/agrement-equipement.component";
  import {DomaineComponent} from "./domaine/domaine.component";
  import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
+ import {GenerationRedevanceComponent} from "./generation-redevance/generation-redevance.component";
 
 const routes: Routes = [
   {

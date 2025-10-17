@@ -77,4 +77,15 @@ export class FactureService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  // génération des redevances annuelles
+  genererRedevancesAnnuelles(categorieId: number, annee: number): Observable<any> {
+    // 2 approches possibles : query params ou body JSON — adaptez à votre API
+    const params = new HttpParams()
+      .set('categorie', String(categorieId))
+      .set('annee', String(annee));
+
+    return this.http.post(`${this.baseUrl}/generation`, null, { params });
+    // Ou:
+    // return this.http.post(`${this.baseUrl}/generation`, { categorie: categorieId, annee });
+  }
 }

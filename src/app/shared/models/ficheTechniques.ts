@@ -48,6 +48,13 @@ export class AvisEtudeTechnique {
   nouveau_statut?: number | null;
 }
 
+export class RetraitAutorisationRequest {
+  fiche_technique?: number | null;
+  date_retrait?: Date | null;
+  motif_retrait?: string;
+}
+
+
 export class ChercheFiche{
   categorie_produit?: number;
   client?: number;
