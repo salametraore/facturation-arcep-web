@@ -184,7 +184,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   }
 
   onPrintDevis(facture: Facture) {
-    this.factureService.genererDevisPDF(facture?.id).subscribe((response: HttpResponse<Blob>)=>{
+    this.factureService.genererDevisPDF(facture?.devis).subscribe((response: HttpResponse<Blob>)=>{
         this.pdfViewService.printDirectly(response);
       },
       error => {

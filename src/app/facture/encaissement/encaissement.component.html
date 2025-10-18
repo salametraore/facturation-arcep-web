@@ -4,7 +4,8 @@
     <h3 class="dashboard-title" style="color: #030303">Liste des encaissements</h3>
     <div class="dashboard-actions">
 
-      <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
+      <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="crud(null,this.operations.create)" color="warn"
+              mat-flat-button>
         <mat-icon>add</mat-icon>
         Nouvel encaissement
       </button>
@@ -14,10 +15,10 @@
         Encaissement direct
       </button>
 
-<!--      <button color="warn" mat-flat-button>
-        <mat-icon>print</mat-icon>
-        Exporter
-      </button>-->
+      <!--      <button color="warn" mat-flat-button>
+              <mat-icon>print</mat-icon>
+              Exporter
+            </button>-->
     </div>
   </div>
 
@@ -26,9 +27,9 @@
       <mat-form-field>
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client"  (keyup.enter)="checher()" required>
+               matInput matTooltip="Nom du client" (keyup.enter)="checher()" required>
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option  *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
+          <mat-option *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>
           </mat-option>
         </mat-autocomplete>
@@ -99,22 +100,32 @@
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <th *matHeaderCellDef mat-header-cell>Actions
-        </th>
+        <th *matHeaderCellDef mat-header-cell>Actions</th>
         <td *matCellDef="let element" mat-cell>
           <button [matMenuTriggerFor]="menu" color="warn" mat-icon-button>
             <mat-icon>settings</mat-icon>
           </button>
+
           <mat-menu #menu="matMenu">
-            <button *ngIf="  hasOperationCode('ENCAISSER')" (click)="crud(element,this.operations.update)" mat-menu-item>
+            <button (click)="crud(element, this.operations.update)" mat-menu-item>
               <mat-icon color="warn">edit</mat-icon>
               Modifier
             </button>
+
+            <!-- Optionnel : séparateur -->
+            <mat-divider></mat-divider>
+
+            <button (click)="onPrintRecu(element)" mat-menu-item>
+              <mat-icon color="accent">print</mat-icon>
+              Editer Reçu
+            </button>
+<!--
+            <button *ngIf="hasOperationCode('ENCAISSER')" (click)="onPrintRecu(element)" mat-menu-item>
+              <mat-icon color="accent">print</mat-icon>
+              Editer Reçu
+            </button>-->
+
           </mat-menu>
-<!--          <button (click)="onPrintRecu(element)" mat-menu-item>
-            <mat-icon color="primary">print</mat-icon>
-            Editer Reçu
-          </button>-->
         </td>
       </ng-container>
       <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>

@@ -108,8 +108,8 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
     });
 
     this.directionService.getListItems().subscribe((directions: Direction[]) => {
-      this.directions = directions;
-    });
+      this.directions = directions.filter(d => d.id !== 0);
+    })
 
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
       this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);

@@ -184,7 +184,7 @@ export class MainNavComponent implements OnInit {
   visibleSousMenus(item: any) {
     const dir = this.utilisateurConnecte?.direction;
     return (item.sous_menus || []).filter(
-      (sm: any) => sm.direction === 0 || sm.direction === dir
+      (sm: any) => dir === 0 || sm.direction === dir
     );
   }
 
