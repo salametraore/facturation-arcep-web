@@ -14,12 +14,14 @@
   <div class="filter-section">
     <div class="filter-group">
 
-      <mat-form-field>
+      <mat-form-field class="mf mf-client no-clip" floatLabel="always">
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="checher()">
+               matInput matTooltip="Nom du client" (keyup.enter)="checher()">
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option *ngFor="let item of clients | search:nomClient" (click)="onGetClient(item)" [value]="item.denomination_sociale">
+          <mat-option *ngFor="let item of clients | search:nomClient"
+                      (click)="onGetClient(item)"
+                      [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>
           </mat-option>
         </mat-autocomplete>
@@ -34,14 +36,14 @@
     </div>
   </div>
 
-  <div class="mat-elevation-z10">
+  <div class="mat-elevation-z10 compact-table">
     <table [dataSource]="t_RecouvDashboardClient" mat-table matSort style="width: 100%">
       <ng-container matColumnDef="client">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Client</th>
         <td *matCellDef="let element" mat-cell> {{element.client}} </td>
       </ng-container>
       <ng-container matColumnDef="compte_comptable">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header>Numéro compte comptable</th>
+        <th *matHeaderCellDef mat-header-cell mat-sort-header>Compte comptable</th>
         <td *matCellDef="let element" mat-cell> {{element.compte_comptable}} </td>
       </ng-container>
       <ng-container matColumnDef="nbre_factures_impayes">

@@ -128,3 +128,8 @@ export const TYPE_FRAIS = [
   { code: 'DA', label: "Dossier d'Appel d'Offre" },
   { code: 'DI', label: "Prestations diverses" }
 ];
+
+export const ETATS_FACTURE = [
+  { code: 'EN_ATTENTE', label: 'En Attente paiement' },
+  { code: 'PAYEE', label: 'Payée' }
+];

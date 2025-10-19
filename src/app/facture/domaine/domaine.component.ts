@@ -23,6 +23,15 @@ import {Role, UtilisateurRole} from "../../shared/models/droits-utilisateur";
 import {Utilisateur} from "../../shared/models/utilisateur";
 import {AuthService} from "../../authentication/auth.service";
 
+interface FTSearchCriteria {
+  text?: string;          // filtre texte global (optionnel, si tu veux en ajouter un)
+  clientId?: number;      // id du client choisi
+  startDate?: string;     // ISO yyyy-mm-dd
+  endDate?: string;       // ISO yyyy-mm-dd
+  serviceId?: number;     // id du produit/service
+  statusId?: number;      // id du statut
+}
+
 @Component({
   selector: 'app-domaine',
   templateUrl: './domaine.component.html',
@@ -44,12 +53,16 @@ export class DomaineComponent implements OnInit, AfterViewInit {
   serviceFilter: any;
   statusFilter: any;
   categories: CategorieProduit[];
+  categoriesFiltered: CategorieProduit[];
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
   client: Client;
   utilisateurConnecte:Utilisateur;
   roleUtilisateurConnecte:UtilisateurRole;
+
+  private filterValues: FTSearchCriteria = {};
+
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -77,11 +90,64 @@ export class DomaineComponent implements OnInit, AfterViewInit {
     this.utilisateurConnecte=this.authService.getConnectedUser();
     this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
     console.log(this.utilisateurConnecte);
+
+    // ⬇️ Predicate de filtre multi-champs
+    this.ficheTechniques.filterPredicate = (row: FicheTechniques, filter: string) => {
+      if (!filter) return true;
+      let f: FTSearchCriteria;
+      try { f = JSON.parse(filter); } catch { return true; }
+
+      // TEXTE global (si tu ajoutes un input text global)
+      if (f.text) {
+        const t = f.text.toLowerCase();
+        const inText =
+          (row.client_nom || '').toLowerCase().includes(t) ||
+          (this.getCategorie(row.categorie_produit) || '').toLowerCase().includes(t) ||
+          (row.statut?.libelle || '').toLowerCase().includes(t);
+        if (!inText) return false;
+      }
+
+      // Client (si tu veux filtrer par id exact)
+      if (f.clientId && row.client !== f.clientId) return false;
+
+      // Service/Produit (adapte selon ton modèle: produit, produit_id, service_id…)
+/*
+      if (f.serviceId) {
+        const produitId = (row as any).produit ?? (row as any).produit_id ?? (row as any).service_id;
+        if (produitId !== f.serviceId) return false;
+      }
+*/
+
+      if (f.serviceId != null) {
+        const topLevelProduit = (row as any).produit ?? (row as any).produit_id ?? null;
+        const okTop = topLevelProduit != null ? Number(topLevelProduit) === Number(f.serviceId) : false;
+        const okDetail = row.produits_detail?.some(pd => Number(pd?.produit) === Number(f.serviceId)) ?? false;
+        if (!(okTop || okDetail)) return false;
+      }
+
+      // Statut
+      if (f.statusId && row.statut?.id !== f.statusId) return false;
+
+      // Dates (row.date_creation doit être une date parsable)
+      if (f.startDate) {
+        const rowTime = this.toDayStart(new Date(row.date_creation));
+        const startTime = this.toDayStart(new Date(f.startDate));
+        if (rowTime < startTime) return false;
+      }
+      if (f.endDate) {
+        const rowTime = this.toDayStart(new Date(row.date_creation));
+        const endTime = this.toDayStart(new Date(f.endDate));
+        if (rowTime > endTime) return false;
+      }
+
+      return true;
+    };
   }
 
   reloadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories = categories;
+      this.categoriesFiltered=categories.filter(f => f.id === this.fixeCategorie);
     });
 
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
@@ -95,19 +161,29 @@ export class DomaineComponent implements OnInit, AfterViewInit {
       this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-/*    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
-    });*/
+
     this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
       this.ficheTechniques.data = response
         .filter(f => f.categorie_produit === this.fixeCategorie)
-        .sort((a, b) => b.id - a.id);  // tri décroissant sur le champ id
+        .sort((a, b) => b.id - a.id);
+
+      // ⬇️ Ré-applique le filtre courant après rechargement
+      if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
+      this.ficheTechniques.filter = JSON.stringify(this.filterValues || {});
     });
   }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.ficheTechniques.filter = filterValue.trim().toLowerCase();
+    const text = (event.target as HTMLInputElement).value?.trim().toLowerCase() || '';
+    this.filterValues = { ...this.filterValues, text };
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
+  }
+
+  private toDayStart(d: Date): number {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x.getTime();
   }
 
   crud(ficheTechnique: FicheTechniques, operation?: string) {
@@ -168,18 +244,6 @@ export class DomaineComponent implements OnInit, AfterViewInit {
     }
   }
 
-  reset() {
-    this.startDate = undefined;
-    this.endDate = undefined;
-    this.statusFilter = undefined;
-    this.nomClient = undefined;
-    this.client = undefined;
-    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
-    });
-  }
-
-
   getCategorie(id: number) {
     return this.categories?.find(cat => cat.id === id).libelle;
   }
@@ -214,21 +278,35 @@ export class DomaineComponent implements OnInit, AfterViewInit {
     });
   }
 
-  cherche(){
-    const chercheFiche: ChercheFiche = new ChercheFiche();
-    chercheFiche.categorie_produit = this.fixeCategorie;
-    chercheFiche.client = this.client?.id;
-    chercheFiche.date_debut = date_converte(this.startDate);
-    chercheFiche.date_fin = date_converte(this.endDate);
-    chercheFiche.statut = this.statusFilter;
-    this.ficheTechniquesService.getFicheTechniques(chercheFiche).subscribe((response: FicheTechniques[]) => {
-      console.log(response.filter(f => f.categorie_produit === this.fixeCategorie))
-      this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
-    });
+  cherche() {
+    this.filterValues = {
+      ...this.filterValues,
+      clientId: this.client?.id || undefined,
+      startDate: this.startDate ? new Date(this.startDate).toISOString().slice(0, 10) : undefined,
+      endDate: this.endDate ? new Date(this.endDate).toISOString().slice(0, 10) : undefined,
+      serviceId: this.serviceFilter || undefined,
+      statusId: this.statusFilter || undefined,
+    };
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
+  }
+
+  reset() {
+    this.nomClient = undefined;
+    this.startDate = undefined;
+    this.endDate = undefined;
+    this.serviceFilter = undefined;
+    this.statusFilter = undefined;
+    this.client = undefined;
+
+    this.filterValues = {};
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
   }
 
   onGetClient(item: Client) {
     this.client = item;
+    this.cherche();
   }
 
   hasOperationCode( opCode: string): boolean {

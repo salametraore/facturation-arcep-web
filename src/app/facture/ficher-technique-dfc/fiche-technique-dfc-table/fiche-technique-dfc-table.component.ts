@@ -23,6 +23,14 @@ import {AuthService} from "../../../authentication/auth.service";
 import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
 import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 
+interface FTListFilter {
+  clientText?: string;   // texte dans le nom du client
+  startDate?: string;    // YYYY-MM-DD
+  endDate?: string;      // YYYY-MM-DD
+  serviceId?: number;    // id du produit/service (si présent dans la ligne)
+  statusId?: number;     // id du statut
+}
+
 @Component({
   selector: 'fiche-technique-dfc-table',
   templateUrl: './fiche-technique-dfc-table.component.html',
@@ -47,11 +55,15 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
   serviceFilter: any;
   statusFilter: any;
   categories: CategorieProduit[];
+  categoriesFiltered: CategorieProduit[];
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+  client: Client;
   utilisateurConnecte:Utilisateur;
   roleUtilisateurConnecte:UtilisateurRole;
+
+  private filterValues: FTListFilter = {};
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -78,11 +90,60 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
     this.utilisateurConnecte=this.authService.getConnectedUser();
     this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
     console.log(this.utilisateurConnecte);
+
+    this.ficheTechniques.filterPredicate = (row: FicheTechniques, raw: string) => {
+      if (!raw) return true;
+      let f: FTListFilter;
+      try { f = JSON.parse(raw); } catch { return true; }
+
+      // 1) Client: filtre texte sur client_nom
+      if (f.clientText) {
+        const needle = f.clientText.trim().toLowerCase();
+        const lib = (row.client_nom ?? '').toLowerCase();
+        if (!lib.includes(needle)) return false;
+      }
+
+      // 2) Service/Produit (si un id produit est porté par la ligne)
+/*      if (f.serviceId != null) {
+        const produitId = (row as any).produit ?? (row as any).produit_id ?? null;
+        // si le modèle ne porte pas le produit, on ne bloque pas
+        if (produitId != null && produitId !== f.serviceId) return false;
+      }*/
+
+      if (f.serviceId != null) {
+        const topLevelProduit = (row as any).produit ?? (row as any).produit_id ?? null;
+        const okTop = topLevelProduit != null ? Number(topLevelProduit) === Number(f.serviceId) : false;
+        const okDetail = row.produits_detail?.some(pd => Number(pd?.produit) === Number(f.serviceId)) ?? false;
+        if (!(okTop || okDetail)) return false;
+      }
+
+      // 3) Statut par id
+      if (f.statusId != null) {
+        if ((row.statut?.id ?? null) !== f.statusId) return false;
+      }
+
+      // 4) Intervalle de dates (inclusif) sur date_creation
+      const rowT = this.dayStart(row.date_creation);
+      if (rowT == null) return false;
+
+      if (f.startDate) {
+        const t0 = this.dayStart(f.startDate);
+        if (t0 != null && rowT < t0) return false;
+      }
+      if (f.endDate) {
+        const t1 = this.dayStart(f.endDate);
+        if (t1 != null && rowT > t1) return false;
+      }
+
+      return true;
+    };
+
   }
 
   reloadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories = categories;
+      this.categoriesFiltered=categories.filter(f => f.id === this.fixeCategorie);
     });
 
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
@@ -99,7 +160,10 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
     this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
       this.ficheTechniques.data = response
         .filter(f => f.categorie_produit === this.fixeCategorie)
-        .sort((a, b) => b.id - a.id);   // ✅ tri décroissant sur le champ id
+        .sort((a, b) => b.id - a.id);
+
+      this.ficheTechniques.filter = JSON.stringify(this.filterValues || {});
+      if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
     });
   }
 
@@ -107,6 +171,12 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.ficheTechniques.filter = filterValue.trim().toLowerCase();
   }
+
+  private dayStart(ts: any): number | null {
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
+
 
   crud(ficheTechnique: FicheTechniques, operation?: string) {
     console.log(operation);
@@ -179,12 +249,35 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
     }
   }
 
-  reset() {
 
+  onGetClient(item: Client) {
+    this.client = item;
+    this.chercher();
   }
 
-  checher() {
 
+  chercher() {
+    this.filterValues = {
+      clientText: (this.nomClient ?? '').trim() || undefined,
+      startDate: this.startDate ? new Date(this.startDate).toISOString().slice(0, 10) : undefined,
+      endDate:   this.endDate   ? new Date(this.endDate).toISOString().slice(0, 10)   : undefined,
+      serviceId: this.serviceFilter || undefined,
+      statusId:  this.statusFilter || undefined,
+    };
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
+  }
+
+  reset() {
+    this.nomClient = undefined;
+    this.startDate = undefined;
+    this.endDate = undefined;
+    this.serviceFilter = undefined;
+    this.statusFilter = undefined;
+
+    this.filterValues = {};
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
   }
 
   getCategorie(id: number) {

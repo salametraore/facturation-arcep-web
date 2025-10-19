@@ -18,6 +18,14 @@ import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/fich
 import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
 import {FicheTechniqueProduit} from "../../../shared/models/ficheTechniquesProduits";
 
+interface FTProduitFilter {
+  q?: string;          // recherche globale
+  designation?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minQty?: number;
+}
+
 @Component({
   selector: 'ficher-technique-dfc-crud',
   templateUrl: './ficher-technique-dfc-crud.component.html',
@@ -33,6 +41,7 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
   clients: Client[];
   client: Client;
   categories: CategorieProduit[];
+  categoriesFiltered: CategorieProduit[];
   categorie: CategorieProduit;
   statutFicheTechniques: StatutFicheTechnique[];
   statutFicheTechnique: StatutFicheTechnique;
@@ -49,6 +58,9 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   montant_de_la_commade: number = 0;
   produits: Produit[];
+
+  filterForm!: FormGroup;
+  private filterValues: FTProduitFilter = {};
 
   constructor(
     private formBuilder: FormBuilder,
@@ -82,6 +94,7 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
   loadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories = categories;
+      this.categoriesFiltered=categories.filter(f => f.id === this.fixeCategorie);
     });
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
       this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
@@ -304,4 +317,5 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
       this.dialogService.alert({message:error.message});
     });
   }
+
 }

@@ -26,6 +26,15 @@ import {AuthService} from "../../authentication/auth.service";
 import {HttpResponse} from "@angular/common/http";
 import {PdfViewService} from "../../shared/services/pdf-view.service";
 
+
+type FilterState = {
+  nomClient?: string;
+  startDate?: string | Date | null;
+  endDate?: string | Date | null;
+  modeId?: number | null;
+};
+
+
 @Component({
   selector: 'app-encaissement',
   templateUrl: './encaissement.component.html',
@@ -54,6 +63,8 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
 
   utilisateurConnecte:Utilisateur;
   roleUtilisateurConnecte:UtilisateurRole;
+
+
 
   constructor(
     private encaissementsService: EncaissementsService,
@@ -98,9 +109,12 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
     });
+
     this.encaissementsService.getListencaissement().subscribe((response: RecouvListeEncaissement[]) => {
-      this.t_RecouvListeEncaissement.data = response.sort((a, b) => b.encaissement_id - a.encaissement_id); // 🔽 tri décroissant par id
-      console.log(this.t_RecouvListeEncaissement.data);
+      this.t_RecouvListeEncaissement.data = response.sort((a, b) => b.encaissement_id - a.encaissement_id);
+      console.log(response);
+      this.setupFilterPredicate();
+      this.checher();
     });
   }
 
@@ -165,15 +179,92 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
   }
 
   reset() {
+    this.nomClient = '';
+    this.startDate = null;
+    this.endDate = null;
+    this.modeFilter = null;
 
+    this.t_RecouvListeEncaissement.filter = ''; // efface tout
+    if (this.t_RecouvListeEncaissement.paginator) {
+      this.t_RecouvListeEncaissement.paginator.firstPage();
+    }
   }
 
   checher() {
-
+    const state: FilterState = {
+      nomClient: this.nomClient || '',
+      startDate: this.startDate || null,
+      endDate: this.endDate || null,
+      modeId: this.modeFilter != null ? Number(this.modeFilter) : null
+    };
+    this.t_RecouvListeEncaissement.filter = JSON.stringify(state);
+    this.t_RecouvListeEncaissement.paginator?.firstPage();
   }
 
   getCategorie(id:number){
     return this.categories?.find(cat=>cat.id===id).libelle;
+  }
+
+
+  private toDayStart(d?: string | Date | null): number | null {
+    if (!d) return null;
+    const x = new Date(d);
+    if (isNaN(x as any)) return null;
+    x.setHours(0, 0, 0, 0);
+    return x.getTime();
+  }
+
+
+  private toDayEnd(d?: string | Date | null): number | null {
+    if (!d) return null;
+    const x = new Date(d);
+    if (isNaN(x as any)) return null;
+    x.setHours(23, 59, 59, 999);
+    return x.getTime();
+  }
+
+
+  private setupFilterPredicate() {
+    (this.t_RecouvListeEncaissement.filterPredicate = (row: RecouvListeEncaissement, raw: string) => {
+      if (!raw) return true;
+      const f: FilterState = JSON.parse(raw || '{}');
+
+        // 3.1 Nom client (contient)
+        if (f.nomClient) {
+          const needle = (f.nomClient || '').toString().trim().toLowerCase();
+          const hay = (row.client || '').toString().trim().toLowerCase();
+          if (!hay.includes(needle)) return false;
+        }
+
+        // 3.2 Dates (entre start & end inclus)
+        if (f.startDate || f.endDate) {
+          const rowT = new Date(row.date_encaissement).getTime();
+          const minT = this.toDayStart(f.startDate);
+          const maxT = this.toDayEnd(f.endDate);
+          if (minT !== null && rowT < minT) return false;
+          if (maxT !== null && rowT > maxT) return false;
+        }
+
+        // 3.3 Mode de paiement
+      // ===== Filtre par ID de mode de paiement =====
+      if (f.modeId != null) {
+        const wantedId = Number(f.modeId);
+        // utilitaire: renvoie un nombre valide ou null
+        const num = (v: any) => {
+          const n = Number(v);
+          return Number.isFinite(n) ? n : null;
+        };
+
+        // essaie plusieurs champs possibles et prends le 1er valide
+        const rowModeId =
+          num((row as any).mode_paiement_id) ??
+            num((row as any).modePaiementId) ??
+              num((row as any).mode_id);
+        if (rowModeId === null || rowModeId !== wantedId) return false;
+      }
+
+      return true;
+    });
   }
 
 

@@ -22,6 +22,15 @@ import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
 import {Utilisateur} from "../../../shared/models/utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
 
+interface FTListFilter {
+  clientText?: string;   // texte saisi dans "Nom du client"
+  startDate?: string;    // YYYY-MM-DD (inclusif)
+  endDate?: string;      // YYYY-MM-DD (inclusif)
+  serviceId?: number;    // id produit/service (doit exister dans produits_detail)
+  statusId?: number;     // id du statut
+}
+
+
 @Component({
   selector: 'agrement-installeur-table',
   templateUrl: './agrement-installeur-table.component.html',
@@ -49,8 +58,11 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+  client: Client;
   utilisateurConnecte:Utilisateur;
   roleUtilisateurConnecte:UtilisateurRole;
+
+  private filterValues: FTListFilter = {};
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -76,6 +88,46 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
     this.utilisateurConnecte=this.authService.getConnectedUser();
     this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
     console.log(this.utilisateurConnecte);
+
+    this.ficheTechniques.filterPredicate = (row: FicheTechniques, raw: string) => {
+      if (!raw) return true;
+      let f: FTListFilter;
+      try { f = JSON.parse(raw); } catch { return true; }
+
+      // 1) Client (texte sur client_nom)
+      if (f.clientText) {
+        const needle = f.clientText.trim().toLowerCase();
+        if (!(row.client_nom ?? '').toLowerCase().includes(needle)) return false;
+      }
+
+      // 2) Service/Produit : le produit sélectionné doit exister dans produits_detail
+      if (f.serviceId != null) {
+        const hasService = row.produits_detail?.some(pd => Number(pd?.produit) === Number(f.serviceId));
+        if (!hasService) return false;
+      }
+
+      // 3) Statut par id
+      if (f.statusId != null) {
+        if ((row.statut?.id ?? null) !== f.statusId) return false;
+      }
+
+      // 4) Intervalle de dates (inclusif) sur date_creation
+      const rowT = this.dayStart(row.date_creation);
+      if (rowT == null) return false;
+
+      if (f.startDate) {
+        const t0 = this.dayStart(f.startDate);
+        if (t0 != null && rowT < t0) return false;
+      }
+      if (f.endDate) {
+        const t1 = this.dayStart(f.endDate);
+        if (t1 != null && rowT > t1) return false;
+      }
+
+      return true;
+    };
+
+
   }
 
   reloadData() {
@@ -91,12 +143,8 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
+      this.produits = produits.filter(f => f.id === 75);
     });
-
-/*    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-        this.ficheTechniques.data = response.filter(f => f.categorie_produit === this.fixeCategorie);
-      });*/
 
     this.ficheTechniquesService.getFicheTechniques()
       .subscribe((lignes: FicheTechniques[]) => {
@@ -106,9 +154,22 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
             f.categorie_produit === this.fixeCategorie &&
             f.produits_detail?.some(p => p && allowed.has(p.produit))
           )
-          .sort((a, b) => (+(b as any).id ?? 0) - (+(a as any).id ?? 0)); // tri décroissant par id
+          .sort((a, b) => b.id - a.id);
+
+        this.ficheTechniques.filter = JSON.stringify(this.filterValues || {});
+        if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
       });
 
+  }
+
+  private dayStart(ts: any): number | null {
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
+
+  onGetClient(item: Client) {
+    this.client = item;
+    this.chercher();
   }
 
   applyFilter(event: Event) {
@@ -177,12 +238,28 @@ export class AgrementInstalleurTableComponent implements OnInit, AfterViewInit {
     }
   }
 
-  reset() {
-
+  chercher() {
+    this.filterValues = {
+      clientText: (this.nomClient ?? '').trim() || undefined,
+      startDate:  this.startDate ? new Date(this.startDate).toISOString().slice(0, 10) : undefined,
+      endDate:    this.endDate   ? new Date(this.endDate).toISOString().slice(0, 10)   : undefined,
+      serviceId:  this.serviceFilter || undefined,
+      statusId:   this.statusFilter || undefined,
+    };
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
   }
 
-  checher() {
+  reset() {
+    this.nomClient = undefined;
+    this.startDate = undefined;
+    this.endDate = undefined;
+    this.serviceFilter = undefined;
+    this.statusFilter = undefined;
 
+    this.filterValues = {};
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
   }
 
   getCategorie(id: number) {

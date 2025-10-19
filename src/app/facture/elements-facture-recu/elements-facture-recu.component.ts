@@ -119,10 +119,12 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
       this.clients = clients;
     });
 
-    this.ficheTechniquesService.getElementFacturationRecus().subscribe((elementFacturationRecuCreeLists: ElementFacturationRecuCreeList[]) => {
-      this.t_ElementFacturationRecuCreeList.data = elementFacturationRecuCreeLists;
-      this.updateDataSourceFilter();
-    });
+    this.ficheTechniquesService.getElementFacturationRecus()
+      .subscribe((elementFacturationRecuCreeLists: ElementFacturationRecuCreeList[]) => {
+        this.t_ElementFacturationRecuCreeList.data = elementFacturationRecuCreeLists
+          .sort((a, b) => b.id - a.id); //
+        this.updateDataSourceFilter();
+      });
   }
 
   applyFilter(event: Event) {

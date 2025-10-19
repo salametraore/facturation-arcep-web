@@ -23,8 +23,8 @@
   </div>
 
   <div class="filter-section">
-    <div class="filter-group">
-      <mat-form-field>
+    <div class="filter-group one-line">
+      <mat-form-field class="mf mf-client" floatLabel="always">
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
                matInput matTooltip="Nom du client" (keyup.enter)="checher()" required>
@@ -34,38 +34,44 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <mat-form-field>
+
+      <mat-form-field class="mf mf-date" floatLabel="always">
         <mat-label>Date début</mat-label>
-        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (keyup.enter)="checher()">
+        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate"
+               (dateChange)="checher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
         <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
-      <mat-form-field>
+
+      <mat-form-field class="mf mf-date" floatLabel="always">
         <mat-label>Date fin</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (keyup.enter)="checher()">
+        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate"
+               (dateChange)="checher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
         <mat-datepicker #pickerEnd></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field class="mf mf-select" floatLabel="always">
         <mat-label>Mode paiement</mat-label>
-        <mat-select [(ngModel)]="modeFilter" (keyup.enter)="checher()">
+        <mat-select [(ngModel)]="modeFilter" (selectionChange)="checher()">
           <mat-option *ngFor="let item of modePaiements" [value]="item.id">
-            {{item.libelle}}
+            {{ item.libelle }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <button (click)="checher()" color="primary" mat-mini-fab>
-        <mat-icon>search</mat-icon>
-      </button>
-      <button (click)="reset()" color="primary" mat-mini-fab>
-        <mat-icon>cached</mat-icon>
-      </button>
+      <div class="actions">
+        <button (click)="checher()" color="primary" mat-mini-fab class="icon-btn">
+          <mat-icon>search</mat-icon>
+        </button>
+        <button (click)="reset()" color="primary" mat-mini-fab class="icon-btn">
+          <mat-icon>cached</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="mat-elevation-z10">
+  <div class="mat-elevation-z10 compact-table">
     <table [dataSource]="t_RecouvListeEncaissement" mat-table matSort style="width: 100%">
 
       <!--      <ng-container matColumnDef="reference">
@@ -90,12 +96,12 @@
       </ng-container>
 
       <ng-container matColumnDef="date_encaissement">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Date encaissement</th>
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Date encais.</th>
         <td *matCellDef="let element" mat-cell> {{element.date_encaissement|date: 'dd/MM/yyyy'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="mode_paiement">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Mode de paiement</th>
+        <th *matHeaderCellDef mat-header-cell mat-sort-header> Mode paiement</th>
         <td *matCellDef="let element" mat-cell> {{element.mode_paiement_libelle}} </td>
       </ng-container>
 

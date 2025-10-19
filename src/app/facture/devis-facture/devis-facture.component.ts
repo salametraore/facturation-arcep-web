@@ -10,7 +10,7 @@ import {PdfViewService} from "../../shared/services/pdf-view.service";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {DialogService} from "../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
-import {operations, TYPE_FRAIS} from "../../constantes";
+import {operations, TYPE_FRAIS,ETATS_FACTURE} from "../../constantes";
 import {DevisFactureCrudComponent} from "./devis-facture-crud/devis-facture-crud.component";
 import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
 import {Client} from "../../shared/models/client";
@@ -44,10 +44,11 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   statusFilter :any;
   categories:CategorieProduit[];
   produits:Produit[];
-  statutFicheTechniques: StatutFicheTechnique[];
+
   clients: Client[];
 
   TYPE_FRAIS=TYPE_FRAIS;
+  etatsfacture=ETATS_FACTURE;
 
   constructor(
     private factureService: FactureService,
@@ -71,7 +72,52 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.reloadData();
     this.fixeCategorie = 9;
+
+    // 🔎 Filtre multi-critères
+    this.t_Facture.filterPredicate = (data: Facture, rawFilter: string) => {
+      if (!rawFilter) return true;
+      let f: {
+        nomClient?: string;
+        startDate?: string | null;
+        endDate?: string | null;
+        serviceFilter?: string | null;
+        statusFilter?: string | number | null;
+      };
+
+      try { f = JSON.parse(rawFilter); } catch { return true; }
+
+      // Client (par nom)
+      const clientName = (this.getClient(data.client) || '').toLowerCase();
+      const okClient = !f.nomClient || clientName.includes(f.nomClient.toLowerCase().trim());
+
+      // Date (sur date_echeance)
+      const d = data?.date_echeance ? new Date(data.date_echeance) : null;
+      const start = f.startDate ? new Date(f.startDate) : null;
+      const end = f.endDate ? new Date(f.endDate) : null;
+      // normalise end au soir
+      if (end) { end.setHours(23,59,59,999); }
+      const okDate =
+        !d ||
+        (
+          (!start || d >= start) &&
+          (!end   || d <= end)
+        );
+
+      // Type de frais (on tolère plusieurs noms de champ possibles)
+      const typeCode =
+        (data as any).type_frais ??
+          (data as any).type ??
+            (data as any).code_type ??
+              '';
+      const okType = !f.serviceFilter || String(typeCode).toLowerCase() === String(f.serviceFilter).toLowerCase();
+
+      // Statut
+      const okStatut = !f.statusFilter || String(data.etat).toLowerCase() === String(f.statusFilter).toLowerCase();
+
+      return okClient && okDate && okType && okStatut;
+    };
   }
+
 
   reloadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
@@ -80,9 +126,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits.filter(f=>f.categorieProduit===this.fixeCategorie);
     });
-    this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
-      this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
-    });
+
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
     });
@@ -155,20 +199,45 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   }
 
   reset() {
+    this.nomClient = '';
+    this.startDate = null;
+    this.endDate = null;
+    this.serviceFilter = null;
+    this.statusFilter = null;
 
+    // Filtre “vide” ⇒ tout passe
+    this.t_Facture!.filter = '';
+    if (this.t_Facture?.paginator) {
+      this.t_Facture.paginator.firstPage();
+    }
   }
+
 
   checher() {
+    // Fabrique l’objet filtre depuis les champs du formulaire
+    const filter = {
+      nomClient: this.nomClient || '',
+      startDate: this.startDate ? new Date(this.startDate).toISOString() : null,
+      endDate:   this.endDate   ? new Date(this.endDate).toISOString()   : null,
+      serviceFilter: this.serviceFilter || null,
+      statusFilter:  this.statusFilter  || null,
+    };
 
+    // Applique le filtre (JSON pour le predicate custom)
+    this.t_Facture!.filter = JSON.stringify(filter);
+
+    // Revenir à la première page si paginator
+    if (this.t_Facture?.paginator) {
+      this.t_Facture.paginator.firstPage();
+    }
   }
+
 
   getCategorie(id:number){
     return this.categories?.find(cat=>cat.id===id)?.libelle;
   }
 
-  getStatut(id: number) {
-    return this.statutFicheTechniques?.find(st => st.id === id)?.libelle;
-  }
+
 
   getClient(id: number) {
     return this.clients?.find(c => c.id === id)?.denomination_sociale;

@@ -348,3 +348,56 @@ mat-radio-group { margin-top: 10px; }
   flex-wrap: wrap;               /* au besoin, passe à la ligne plutôt que d'élargir */
   gap: 6px;
 }
+
+/* Barre de filtres en GRID : 1 (client) + 4 (dates, service, statut) + 2 boutons */
+.grid-filters {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, 1fr) auto auto; /* ajuste 2fr/1fr selon ton espace */
+  gap: 10px 12px; /* row/col gap */
+  align-items: end; /* aligne tous les champs/boutons sur leur base */
+}
+
+/* Descendre légèrement le champ client */
+.grid-filters .client-field {
+  transform: translateY(1px);     /* baisse visuelle douce */
+  /* ou: margin-top: 6px;  (si tu préfères) */
+}
+
+/* Taille des mini-fab et alignement bas */
+.grid-filters .action-btn {
+  align-self: center;               /* 👈 centre verticalement */
+  justify-self: start;              /* ou end si tu veux les coller à droite */
+}
+
+.grid-filters .action-btn {
+  transform: translateY(-2px);      /* ajuste -2 / -3px selon ton thème */
+}
+
+/* Optionnel : largeur mini utile pour dates (évite le saut trop tôt) */
+.grid-filters mat-form-field {
+  min-width: 150px;                /* ajuste 160-200px selon ton layout */
+}
+
+/* Responsive: sous 992px -> on passe en 2 lignes, puis 1 */
+@media (max-width: 992px) {
+  .grid-filters {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr; /* client + 3 colonnes */
+    grid-auto-flow: row dense;
+  }
+  .grid-filters .action-btn { justify-self: start; }
+}
+
+@media (max-width: 640px) {
+  .grid-filters {
+    grid-template-columns: 1fr;     /* pile en colonne */
+  }
+  .grid-filters mat-form-field,
+  .grid-filters .action-btn {
+    width: 100%;
+  }
+}
+
+:host ::ng-deep .mat-mdc-mini-fab{
+  --mdc-fab-small-container-dimension: 36px; /* défaut 40px */
+  --mat-mdc-fab-small-shape: 14px;
+}

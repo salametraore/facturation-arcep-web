@@ -5,24 +5,24 @@
     <div class="dashboard-actions">
       <button (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
         <mat-icon>add</mat-icon>
-        FT nom de domaine
+        Nouvelle fiche technique
       </button>
-      <button color="warn" mat-flat-button>
+<!--      <button color="warn" mat-flat-button>
         <mat-icon>print</mat-icon>
         Exporter
-      </button>
+      </button>-->
     </div>
   </div>
 
-  <div class="filter-section">
+<!--  <div class="filter-section">
     <div class="filter-group">
 
       <mat-form-field>
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="checher()" required>
+               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="chercher()" required>
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
+          <mat-option *ngFor="let item of clients | search:nomClient" (click)="onGetClient(item)"   [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>
           </mat-option>
         </mat-autocomplete>
@@ -30,21 +30,21 @@
 
       <mat-form-field>
         <mat-label>Date début</mat-label>
-        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (keyup.enter)="checher()">
+        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (dateChange)="chercher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
         <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Date fin</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (keyup.enter)="checher()">
+        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (dateChange)="chercher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
         <mat-datepicker #pickerEnd></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Catégorie de service</mat-label>
-        <mat-select [(ngModel)]="serviceFilter" (keyup.enter)="checher()">
+        <mat-select [(ngModel)]="serviceFilter" (selectionChange)="chercher()">
           <mat-option *ngFor="let item of produits" [value]="item.id">
             {{item.libelle}}
           </mat-option>
@@ -53,17 +53,72 @@
 
       <mat-form-field>
         <mat-label>Statut</mat-label>
-        <mat-select [(ngModel)]="statusFilter" (keyup.enter)="checher()">
+        <mat-select [(ngModel)]="statusFilter" (selectionChange)="chercher()">
           <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">
             {{item.libelle}}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <button (click)="checher()" color="primary" mat-mini-fab>
+      <button (click)="chercher()" color="primary" mat-mini-fab>
         <mat-icon>search</mat-icon>
       </button>
       <button (click)="reset()" color="primary" mat-mini-fab>
+        <mat-icon>cached</mat-icon>
+      </button>
+    </div>
+  </div>-->
+
+  <div class="filter-section">
+    <div class="filter-group grid-filters">
+      <mat-form-field class="client-field">
+        <mat-label>Nom du client</mat-label>
+        <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
+               matInput matTooltip="Nom du client" placeholder="Nom du client">
+        <mat-autocomplete #auto_cl="matAutocomplete">
+          <mat-option *ngFor="let item of clients | search:nomClient" (click)="onGetClient(item)"
+                      [value]="item.denomination_sociale">
+            <span>{{item.denomination_sociale}}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Date début</mat-label>
+        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (dateChange)="chercher()">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStart></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Date fin</mat-label>
+        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (dateChange)="chercher()">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEnd></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Catégorie de service</mat-label>
+        <mat-select [(ngModel)]="serviceFilter" (selectionChange)="chercher()">
+          <mat-option *ngFor="let item of produits" [value]="item.id">
+            {{item.libelle}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="statusFilter" (selectionChange)="chercher()">
+          <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">
+            {{item.libelle}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button (click)="chercher()" color="primary" mat-mini-fab class="action-btn">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button (click)="reset()" color="primary" mat-mini-fab class="action-btn">
         <mat-icon>cached</mat-icon>
       </button>
     </div>
@@ -79,7 +134,7 @@
 
       <ng-container matColumnDef="date_creation">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Date soumission</th>
-        <td *matCellDef="let element" mat-cell> {{element.date_creation|date: 'dd/mm/yyyy'}} </td>
+        <td *matCellDef="let element" mat-cell> {{element.date_creation|date: 'dd/MM/yyyy'}} </td>
       </ng-container>
       <ng-container matColumnDef="categorie_produit">
         <th *matHeaderCellDef mat-header-cell mat-sort-header> Catégorie</th>

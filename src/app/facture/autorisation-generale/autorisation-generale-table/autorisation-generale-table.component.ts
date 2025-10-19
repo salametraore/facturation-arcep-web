@@ -22,6 +22,15 @@ import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
 import {Utilisateur} from "../../../shared/models/utilisateur";
 
+interface FTListFilter {
+  clientText?: string;   // texte saisi dans "Nom du client"
+  startDate?: string;    // YYYY-MM-DD (inclusif)
+  endDate?: string;      // YYYY-MM-DD (inclusif)
+  serviceId?: number;    // id produit/service (ligne ou dans produits_detail)
+  statusId?: number;     // id du statut
+}
+
+
 @Component({
   selector: 'autorisation-generale-table',
   templateUrl: './autorisation-generale-table.component.html',
@@ -49,9 +58,11 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
+  client: Client;
   utilisateurConnecte:Utilisateur;
   roleUtilisateurConnecte:UtilisateurRole;
 
+  private filterValues: FTListFilter = {};
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -78,6 +89,49 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
     this.utilisateurConnecte=this.authService.getConnectedUser();
     this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
     console.log(this.utilisateurConnecte);
+
+    this.ficheTechniques.filterPredicate = (row: FicheTechniques, raw: string) => {
+      if (!raw) return true;
+      let f: FTListFilter;
+      try { f = JSON.parse(raw); } catch { return true; }
+
+      // 1) Client (texte sur client_nom)
+      if (f.clientText) {
+        const needle = f.clientText.trim().toLowerCase();
+        if (!(row.client_nom ?? '').toLowerCase().includes(needle)) return false;
+      }
+
+      // 2) Service/Produit
+      //   - si la ligne porte un champ produit / produit_id, on compare
+      //   - sinon, on cherche dans produits_detail[] (si présent)
+      if (f.serviceId != null) {
+        const topLevelProduit = (row as any).produit ?? (row as any).produit_id ?? null;
+        const okTop = topLevelProduit != null ? Number(topLevelProduit) === Number(f.serviceId) : false;
+        const okDetail = row.produits_detail?.some(pd => Number(pd?.produit) === Number(f.serviceId)) ?? false;
+        if (!(okTop || okDetail)) return false;
+      }
+
+      // 3) Statut par id
+      if (f.statusId != null) {
+        if ((row.statut?.id ?? null) !== f.statusId) return false;
+      }
+
+      // 4) Intervalle de dates (inclusif) sur date_creation
+      const rowT = this.dayStart(row.date_creation);
+      if (rowT == null) return false;
+
+      if (f.startDate) {
+        const t0 = this.dayStart(f.startDate);
+        if (t0 != null && rowT < t0) return false;
+      }
+      if (f.endDate) {
+        const t1 = this.dayStart(f.endDate);
+        if (t1 != null && rowT > t1) return false;
+      }
+
+      return true;
+    };
+
   }
 
   reloadData() {
@@ -93,15 +147,21 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
+      this.produits = produits.filter(f => f.id === 76);
     });
 
-    this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
-      this.ficheTechniques.data = response
-        .filter(f => f.categorie_produit === this.fixeCategorie)
-        .sort((a, b) => b.id - a.id);  // Tri décroissant sur le champ id
-    });
+    this.ficheTechniquesService.getFicheTechniques().subscribe((lignes: FicheTechniques[]) => {
+      const allowed = new Set<number>([76]);
+      this.ficheTechniques.data = lignes
+        .filter(f =>
+          f.categorie_produit === this.fixeCategorie &&
+          f.produits_detail?.some(p => p && allowed.has(p.produit))
+        )
+        .sort((a, b) => b.id - a.id);  // Tri décroissant
 
+      this.ficheTechniques.filter = JSON.stringify(this.filterValues || {});
+      if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
+    });
 
   }
 
@@ -158,13 +218,40 @@ export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit
     }
   }
 
+  onGetClient(item: Client) {
+    this.client = item;
+    this.chercher();
+  }
+
+  private dayStart(ts: any): number | null {
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
+
+  chercher() {
+    this.filterValues = {
+      clientText: (this.nomClient ?? '').trim() || undefined,
+      startDate:  this.startDate ? new Date(this.startDate).toISOString().slice(0, 10) : undefined,
+      endDate:    this.endDate   ? new Date(this.endDate).toISOString().slice(0, 10)   : undefined,
+      serviceId:  this.serviceFilter || undefined,
+      statusId:   this.statusFilter || undefined,
+    };
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
+  }
+
   reset() {
+    this.nomClient = undefined;
+    this.startDate = undefined;
+    this.endDate = undefined;
+    this.serviceFilter = undefined;
+    this.statusFilter = undefined;
 
+    this.filterValues = {};
+    this.ficheTechniques.filter = JSON.stringify(this.filterValues);
+    if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();
   }
 
-  checher() {
-
-  }
 
   getCategorie(id: number) {
     return this.categories?.find(cat => cat.id === id).libelle;

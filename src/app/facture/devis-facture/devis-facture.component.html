@@ -1,25 +1,14 @@
 <div class="dashboard-container">
-
   <div class="dashboard-header">
-    <h3 class="dashboard-title" style="color: #030303">Liste factures / devis</h3>
-    <!--    <div class="dashboard-actions">-->
-    <!--      <button (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>-->
-    <!--        <mat-icon>add</mat-icon>-->
-    <!--        FT nom de domaine-->
-    <!--      </button>-->
-    <!--      <button color="warn" mat-flat-button>-->
-    <!--        <mat-icon>print</mat-icon>-->
-    <!--        Exporter-->
-    <!--      </button>-->
-    <!--    </div>-->
+    <h3 class="dashboard-title" style="color: #030303">Liste factures/devis</h3>
   </div>
 
   <div class="filter-section">
-    <div class="filter-group">
-      <mat-form-field>
+    <div class="filter-group one-line">
+      <mat-form-field class="mf mf-client" floatLabel="always">
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client"  (keyup.enter)="checher()" required>
+               matInput matTooltip="Nom du client" (keyup.enter)="checher()" required>
         <mat-autocomplete #auto_cl="matAutocomplete">
           <mat-option *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
             <span>{{item.denomination_sociale}}</span>
@@ -27,52 +16,51 @@
         </mat-autocomplete>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field class="mf mf-date" floatLabel="always">
         <mat-label>Date début</mat-label>
         <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (keyup.enter)="checher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
         <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
-      <mat-form-field>
+
+      <mat-form-field class="mf mf-date" floatLabel="always">
         <mat-label>Date fin</mat-label>
         <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (keyup.enter)="checher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
         <mat-datepicker #pickerEnd></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Catégorie de service</mat-label>
+      <mat-form-field class="mf mf-select" floatLabel="always">
+        <mat-label>Type frais</mat-label>
         <mat-select [(ngModel)]="serviceFilter" (keyup.enter)="checher()">
-          <mat-option *ngFor="let item of TYPE_FRAIS" [value]="item.code">
-            {{item.label}}
-          </mat-option>
+          <mat-option *ngFor="let item of TYPE_FRAIS" [value]="item.code">{{item.label}}</mat-option>
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field class="mf mf-select" floatLabel="always">
         <mat-label>Statut</mat-label>
         <mat-select [(ngModel)]="statusFilter" (keyup.enter)="checher()">
-          <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">
-            {{item.libelle}}
-          </mat-option>
+          <mat-option *ngFor="let e of etatsfacture" [value]="e.value">{{e.label}}</mat-option>
         </mat-select>
       </mat-form-field>
 
-      <button (click)="checher()" color="primary" mat-mini-fab>
-        <mat-icon>search</mat-icon>
-      </button>
-      <button (click)="reset()" color="primary" mat-mini-fab>
-        <mat-icon>cached</mat-icon>
-      </button>
+      <div class="actions">
+        <button (click)="checher()" color="primary" mat-mini-fab class="icon-btn">
+          <mat-icon>search</mat-icon>
+        </button>
+        <button (click)="reset()" color="primary" mat-mini-fab class="icon-btn">
+          <mat-icon>cached</mat-icon>
+        </button>
+      </div>
 
-      <button (click)="openGenererRedevancesAnnuelles()" color="warn" mat-flat-button>
+<!--      <button (click)="openGenererRedevancesAnnuelles()" color="warn" mat-flat-button class="generate-btn">
         <mat-icon>point_of_sale</mat-icon>
         Générer Redevances
-      </button>
-
+      </button>-->
     </div>
   </div>
-  <div class="mat-elevation-z10">
+
+  <div class="mat-elevation-z10 compact-table">
     <table [dataSource]="t_Facture" mat-table matSort style="width: 100%">
       <ng-container matColumnDef="reference">
         <th *matHeaderCellDef mat-header-cell mat-sort-header>Référence</th>

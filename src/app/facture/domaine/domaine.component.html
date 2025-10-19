@@ -7,17 +7,16 @@
         <mat-icon>add</mat-icon>
         FT nom de domaine
       </button>
-      <button color="warn" mat-flat-button>
+<!--      <button color="warn" mat-flat-button>
         <mat-icon>print</mat-icon>
         Exporter
-      </button>
+      </button>-->
     </div>
   </div>
 
   <div class="filter-section">
-    <div class="filter-group">
-
-      <mat-form-field>
+    <div class="filter-group grid-filters">
+      <mat-form-field class="client-field">
         <mat-label>Nom du client</mat-label>
         <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
                matInput matTooltip="Nom du client" placeholder="Nom du client">
@@ -31,21 +30,21 @@
 
       <mat-form-field>
         <mat-label>Date début</mat-label>
-        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate">
+        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (dateChange)="cherche()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
         <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Date fin</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate">
+        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (dateChange)="cherche()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
         <mat-datepicker #pickerEnd></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Catégorie de service</mat-label>
-        <mat-select [(ngModel)]="serviceFilter">
+        <mat-select [(ngModel)]="serviceFilter" (selectionChange)="cherche()">
           <mat-option *ngFor="let item of produits" [value]="item.id">
             {{item.libelle}}
           </mat-option>
@@ -54,17 +53,17 @@
 
       <mat-form-field>
         <mat-label>Statut</mat-label>
-        <mat-select [(ngModel)]="statusFilter">
+        <mat-select [(ngModel)]="statusFilter" (selectionChange)="cherche()">
           <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">
             {{item.libelle}}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <button (click)="cherche()" color="primary" mat-mini-fab>
+      <button (click)="cherche()" color="primary" mat-mini-fab class="action-btn">
         <mat-icon>search</mat-icon>
       </button>
-      <button (click)="reset()" color="primary" mat-mini-fab>
+      <button (click)="reset()" color="primary" mat-mini-fab class="action-btn">
         <mat-icon>cached</mat-icon>
       </button>
     </div>

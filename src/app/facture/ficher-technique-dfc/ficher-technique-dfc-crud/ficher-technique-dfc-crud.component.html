@@ -17,7 +17,7 @@
       <mat-form-field appearance="outline" floatLabel="always" fxFlex="30" fxFlex.xs="100">
         <mat-label>Catégorie de service</mat-label>
         <mat-select formControlName="produit" matTooltip="Catégorie de service">
-          <mat-option *ngFor="let item of produits" [value]="item.id">
+          <mat-option *ngFor="let item of categoriesFiltered" [value]="item.id">
             {{ item.libelle }}
           </mat-option>
         </mat-select>
