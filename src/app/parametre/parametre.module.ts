@@ -4,6 +4,7 @@ import {ParametreRoutingModule} from './parametre-routing.module';
 import {SharedModule} from '../shared/shared.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PdfViewerModule} from 'ng2-pdf-viewer';
+import { MatPaginatorModule } from '@angular/material/paginator';
 // import {DomaineComponent} from "./domaine/domaine.component";
 // import {DomaineCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
 // import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
@@ -45,6 +46,8 @@ import {ZonePostaleCrudComponent} from "./zone-postale/zone-postale-crud/zone-po
 import {ZonePostaleComponent} from "./zone-postale/zone-postale.component";
 import {ZoneCouvertureComponent} from "./zone-couverture/zone-couverture.component";
 import {CategorieStationComponent} from "./categorie-station/categorie-station.component";
+import {RoleCrudComponent} from "./roles/role-crud/role-crud.component";
+import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
 
 @NgModule({
   declarations: [
@@ -79,7 +82,8 @@ import {CategorieStationComponent} from "./categorie-station/categorie-station.c
     ZonePostaleComponent,
     ZoneCouvertureComponent,
     CategorieStationComponent,
-
+    RolesPageComponent,
+    RoleCrudComponent
   ],
   imports: [
     CommonModule,
@@ -88,6 +92,7 @@ import {CategorieStationComponent} from "./categorie-station/categorie-station.c
     ReactiveFormsModule,
     FormsModule,
     PdfViewerModule,
+    MatPaginatorModule,
   ]
 })
 export class ParametreModule {

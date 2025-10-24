@@ -15,7 +15,7 @@ export class StatutFicheTechniqueService {
 
   // GET all
   getListItems(): Observable<StatutFicheTechnique[]> {
-    return this.http.get<StatutFicheTechnique[]>(this.baseUrl);
+    return this.http.get<StatutFicheTechnique[]>(`${this.baseUrl}/`);
   }
 
   // GET by ID

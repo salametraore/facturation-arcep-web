@@ -1,7 +1,7 @@
 <!-- generation-redevance-crud.component.html (version avec mat-stepper) -->
 
 <div class="dashboard-container">
-  <h1 class="dashboard-title" style="color: #030303">Encaissement direct (frais de dossier)</h1>
+  <h1 class="dashboard-title" style="color: #030303">Encaissement de frais dossier sans facture</h1>
 
   <mat-stepper #stepper (selectionChange)="onStepChange?.($event)">
 
@@ -16,38 +16,37 @@
           <mat-label>Nom du client</mat-label>
 
           <input
-            matInput
             [formControl]="clientDisplay"
-          [matAutocomplete]="auto_cl"
-          matTooltip="Nom du client"
-          required
+            [matAutocomplete]="auto_cl"
+            matInput
+            matTooltip="Nom du client"
+            required
           >
 
           <mat-autocomplete
               #auto_cl="matAutocomplete"
               (optionSelected)="onClientPicked($event.option.value)"
           >
-          <mat-option
-            *ngFor="let item of clients | search: clientDisplay.value"
-            [value]="item"                                       >
-          >
-          {{ item.denomination_sociale }}
-          </mat-option>
+            <mat-option
+              *ngFor="let item of clients | search: clientDisplay.value"
+              [value]="item">
+              {{ item.denomination_sociale }}
+            </mat-option>
           </mat-autocomplete>
         </mat-form-field>
 
         <!-- Objet -->
         <mat-form-field>
           <mat-label>Objet</mat-label>
-          <input matInput formControlName="objet" placeholder="encaissement Frais de Dossier">
+          <input formControlName="objet" matInput placeholder="encaissement Frais de Dossier">
         </mat-form-field>
 
         <!-- LIGNE 1 : Date | Mode de paiement -->
-        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+        <div fxLayout="row" fxLayoutAlign="start stretch" fxLayoutGap="16px">
           <mat-form-field fxFlex="50" fxFlex.xs="100">
             <mat-label>Date d'encaissement</mat-label>
-            <input matInput formControlName="date_encaissement" [matDatepicker]="dp1" required>
-            <mat-datepicker-toggle matIconSuffix [for]="dp1"></mat-datepicker-toggle>
+            <input [matDatepicker]="dp1" formControlName="date_encaissement" matInput required>
+            <mat-datepicker-toggle [for]="dp1" matIconSuffix></mat-datepicker-toggle>
             <mat-datepicker #dp1></mat-datepicker>
           </mat-form-field>
 
@@ -62,20 +61,20 @@
         </div>
 
         <!-- LIGNE 2 : Référence | Montant -->
-        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
+        <div fxLayout="row" fxLayoutAlign="start stretch" fxLayoutGap="16px">
           <mat-form-field fxFlex="50" fxFlex.xs="100">
-            <mat-label>Référence</mat-label>
-            <input matInput formControlName="reference">
+            <mat-label>Référence chèque/virement</mat-label>
+            <input formControlName="reference" matInput>
           </mat-form-field>
 
           <mat-form-field fxFlex="50" fxFlex.xs="100">
             <mat-label>Montant</mat-label>
-            <input matInput formControlName="montant" type="number" inputmode="decimal" required>
+            <input formControlName="montant" inputmode="decimal" matInput required type="number">
           </mat-form-field>
         </div>
 
         <div class="action-buttons">
-          <button mat-button matStepperNext [disabled]="encaissementForm.invalid">Suivant</button>
+          <button [disabled]="encaissementForm.invalid" mat-button matStepperNext>Suivant</button>
         </div>
       </form>
     </mat-step>
@@ -85,8 +84,8 @@
       <form [formGroup]="ficheForm">
         <ng-template matStepLabel>Service à facturer</ng-template>
         <br>
-        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
-          <mat-form-field fxFlex="50" fxFlex.xs="100">
+        <div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="16px">
+          <mat-form-field fxFlex="40" fxFlex.xs="100" class="centered-field">
             <mat-label>Catégorie produit</mat-label>
             <mat-select formControlName="categorie_produit" (selectionChange)="onCategorieChange()" required>
               <mat-option *ngFor="let cp of categories" [value]="cp.id">
@@ -99,17 +98,17 @@
 
       <div class="p-4">
         <div class="mb-2">
-          <button mat-raised-button color="primary" (click)="addProduitLine()">Ajouter une ligne</button>
+          <button (click)="addProduitLine()" color="primary" mat-raised-button>Ajouter une ligne</button>
         </div>
 
         <!-- Conteneur avec styles (cadre/scroll/sticky) -->
         <div class="mat-elevation-z10">
-          <table mat-table [dataSource]="produitsDS">
+          <table [dataSource]="produitsDS" mat-table>
 
             <!-- Produit -->
             <ng-container matColumnDef="produit">
-              <th mat-header-cell *matHeaderCellDef>Service concerné</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>Service concerné</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
                   <mat-select formControlName="produit" required>
                     <mat-option *ngFor="let p of produitsFiltered" [value]="p.id">{{ p.libelle }}</mat-option>
@@ -120,41 +119,41 @@
 
             <!-- Désignation (SVA / Zone texte libre) -->
             <ng-container matColumnDef="designation">
-              <th mat-header-cell *matHeaderCellDef>Description / Zone</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>Description / Zone</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
-                  <input matInput formControlName="designation" placeholder="Description (SVA) ou Zone (texte)">
+                  <input formControlName="designation" matInput placeholder="Description (SVA) ou Zone (texte)">
                 </mat-form-field>
               </td>
             </ng-container>
 
             <!-- Marque (cat 12) -->
             <ng-container matColumnDef="marque">
-              <th mat-header-cell *matHeaderCellDef>Marque</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>Marque</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
-                  <input matInput formControlName="marque" placeholder="Marque (agrément équipement)">
+                  <input formControlName="marque" matInput placeholder="Marque (agrément équipement)">
                 </mat-form-field>
               </td>
             </ng-container>
 
             <!-- Modèle (cat 12) -->
             <ng-container matColumnDef="modele">
-              <th mat-header-cell *matHeaderCellDef>Modèle</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>Modèle</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
-                  <input matInput formControlName="modele" placeholder="Modèle (agrément équipement)">
+                  <input formControlName="modele" matInput placeholder="Modèle (agrément équipement)">
                 </mat-form-field>
               </td>
             </ng-container>
 
             <!-- Zone liste (cat 13) -->
             <ng-container matColumnDef="zone">
-              <th mat-header-cell *matHeaderCellDef>Zone de desserte</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>Zone de desserte</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
                   <mat-select formControlName="zone_couverture" placeholder="Zone de desserte">
-                    <mat-option *ngFor="let z of zones" [value]="z.id">
+                    <mat-option *ngFor="let z of zoneCouverture" [value]="z.id">
                       {{ z.code ? (z.code + ' — ') : ''}}{{ z.libelle }}
                     </mat-option>
                   </mat-select>
@@ -164,53 +163,53 @@
 
             <!-- Quantité -->
             <ng-container matColumnDef="quantite">
-              <th mat-header-cell *matHeaderCellDef>Qté</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>Qté</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
-                  <input matInput type="number" formControlName="quantite" required>
+                  <input formControlName="quantite" matInput required type="number">
                 </mat-form-field>
               </td>
             </ng-container>
 
             <!-- Prix unitaire -->
             <ng-container matColumnDef="prix_unitaire">
-              <th mat-header-cell *matHeaderCellDef>PU</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>PU</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
-                  <input matInput type="number" formControlName="prix_unitaire" required>
+                  <input formControlName="prix_unitaire" matInput required type="number">
                 </mat-form-field>
               </td>
             </ng-container>
 
             <!-- Total -->
             <ng-container matColumnDef="total">
-              <th mat-header-cell *matHeaderCellDef>Total</th>
-              <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
+              <th *matHeaderCellDef mat-header-cell>Total</th>
+              <td *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)" mat-cell>
                 <mat-form-field appearance="outline">
-                  <input matInput formControlName="total" disabled>
+                  <input disabled formControlName="total" matInput>
                 </mat-form-field>
               </td>
             </ng-container>
 
             <!-- Actions -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef></th>
-              <td mat-cell *matCellDef="let row; let i = index">
-                <button mat-icon-button color="warn" (click)="removeProduitLine(i)">
+              <th *matHeaderCellDef mat-header-cell></th>
+              <td *matCellDef="let row; let i = index" mat-cell>
+                <button (click)="removeProduitLine(i)" color="warn" mat-icon-button>
                   <mat-icon>delete</mat-icon>
                 </button>
               </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+            <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
           </table>
         </div>
       </div>
 
       <div class="action-buttons">
         <button mat-button matStepperPrevious>Retour</button>
-        <button mat-button matStepperNext [disabled]="ficheForm.invalid">Suivant</button>
+        <button [disabled]="ficheForm.invalid" mat-button matStepperNext>Suivant</button>
       </div>
     </mat-step>
 
@@ -232,60 +231,57 @@
               <strong>{{ sommeProduits() | number:'1.0-0' }} XOF</strong>
             </span>
             <span>Crédit :
-              <strong>{{ (encaissementForm.value.montant||0) - sommeProduits() | number:'1.0-0'}} XOF</strong>
+              <strong>{{ (encaissementForm.value.montant || 0) - sommeProduits() | number:'1.0-0'}} XOF</strong>
             </span>
           </div>
         </div>
 
         <!-- Tableau récap produits -->
         <div class="invoice-table">
-          <div class="mb-2">
-            <button mat-raised-button color="primary" (click)="addProduitLine()">Ajouter une ligne</button>
-          </div>
 
-          <div class="mat-elevation-z10"
-               [ngClass]="{
+          <div [ngClass]="{
                      'cat-12': ficheForm?.value?.categorie_produit === 12,
                      'cat-13': ficheForm?.value?.categorie_produit === 13
-                   }">
-            <table mat-table [dataSource]="produitsDS" matSort style="width: 100%">
+                   }"
+               class="mat-elevation-z10">
+            <table [dataSource]="produitsDS" mat-table matSort style="width: 100%">
               <ng-container matColumnDef="libelle">
-                <th mat-header-cell *matHeaderCellDef>Service</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <th *matHeaderCellDef mat-header-cell>Service</th>
+                <td *matCellDef="let row; let i=index" mat-cell>
                   {{ (produitsFormArray.at(i).get('produit_libelle')?.value) || '' }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="desc">
-                <th mat-header-cell *matHeaderCellDef>Desc/Zone</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <th *matHeaderCellDef mat-header-cell>Desc/Zone</th>
+                <td *matCellDef="let row; let i=index" mat-cell>
                   {{ getDesignationOrZone(i) }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="qte">
-                <th mat-header-cell *matHeaderCellDef>Qté</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <th *matHeaderCellDef mat-header-cell>Qté</th>
+                <td *matCellDef="let row; let i=index" mat-cell>
                   {{ produitsFormArray.at(i).value.quantite }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="pu">
-                <th mat-header-cell *matHeaderCellDef>PU</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <th *matHeaderCellDef mat-header-cell>PU</th>
+                <td *matCellDef="let row; let i=index" mat-cell>
                   {{ produitsFormArray.at(i).value.prix_unitaire | number:'1.0-0' }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="tt">
-                <th mat-header-cell *matHeaderCellDef>Total</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <th *matHeaderCellDef mat-header-cell>Total</th>
+                <td *matCellDef="let row; let i=index" mat-cell>
                   {{ lineTotal(i) | number:'1.0-0' }}
                 </td>
               </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="['libelle','desc','qte','pu','tt']"></tr>
-              <tr mat-row *matRowDef="let r; columns: ['libelle','desc','qte','pu','tt'];"></tr>
+              <tr *matHeaderRowDef="['libelle','desc','qte','pu','tt']" mat-header-row></tr>
+              <tr *matRowDef="let r; columns: ['libelle','desc','qte','pu','tt'];" mat-row></tr>
             </table>
           </div>
         </div>
@@ -293,8 +289,8 @@
         <!-- Actions -->
         <div class="action-buttons">
           <button mat-button matStepperPrevious>Retour</button>
-          <button mat-raised-button class="register-button" color="primary" (click)="submit()">Enregistrer</button>
-          <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
+          <button (click)="submit()" class="register-button" color="primary" mat-raised-button>Enregistrer</button>
+          <button (click)="onFerme()" color="warn" mat-raised-button>Fermer</button>
         </div>
       </div>
     </mat-step>

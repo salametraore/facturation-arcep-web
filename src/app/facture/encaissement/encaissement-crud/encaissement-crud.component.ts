@@ -21,6 +21,13 @@ import {Affectation, EncaissementDetail} from "../../../shared/models/encaisseme
 import {FactureService} from "../../../shared/services/facture.service";
 import {Facture} from "../../../shared/models/facture";
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
+import { forkJoin } from 'rxjs';
+
+type AffectationX = Affectation & {
+  reference?: string;
+  objet?: string;
+};
+
 
 @Component({
   selector: 'app-encaissement-crud',
@@ -28,6 +35,7 @@ import {StepperSelectionEvent} from "@angular/cdk/stepper";
   styleUrl: './encaissement-crud.component.scss'
 })
 export class EncaissementCrudComponent implements OnInit, AfterViewInit {
+
 
   encaissementDetail?: EncaissementDetail;
   fixeCategorie?: number;
@@ -46,7 +54,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
   errorMessage: any;
   t_Affectation1?: MatTableDataSource<Affectation>;
   t_Affectation2?: MatTableDataSource<Affectation>;
-  displayedColumns: string[] = ['facture_id', 'date_affectation', 'montant', 'montant_affecte'];
+  displayedColumns: string[] = ['facture_id', 'reference', 'objet', 'date_affectation', 'montant', 'montant_affecte'];
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('paginator2') paginator2!: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -108,6 +116,49 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
     this.title = this.title + ' - ' + this.window_name;
   }
 
+  // ajoute cette méthode dans la classe
+  private hydrateAffectationsAvecFactures(affs: Affectation[]): void {
+    if (!affs || affs.length === 0) {
+      this.t_Affectation1.data = [];
+      this.t_Affectation2.data = [];
+      return;
+    }
+
+    // Appel unitaire par facture_id (forkJoin)
+    const calls = affs.map(a => this.factureService.getItem(a.facture_id)); // ou getById(...) selon ton service
+
+    // important : importer forkJoin
+    // import { forkJoin } from 'rxjs';
+    forkJoin(calls).subscribe({
+      next: (factures: Facture[]) => {
+        const merged: AffectationX[] = affs.map(a => {
+          const f = factures.find(ff => ff.id === a.facture_id);
+          return {
+            ...a,
+            reference: f?.reference,
+            objet: f?.objet,
+            // au besoin, on peut aussi fiabiliser montant/date depuis la facture:
+            montant: (a as any).montant ?? f?.montant,
+            date_affectation: a.date_affectation ?? f?.date_echeance,
+          };
+        });
+
+        this.t_Affectation1.data = [...merged];
+        this.t_Affectation2.data = [...merged];
+
+        // recalcul somme affectée si besoin
+        this.onMontantAffecteChange1();
+      },
+      error: (err) => {
+        console.error('Hydratation affectations échouée', err);
+        // on garde au moins les data de base
+        this.t_Affectation1.data = [...affs];
+        this.t_Affectation2.data = [...affs];
+      }
+    });
+  }
+
+
   reloadData() {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
@@ -125,13 +176,16 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
     });
 
     if (this.encaissementDetail?.affectations?.length > 0) {
-      this.t_Affectation1.data = [...this.encaissementDetail.affectations];
-      this.t_Affectation2.data = [...this.encaissementDetail.affectations];
+      // Somme affectée déjà calculée comme avant
       this.somme_affectee = this.encaissementDetail.affectations
         .reduce((total, s) => total + (Number(s.montant_affecte) || 0), 0);
+
       setTimeout(() => {
         this.credit = Number(this.encaissementDetail?.montant) - this.somme_affectee;
       }, 1000);
+
+      // ➜ au lieu de setter directement t_Affectation1/2, on hydrate :
+      this.hydrateAffectationsAvecFactures(this.encaissementDetail.affectations);
     }
   }
 
@@ -175,14 +229,17 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         this.facturesImpayees = factures.filter(f => f.etat === 'EN_ATTENTE');
         //this.facturesImpayees =factures;
         console.log(factures);
-        let affectations: Affectation[] = this.facturesImpayees.map(a => ({
-          facture_id: a.id,
-          date_affectation: a.date_echeance,
-          montant: a.montant
+        const affectations: AffectationX[] = this.facturesImpayees.map(f => ({
+          facture_id: f.id,
+          date_affectation: f.date_echeance,
+          montant: f.montant,
+          reference: f.reference,   // ← NEW
+          objet: f.objet            // ← NEW
         }));
+
         setTimeout(() => {
           this.t_Affectation1.data = [...affectations];
-        }, 1000);
+        }, 0);
       });
     }
   }

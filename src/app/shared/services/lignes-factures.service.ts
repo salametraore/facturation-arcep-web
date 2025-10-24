@@ -27,7 +27,7 @@ export class LignesFacturesService {
       }
 
       getListItems() : Observable<LignesFactures[]> {
-          return this.http.get<LignesFactures[]>(`${this.baseUrl}`);
+          return this.http.get<LignesFactures[]>(`${this.baseUrl}/`);
       }
 
 }

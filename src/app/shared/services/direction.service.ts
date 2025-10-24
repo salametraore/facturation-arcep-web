@@ -31,6 +31,6 @@ export class DirectionService {
   }
 
   getListItems(): Observable<Direction[]> {
-    return this.http.get<Direction[]>(`${this.baseUrl}`);
+    return this.http.get<Direction[]>(`${this.baseUrl}/`);
   }
 }

@@ -47,7 +47,7 @@
         <!-- LIGNE 2 : Référence (50%) | Montant (50%) -->
         <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start stretch">
           <mat-form-field fxFlex="50" fxFlex.xs="100">
-            <mat-label>Référence</mat-label>
+            <mat-label>Référence chèque/virement</mat-label>
             <input matInput formControlName="reference">
           </mat-form-field>
 
@@ -78,6 +78,16 @@
             <td *matCellDef="let element" mat-cell> {{element.facture_id}} </td>
           </ng-container>
 
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Référence </th>
+            <td mat-cell *matCellDef="let element"> {{ element.reference }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="objet">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Objet </th>
+            <td mat-cell *matCellDef="let element"> {{ element.objet }} </td>
+          </ng-container>
+
           <ng-container matColumnDef="date_affectation">
             <th *matHeaderCellDef mat-header-cell mat-sort-header> Date échéance</th>
             <td *matCellDef="let element" mat-cell> {{element.date_affectation|date: 'dd/mm/yyyy'}} </td>
@@ -99,7 +109,7 @@
 
           <!-- Row shown when there is no matching data. -->
           <tr *matNoDataRow class="mat-row">
-            <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au
+            <td class="mat-cell" colspan="6">Aucune correspondance trouvée dans la base de données correspondant au
               critère
               de
               recherche
@@ -140,6 +150,16 @@
               <ng-container matColumnDef="facture_id">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Facture</th>
                 <td *matCellDef="let element" mat-cell> {{element.facture_id}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="reference">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Référence </th>
+                <td mat-cell *matCellDef="let element"> {{ element.reference }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="objet">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Objet </th>
+                <td mat-cell *matCellDef="let element"> {{ element.objet }} </td>
               </ng-container>
 
               <ng-container matColumnDef="date_affectation">

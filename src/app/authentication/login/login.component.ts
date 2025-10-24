@@ -28,6 +28,8 @@ export class LoginComponent implements OnInit {
   utilisateurRoles: UtilisateurRole[];
   utilisateurRole: UtilisateurRole;
 
+  bgUrl = 'assets/images/background.png';
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,

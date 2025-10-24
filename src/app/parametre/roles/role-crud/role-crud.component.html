@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content [formGroup]="form">
+  <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <mat-form-field appearance="outline">
+      <mat-label>Code</mat-label>
+      <input matInput formControlName="code"/>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Libellé</mat-label>
+      <input matInput formControlName="libelle" required/>
+      <mat-error *ngIf="form.get('libelle')?.hasError('required')">Libellé obligatoire</mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- Dual list -->
+  <div class="dual-list">
+    <div class="pane">
+      <b>Opérations disponibles</b>
+      <mat-selection-list [(ngModel)]="selectedLeft">
+        <mat-list-option *ngFor="let op of left" [value]="op">{{ op.libelle }}</mat-list-option>
+      </mat-selection-list>
+    </div>
+
+    <div class="actions">
+      <button mat-mini-fab (click)="toRightAll()" matTooltip="Tout à droite">
+        <mat-icon>keyboard_double_arrow_right</mat-icon>
+      </button>
+      <button mat-mini-fab (click)="toRightSelected()" matTooltip="Sélection à droite">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <button mat-mini-fab (click)="toLeftSelected()" matTooltip="Sélection à gauche">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-mini-fab (click)="toLeftAll()" matTooltip="Tout à gauche">
+        <mat-icon>keyboard_double_arrow_left</mat-icon>
+      </button>
+    </div>
+
+    <div class="pane">
+      <b>Opérations du rôle</b>
+      <mat-selection-list [(ngModel)]="selectedRight">
+        <mat-list-option *ngFor="let op of right" [value]="op">{{ op.libelle }}</mat-list-option>
+      </mat-selection-list>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Annuler</button>
+  <button mat-flat-button color="primary" (click)="save()">Enregistrer</button>
+</mat-dialog-actions>

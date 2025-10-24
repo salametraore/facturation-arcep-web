@@ -29,7 +29,7 @@ export class FicheTechniquesProduitsService {
   }
 
   getListItems(): Observable<FicheTechniquesProduits[]> {
-    return this.http.get<FicheTechniquesProduits[]>(`${this.baseUrl}`);
+    return this.http.get<FicheTechniquesProduits[]>(`${this.baseUrl}/`);
   }
 
 }

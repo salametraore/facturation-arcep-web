@@ -34,7 +34,7 @@ export class FactureService {
   }
 
   getListItems() : Observable<Facture[]> {
-    return this.http.get<Facture[]>(`${this.baseUrl}`);
+    return this.http.get<Facture[]>(`${this.baseUrl}/`);
   }
 
   getListeFacturesByClientId(id:number) : Observable<Facture[]> {
@@ -77,7 +77,7 @@ export class FactureService {
     };
     return this.http.get<any>(url, httpOptions);
   }
- //http://localhost:8000/facturation_api/devis/generate-pdf/35/
+
 
    genererDevisPDF(devis_id: number) {
     //const url = ${this.baseUrl}/generate-pdf/${facture_id};

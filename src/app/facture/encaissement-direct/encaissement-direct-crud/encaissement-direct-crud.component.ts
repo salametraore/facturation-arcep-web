@@ -1,14 +1,15 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl,FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import {Component, Inject, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatTableDataSource} from '@angular/material/table';
+import {StepperSelectionEvent} from '@angular/cdk/stepper';
 
-import { CategorieProduit } from '../../../shared/models/categorie-produit';
-import { Produit } from '../../../shared/models/produit';
-import { Client } from '../../../shared/models/client';
-import { ModePaiement } from '../../../shared/models/mode-paiement';
-import { ZoneCouverture } from '../../../shared/models/zone-couverture';
+import {CategorieProduit} from '../../../shared/models/categorie-produit';
+import {Produit} from '../../../shared/models/produit';
+import {Client} from '../../../shared/models/client';
+import {ModePaiement} from '../../../shared/models/mode-paiement';
+import {TarifFraisDossierList} from '../../../shared/models/tarifFraisDossierList';
+import {ZoneCouverture} from '../../../shared/models/zone-couverture';
 
 import {
   EncaissementDirectFicheTechniqueRequest,
@@ -18,14 +19,15 @@ import {
   ProduitDetailForPayload
 } from '../../../shared/models/encaissement-direct-request';
 
-import { CategorieProduitService } from '../../../shared/services/categorie-produit.service';
-import { ProduitService } from '../../../shared/services/produits.service';
-import { ClientService } from '../../../shared/services/client.service';
-import { EncaissementsService } from '../../../shared/services/encaissements.service';
-import { FicheTechniquesService } from '../../../shared/services/fiche-techniques.service';
-import { ZoneCouvertureService } from '../../../shared/services/zone-couverture.service';
-import { ModePaiementService } from '../../../shared/services/mode-paiement.service';
-import { MsgMessageServiceService } from '../../../shared/services/msg-message-service.service';
+import {CategorieProduitService} from '../../../shared/services/categorie-produit.service';
+import {ProduitService} from '../../../shared/services/produits.service';
+import {ClientService} from '../../../shared/services/client.service';
+import {EncaissementsService} from '../../../shared/services/encaissements.service';
+import {FicheTechniquesService} from '../../../shared/services/fiche-techniques.service';
+import {TypeFraisService} from '../../../shared/services/type-frais-dossier.service';
+import {ZoneCouvertureService} from '../../../shared/services/zone-couverture.service';
+import {ModePaiementService} from '../../../shared/services/mode-paiement.service';
+import {MsgMessageServiceService} from '../../../shared/services/msg-message-service.service';
 import {bouton_names, date_converte, operations} from "../../../constantes";
 
 @Component({
@@ -43,6 +45,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
   clientDisplay = new FormControl<string>('');
 
   categories: CategorieProduit[] = [];
+  tarifFraisDossierLists: TarifFraisDossierList[] = [];
   produitsAll: Produit[] = [];
   produitsFiltered: Produit[] = [];
   clients: Client[] = [];
@@ -50,6 +53,28 @@ export class EncaissementDirectCrudComponent implements OnInit {
   zoneCouverture: ZoneCouverture[] = [];
 
   nomClient: string | null = null;
+
+  // === IDs produits (adapte si nécessaire) ===
+  private readonly PRODUCT_BASE_ID = 72;
+  private readonly PRODUCT_RADIO_ID = 73;
+  private readonly PRODUCT_TERMINAL_ID = 74;
+
+  // === Prix (si tu veux pousser le PU depuis le front) ===
+  private readonly PRICE_BASE = 50000;
+  private readonly PRICE_RADIO = 50000;
+  private readonly PRICE_TERMINAL = 30000;
+
+  private isBase = (id: number) => id === this.PRODUCT_BASE_ID;
+  private isRadio = (id: number) => id === this.PRODUCT_RADIO_ID;
+  private isTerminal = (id: number) => id === this.PRODUCT_TERMINAL_ID;
+
+  private findIndexByProduct(id: number): number {
+    return this.produitsFormArray.controls.findIndex(fg => +fg.get('produit')!.value === id);
+  }
+
+  private hasProduct(id: number): boolean {
+    return this.findIndexByProduct(id) >= 0;
+  }
 
   get produitsFormArray(): FormArray<FormGroup> {
     return this.ficheForm.get('produits_detail') as FormArray<FormGroup>;
@@ -61,18 +86,25 @@ export class EncaissementDirectCrudComponent implements OnInit {
     private produitService: ProduitService,
     private clientService: ClientService,
     private encaissementsService: EncaissementsService,
+    private typeFraisService: TypeFraisService,
     private ficheTechniquesService: FicheTechniquesService,
     private zoneCouvertureService: ZoneCouvertureService,
     private modePaiementService: ModePaiementService,
     private msg: MsgMessageServiceService,
     public dialogRef: MatDialogRef<EncaissementDirectCrudComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.initForms();
     this.loadData();
     this.linkClientFields();
+
+    this.encaissementForm.get('montant')!.valueChanges.subscribe(() => {
+      this.updateMontants();
+    });
+
     this.addProduitLine();
   }
 
@@ -115,26 +147,41 @@ export class EncaissementDirectCrudComponent implements OnInit {
     this.clientService.getItems()
       .subscribe(cl => this.clients = cl);
 
-    this.zoneCouvertureService.getListItems()
-      .subscribe(z => this.zoneCouverture = (z || []).filter(zz => zz.categorie_produit === 13));
+
+
+/*    this.zoneCouvertureService.getListItems().subscribe((lignesZones: ZoneCouverture[]) => {
+      this.zoneCouverture = lignesZones.filter(f => f.categorie_produit === 13);
+    });*/
+
+    this.zoneCouvertureService.getListItems().subscribe((lignesZones: ZoneCouverture[]) => {
+      this.zoneCouverture = (lignesZones || []).filter(z => [5, 6, 7, 8].includes(z.id));
+    });
 
     this.modePaiementService.getItems()
       .subscribe((modes: ModePaiement[]) => this.modePaiements = modes);
 
+    this.typeFraisService.getListItems()
+      .subscribe((lignesTypeFrais: TarifFraisDossierList[]) => {
+        this.tarifFraisDossierLists = lignesTypeFrais || [];
+        this.recomputeAllUnitPrices();
+      });
+
     const id = this.encaissementForm.get('client')!.value;
     if (id) {
       const c = this.clients.find(x => x.id === id);
-      if (c) this.clientDisplay.setValue(c.denomination_sociale, { emitEvent: false });
+      if (c) this.clientDisplay.setValue(c.denomination_sociale, {emitEvent: false});
     }
+    console.log("zoneCouverture");
+    console.log(this.zoneCouverture);
   }
 
   /** --------- SYNCHRONISATION CLIENT --------- */
   private linkClientFields(): void {
     const clientId = this.encaissementForm.get('client')!.value;
-    if (clientId) this.ficheForm.patchValue({ client: clientId }, { emitEvent: false });
+    if (clientId) this.ficheForm.patchValue({client: clientId}, {emitEvent: false});
 
     this.encaissementForm.get('client')!.valueChanges.subscribe((id: number) => {
-      this.ficheForm.patchValue({ client: id }, { emitEvent: false });
+      this.ficheForm.patchValue({client: id}, {emitEvent: false});
     });
   }
 
@@ -142,28 +189,19 @@ export class EncaissementDirectCrudComponent implements OnInit {
   onCategorieChange(): void {
     const cat = this.ficheForm.get('categorie_produit')!.value;
 
-    this.produitsFiltered = (this.produitsAll || []).filter(p =>
-      p.categorieProduit === cat && (cat !== 13 || p.id === 81)
-    );
-
-    this.produitsFormArray.controls.forEach((fg: FormGroup) => {
-      const currentProd = fg.get('produit')!.value;
-
-      if (!this.produitsFiltered.some(p => p.id === currentProd)) {
-        fg.patchValue({ produit: (cat === 13 ? 81 : null) }, { emitEvent: false });
+    // Filtrage produits selon la catégorie
+    this.produitsFiltered = (this.produitsAll || []).filter(p => {
+      if (cat === 12) {
+        // Agrément d’équipement : restreindre aux 3 lignes
+        return [this.PRODUCT_BASE_ID, this.PRODUCT_RADIO_ID, this.PRODUCT_TERMINAL_ID].includes(p.id);
       }
-
-      // Nettoyage des champs
-      if (cat === 11) {
-        fg.patchValue({ marque: '', modele: '', zone_couverture: null });
-      } else if (cat === 12) {
-        fg.patchValue({ designation: '', zone_couverture: null });
-      } else if (cat === 13) {
-        fg.patchValue({ designation: '', marque: '', modele: '' });
-      } else {
-        fg.patchValue({ marque: '', modele: '', zone_couverture: null });
+      if (cat === 13) {
+        return p.id === 81; // ton cas existant
       }
+      return p.categorieProduit === cat;
     });
+
+    // … (le reste de ta méthode inchangé)
 
     // Colonnes affichées
     this.displayedColumns =
@@ -171,42 +209,121 @@ export class EncaissementDirectCrudComponent implements OnInit {
         cat === 12 ? ['produit', 'marque', 'modele', 'quantite', 'prix_unitaire', 'total', 'actions'] :
           cat === 13 ? ['produit', 'zone', 'quantite', 'prix_unitaire', 'total', 'actions'] :
             ['produit', 'designation', 'quantite', 'prix_unitaire', 'total', 'actions'];
+
+    this.produitsFormArray.controls.forEach((fg: FormGroup) => {
+      // reset des validators pour éviter accumulation
+      fg.get('marque')!.clearValidators();
+      fg.get('modele')!.clearValidators();
+
+      if (cat === 12) {
+        fg.get('marque')!.addValidators(Validators.required);
+        fg.get('modele')!.addValidators(Validators.required);
+      }
+
+      fg.get('marque')!.updateValueAndValidity({ emitEvent: false });
+      fg.get('modele')!.updateValueAndValidity({ emitEvent: false });
+    });
+
+    // si cat=12, s'assurer que la ligne "Base" existe (ton ajout auto)
+    if (cat === 12 && !this.hasProduct(this.PRODUCT_BASE_ID)) {
+      this.produitsFormArray.push(this.createProduitFG(this.PRODUCT_BASE_ID, this.PRICE_BASE));
+      this.refreshDS();
+    }
+
+    this.recomputeAllUnitPrices();
   }
 
-  /** --------- GESTION DES PRODUITS --------- */
-  addProduitLine(): void {
+  private createProduitFG(defaultProductId?: number, defaultPU?: number): FormGroup {
     const fg = this.fb.group({
-      produit: [null, Validators.required],
+      produit: [defaultProductId ?? null, Validators.required],
       produit_libelle: [''],
       designation: [''],
       marque: [''],
       modele: [''],
       zone_couverture: [null],
       quantite: [1, [Validators.required, Validators.min(1)]],
-      prix_unitaire: [0, [Validators.required, Validators.min(0)]],
+      prix_unitaire: [defaultPU ?? 0, [Validators.required, Validators.min(0)]],
       total: [{ value: 0, disabled: true }],
     });
 
-  // total auto
-    fg.valueChanges.subscribe(() => {
+    // (validators cat=12) ...
+
+    // total auto sur qté
+    fg.get('quantite')!.valueChanges.subscribe(() => {
       const q = +fg.get('quantite')!.value || 0;
       const pu = +fg.get('prix_unitaire')!.value || 0;
       fg.get('total')!.setValue(q * pu, { emitEvent: false });
     });
 
-    // >>> maj du libellé produit quand l'id change
+    // total auto sur PU
+    fg.get('prix_unitaire')!.valueChanges.subscribe(() => {
+      const q = +fg.get('quantite')!.value || 0;
+      const pu = +fg.get('prix_unitaire')!.value || 0;
+      fg.get('total')!.setValue(q * pu, { emitEvent: false });
+    });
+
+    // changement de produit (PU depuis grille + base auto)
     fg.get('produit')!.valueChanges.subscribe((id: number) => {
       const lib = this.produitsAll.find(p => p.id === id)?.libelle ?? '';
       fg.get('produit_libelle')!.setValue(lib, { emitEvent: false });
+
+      const pu = this.getUnitPriceFor(id);
+      fg.get('prix_unitaire')!.setValue(pu, { emitEvent: false });
+
+      const q = +fg.get('quantite')!.value || 0;
+      fg.get('total')!.setValue(q * pu, { emitEvent: false });
+
+      const currentCat = this.ficheForm.get('categorie_produit')!.value;
+      if (currentCat === 12 && (this.isRadio(id) || this.isTerminal(id)) && !this.hasProduct(this.PRODUCT_BASE_ID)) {
+        this.produitsFormArray.insert(0, this.createProduitFG(this.PRODUCT_BASE_ID, undefined));
+        this.refreshDS();
+        this.recomputeAllUnitPrices();
+      }
     });
 
-    this.produitsFormArray.push(fg);
+    // ✅ ICI : abonné global pour remettre à jour affecte/solde quand la ligne change
+    fg.valueChanges.subscribe(() => {
+      this.updateMontants();   // utilise sommeProduits() et le champ 'montant'
+    });
+
+    // (optionnel) init si defaultProductId fourni
+    if (defaultProductId) {
+      const lib = this.produitsAll.find(p => p.id === defaultProductId)?.libelle ?? '';
+      fg.get('produit_libelle')!.setValue(lib, { emitEvent: false });
+      const puInit = this.getUnitPriceFor(defaultProductId);
+      fg.get('prix_unitaire')!.setValue(puInit, { emitEvent: false });
+      const qInit = +fg.get('quantite')!.value || 0;
+      fg.get('total')!.setValue(qInit * puInit, { emitEvent: false });
+
+      // si tu veux MAJ immédiate d'affecte/solde à l'init :
+      this.updateMontants();
+    }
+
+    return fg;
+  }
+
+  addProduitLine(): void {
+    const cat = this.ficheForm.get('categorie_produit')!.value;
+    const defId = (cat === 12) ? this.PRODUCT_BASE_ID : null;
+
+    this.produitsFormArray.push(this.createProduitFG(defId!, undefined));
     this.refreshDS();
+
+    if (defId) {
+      const fg = this.produitsFormArray.at(this.produitsFormArray.length - 1) as FormGroup;
+      const pu = this.getUnitPriceFor(defId);
+      fg.get('prix_unitaire')!.setValue(pu, { emitEvent: false });
+      const q = +fg.get('quantite')!.value || 0;
+      fg.get('total')!.setValue(q * pu, { emitEvent: false });
+    }
+
+    this.updateMontants();
   }
 
   removeProduitLine(i: number): void {
     this.produitsFormArray.removeAt(i);
     this.refreshDS();
+    this.updateMontants();
   }
 
   refreshDS(): void {
@@ -215,15 +332,16 @@ export class EncaissementDirectCrudComponent implements OnInit {
 
   onClientPicked(c: Client) {
     // affiche le nom dans l’input
-    this.clientDisplay.setValue(c.denomination_sociale, { emitEvent: false });
+    this.clientDisplay.setValue(c.denomination_sociale, {emitEvent: false});
 
     // met l’ID dans les formulaires
-    this.encaissementForm.patchValue({ client: c.id }, { emitEvent: false });
-    this.ficheForm.patchValue({ client: c.id }, { emitEvent: false });
+    this.encaissementForm.patchValue({client: c.id}, {emitEvent: false});
+    this.ficheForm.patchValue({client: c.id}, {emitEvent: false});
 
     // (facultatif) garder un libellé pour résumé
     this.nomClient = c.denomination_sociale;
   }
+
   /** --------- VALIDATION ET ENVOI --------- */
   submit(): void {
     if (this.encaissementForm.invalid || this.ficheForm.invalid) {
@@ -253,6 +371,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
           modele: l.modele ?? '',
           zone_couverture: l.zone_couverture,
         };
+
         return detailSansZone;
       });
 
@@ -286,11 +405,13 @@ export class EncaissementDirectCrudComponent implements OnInit {
     };
 
     this.encaissementsService.createEncaissementDirect(payload).subscribe({
-      next: () => { this.msg.success('Encaissement direct enregistré avec succès.'); this.dialogRef.close(true); },
+      next: () => {
+        this.msg.success('Encaissement direct enregistré avec succès.');
+        this.dialogRef.close(true);
+      },
       error: () => this.msg.failed('Erreur lors de l’enregistrement.')
     });
   }
-
 
 
   /** --------- UTILITAIRES --------- */
@@ -301,6 +422,18 @@ export class EncaissementDirectCrudComponent implements OnInit {
       return sum + q * pu;
     }, 0);
   }
+
+  /** Met à jour les champs affecte et solde_non_affecte */
+  private updateMontants(): void {
+    const montantProduits = this.sommeProduits();
+    const montantEncaisse = +this.encaissementForm.get('montant')?.value || 0;
+
+    this.encaissementForm.patchValue({
+      affecte: montantProduits,
+      solde_non_affecte: montantEncaisse - montantProduits
+    }, { emitEvent: false });
+  }
+
 
   getClientName(): string {
     const clientId = this.encaissementForm?.value?.client;
@@ -321,9 +454,47 @@ export class EncaissementDirectCrudComponent implements OnInit {
     this.dialogRef.close('Yes');
   }
 
-  lineTotal(i: number): number { const ctrl = this.produitsFormArray?.at(i); if (!ctrl) { return 0; } const q = +ctrl.get('quantite')?.value || 0; const pu = +ctrl.get('prix_unitaire')?.value || 0; return q * pu; }
+  lineTotal(i: number): number {
+    const ctrl = this.produitsFormArray?.at(i);
+    if (!ctrl) {
+      return 0;
+    }
+    const q = +ctrl.get('quantite')?.value || 0;
+    const pu = +ctrl.get('prix_unitaire')?.value || 0;
+    return q * pu;
+  }
 
   onStepChange(event: StepperSelectionEvent): void {
     // Placeholder si tu veux des actions par étape
   }
+
+  private parsePrice(x: string | number | null | undefined): number {
+    if (x == null) return 0;
+    if (typeof x === 'number') return x;
+    const cleaned = x.replace(/\s/g, '').replace(',', '.');
+    const n = Number(cleaned);
+    return isNaN(n) ? 0 : n;
+  }
+
+  /** PU unique par produit (ignore quantite_min/max) */
+  private getUnitPriceFor(productId: number): number {
+    if (!productId || !this.tarifFraisDossierLists?.length) return 0;
+    const row = this.tarifFraisDossierLists.find(t => +t.produit === +productId);
+    return this.parsePrice(row?.prix_unitaire);
+  }
+
+  /** Recalcule les PU pour toutes les lignes */
+  private recomputeAllUnitPrices(): void {
+    if (!this.produitsFormArray?.length) return;
+    this.produitsFormArray.controls.forEach((fg: FormGroup) => {
+      const prodId = +fg.get('produit')!.value || 0;
+      const q = +fg.get('quantite')!.value || 0;
+      const pu = this.getUnitPriceFor(prodId);
+      fg.get('prix_unitaire')!.setValue(pu, { emitEvent: false });
+      fg.get('total')!.setValue(q * pu, { emitEvent: false });
+    });
+
+    this.updateMontants();
+  }
+
 }

@@ -54,6 +54,19 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
   produits: Produit[];
   productAllowedIds = [72, 73, 74];
 
+  // IDs des 3 "produits" d'agrément
+  private readonly PRODUCT_BASE_ID = 72;
+  private readonly PRODUCT_RADIO_ID = 73;
+  private readonly PRODUCT_TERMINAL_ID = 74;
+
+  // utilitaires
+  private isBase = (id: number) => id === this.PRODUCT_BASE_ID;
+  private isRadio = (id: number) => id === this.PRODUCT_RADIO_ID;
+  private isTerminal = (id: number) => id === this.PRODUCT_TERMINAL_ID;
+
+  private hasProductInTable = (productId: number): boolean =>
+    this.t_FicheTechniquesProduits.data?.some(r => r.produit === productId) ?? false;
+
   constructor(
     private formBuilder: FormBuilder,
     private ficheTechniquesService: FicheTechniquesService,
@@ -99,15 +112,32 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
       this.clients = clients;
     });
 
-/*    this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
-    });*/
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits.filter(p =>
         p.categorieProduit === this.fixeCategorie &&
         this.productAllowedIds.includes(p.id)
       );
+
+      // 1) Pré-sélectionner "base" dans le formulaire d'ajout
+      if (this.produits.some(p => p.id === this.PRODUCT_BASE_ID)) {
+        this.form_ficheTechniquesProduit.patchValue({ produit: this.PRODUCT_BASE_ID });
+      }
+
+      // 2) Si création (pas de ficheTechnique) et tableau vide => ajouter la ligne "base"
+      if (!this.ficheTechnique || !this.ficheTechnique?.produits_detail?.length) {
+        if (!this.hasProductInTable(this.PRODUCT_BASE_ID)) {
+          this.add_ligneCommande(this.getBaseRowTemplate());
+        }
+      } else {
+        // Cas édition : s'il existe Radio/Terminal sans Base, on ajoute la Base
+        const hasRadio = this.ficheTechnique.produits_detail.some(d => d.produit === this.PRODUCT_RADIO_ID);
+        const hasTerminal = this.ficheTechnique.produits_detail.some(d => d.produit === this.PRODUCT_TERMINAL_ID);
+        const hasBase = this.ficheTechnique.produits_detail.some(d => d.produit === this.PRODUCT_BASE_ID);
+        if ((hasRadio || hasTerminal) && !hasBase) {
+          this.add_ligneCommande(this.getBaseRowTemplate());
+        }
+      }
     });
 
   }
@@ -155,40 +185,67 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
   }
 
 
+  private getBaseRowTemplate(): FicheTechniqueProduit {
+    const r = new FicheTechniqueProduit();
+    r.produit = this.PRODUCT_BASE_ID;
+    r.marque = this.form_ficheTechniquesProduit.get('marque')?.value || '';
+    r.modele = this.form_ficheTechniquesProduit.get('modele')?.value || '';
+    r.quantite = 1;
+    return r;
+  }
 
   onAdd() {
-    const ficheTechniquesProduit: FicheTechniqueProduit = new FicheTechniqueProduit();
     const formValue = this.form_ficheTechniquesProduit.value;
+    const selectedProductId = +formValue['produit'];
+
+    // 0) garde-fous
+    if (!selectedProductId) { return; }
+
+    // 1) si l'utilisateur ajoute Radio/Terminal, s'assurer que "base" est présent
+    if (this.isRadio(selectedProductId) || this.isTerminal(selectedProductId)) {
+      if (!this.hasProductInTable(this.PRODUCT_BASE_ID)) {
+        this.add_ligneCommande(this.getBaseRowTemplate());
+      }
+    }
+
+    // 2) éviter les doublons exacts de produit (optionnel: tu peux raffiner par marque/modèle)
+    const alreadyExists = this.t_FicheTechniquesProduits.data
+      .some(r => r.produit === selectedProductId
+        && r.marque === formValue['marque']
+        && r.modele === formValue['modele']);
+
+    if (alreadyExists) {
+      this.msgMessageService.failed('Cet élément existe déjà dans la liste.');
+      return;
+    }
+
+    // 3) éviter d’ajouter "base" plusieurs fois
+    if (this.isBase(selectedProductId) && this.hasProductInTable(this.PRODUCT_BASE_ID)) {
+      this.msgMessageService.failed('Le forfait de base est déjà présent.');
+      return;
+    }
+
+    // 4) construire et ajouter la ligne sélectionnée
+    const ficheTechniquesProduit: FicheTechniqueProduit = new FicheTechniqueProduit();
     ficheTechniquesProduit.marque = formValue['marque'];
     ficheTechniquesProduit.modele = formValue['modele'];
-    ficheTechniquesProduit.quantite = formValue['quantite'];
-    ficheTechniquesProduit.produit = formValue['produit'];
-    console.log(ficheTechniquesProduit);
+    ficheTechniquesProduit.quantite = +formValue['quantite'] || 1;
+    ficheTechniquesProduit.produit = selectedProductId;
+
     this.add_ligneCommande(ficheTechniquesProduit);
-    // if (this.t_FicheTechniquesProduits.data?.find(ap => (ap.designation === ficheTechniquesProduit.designation&&))) {
-    //   this.dialogService.yes_no({
-    //     title: 'Confirmation de modifiaction',
-    //     message: 'Ce produit existe déjà dans la commande, voulez-vous le modifier  ?'
-    //   }).subscribe(yes_no => {
-    //     if (yes_no === true) {
-    //       this.delete_ligneCommande(ficheTechniquesProduit);
-    //       this.add_ligneCommande(ficheTechniquesProduit);
-    //     }
-    //   });
-    // } else {
-    //   this.add_ligneCommande(ficheTechniquesProduit);
-    // }
   }
 
   add_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
-    // Ajouter l'élément à la liste existante
     this.t_FicheTechniquesProduits.data.push(ficheTechniquesProduit);
-
-// Réaffecter le tableau mis à jour à la source de données
-    this.t_FicheTechniquesProduits.data = [...this.t_FicheTechniquesProduits.data]; // Création d'une nouvelle référence
+    this.t_FicheTechniquesProduits.data = [...this.t_FicheTechniquesProduits.data];
     this.initFormFicheTechniquesProduit_create();
+
+    // conserver la sélection par défaut
+    this.form_ficheTechniquesProduit.patchValue({ produit: this.PRODUCT_BASE_ID });
+
     this.getMontantTotal([...this.t_FicheTechniquesProduits.data]);
   }
+
 
   onUpdate(ficheTechniquesProduit: FicheTechniqueProduit) {
     this.form_ficheTechniquesProduit = this.formBuilder.group({
@@ -200,16 +257,23 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onDelete(ficheTechniquesProduit: FicheTechniqueProduit) {
+  onDelete(row: FicheTechniqueProduit) {
     this.dialogService.yes_no({
       title: 'Confirmation de la suppression',
-      message: 'Confirmez-vous supprimer ce produit de la commande ?'
-    }).subscribe(yes_no => {
-      if (yes_no === true) {
-        this.delete_ligneCommande(ficheTechniquesProduit);
+      message: 'Confirmez-vous supprimer cet élément ?'
+    }).subscribe(yes => {
+      if (yes) {
+        const idx = this.t_FicheTechniquesProduits.data.indexOf(row);
+        if (idx >= 0) {
+          const copy = [...this.t_FicheTechniquesProduits.data];
+          copy.splice(idx, 1);
+          this.t_FicheTechniquesProduits.data = copy;
+          this.getMontantTotal(copy);
+        }
       }
     });
   }
+
 
   delete_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
     this.t_FicheTechniquesProduits.data = this.t_FicheTechniquesProduits.data.filter(p => p.id !== ficheTechniquesProduit.id);

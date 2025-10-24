@@ -11,6 +11,7 @@ import {TarifFraisRedevanceComponent} from "./tarif-frais-redevance/tarif-frais-
 import {TarifFrequenceComponent} from "./tarif-frequence/tarif-frequence.component";
 import {ZoneCouvertureComponent} from "./zone-couverture/zone-couverture.component";
 import {ZonePostaleComponent} from "./zone-postale/zone-postale.component";
+import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
 
 const routes: Routes = [
   {
@@ -26,6 +27,7 @@ const routes: Routes = [
       {path: 'tarif-frequences', component: TarifFrequenceComponent},
       {path: 'zone-couvertures', component: ZoneCouvertureComponent},
       {path: 'zone-postales', component: ZonePostaleComponent},
+      {path: 'roles-page', component: RolesPageComponent},
     ]
   }
 ];

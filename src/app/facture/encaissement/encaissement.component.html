@@ -7,12 +7,12 @@
       <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="crud(null,this.operations.create)" color="warn"
               mat-flat-button>
         <mat-icon>add</mat-icon>
-        Nouvel encaissement
+        Nouvel encaissement de facture
       </button>
 
       <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="openEncaissementDirect()" color="warn" mat-flat-button>
-        <mat-icon>point_of_sale</mat-icon>
-        Encaissement direct
+        <mat-icon>add</mat-icon>
+        Encaissement de frais dossier sans facture
       </button>
 
       <!--      <button color="warn" mat-flat-button>

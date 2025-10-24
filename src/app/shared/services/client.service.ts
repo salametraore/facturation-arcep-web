@@ -21,7 +21,7 @@ export class ClientService {
   }
 
   getItems(): Observable<Client[]> {
-    return this.httpClient.get<Client[]>(this.url_backend);
+    return this.httpClient.get<Client[]>(`${this.url_backend}/`);
   }
 
   getDetailFicheClients(): Observable<RecouvDashboardClient[]> {

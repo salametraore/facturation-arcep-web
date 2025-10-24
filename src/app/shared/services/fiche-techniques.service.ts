@@ -36,7 +36,6 @@ export class FicheTechniquesService {
 
   retraitAutorisation(retraitAutorisationRequest: RetraitAutorisationRequest): Observable<RetraitAutorisationRequest> {
     return this.http.post<RetraitAutorisationRequest>(`${environment.baseUrl}/retrait-fiche/`, retraitAutorisationRequest);
-    //return this.http.post<RetraitAutorisationRequest>(`http://localhost:8000/facturation_api/retrait-fiche/`, retraitAutorisationRequest);
   }
 
   create(ficheTechniqueData: FormData): Observable<FicheTechniques> {
@@ -52,7 +51,7 @@ export class FicheTechniquesService {
   }
 
   getListItems(): Observable<FicheTechniques[]> {
-    return this.http.get<FicheTechniques[]>(`${this.baseUrl}`);
+    return this.http.get<FicheTechniques[]>(`${this.baseUrl}/`);
   }
 
   getElementFacturationRecu(id:number): Observable<FicheTechniqueAFacturer> {
@@ -60,7 +59,7 @@ export class FicheTechniquesService {
   }
 
   getElementFacturationRecus(): Observable<ElementFacturationRecuCreeList[]> {
-    return this.http.get<ElementFacturationRecuCreeList[]>(`${this.baseUrl_2}`);
+    return this.http.get<ElementFacturationRecuCreeList[]>(`${this.baseUrl_2}/`);
   }
 
   getFicheTechniques(chercheFiche?:ChercheFiche): Observable<FicheTechniques[]> {

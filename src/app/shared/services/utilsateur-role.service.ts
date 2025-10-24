@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {UtilisateurRole} from "../models/droits-utilisateur";
+import {RequestPostRole, UtilisateurRole} from "../models/droits-utilisateur";
 import {environment} from "../../../environments/environment";
 
 @Injectable({
@@ -33,7 +33,6 @@ export class UtilisateurRoleRoleService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}/`);
   }
-
 
 
 }

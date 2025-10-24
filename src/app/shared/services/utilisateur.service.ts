@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {Utilisateur} from "../models/utilisateur";
 import {environment} from "../../../environments/environment";
-import {UtilisateurRole} from "../models/droits-utilisateur";
+import {RequestPostUtilisateur, UtilisateurRole} from "../models/droits-utilisateur";
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +46,10 @@ export class UtilisateurService {
 
   getUtisateurByUsername(username: string): Observable<Utilisateur> {
     return this.http.get<Utilisateur>(`${this.baseUrl}/${username}/`);
+  }
+
+  creerUtilisateurAvecRoles(requestPostUtilisateur: RequestPostUtilisateur): Observable<RequestPostUtilisateur> {
+    return this.http.post<RequestPostUtilisateur>(`${this.baseUrl}/`, requestPostUtilisateur);
   }
 
 }
