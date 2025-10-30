@@ -17,6 +17,8 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import { ReleveCompteClient} from "../../../shared/models/ligne-releve-compte-client";
 import {RecouvDashboardClient} from "../../../shared/models/recouv-dashboard-client";
+import {HttpResponse} from "@angular/common/http";
+import {PdfViewService} from "../../../shared/services/pdf-view.service";
 
 @Component({
   selector: 'app-client-crud',
@@ -59,6 +61,7 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
     private produitService: ProduitService,
     private clientService: ClientService,
     public dialog: MatDialog,
+    private pdfViewService: PdfViewService,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
     public dialogRef: MatDialogRef<ClientCrudComponent>,
@@ -140,5 +143,16 @@ export class ClientCrudComponent implements OnInit,AfterViewInit {
 
   onGetClient(client: Client) {
     this.client = client;
+  }
+
+  onPrintReleveClient() {
+    console.log("client");
+    console.log(this.client);
+    this.clientService.genererRelevePDF(this.client.id).subscribe((response: HttpResponse<Blob>)=>{
+        this.pdfViewService.printDirectly(response);
+      },
+      error => {
+        this.dialogService.alert({message: error});
+      })
   }
 }

@@ -17,16 +17,15 @@ import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {DialogService} from "../../../shared/services/dialog.service";
 import {operations,bouton_names} from "../../../constantes";
-import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 
 @Component({
-  selector: 'numerotation-crud',
-  templateUrl: './numerotation-crud.component.html',
-  styleUrl: './numerotation-crud.component.scss'
+  selector: 'frequences-crud',
+  templateUrl: './frequences-crud.component.html',
+  styleUrl: './frequences-crud.component.scss'
 })
-export class NumerotationCrudComponent implements OnInit, AfterViewInit {
+export class FrequencesCrudComponent implements OnInit, AfterViewInit {
 
-  @Input() fixeCategorie: number;
+  @Input() frequencesCategories: number;
   @Input() ficheTechnique: FicheTechniques;
   @Input() operation: string;
   @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
@@ -40,7 +39,6 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   form_ficheTechnique: FormGroup;
   form_ficheTechniquesProduit: FormGroup;
   t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
-  historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
   public operations = operations;
   public bouton_names = bouton_names;
@@ -72,7 +70,7 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     console.log(this.ficheTechnique)
-    this.loadData();
+    this.reloadData();
     this.initFormCommandeClient_create();
     this.initFormFicheTechniquesProduit_create();
     if (this.ficheTechnique) {
@@ -81,7 +79,10 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
     }
   }
 
-  loadData() {
+  reloadData() {
+
+    const FREQUENCES_CATEGORIES = new Set<number>([1,2,3,4,5,6,7]);
+
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories = categories;
     });
@@ -98,12 +99,10 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
-    });
-
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
+      this.produits = produits.filter(p =>
+        FREQUENCES_CATEGORIES.has(p.categorieProduit)
+      );
+    })
 
 
   }
@@ -243,7 +242,7 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
       utilisateur: 1,
       position: 1,
       commentaire: formValue['commentaire'],
-      categorie_produit: this.fixeCategorie,
+      categorie_produit: formValue['categorie_produit'],
       produits_detail: this.t_FicheTechniquesProduits?.data,
     };
     // Construire FormData

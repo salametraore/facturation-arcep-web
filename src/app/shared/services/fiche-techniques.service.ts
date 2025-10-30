@@ -35,7 +35,7 @@ export class FicheTechniquesService {
   }
 
   retraitAutorisation(retraitAutorisationRequest: RetraitAutorisationRequest): Observable<RetraitAutorisationRequest> {
-    return this.http.post<RetraitAutorisationRequest>(`${environment.baseUrl}/retrait-fiche/`, retraitAutorisationRequest);
+    return this.http.post<RetraitAutorisationRequest>(`${environment.baseUrl}/retrait-fiche-technique/`, retraitAutorisationRequest);
   }
 
   create(ficheTechniqueData: FormData): Observable<FicheTechniques> {

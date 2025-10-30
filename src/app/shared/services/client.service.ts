@@ -16,6 +16,7 @@ export class ClientService {
   private url_backend = environment.baseUrl +'/clients';
   private url_backend_2 = environment.baseUrl +'/recouv';
   private url_backend_3 = environment.baseUrl +'/releve-client/';
+  private url_backend_4 = environment.baseUrl +'/releve/generate-pdf/';
 
   constructor(private httpClient: HttpClient) {
   }
@@ -36,6 +37,8 @@ export class ClientService {
     return this.httpClient.get<ReleveCompteClient[]>(`${this.url_backend_3}${id}/`);
   }
 
+
+
   getItem(id: any): Observable<Client> {
     return this.httpClient.get<Client>(`${this.url_backend}/${id}`);
   }
@@ -50,6 +53,14 @@ export class ClientService {
 
   delete(id: any): Observable<any> {
     return this.httpClient.delete(`${this.url_backend}/${id}`);
+  }
+
+  genererRelevePDF(client_id: number) {
+    const url = `${environment.baseUrl}/releve/generate-pdf/${client_id}/`
+    const httpOptions = {
+      'responseType': 'arraybuffer' as 'json'
+    };
+    return this.httpClient.get<any>(url, httpOptions);
   }
 }
 

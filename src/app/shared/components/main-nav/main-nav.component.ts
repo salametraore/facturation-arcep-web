@@ -63,12 +63,12 @@ export class MainNavComponent implements OnInit {
   /* ---------------- MENU DATA ---------------- */
   menuItems: MenuItem[] = [
     {
-      id: 10, direction: 0, titre: 'Paramétrage', description: 'Paramétrage',
+      id: 10, direction: 100, titre: 'Paramétrage', description: 'Paramétrage',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
         {
           id: 1005,
-          direction: 0,
+          direction: 5555,
           titre: 'Les catégories de station',
           description: 'Les catégories de station',
           actif: 'OUI',
@@ -79,7 +79,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1010,
-          direction: 0,
+          direction: 5555,
           titre: 'Les zones de couverture des radio',
           description: 'Les zones de couverture des radio',
           actif: 'OUI',
@@ -90,7 +90,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1015,
-          direction: 0,
+          direction: 5555,
           titre: 'Les zones postales',
           description: 'Les zones postales',
           actif: 'OUI',
@@ -101,7 +101,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1020,
-          direction: 0,
+          direction: 5555,
           titre: 'Les catégories de produits',
           description: 'Les catégories de produits',
           actif: 'OUI',
@@ -112,7 +112,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1025,
-          direction: 0,
+          direction: 5555,
           titre: 'Les produits',
           description: 'Les produits',
           actif: 'OUI',
@@ -123,7 +123,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1030,
-          direction: 0,
+          direction: 5555,
           titre: 'Les tarifs frais de dossier',
           description: 'Les tarifs frais de dossier',
           actif: 'OUI',
@@ -134,7 +134,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1035,
-          direction: 0,
+          direction: 5555,
           titre: 'Les tarifs des redevances annuelles de gestion',
           description: 'Les tarifs des redevances annuelles de gestion',
           actif: 'OUI',
@@ -145,7 +145,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1040,
-          direction: 0,
+          direction: 5555,
           titre: 'Les garanties',
           description: 'Les garanties',
           actif: 'OUI',
@@ -156,7 +156,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1045,
-          direction: 0,
+          direction: 5555,
           titre: 'Les tarifs des fréquences',
           description: 'Les tarifs des fréquences',
           actif: 'OUI',
@@ -167,7 +167,7 @@ export class MainNavComponent implements OnInit {
         },
         {
           id: 1050,
-          direction: 0,
+          direction: 5555,
           titre: 'Les rôles',
           description: 'Les rôles',
           actif: 'OUI',
@@ -281,6 +281,17 @@ export class MainNavComponent implements OnInit {
           sous_menus: null,
           url: 'facture/agrement-equipement'
         },
+/*        {
+          id: 2060,
+          direction: 333333,
+          titre: 'Fréquences',
+          description: 'Fréquences',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/frequences'
+        },*/
       ]
     },
     {

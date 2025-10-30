@@ -71,6 +71,11 @@ import { EncaissementDirectCrudComponent } from './encaissement-direct/encaissem
 import {GenerationRedevanceComponent} from "./generation-redevance/generation-redevance.component";
 import {GenerationRedevanceCrudComponent} from "./generation-redevance/generation-redevance-crud/generation-redevance-crud.component";
 import {RetraitAutorisationDialogComponent} from "./retrait-autorisation-dialog/retrait-autorisation-dialog.component";
+import {FrequencesComponent} from "./frequences/frequences.component";
+import {FrequencesTableComponent} from "./frequences/frequences-table/frequences-table.component";
+import {FrequencesCrudComponent} from "./frequences/frequences-crud/frequences-crud.component";
+import { ScrollingModule } from '@angular/cdk/scrolling'
+
 
 @NgModule({
   declarations: [
@@ -120,6 +125,9 @@ import {RetraitAutorisationDialogComponent} from "./retrait-autorisation-dialog/
     GenerationRedevanceComponent,
     GenerationRedevanceCrudComponent,
     RetraitAutorisationDialogComponent,
+    FrequencesComponent,
+    FrequencesTableComponent,
+    FrequencesCrudComponent,
   ],
   imports: [
     CommonModule,
@@ -128,6 +136,8 @@ import {RetraitAutorisationDialogComponent} from "./retrait-autorisation-dialog/
     ReactiveFormsModule,
     FormsModule,
     PdfViewerModule,
-  ]
+    ScrollingModule,
+  ] ,
+
 })
 export class FactureModule { }

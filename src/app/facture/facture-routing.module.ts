@@ -26,6 +26,7 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import {DomaineComponent} from "./domaine/domaine.component";
  import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
  import {GenerationRedevanceComponent} from "./generation-redevance/generation-redevance.component";
+ import {FrequencesComponent} from "./frequences/frequences.component";
 
 const routes: Routes = [
   {
@@ -52,6 +53,7 @@ const routes: Routes = [
       {path: 'agrement-installeur', component:AgrementInstalleurComponent},
       {path: 'numerotation', component:NumerotationComponent},
       {path: 'agrement-equipement', component:AgrementEquipementComponent},
+      {path: 'frequences', component:FrequencesComponent},
     ]
   }
 ];

@@ -20,6 +20,8 @@ import {operations} from "../../constantes";
 import {DetailFicheClient} from "../../shared/models/detail-fiche-client";
 import {ClientTablesComponent} from "./client-tables/client-tables.component";
 import {RecouvDashboardClient} from "../../shared/models/recouv-dashboard-client";
+import {RecouvListeEncaissement} from "../../shared/models/recouv-liste-encaissement";
+import {HttpResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-client',
@@ -200,4 +202,7 @@ export class ClientComponent implements OnInit, AfterViewInit {
   onGetClient(item: Client) {
     this.client = item;
   }
+
+
+
 }

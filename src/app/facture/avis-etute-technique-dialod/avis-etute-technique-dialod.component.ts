@@ -11,6 +11,12 @@ import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
 import {CategorieProduitService} from "../../shared/services/categorie-produit.service";
 import {CategorieProduit} from "../../shared/models/categorie-produit";
 
+interface CategorieProduitDuree {
+  id: number;
+  libelle: string;
+  duree: number;
+}
+
 @Component({
   selector: 'app-avis-etute-technique-dialod',
   templateUrl: './avis-etute-technique-dialod.component.html',
@@ -31,6 +37,81 @@ export class AvisEtuteTechniqueDialodComponent implements OnInit {
   statutFicheTechniques: StatutFicheTechnique[];
   categorieProduits: CategorieProduit[];
   avisChoices= AVIS;
+
+  dureeService : number;
+
+  categorieProduitDurees: CategorieProduitDuree[] =[
+    {
+      "id": 1,
+      "libelle": "Services fixes",
+      "duree": 5
+    },
+    {
+      "id": 2,
+      "libelle": "Services mobiles à usage privé",
+      "duree": 5
+    },
+    {
+      "id": 3,
+      "libelle": "Services mobiles ouverts au public",
+      "duree": 5
+    },
+    {
+      "id": 4,
+      "libelle": "Services mobiles aéronautiques",
+      "duree": 5
+    },
+    {
+      "id": 5,
+      "libelle": "Radiodiffusion et télédistribution",
+      "duree": 5
+    },
+    {
+      "id": 6,
+      "libelle": "Services par satellite",
+      "duree": 5
+    },
+    {
+      "id": 7,
+      "libelle": "Service amateur & expérimental",
+      "duree": 5
+    },
+    {
+      "id": 8,
+      "libelle": "Numérotation",
+      "duree": 100
+    },
+    {
+      "id": 9,
+      "libelle": "Noms de domaine",
+      "duree": 3
+    },
+    {
+      "id": 10,
+      "libelle": "Services de confiance",
+      "duree": 3
+    },
+    {
+      "id": 11,
+      "libelle": "Services à valeur ajoutée",
+      "duree": 3
+    },
+    {
+      "id": 12,
+      "libelle": "Autorisations & agréments",
+      "duree": 3
+    },
+    {
+      "id": 13,
+      "libelle": "Activités postales",
+      "duree": 3
+    },
+    {
+      "id": 14,
+      "libelle": "Prestations diverses",
+      "duree": 0
+    }
+  ]
 
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
@@ -58,6 +139,20 @@ export class AvisEtuteTechniqueDialodComponent implements OnInit {
     });
 
     this.initForm_update();
+
+
+    // Auto-renseigner la durée quand l'avis devient DEF
+    this.form.get('avis')?.valueChanges.subscribe((avis: string) => {
+      if (avis === 'DEF') {
+        // Sécurité: si jamais dureeService n'est pas encore fixé, on recalcule
+        const catId = this.ficheTechnique?.categorie_produit;
+        const duree = this.dureeService ?? this.getDuree(catId as number) ?? 0;
+
+        this.form.patchValue({ duree });
+        this.updateDateFin();
+      }
+    });
+
   }
 
   initForm_update() {
@@ -72,6 +167,7 @@ export class AvisEtuteTechniqueDialodComponent implements OnInit {
       commentaire: [this.ficheTechnique?.commentaire],
     });
     this.autoCalculateDateFin();
+    this.dureeService=this.getDuree(this.ficheTechnique?.categorie_produit);
   }
 
   initForm_create() {
@@ -91,6 +187,12 @@ export class AvisEtuteTechniqueDialodComponent implements OnInit {
     this.form.get('date_debut')?.valueChanges.subscribe(() => this.updateDateFin());
     this.form.get('duree')?.valueChanges.subscribe(() => this.updateDateFin());
   }
+
+  getDuree(id: number): number  {
+    const item = this.categorieProduitDurees.find(c => c.id === +id);
+    return item?.duree ?? 0;
+  }
+
 
   updateDateFin() {
     const dateDebut = this.form.get('date_debut')?.value;

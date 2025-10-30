@@ -1,3 +1,26 @@
+.timeline-viewport {
+  height: 60vh;           /* ou une hauteur fixe: 480px */
+  width: 100%;
+  overflow: auto;
+  padding: 8px 6px;
+  box-sizing: border-box;
+  scrollbar-gutter: stable;
+}
+
+.dark-card {
+  background-color: #dfd8d8;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Optionnel : style de la scrollbar (webkit) */
+.timeline-viewport::-webkit-scrollbar { width: 8px; }
+.timeline-viewport::-webkit-scrollbar-thumb { background: #bdbdbd; border-radius: 4px; }
+
+.empty { padding: 8px; color: #666; text-align: center; }
+
+
 .dark-card {
   background-color: #dfd8d8; /* Fond sombre */
   //color: #ffffff; /* Texte blanc pour le contraste */
@@ -5,3 +28,5 @@
   border-radius: 8px; /* Coins arrondis */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ombre légère */
 }
+
+

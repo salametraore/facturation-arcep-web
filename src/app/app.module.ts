@@ -13,6 +13,7 @@ import {SharedModule} from './shared/shared.module';
 import {AuthInterceptor} from "./authentication/auth.interceptor";
 
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import {ScrollingModule} from "@angular/cdk/scrolling";
 
 registerLocaleData(localeFR);
 
@@ -40,6 +41,7 @@ export const MY_FORMAT: MatDateFormats = {
     ReactiveFormsModule,
     HttpClientModule,
     SharedModule,
+    ScrollingModule,
   ],
 
   providers: [
