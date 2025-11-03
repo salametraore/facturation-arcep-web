@@ -41,7 +41,7 @@
 <!--                <a [routerLink]="['/auth/forgot-password']" class="link">Mot de passe oublié ?</a>-->
               </div>
 
-              <button type="submit" mat-raised-button color="warn" class="full-width">
+              <button type="submit" mat-raised-button color="primary" class="full-width">
                 <span *ngIf="isLoading && !show2faForm">Connexion...</span>
                 <span *ngIf="!isLoading || show2faForm">Se connecter</span>
               </button>
@@ -60,7 +60,7 @@
                 </mat-error>
               </mat-form-field>
 
-              <button type="submit" mat-raised-button color="warn" class="full-width">
+              <button type="submit" mat-raised-button color="primary" class="full-width">
                 <span *ngIf="isLoading && show2faForm">Vérification...</span>
                 <span *ngIf="!isLoading || !show2faForm">Vérifier le code</span>
               </button>

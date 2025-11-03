@@ -75,6 +75,12 @@ import {FrequencesComponent} from "./frequences/frequences.component";
 import {FrequencesTableComponent} from "./frequences/frequences-table/frequences-table.component";
 import {FrequencesCrudComponent} from "./frequences/frequences-crud/frequences-crud.component";
 import { ScrollingModule } from '@angular/cdk/scrolling'
+import {ClientDirectionTechniqueComponent} from "./client-direction-technique/client-direction-technique.component";
+import {ClientDetailsComponent} from "./client-direction-technique/client-details/client-details.component";
+import {ClientDetailsReleveCompteComponent} from "./client-direction-technique/client-details/client-details-releve-compte/client-details-releve-compte.component";
+import {ClientDetailsEncaissementsComponent} from "./client-direction-technique/client-details/client-details-encaissements/client-details-encaissements.component";
+import {ClientDetailsFacturesComponent} from "./client-direction-technique/client-details/client-details-factures/client-details-factures.component";
+import {ClientDetailsFichesTechniques} from "./client-direction-technique/client-details/client-details-fiches-techniques/client-details-fiches-techniques";
 
 
 @NgModule({
@@ -128,6 +134,12 @@ import { ScrollingModule } from '@angular/cdk/scrolling'
     FrequencesComponent,
     FrequencesTableComponent,
     FrequencesCrudComponent,
+    ClientDirectionTechniqueComponent,
+    ClientDetailsComponent,
+    ClientDetailsReleveCompteComponent,
+    ClientDetailsEncaissementsComponent,
+    ClientDetailsFacturesComponent,
+    ClientDetailsFichesTechniques,
   ],
   imports: [
     CommonModule,

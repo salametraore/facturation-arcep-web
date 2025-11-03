@@ -33,8 +33,7 @@ interface FTListFilter {
 
 @Component({
   selector: 'fiche-technique-dfc-table',
-  templateUrl: './fiche-technique-dfc-table.component.html',
-  styleUrl: './fiche-technique-dfc-table.component.scss'
+  templateUrl: './fiche-technique-dfc-table.component.html'
 })
 export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
 

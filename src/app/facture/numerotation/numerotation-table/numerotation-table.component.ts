@@ -34,8 +34,7 @@ interface FTListFilter {
 
 @Component({
   selector: 'numerotation-table',
-  templateUrl: './numerotation-table.component.html',
-  styleUrl: './numerotation-table.component.scss'
+  templateUrl: './numerotation-table.component.html'
 })
 export class NumerotationTableComponent implements OnInit, AfterViewInit {
 

@@ -33,8 +33,7 @@ interface FTListFilter {
 
 @Component({
   selector: 'service-a-valeur-ajoute-table',
-  templateUrl: './service-a-valeur-ajoute-table.component.html',
-  styleUrl: './service-a-valeur-ajoute-table.component.scss'
+  templateUrl: './service-a-valeur-ajoute-table.component.html'
 })
 export class ServiceAValeurAjouteTableComponent implements OnInit, AfterViewInit {
 

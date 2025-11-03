@@ -247,3 +247,18 @@ mat-expansion-panel {
   align-items: center;
   justify-content: center;
 }
+
+
+/* === ARCEP theme touch-ups === */
+.menu-header {
+  color: var(--brand-primary);
+}
+
+mat-expansion-panel {
+  background: color-mix(in srgb, var(--brand-primary) 5%, #fff);
+}
+
+.mat-expansion-indicator::after {
+  color: var(--brand-primary);
+}
+/* === end ARCEP theme touch-ups === */

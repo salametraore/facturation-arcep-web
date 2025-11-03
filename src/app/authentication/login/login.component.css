@@ -109,3 +109,19 @@
   color: inherit;
   text-decoration: none;
 }
+
+/* Espace vertical entre deux champs consécutifs */
+.login-form-container form .mat-form-field + .mat-form-field {
+  margin-top: 12px;   /* 8–16px selon ton goût */
+}
+
+/* Optionnel : grille simple avec un gap uniforme pour tout le formulaire */
+.login-form-container form {
+  display: grid;
+  row-gap: 12px;      /* espace entre TOUTES les lignes (champs, msg, bouton) */
+}
+
+/* Optionnel : un peu d'air au-dessus du bouton */
+.login-form-container form button[type="submit"] {
+  margin-top: 6px;
+}

@@ -18,8 +18,7 @@ import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traite
 
 @Component({
   selector: 'app-domaine-crud',
-  templateUrl: './domaine-crud.component.html',
-  styleUrl: './domaine-crud.component.scss'
+  templateUrl: './domaine-crud.component.html'
 })
 export class DomaineCrudComponent implements OnInit {
 

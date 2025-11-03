@@ -25,8 +25,7 @@ import {HttpResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-client',
-  templateUrl: './client.component.html',
-  styleUrl: './client.component.scss'
+  templateUrl: './client.component.html'
 })
 export class ClientComponent implements OnInit, AfterViewInit {
 
@@ -35,7 +34,14 @@ export class ClientComponent implements OnInit, AfterViewInit {
   t_RecouvDashboardClient?: MatTableDataSource<RecouvDashboardClient>;
 
 
-  displayedColumns: string[] = ['client', 'compte_comptable','nbre_factures_impayes', 'total_du','avance_du', 'actions'];
+  displayedColumns = [
+    'client',
+    'compte_comptable',
+    'nbre_factures_impayes',
+    'total_du',
+    'avance_du',
+    'actions'
+  ];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   public operations = operations;
@@ -183,7 +189,7 @@ export class ClientComponent implements OnInit, AfterViewInit {
     });
   }
 
-  checher() {
+  chercher() {
     this.clientService.getDetailFicheClients().subscribe((detailClients: RecouvDashboardClient[]) => {
       const rows = detailClients.filter(l => l?.client_id === this.client?.id);
       this.t_RecouvDashboardClient.data =rows;

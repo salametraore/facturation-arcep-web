@@ -23,8 +23,7 @@ import {FicheTechniqueAFacturer} from "../../shared/models/fiche-technique-a-fac
 
 @Component({
   selector: 'app-elements-facture-recu',
-  templateUrl: './elements-facture-recu.component.html',
-  styleUrl: './elements-facture-recu.component.scss'
+  templateUrl: './elements-facture-recu.component.html'
 })
 export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
 
@@ -248,7 +247,7 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
 
   }
 
-  checher() {
+  chercher() {
 
   }
 

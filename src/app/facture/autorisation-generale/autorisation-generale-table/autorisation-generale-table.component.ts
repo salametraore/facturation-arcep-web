@@ -33,8 +33,7 @@ interface FTListFilter {
 
 @Component({
   selector: 'autorisation-generale-table',
-  templateUrl: './autorisation-generale-table.component.html',
-  styleUrl: './autorisation-generale-table.component.scss'
+  templateUrl: './autorisation-generale-table.component.html'
 })
 export class AutorisationGeneraleTableComponent implements OnInit, AfterViewInit {
 

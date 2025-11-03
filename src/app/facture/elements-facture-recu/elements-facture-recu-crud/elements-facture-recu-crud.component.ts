@@ -22,8 +22,7 @@ import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 
 @Component({
   selector: 'app-elements-facture-recu-crud',
-  templateUrl: './elements-facture-recu-crud.component.html',
-  styleUrl: './elements-facture-recu-crud.component.scss'
+  templateUrl: './elements-facture-recu-crud.component.html'
 })
 export class ElementsFactureRecuCrudComponent implements OnInit {
 
@@ -35,6 +34,8 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   form: FormGroup;
   mode: string = '';
   title: string = '';
+
+
 
   window_name = ' FicheTechnique';
   categories: CategorieProduit[];
@@ -115,6 +116,9 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
         this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
       });
+
+
+
   }
 
 

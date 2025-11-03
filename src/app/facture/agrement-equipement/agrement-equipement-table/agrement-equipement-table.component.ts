@@ -32,8 +32,7 @@ interface FTListFilter {
 
 @Component({
   selector: 'agrement-equipement-table',
-  templateUrl: './agrement-equipement-table.component.html',
-  styleUrl: './agrement-equipement-table.component.scss'
+  templateUrl: './agrement-equipement-table.component.html'
 })
 export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
 

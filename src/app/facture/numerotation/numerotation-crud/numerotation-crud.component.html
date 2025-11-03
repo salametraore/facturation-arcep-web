@@ -1,176 +1,195 @@
-<div class="dashboard-container">
-  <h5 class="dashboard-title" style="color: #030303">Saisie mise à jour fiche technique - Numérotation</h5>
+<!-- src/app/features/numerotation/fiche-technique/num-ft-edit-page.component.html -->
+<mat-card>
 
-  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
-  <!--  <div class="demand-status">-->
-  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
-  <!--    <mat-stepper [linear]="true" #stepper>-->
-  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
-  <!--        <ng-template matStepLabel>-->
-  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
-  <!--        </ng-template>-->
-  <!--      </mat-step>-->
-  <!--    </mat-stepper>-->
-  <!--  </div>-->
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Saisie et mise à jour d'une fiche technique — Numérotation</h2>
+  </div>
 
-  <!-- Documents -->
-  <!--  <div class="documents-section">-->
-  <!--    <span class="section-label">DOCUMENTS</span>-->
-  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
-  <!--  </div>-->
+  <!-- Grille 2 colonnes : 75% / 25% -->
+  <div class="two-col two-col--75-25">
 
-  <!-- Fiche technique -->
+    <!-- ===== Colonne gauche : FICHE TECHNIQUE + LIGNES ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Fiche technique</h3>
 
+        <!-- Actions globales alignées à droite -->
+        <div class="list-actions">
+          <button
+            mat-flat-button
+            color="primary"
+            *ngIf="operation===operations.create || operation===operations.update"
+            (click)="onSave()"
+            [disabled]="t_FicheTechniquesProduits.data?.length<1">
+            <mat-icon>save</mat-icon>
+            Enregistrer
+          </button>
 
-  <div fxLayout="row" fxLayoutGap="20px">
-    <!-- Colonne de gauche : Fiche Technique -->
-    <div fxFlex="75%">
-      <mat-card class="dark-card">
-        <div mat-dialog-content class="dense-40">
+          <button mat-stroked-button color="primary" (click)="onRetour()">
+            <mat-icon>undo</mat-icon>
+            Retour
+          </button>
 
-          <form [formGroup]="form_ficheTechnique">
-            <!-- Ligne 1 : Client 60% + Catégorie de service 40% -->
-            <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px">
-              <mat-form-field appearance="outline" floatLabel="always" fxFlex="100" fxFlex.xs="100">
-                <mat-label>Client</mat-label>
-                <mat-select formControlName="client" matTooltip="Client">
-                  <mat-option *ngFor="let item of clients" (click)="onGetClient(item)" [value]="item.id">
-                    {{ item?.denomination_sociale }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+          <button
+            mat-flat-button
+            color="warn"
+            *ngIf="operation===operations.transmettre"
+            (click)="onTransmettre()">
+            <mat-icon>send</mat-icon>
+            Transmettre
+          </button>
+        </div>
+      </div>
 
-            </div>
+      <div class="list-body">
+        <!-- Formulaire principal -->
+        <form [formGroup]="form_ficheTechnique" class="form-grid">
 
-            <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px">
-              <mat-form-field appearance="outline" floatLabel="always" fxFlex="100" fxFlex.xs="100">
-                <mat-label>Commentaire</mat-label>
-                <textarea matInput formControlName="commentaire" matTooltip="Commentaire"></textarea>
-              </mat-form-field>
-            </div>
-          </form>
+          <!-- Client (plein, comme SVA) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Client</mat-label>
+            <mat-select formControlName="client" matTooltip="Client">
+              <mat-option *ngFor="let item of clients" (click)="onGetClient(item)" [value]="item.id">
+                {{ item?.denomination_sociale }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-          <b><span >Ajout d'une catégorie de numéro</span></b>
-          <form [formGroup]="form_ficheTechniquesProduit">
-            <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px" fxLayoutGap.xs="10px">
+          <!-- Commentaire -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Commentaire</mat-label>
+            <textarea matInput formControlName="commentaire" rows="1" matTooltip="Commentaire"></textarea>
+          </mat-form-field>
+        </form>
 
-              <mat-form-field appearance="outline" floatLabel="always" fxFlex="30" fxFlex.xs="100">
+        <div class="blank-row"></div>
+
+        <!-- ===== Sous-collection : Ajout d’une catégorie de numéro ===== -->
+        <section class="list-box list-box--compact">
+          <div class="list-header">
+            <h3 class="list-title">Ajout d'une catégorie de numéro</h3>
+          </div>
+
+          <div class="list-body">
+            <form [formGroup]="form_ficheTechniquesProduit" class="product-row product-row--tight">
+
+              <!-- Catégorie de numéro -->
+              <mat-form-field appearance="outline" class="product-field">
                 <mat-label>Catégorie de numéro</mat-label>
-                <mat-select formControlName="produit" matTooltip="Catégorie de service">
+                <mat-select formControlName="produit" matTooltip="Catégorie de numéro">
                   <mat-option *ngFor="let item of produits" [value]="item.id">
                     {{ item.libelle }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
 
-              <mat-form-field appearance="outline" floatLabel="always" fxFlex="10" fxFlex.xs="100">
-                <mat-label>Nombre de numéro</mat-label>
-                <input type="number" min="1" matInput (blur)="onGetTotalLigne()" formControlName="quantite" matTooltip="Nombre de numéro" required>
+              <!-- Nombre de numéros (court) -->
+              <mat-form-field appearance="outline" class="product-field short">
+                <mat-label>Nombre de numéros</mat-label>
+                <input type="number" min="1" matInput formControlName="quantite"
+                       (blur)="onGetTotalLigne()" required>
               </mat-form-field>
 
-              <mat-form-field appearance="outline" floatLabel="always" fxFlex="50" fxFlex.xs="100">
-                <mat-label>Plages de numéro</mat-label>
-                <input type="text" min="1" matInput formControlName="plage_numero"
-                       matTooltip="Plages de numéro" required>
+              <!-- Plages de numéros (large) -->
+              <mat-form-field appearance="outline" class="product-field designation">
+                <mat-label>Plages de numéros</mat-label>
+                <input type="text" matInput formControlName="plage_numero"
+                       matTooltip="Ex. 70 00 00 00–70 00 99 99; 71 10 00 00–71 10 49 99" required>
               </mat-form-field>
 
-              <button mat-raised-button class="custom-chip-button" color="primary"
-                      [disabled]="form_ficheTechniquesProduit.invalid"
-                      matTooltip="Ajouter "
-                      (click)="onAdd()">
+              <!-- Bouton sur la même ligne -->
+              <button
+                mat-flat-button
+                color="primary"
+                class="add-btn"
+                [disabled]="form_ficheTechniquesProduit.invalid"
+                (click)="onAdd()">
                 <mat-icon>add</mat-icon>
                 Ajouter
               </button>
-
-            </div>
-
-          </form>
-
-          <div class="table-frame mat-elevation-z10 dense-table">
-            <!--  <b><span >Liste des catégories sélectionnées</span></b>-->
-            <table style="width: 100%" mat-table [dataSource]="t_FicheTechniquesProduits" matSort>
-
-              <ng-container matColumnDef="produit">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Catégorie de numéro</th>
-                <td mat-cell *matCellDef="let element"> {{getProduit(element.produit)}} </td>
-              </ng-container>
-
-
-              <ng-container matColumnDef="quantite">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre de numéro</th>
-                <td mat-cell *matCellDef="let element"> {{element.quantite?.toLocaleString('fr-FR')}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="plage_numero">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Plage de numéro</th>
-                <td mat-cell *matCellDef="let element"> {{element.plage_numero}} </td>
-              </ng-container>
-
-
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Actions</th>
-                <td mat-cell *matCellDef="let element">
-                  <button mat-icon-button [matMenuTriggerFor]="menu" color="warn">
-                    <mat-icon>settings</mat-icon>
-                  </button>
-                  <mat-menu #menu="matMenu">
-                    <button mat-menu-item class="btn_edit" (click)="onUpdate(element)">
-                      <mat-icon color="primary">edit</mat-icon>
-                      Modifier
-                    </button>
-                    <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
-                      <mat-icon color="warn">delete</mat-icon>
-                      Supprimer
-                    </button>
-                  </mat-menu>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-              <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="4">
-                  Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
-                </td>
-              </tr>
-            </table>
-
-            <!-- Ligne de bas de tableau : paginator (à gauche) + total (à droite) -->
-            <div class="table-bottom">
-              <mat-paginator [pageSize]="10" [pageSizeOptions]="[3,5, 10, 15]" showFirstLastButtons></mat-paginator>
-            </div>
+            </form>
           </div>
-        </div>
-        <br>
-        <div align="end" mat-dialog-actions>
-          &nbsp;&nbsp;
-          <button mat-raised-button class="custom-chip-button" color="primary" (click)="onRetour()" matTooltip="Imprimer">
-            <mat-icon>undo</mat-icon>
-            Retour
-          </button>
-          &nbsp;&nbsp;
-          &nbsp;&nbsp;
-          <button mat-raised-button  *ngIf="this.operation===this.operations.create ||this.operation===this.operations.update"  class="custom-chip-button" color="primary" (click)="onSave()"
-                  [disabled]="t_FicheTechniquesProduits.data?.length<1"
-                  matTooltip="Enregistrer">
-            <mat-icon>save</mat-icon>
-            Enregistrer
-          </button>
-          &nbsp;&nbsp;
-          <button mat-raised-button *ngIf="this.operation===this.operations.transmettre" (click)="onTransmettre()" color="warn">Transmettre</button>
-        </div>
-      </mat-card>
+        </section>
 
-      <avis-technique-infos  [ficheTechnique]="ficheTechnique"></avis-technique-infos>
-    </div>
+        <div class="blank-row"></div>
 
-    <!-- Colonne de droite : Historique de la Demande -->
-    <div fxFlex="25%">
-      <div class="section">
-        <h5>Historique de la demande</h5>
-        <historique-traitement [historiqueFicheTechniques]="historiqueFicheTechniques" ></historique-traitement>
+        <!-- ===== Tableau des catégories sélectionnées ===== -->
+        <div class="mat-elevation-z10 compact-table">
+          <table mat-table [dataSource]="t_FicheTechniquesProduits" matSort style="width: 100%">
+
+            <!-- Catégorie -->
+            <ng-container matColumnDef="produit">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie de numéro</th>
+              <td mat-cell *matCellDef="let element">{{ getProduit(element.produit) }}</td>
+            </ng-container>
+
+            <!-- Nombre de numéros -->
+            <ng-container matColumnDef="quantite">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de numéros</th>
+              <td mat-cell *matCellDef="let element">{{ element.quantite?.toLocaleString('fr-FR') }}</td>
+            </ng-container>
+
+            <!-- Plages -->
+            <ng-container matColumnDef="plage_numero">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Plages de numéros</th>
+              <td mat-cell *matCellDef="let element">{{ element.plage_numero }}</td>
+            </ng-container>
+
+            <!-- Actions -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let element">
+                <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
+                  <mat-icon>settings</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item class="btn_edit" (click)="onUpdate(element)">
+                    <mat-icon color="primary">edit</mat-icon>
+                    Modifier
+                  </button>
+                  <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
+                    <mat-icon color="warn">delete</mat-icon>
+                    Supprimer
+                  </button>
+                </mat-menu>
+              </td>
+            </ng-container>
+
+            <!-- Lignes -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            <!-- Aucune donnée -->
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="4">
+                Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+              </td>
+            </tr>
+          </table>
+        </div>
+
+      </div> <!-- /list-body -->
+
+      <div align="center">
+        <avis-technique-infos
+          [ficheTechnique]="ficheTechnique">
+        </avis-technique-infos>
       </div>
-    </div>
-  </div>
-</div>
+
+    </section>
+
+    <!-- ===== Colonne droite : HISTORIQUE ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Historique de la demande</h3>
+      </div>
+      <div class="list-body">
+        <historique-traitement
+          [historiqueFicheTechniques]="historiqueFicheTechniques">
+        </historique-traitement>
+      </div>
+    </section>
+
+  </div> <!-- /two-col -->
+</mat-card>

@@ -1,0 +1,109 @@
+<div class="page-container">
+  <h2 class="page-title">Liste des clients</h2>
+
+  <!-- 🔍 Zone de filtres -->
+  <div class="filter-bar">
+    <mat-form-field appearance="outline">
+      <mat-label>Recherche</mat-label>
+      <input matInput placeholder="Rechercher un client ou email..." [(ngModel)]="search" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Type de client</mat-label>
+      <mat-select [(ngModel)]="typeFilter">
+        <mat-option value="">Tous</mat-option>
+        <mat-option value="gros">Gros client</mat-option>
+        <mat-option value="moyen">Moyen client</mat-option>
+        <mat-option value="petit">Petit client</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Du</mat-label>
+      <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+      <mat-datepicker #fromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Au</mat-label>
+      <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+      <mat-datepicker #toPicker></mat-datepicker>
+    </mat-form-field>
+
+    <button class="upload-label-reset" (click)="resetFilters()">
+      <mat-icon>refresh</mat-icon>
+      Réinitialiser
+    </button>
+  </div>
+
+  <!-- 📁 Zone import / actions -->
+  <div class="upload-action-section">
+    <label for="fileUpload" class="upload-label">
+      <mat-icon>cloud_upload</mat-icon>
+      Importer un fichier
+    </label>
+    <input id="fileUpload" type="file" hidden (change)="onFileSelected($event)" />
+    <span *ngIf="selectedFileName" class="file-name">{{ selectedFileName }}</span>
+
+    <button class="upload-label-print" (click)="printSelected()">
+      <mat-icon>print</mat-icon>
+      Imprimer
+    </button>
+
+    <button class="upload-label-export" (click)="exportSelected()">
+      <mat-icon>file_download</mat-icon>
+      Exporter
+    </button>
+
+    <button class="upload-label-create" (click)="goToCreate()">
+      <mat-icon>add</mat-icon>
+      Nouveau client
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- 🗂️ Tableau des clients -->
+  <div class="table-container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th><mat-checkbox [(ngModel)]="selectAll" (change)="toggleSelectAll()"></mat-checkbox></th>
+          <th>Client</th>
+          <th>Numéro de compte</th>
+          <th>Date d'enregistrement</th>
+          <th>Nombre de factures</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of filteredClients">
+          <td><mat-checkbox [(ngModel)]="c.selected"></mat-checkbox></td>
+          <td>
+            <div class="client-info">
+              <div>
+                <div class="client-name">{{ c.name }}</div>
+                <div class="client-email">{{ c.email }}</div>
+              </div>
+            </div>
+
+          </td>
+          <td>{{ c.accountNumber }}</td>
+          <td>{{ c.registeredAt }}</td>
+          <td>{{ c.invoiceCount }}</td>
+          <td>
+            <button mat-flat-button color="primary" (click)="openDetail(c.id)">
+              <mat-icon>visibility</mat-icon>
+              Voir
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredClients.length === 0">
+          <td colspan="6" class="empty-row">Aucun client trouvé.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

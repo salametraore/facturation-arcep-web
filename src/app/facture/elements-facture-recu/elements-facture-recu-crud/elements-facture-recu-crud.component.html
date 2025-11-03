@@ -1,123 +1,159 @@
-<div class="dashboard-container">
+<!-- src/app/features/facturation/elements-recus/element-recus-edit-page.component.html -->
+<mat-card>
 
-  <div fxLayout="row" fxLayoutGap="20px">
-    <!-- Colonne de gauche : Fiche Technique -->
-    <div fxFlex="75%">
-      <mat-card class="dark-card">
-        <div class="tech-sheet-section">
-          <form [formGroup]="form">
-
-            <div align="center">
-              <span class="subsection-label">Génération de Factures/Dévis</span>
-            </div>
-
-            <!-- Ligne 1 : Client (70%) | Compte comptable (30%) -->
-            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start start">
-              <mat-form-field fxFlex="70" fxFlex.xs="100">
-                <mat-label>Client</mat-label>
-                <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
-                       placeholder="Cliquez et sélectionnez votre client">
-                <mat-autocomplete #auto_cl="matAutocomplete">
-                  <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
-                              [value]="item.denomination_sociale">
-                    <span>{{ item.denomination_sociale }}</span>
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-
-              <mat-form-field fxFlex="30" fxFlex.xs="100">
-                <mat-label>Compte comptable</mat-label>
-                <input matInput formControlName="numenroCompte" placeholder="Compte comptable">
-              </mat-form-field>
-            </div>
-
-            <!-- Ligne 2 : Objet (70%) en premier | Signataire (30%) -->
-            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start start">
-              <mat-form-field fxFlex="70" fxFlex.xs="100">
-                <mat-label>Objet</mat-label>
-                <input matInput formControlName="objet" placeholder="Objet">
-              </mat-form-field>
-
-              <mat-form-field fxFlex="30" fxFlex.xs="100">
-                <mat-label>Signataire</mat-label>
-                <input matInput formControlName="signataire" placeholder="Signataire">
-              </mat-form-field>
-            </div>
-
-            <!-- Commentaire (pleine largeur) -->
-            <div>
-              <mat-form-field>
-                <mat-label>Commentaire</mat-label>
-                <textarea matInput formControlName="commentaire" placeholder="Commentaire"></textarea>
-              </mat-form-field>
-            </div>
-
-          </form>
-
-          <div class="mat-elevation-z10" >
-            <table mat-table [dataSource]="t_ProduitFiche" matSort style="width: 100%">
-
-              <!-- Elément technique -->
-              <ng-container matColumnDef="produit_nom">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Élément technique</th>
-                <td mat-cell *matCellDef="let element">{{ element.produit_nom }}</td>
-                <td mat-footer-cell *matFooterCellDef><strong>Total général</strong></td>
-              </ng-container>
-
-              <!-- Quantité -->
-              <ng-container matColumnDef="quantite">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantité</th>
-                <td mat-cell *matCellDef="let element">{{ element.quantite }}</td>
-                <td mat-footer-cell *matFooterCellDef></td>
-              </ng-container>
-
-              <!-- Prix unitaire -->
-              <ng-container matColumnDef="prix_unitaire">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Prix unitaire</th>
-                <td mat-cell *matCellDef="let element">{{ element.prix_unitaire | number:'1.0-0' }}</td>
-                <td mat-footer-cell *matFooterCellDef></td>
-              </ng-container>
-
-              <!-- Total -->
-              <ng-container matColumnDef="total">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
-                <td mat-cell *matCellDef="let element">{{ element.total | number:'1.0-0' }}</td>
-                <td mat-footer-cell *matFooterCellDef>
-                  <strong>{{ totalGeneral | number:'1.0-0' }}</strong>
-                </td>
-              </ng-container>
-
-              <!-- Header / Rows / Footer -->
-              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-              <tr mat-row *matRowDef="let element; columns: displayedColumns;"
-                  (click)="onRowClicked(element)"
-                  [ngClass]="{ 'selected': element === selectedRow }"></tr>
-              <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
-
-              <!-- Aucun résultat -->
-              <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="4">
-                  Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
-                </td>
-              </tr>
-            </table>
-          </div>
-          <br>
-          <div class="actions">
-            <button mat-raised-button (click)="crud()" color="warn">Generer Facture</button>
-            <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
-          </div>
-        </div>
-      </mat-card>
-
-    </div>
-
-    <!-- Colonne de droite : Historique de la Demande -->
-    <div fxFlex="25%">
-      <div class="section">
-        <h5>Historique de la demande</h5>
-        <historique-traitement [historiqueFicheTechniques]="historiqueFicheTechniques" ></historique-traitement>
-      </div>
-    </div>
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Saisie et génération — Factures / Devis (éléments reçus)</h2>
   </div>
-</div>
+
+  <!-- Grille 2 colonnes : 75% / 25% -->
+  <div class="two-col two-col--75-25">
+
+    <!-- ===== Colonne gauche : FICHE TECHNIQUE + LIGNES ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Fiche technique</h3>
+
+        <!-- Actions globales alignées à droite -->
+        <div class="list-actions">
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="crud()"
+            [disabled]="!t_ProduitFiche?.data?.length">
+            <mat-icon>save</mat-icon>
+            Enregistrer / Générer
+          </button>
+
+          <button mat-stroked-button color="primary" (click)="onFerme()">
+            <mat-icon>undo</mat-icon>
+            Retour
+          </button>
+
+        </div>
+      </div>
+
+      <div class="list-body">
+        <!-- Formulaire principal -->
+        <form [formGroup]="form" class="form-grid">
+
+          <!-- Client (autocomplete, plein) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Client</mat-label>
+            <input
+              matInput
+              placeholder="Cliquez et sélectionnez votre client"
+              [(ngModel)]="nomClient"
+              [matAutocomplete]="auto_cl"
+              formControlName="client">
+            <mat-autocomplete #auto_cl="matAutocomplete">
+              <mat-option
+                *ngFor="let item of clients | search: nomClient"
+                [value]="item.denomination_sociale"
+                (click)="onGetClient(item)">
+                <span>{{ item.denomination_sociale }}</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <!-- Compte comptable -->
+          <mat-form-field appearance="outline">
+            <mat-label>Compte comptable</mat-label>
+            <input matInput formControlName="numenroCompte" placeholder="Compte comptable">
+          </mat-form-field>
+
+          <!-- Objet -->
+          <mat-form-field appearance="outline">
+            <mat-label>Objet</mat-label>
+            <input matInput formControlName="objet" placeholder="Objet">
+          </mat-form-field>
+
+          <!-- Signataire -->
+          <mat-form-field appearance="outline">
+            <mat-label>Signataire</mat-label>
+            <input matInput formControlName="signataire" placeholder="Signataire">
+          </mat-form-field>
+
+          <!-- Commentaire (plein) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Commentaire</mat-label>
+            <textarea matInput formControlName="commentaire" placeholder="Commentaire" rows="1"></textarea>
+          </mat-form-field>
+        </form>
+
+        <div class="blank-row"></div>
+
+        <!-- ===== Tableau des éléments techniques reçus ===== -->
+        <div class="mat-elevation-z10 compact-table">
+          <table mat-table [dataSource]="t_ProduitFiche" matSort style="width: 100%">
+
+            <!-- Élément technique -->
+            <ng-container matColumnDef="produit_nom">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Élément technique</th>
+              <td mat-cell *matCellDef="let element">{{ element.produit_nom }}</td>
+              <td mat-footer-cell *matFooterCellDef><strong>Total général</strong></td>
+            </ng-container>
+
+            <!-- Quantité -->
+            <ng-container matColumnDef="quantite">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantité</th>
+              <td mat-cell *matCellDef="let element">{{ element.quantite }}</td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!-- Prix unitaire -->
+            <ng-container matColumnDef="prix_unitaire">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Prix unitaire</th>
+              <td mat-cell *matCellDef="let element">{{ element.prix_unitaire | number:'1.0-0' }}</td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!-- Total -->
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+              <td mat-cell *matCellDef="let element">{{ element.total | number:'1.0-0' }}</td>
+              <td mat-footer-cell *matFooterCellDef>
+                <strong>{{ totalGeneral | number:'1.0-0' }}</strong>
+              </td>
+            </ng-container>
+
+            <!-- Header / Rows / Footer -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr
+              mat-row
+              *matRowDef="let element; columns: displayedColumns"
+              (click)="onRowClicked(element)"
+              [ngClass]="{ 'selected': element === selectedRow }">
+            </tr>
+            <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+
+            <!-- Aucune donnée -->
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="4">
+                Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+              </td>
+            </tr>
+          </table>
+        </div>
+
+      </div> <!-- /list-body -->
+
+      <!-- (Optionnel) Infos d'avis technique comme sur Numérotation -->
+<!--      <div align="center">
+        <avis-technique-infos [ficheTechnique]="ficheTechnique"></avis-technique-infos>
+      </div>-->
+
+    </section>
+
+    <!-- ===== Colonne droite : HISTORIQUE ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Historique de la demande</h3>
+      </div>
+      <div class="list-body">
+        <historique-traitement [historiqueFicheTechniques]="historiqueFicheTechniques"></historique-traitement>
+      </div>
+    </section>
+
+  </div> <!-- /two-col -->
+</mat-card>

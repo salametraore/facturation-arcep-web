@@ -23,8 +23,7 @@ import {CategorieProduit} from "../../../../shared/models/categorie-produit";
 
 @Component({
   selector: 'client-encaissements',
-  templateUrl: './client-encaissements.component.html',
-  styleUrl: './client-encaissements.component.scss'
+  templateUrl: './client-encaissements.component.html'
 })
 export class ClientEncaissementsComponent implements OnInit,AfterViewInit{
 

@@ -24,8 +24,7 @@ import {GenerationRedevanceCrudComponent} from "../generation-redevance/generati
 
 @Component({
   selector: 'app-devis-facture',
-  templateUrl: './devis-facture.component.html',
-  styleUrl: './devis-facture.component.scss'
+  templateUrl: './devis-facture.component.html'
 })
 export class DevisFactureComponent implements OnInit, AfterViewInit {
 
@@ -213,7 +212,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   }
 
 
-  checher() {
+  chercher() {
     // Fabrique l’objet filtre depuis les champs du formulaire
     const filter = {
       nomClient: this.nomClient || '',
@@ -269,7 +268,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     });
     dialogRef.afterClosed().subscribe(() => {
       // rafraîchir si nécessaire
-      this.checher?.();
+      this.chercher?.();
     });
   }
 

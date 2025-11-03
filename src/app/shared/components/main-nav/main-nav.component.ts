@@ -62,7 +62,7 @@ export class MainNavComponent implements OnInit {
 
   /* ---------------- MENU DATA ---------------- */
   menuItems: MenuItem[] = [
-    {
+/*    {
       id: 10, direction: 100, titre: 'Paramétrage', description: 'Paramétrage',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
@@ -177,12 +177,12 @@ export class MainNavComponent implements OnInit {
           url: 'parametre/roles-page'
         },
       ]
-    },
+    },*/
     {
       id: 20, direction: 0, titre: 'Fiches Techniques', description: 'Fiches Techniques',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        {
+/*        {
           id: 2005,
           direction: 100,
           titre: 'Tableau de bord',
@@ -192,7 +192,7 @@ export class MainNavComponent implements OnInit {
           feuille: 1,
           sous_menus: null,
           url: 'dashboard/dashboard-fiche-technique'
-        },
+        },*/
         {
           id: 2010,
           direction: 2,
@@ -292,13 +292,24 @@ export class MainNavComponent implements OnInit {
           sous_menus: null,
           url: 'facture/frequences'
         },*/
+/*        {
+          id: 2100,
+          direction: 0,
+          titre: 'Clients',
+          description: 'Clients',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/client-direction-technique'
+        },*/
       ]
     },
     {
       id: 30, direction: 0, titre: 'Facturation/Devis', description: 'Facturation/Devis',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        {
+/*        {
           id: 3005,
           direction: 100,
           titre: 'Tableau de bord',
@@ -308,7 +319,7 @@ export class MainNavComponent implements OnInit {
           feuille: 1,
           sous_menus: null,
           url: 'dashboard/dashboard-dfc'
-        },
+        },*/
         {
           id: 3010,
           direction: 1,
@@ -337,7 +348,7 @@ export class MainNavComponent implements OnInit {
       id: 40, direction: 0, titre: 'Recouvrement', description: 'Recouvrement',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-        {
+/*        {
           id: 4005,
           direction: 100,
           titre: 'Tableau de bord',
@@ -347,7 +358,7 @@ export class MainNavComponent implements OnInit {
           feuille: 1,
           sous_menus: null,
           url: 'dashboard/recouvrement'
-        },
+        },*/
         {
           id: 4010,
           direction: 1,

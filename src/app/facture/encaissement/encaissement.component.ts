@@ -37,15 +37,15 @@ type FilterState = {
 
 @Component({
   selector: 'app-encaissement',
-  templateUrl: './encaissement.component.html',
-  styleUrl: './encaissement.component.scss'
+  templateUrl: './encaissement.component.html'
 })
 export class EncaissementComponent implements OnInit, AfterViewInit {
 
   @Input() fixeCategorie:number;
   t_RecouvListeEncaissement?: MatTableDataSource<RecouvListeEncaissement>;
 
-  displayedColumns: string[] = ['client','montant','affecte','solde_non_affecte', 'date_encaissement','mode_paiement', 'actions'];
+  displayedColumns = ['client', 'montant', 'affecte', 'solde_non_affecte','date_encaissement', 'mode_paiement', 'actions' ];
+
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   public operations = operations;
@@ -114,7 +114,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
       this.t_RecouvListeEncaissement.data = response.sort((a, b) => b.encaissement_id - a.encaissement_id);
       console.log(response);
       this.setupFilterPredicate();
-      this.checher();
+      this.chercher();
     });
   }
 
@@ -190,7 +190,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     }
   }
 
-  checher() {
+  chercher() {
     const state: FilterState = {
       nomClient: this.nomClient || '',
       startDate: this.startDate || null,
@@ -277,7 +277,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     });
     dialogRef.afterClosed().subscribe(() => {
       // rafraîchir si nécessaire
-      this.checher?.();
+      this.chercher?.();
     });
   }
 

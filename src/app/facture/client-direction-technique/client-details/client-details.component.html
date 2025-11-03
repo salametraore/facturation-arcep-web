@@ -1,0 +1,43 @@
+<mat-card>
+  <mat-card-header class="client-header">
+    <mat-card-title>
+      <div class="title-row">
+        <span class="label">Fiche Client :</span>
+        <span class="value">{{ client?.denomination_sociale }}</span>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content >
+    <!-- Onglets principaux -->
+    <mat-tab-group>
+
+      &lt;!&ndash; Fiches Techniques &ndash;&gt;
+      <mat-tab label="Fiches Techniques">
+        <client-details-fiches-techniques></client-details-fiches-techniques>
+      </mat-tab>
+
+      <!-- Onglet Factures -->
+      <mat-tab label="Factures">
+        <client-details-factures></client-details-factures>
+      </mat-tab>
+
+      &lt;!&ndash;- Onglet Encaissements &ndash;&gt;
+      <mat-tab label="Encaissements">
+        <client-details-encaissements></client-details-encaissements>
+      </mat-tab>
+
+
+            &lt;!&ndash; Onglet Relevé de compte &ndash;&gt;
+            <mat-tab label="Relevé de compte">
+              <client-details-releve-compte></client-details-releve-compte>
+            </mat-tab>
+
+    </mat-tab-group>
+    <br>
+    <div align="end">
+      <button mat-raised-button color="warn" (click)="onFerme()">Fermer</button>
+    </div>
+    <br>
+  </mat-card-content>
+</mat-card>

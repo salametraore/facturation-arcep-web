@@ -1,0 +1,563 @@
+@use '@angular/material' as mat;
+
+/* ============ THEME MATERIAL (ARCEP Rose) ============ */
+@include mat.core();
+
+$primary: mat.define-palette(mat.$pink-palette, 800);    // ~ #ad1457
+$accent:  mat.define-palette(mat.$pink-palette, A200);
+$warn:    mat.define-palette(mat.$deep-orange-palette);
+
+$theme: mat.define-light-theme((
+  color: (primary: $primary, accent: $accent, warn: $warn),
+  typography: mat.define-typography-config(),
+  density: -1
+));
+@include mat.all-component-themes($theme);
+
+/* ============ VARIABLES CSS (surfaces/texte/bordures) ============ */
+:root {
+  --brand-primary: #{mat.get-color-from-palette($primary)};
+  --brand-primary-contrast: #{mat.get-color-from-palette($primary, default-contrast)};
+
+  /* surfaces & texte */
+  --surface: #ffffff;
+  --surface-alt: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%); /* rose très pâle */
+  --text: #2b2b2b;
+  --text-muted: #5a5a5a;
+
+  /* bordures */
+  --border-weak: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%);
+  --border-strong: color-mix(in srgb, var(--brand-primary) 30%, #fff 70%);
+}
+
+/* SCSS legacy (si besoin ponctuel) */
+$brand: #ad1457;
+$brand-600: #c2185b;
+$brand-400: #ec407a;
+
+/* ============ GLOBAL / WATERMARK ============ */
+html, body { height: 100%; background: #FAFAFA; color: var(--text); }
+
+mat-sidenav-content { position: relative; min-height: 100%; }
+mat-sidenav-content::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("/assets/images/arcep-logo.png");
+  background-repeat: no-repeat;
+  background-position: center 20%;
+  background-size: 520px auto;
+  opacity: 0.06; pointer-events: none; z-index: 0;
+}
+mat-sidenav-content > * { position: relative; z-index: 1; }
+
+@media print { mat-sidenav-content::before { display: none; } }
+
+/* ============ SIDENAV ============ */
+.sidenav {
+  background-color: var(--surface-alt);
+  color: #7A003D;
+}
+.sidenav .mat-list-item,
+.sidenav a.mat-list-item {
+  color: inherit; border-radius: 10px; margin: 4px 6px;
+}
+.sidenav .mat-list-item:hover,
+.sidenav a.mat-list-item:hover {
+  background: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%);
+}
+.menu-panel .mat-expansion-panel-header { background: transparent; }
+.menu-panel.mat-expansion-panel {
+  background: transparent; box-shadow: none;
+  border: 1px solid var(--border-weak); border-radius: 12px; margin: 6px 6px 10px;
+}
+
+/* ============ TOOLBAR / TITRE ============ */
+mat-toolbar { height: 30px; .mat-mdc-toolbar-row { min-height: 30px; } }
+
+.app-toolbar .app-title {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; margin-left: 8px;
+  border-radius: 8px;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border-weak);
+  color: color-mix(in srgb, var(--brand-primary) 70%, #000 30%);
+  font-weight: 600; line-height: 1.2; white-space: nowrap;
+}
+
+/* ============ BLOCS / CARTES / LISTES ============ */
+.list-box, mat-card.card, mat-card.list-box {
+  background: var(--surface);
+  border: 1px solid var(--border-weak) !important;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06);
+}
+.list-header{
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border-weak) !important;
+}
+.list-title{ margin: .25rem 0; font-weight: 600; font-size: 1.1rem; }
+.list-actions{ margin-left: auto; display: flex; gap: 8px; }
+.list-body{ padding: 10px 12px 12px; }
+.blank-row{ height: 12px; }
+
+/* boutons */
+.btn_details { color: $brand; }
+.btn_edit    { color: $brand; }
+.btn_delete  { color: #d32f2f; }
+.primary     { color: $brand; text-align: center; }
+button { margin-left: 5px; }
+
+/* ============ TABLES ============ */
+.mat-mdc-table .mat-mdc-header-row {
+  background-color: var(--brand-primary);
+  color: var(--brand-primary-contrast);
+}
+.mat-mdc-table .mat-mdc-header-cell { color: var(--brand-primary-contrast); }
+.mat-mdc-table .mat-sort-header-arrow { color: var(--brand-primary-contrast) !important; opacity: 1 !important; }
+.mat-mdc-table .mat-mdc-header-row.mat-mdc-table-sticky { border-bottom: 1px solid rgba(0,0,0,.12); }
+
+/* Zebra rose clair */
+.mat-mdc-table .mat-mdc-row { height: 30px; }
+.mat-mdc-table .mat-mdc-row:not(.selected):nth-child(odd)  { background-color: #fff; }
+.mat-mdc-table .mat-mdc-row:not(.selected):nth-child(even) { background-color: color-mix(in srgb, var(--brand-primary) 8%, #fff 92%); }
+.mat-mdc-table .mat-mdc-row:not(.selected):hover { background-color: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%); }
+.selected { background-color: color-mix(in srgb, var(--brand-primary) 28%, #fff 72%) !important; }
+.mat-mdc-table .mat-mdc-cell, .mat-mdc-table .mat-mdc-footer-cell { border-bottom: 1px solid rgba(0,0,0,.06); }
+
+/* Paginator icônes en primaire */
+.mat-mdc-paginator {
+  --mat-paginator-container-size: 36px;
+  --mat-paginator-enabled-icon-color: var(--brand-primary);
+}
+
+/* ============ FILTRES (centrés, compacts) ============ */
+.filters{
+  display: flex; justify-content: center;
+  border: 1px solid var(--border-weak) !important;
+  border-radius: 6px; background: var(--surface);
+  padding: 12px 14px; margin-bottom: 12px;
+}
+.filters-grid{
+  display: grid;
+  grid-template-columns: repeat(5, 220px);
+  gap: 10px; align-items: end; justify-content: center;
+}
+.filters mat-form-field{ width: 220px; margin: 0; }
+.filters .mdc-text-field--outlined{
+  height: 40px;
+  --mdc-outlined-text-field-outline-color: color-mix(in srgb, var(--brand-primary) 45%, #6b6b6b);
+  --mdc-outlined-text-field-hover-outline-color: color-mix(in srgb, var(--brand-primary) 55%, #545454);
+  --mdc-outlined-text-field-focus-outline-color: var(--brand-primary);
+}
+.filters .mat-mdc-form-field-infix{ padding: 8px 0 10px; }
+.filters .mat-mdc-form-field-subscript-wrapper{ display: none; }
+
+@media (max-width: 1400px){ .filters-grid{ grid-template-columns: repeat(4, 220px); } }
+@media (max-width: 1100px){ .filters-grid{ grid-template-columns: repeat(3, 220px); } }
+@media (max-width: 800px) { .filters-grid{ grid-template-columns: repeat(2, 220px); } }
+
+/* Variante "une ligne sans scroll" */
+.filters--one-line { overflow: hidden; }
+.filters--one-line .filters-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr)) 40px 40px;
+  column-gap: 10px; align-items: end; justify-content: stretch;
+}
+.filters--one-line .filters-grid mat-form-field { width: 100%; margin: 0; }
+.filters--one-line .filters-grid .action-btn { width: 40px; height: 40px; align-self: end; }
+@media (max-width: 1280px) {
+  .filters--one-line .filters-grid { grid-template-columns: repeat(5, minmax(130px, 1fr)) 40px 40px; }
+}
+@media (max-width: 1100px) {
+  .filters--one-line .filters-grid { grid-template-columns: repeat(5, minmax(120px, 1fr)) 40px 40px; }
+}
+.filters--one-line .mdc-text-field--outlined { height: 38px; }
+.filters--one-line .mat-mdc-form-field-infix { padding: 6px 0 8px; }
+
+/* ============ FORM / DIALOGS ============ */
+.form-grid{ display: flex; flex-direction: column; gap: 12px; }
+.form-section-title{ font-weight: 600; margin-top: 6px; color: #444; }
+.radio-line{ display: flex; gap: 24px; align-items: center; padding: 4px 2px; }
+.form-actions{ display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+
+.dialog-title-rose{
+  background: var(--brand-primary);
+  color: var(--brand-primary-contrast);
+  border: 2px solid var(--brand-primary);
+  border-radius: 6px 6px 0 0;
+  padding: 10px 12px; margin: 0; font-size: 1.1rem; font-weight: 600;
+}
+.dialog-content{ padding: 12px !important; }
+.list-box--compact .list-header{ padding: 8px 10px; }
+.list-box--compact .list-body{ padding: 10px 10px 12px; }
+
+/* ============ PAGE TITLE BAR ============ */
+.page-title{
+  background: var(--brand-primary);
+  color: var(--brand-primary-contrast);
+  border: 2px solid var(--brand-primary);
+  border-radius: 6px;
+  padding: 10px 12px; margin-bottom: 12px;
+}
+.page-title h2{ margin: 0; font-size: 1.3rem; font-weight: 600; }
+.page-title.with-icon{ display: flex; align-items: center; gap: 8px; }
+.page-title.with-icon .mat-icon{ color: var(--brand-primary-contrast); }
+
+/* ============ CHECKBOX / RADIO COULEURS MARQUE ============ */
+mat-checkbox {
+  --mdc-checkbox-selected-focus-state-layer-color: #{$brand};
+  --mdc-checkbox-selected-checkmark-color: white;
+  --mdc-checkbox-selected-focus-icon-color: #{$brand};
+  --mdc-checkbox-selected-hover-icon-color: #{$brand-600};
+  --mdc-checkbox-selected-icon-color: #{$brand};
+}
+.mat-mdc-radio-button.mat-accent {
+  --mdc-radio-selected-focus-icon-color: #{$brand};
+  --mdc-radio-selected-hover-icon-color: #{$brand};
+  --mdc-radio-selected-icon-color: #{$brand};
+  --mdc-radio-selected-pressed-icon-color: #{$brand};
+  --mat-radio-checked-ripple-color: #{$brand-400};
+}
+
+/* ============ TIMELINE CARDS ============ */
+.mat-mdc-card.timeline-card,
+.mat-mdc-card.dark-card {
+  background-color: color-mix(in srgb, var(--brand-primary) 8%, #fff 92%) !important;
+}
+@supports not (color: color-mix(in srgb, #000, #fff)) {
+  .mat-mdc-card.timeline-card,
+  .mat-mdc-card.dark-card { background-color: #fbe8f1 !important; }
+}
+
+/* ============ ACCESSIBILITÉ : focus visible ============ */
+.mat-focus-indicator:focus-visible,
+button:focus-visible,
+a:focus-visible,
+.mat-mdc-form-field:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 30%, #fff 70%);
+  border-radius: 6px;
+}
+
+/* ============ DIVERS UTILES ============ */
+.search-div{ margin: 10px; }
+.search-form-field{ width: 70%; }
+div[align="end"] { text-align: right; }
+.input-full-width{ width: 100%; box-sizing: border-box; }
+.spinner-container{
+  position: absolute; inset: 0; display:flex; justify-content:center; align-items:center;
+  background: rgba(0, 0, 0, 0.32); z-index: 20000;
+}
+input, textarea { text-transform: uppercase; }
+.mat-mdc-button_label { color: white; }
+.mat-mdc-menu-item .mat-icon { margin-right: .5rem; }
+div[cdkDrag] { cursor: move; }
+
+
+/* Variante 75 / 25 pour les pages avec historique à droite */
+.two-col--75-25 {
+  display: grid;
+  grid-template-columns: 3fr 1fr; /* 75% / 25% */
+  gap: 1rem;
+}
+
+/* Même règle de repli que ta grille par défaut */
+@media (max-width: 1100px){
+  .two-col--75-25 { grid-template-columns: 1fr; }
+}
+
+.timeline-viewport {
+  height: 60vh;
+  width: 100%;
+  overflow: auto;
+  padding: 8px 6px;
+  box-sizing: border-box;
+  scrollbar-gutter: stable;
+}
+
+/* garde l’espacement/arrondis/ombre, mais PAS de background ici */
+.dark-card {
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Scrollbar optionnelle */
+.timeline-viewport::-webkit-scrollbar { width: 8px; }
+.timeline-viewport::-webkit-scrollbar-thumb { background: #bdbdbd; border-radius: 4px; }
+
+.empty { padding: 8px; color: #666; text-align: center; }
+
+/* === PATCH "limites des zones" — bordures nettes et visibles === */
+
+/* 1) Renforcer les variables de bordure */
+:root {
+  /* augmente légèrement l’intensité */
+  --border-weak:  color-mix(in srgb, var(--brand-primary) 22%, #fff 78%);
+  --border-strong: color-mix(in srgb, var(--brand-primary) 40%, #fff 60%);
+}
+
+/* 2) Filtres : cadre bien visible */
+.filters {
+  background: #fff;
+  border: 2px solid var(--brand-primary) !important;
+  border-radius: 8px;
+}
+
+/* 3) Cadres “list-box” (sections + mat-card éventuels) */
+section.list-box,
+.list-box,
+mat-card.list-box {
+  background: #fff;
+  border: 2px solid var(--brand-primary) !important;
+  border-radius: 8px;
+  box-shadow: none; /* on s’appuie sur la bordure, pas sur l’ombre */
+}
+
+/* 4) En-tête du bloc (séparateur bas marqué) */
+.list-header {
+  border-bottom: 2px solid var(--border-strong) !important;
+}
+
+/* 5) Barre de titre de page (rose) */
+.page-title {
+  background: var(--brand-primary);
+  color: var(--brand-primary-contrast);
+  border: 2px solid var(--brand-primary) !important;
+  border-radius: 8px;
+}
+
+/* 6) Encadrer le conteneur table + paginator pour une limite continue */
+.compact-table {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  overflow: hidden; /* la bordure entoure l’ensemble */
+}
+
+/* 7) (Optionnel) Donner un trait très léger à TOUTES les cartes, si tu le souhaites */
+.mat-mdc-card:not(.list-box) {
+  border: 1px solid var(--border-weak);
+  border-radius: 8px;
+}
+
+/* 8) Fallback si color-mix n’est pas supporté */
+@supports not (color: color-mix(in srgb, #000, #fff)) {
+  :root {
+    --border-weak:  #e8b9cc;  /* rose très pâle */
+    --border-strong:#d98aa8;  /* rose un peu plus soutenu */
+  }
+}
+
+/* Carte d'info avec bordure rose clair et fond très léger */
+.info-card {
+  border: 2px solid color-mix(in srgb, var(--brand-primary) 35%, #fff 65%) !important;
+  background: color-mix(in srgb, var(--brand-primary) 6%, #fff 94%);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: none; /* look propre, bordure bien lisible */
+}
+
+/* Centrage horizontal + wrap s'il manque de place */
+.info-card--center,
+.info-card--center .mat-mdc-card-content,
+.info-card--center mat-card-content,
+.info-card--center .info-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  text-align: center;
+  margin: 0;
+}
+
+/* Fallback si color-mix non supporté */
+@supports not (color: color-mix(in srgb, #000, #fff)) {
+  .info-card {
+    border-color: #e8b9cc;   /* rose clair */
+    background: #fff6fa;     /* très léger rose */
+  }
+}
+
+/* 2 colonnes équilibrées comme dans la capture */
+.row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Ligne “Ajout de produit” : Désignation plus large + bouton à droite */
+.row-add-line {
+  display: grid;
+  grid-template-columns: 1.6fr 0.8fr 0.8fr 0.8fr auto; /* ≈ 45% / 18% / 18% / 18% / bouton */
+  gap: 10px;
+  align-items: end;
+}
+
+.row-add-line .action-btn {
+  height: 40px;
+  align-self: end;
+  white-space: nowrap;
+}
+
+
+/* Ligne “Ajout de produit” : tout sur une seule ligne */
+.product-row{
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 1.8fr)  /* Désignation */
+    130px                  /* Prix Unit. */
+    110px                  /* Quantité */
+    140px                  /* Total */
+    auto;                  /* Bouton */
+  gap: 10px;
+  align-items: end;
+}
+
+/* Largeurs utilitaires pour compacter les champs */
+.product-row .field--xl { width: 100%; }
+.product-row .field--sm { width: 100%; max-width: 160px; }
+.product-row .field--xs { width: 100%; max-width: 120px; }
+
+/* Bouton compact aligné */
+.product-row .add-btn{
+  height: 40px;
+  white-space: nowrap;
+  align-self: end;
+}
+
+/* BLOC avec bordure rose clair (tu l’as déjà via .list-box) — renfort visuel léger */
+.list-box--compact{
+  border: 2px solid color-mix(in srgb, var(--brand-primary) 45%, #fff 55%);
+  border-radius: 6px;
+}
+.list-box--compact .list-header{
+  border-bottom: 2px solid color-mix(in srgb, var(--brand-primary) 45%, #000 55%);
+}
+
+/* Réactivité : passe sous 5 colonnes si l’espace manque */
+@media (max-width: 980px){
+  .product-row{
+    grid-template-columns:
+      1fr 120px 100px 120px auto;
+  }
+}
+@media (max-width: 760px){
+  .product-row{
+    grid-template-columns: 1fr 1fr;
+  }
+  .product-row .add-btn{ justify-self: start; }
+}
+
+
+/* Ligne à 2 colonnes 70% / 30% */
+.row-70-30{
+  display: grid;
+  grid-template-columns: 70% 30%;
+  gap: 12px;
+  align-items: end;
+}
+
+/* Empiler en 1 colonne sur écrans étroits */
+@media (max-width: 900px){
+  .row-70-30{
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ====== Ligne d'ajout compacte et alignée ====== */
+.product-row--tight{
+  display:flex; align-items:flex-end; gap:10px; flex-wrap:nowrap;
+  border:2px solid color-mix(in srgb, var(--brand-primary) 35%, #fff 65%);
+  border-radius:8px; padding:10px;
+  /* variables de taille uniformes */
+  --ui-compact-w: 120px;   /* largeur des petits champs + bouton */
+  --ui-compact-h: 40px;    /* hauteur des champs + bouton */
+}
+
+/* champs : aucune marge basse supplémentaire */
+.product-row--tight .product-field{ margin:0; }
+
+/* Désignation (large) */
+.product-row--tight .product-field.designation{
+  flex:1 1 auto; min-width:220px;
+}
+
+/* Petits champs : même largeur que le bouton */
+.product-row--tight .product-field.short{
+  flex:0 0 var(--ui-compact-w);
+  width:var(--ui-compact-w); max-width:var(--ui-compact-w);
+}
+
+/* Hauteur compacte (MD Outlined) */
+.product-row--tight .mdc-text-field--outlined{
+  height:var(--ui-compact-h);
+}
+.product-row--tight .mat-mdc-form-field-infix{
+  padding:6px 0 8px;   /* compacter la zone de saisie */
+}
+
+/* Bouton “Ajouter” exactement même taille */
+.product-row--tight .add-btn{
+  width:var(--ui-compact-w);
+  height:var(--ui-compact-h);
+  align-self:end;
+  display:flex; align-items:center; justify-content:center;
+  white-space:nowrap; padding:0 12px;
+}
+
+/* (optionnel) Très étroit : passe à 2 lignes proprement */
+@media (max-width: 900px){
+  .product-row--tight{ flex-wrap:wrap; }
+  .product-row--tight .add-btn{ width:160px; } /* un peu plus large en mobile */
+}
+
+.list-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  border-bottom:2px solid var(--brand-primary);
+}
+.list-title{ margin:.25rem 0; font-weight:600; font-size:1.1rem; }
+.list-actions{
+  margin-left:auto;            /* pousse les boutons à droite */
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+
+/* Mise en page des 3 lignes (global, scoped par .facture-edit) */
+.facture-edit .row {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+.facture-edit .cols-70-30 { grid-template-columns: 70% 30%; }
+.facture-edit .cols-50-50 { grid-template-columns: 1fr 1fr; } /* 50/50 */
+
+.facture-edit .row .w-full,
+.facture-edit .row .mat-form-field {
+  width: 100%;
+}
+
+/* Responsive : on empile en mobile */
+@media (max-width: 768px) {
+  .facture-edit .cols-70-30,
+  .facture-edit .cols-50-50 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.facture-edit .form-grid > .row { display: grid !important; }
+/* Réduit uniquement l’écart HORIZONTAL entre les 2 colonnes */
+.facture-edit .row {
+  column-gap: 8px;   /* ← mets 6px ou 4px si tu veux encore plus serré */
+  row-gap: 12px;     /* l’écart VERTICAL reste confortable (tu peux baisser si besoin) */
+}
+
+/* Optionnel : élimine toute marge par défaut sur les champs */
+.facture-edit .row .mat-mdc-form-field {
+  margin: 0;
+}
+.facture-edit .row.grid-50-50 { column-gap: 6px; }

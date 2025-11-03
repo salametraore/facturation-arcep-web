@@ -1,87 +1,115 @@
-<div class="dashboard-container">
-  <h5 class="dashboard-title" style="color: #030303">Saisie mise à jour fiche technique - Nom de domaine</h5>
+<!-- src/app/features/fiche-technique/domaines/fiche-technique-page.component.html -->
+<mat-card>
 
-  <!--  &lt;!&ndash; État de la demande &ndash;&gt;-->
-  <!--  <div class="demand-status">-->
-  <!--    <span class="status-label">ETAT DE LA DEMANDE</span>-->
-  <!--    <mat-stepper [linear]="true" #stepper>-->
-  <!--      <mat-step *ngFor="let step of steps; let i = index" [completed]="!step.active" [editable]="false">-->
-  <!--        <ng-template matStepLabel>-->
-  <!--          <span [ngClass]="{ 'active-step': step.active }">{{ step.label }}</span>-->
-  <!--        </ng-template>-->
-  <!--      </mat-step>-->
-  <!--    </mat-stepper>-->
-  <!--  </div>-->
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Saisie et mise à jour d'une fiche technique de nom de domaine</h2>
+  </div>
 
-  <!-- Documents -->
-  <!--  <div class="documents-section">-->
-  <!--    <span class="section-label">DOCUMENTS</span>-->
-  <!--    <button mat-raised-button color="warn" (click)="onImport()">Importer des documents</button>-->
-  <!--  </div>-->
+  <!-- Grille 2 colonnes : 2fr / 1fr (cf. .two-col dans styles_arcep.scss) -->
+  <div class="two-col two-col--75-25">
 
-  <!-- Fiche technique -->
+    <!-- ===== Colonne gauche : FICHE TECHNIQUE ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Fiche technique</h3>
+      </div>
 
+      <div class="list-body">
+        <form [formGroup]="form" class="form-grid">
 
-  <div fxLayout="row" fxLayoutGap="20px">
-    <!-- Colonne de gauche : Fiche Technique -->
-    <div fxFlex="75%">
-      <mat-card class="dark-card">
-      <div class="tech-sheet-section">
-        <form [formGroup]="form">
+          <!-- Client (autocomplete) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Client</mat-label>
+            <input matInput
+                   [(ngModel)]="nomClient"
+                   [matAutocomplete]="auto_cl"
+                   formControlName="client"
+                   placeholder="Nom du client">
+            <mat-autocomplete #auto_cl="matAutocomplete">
+              <mat-option *ngFor="let item of clients | search: nomClient"
+                          (click)="onGetClient(item)"
+                          [value]="item.denomination_sociale">
+                <span>{{ item.denomination_sociale }}</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
 
-          <div class="client-section">
-            <!--<span class="subsection-label">Client</span>-->
+          <!-- Caractéristiques / Domiciliation (sélecteur produit) -->
 
-            <mat-form-field>
-              <mat-label>Client</mat-label>
-              <input matInput [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client">
-              <mat-autocomplete #auto_cl="matAutocomplete">
-                <mat-option (click)="onGetClient(item)" *ngFor="let item of clients | search:nomClient"
-                            [value]="item.denomination_sociale">
-                  <span>{{item.denomination_sociale}}</span>
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
+<!--
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Domiciliation du demandeur</mat-label>
+            <mat-select formControlName="produit" matTooltip="Domiciliation">
+              <mat-option *ngFor="let item of produits" [value]="item.id">
+                {{ item.libelle }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+-->
 
+          <!-- Domiciliation du demandeur (boutons radio) -->
+          <div class="form-section-title">
+            Domiciliation du demandeur
+            <span matTooltip="Domiciliation"> </span>
           </div>
 
-          <div class="domiciliation-section">
-      <!--      <span class="subsection-label">Domiciliation</span>-->
-            <mat-form-field>
-              <mat-label>Domiciliation du demandeur</mat-label>
-              <mat-select formControlName="produit" matTooltip="Domiciliation">
-                <mat-option *ngFor="let item of produits" [value]="item.id">
-                  {{item.libelle}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
+          <mat-radio-group formControlName="produit" class="radio-line">
+            <mat-radio-button
+              *ngFor="let item of produits"
+              [value]="item.id">
+              {{ item.libelle }}
+            </mat-radio-button>
+          </mat-radio-group>
 
-          <div class="comment-section">
-           <!-- <span class="subsection-label">COMMENTAIRE</span>-->
-            <mat-form-field>
-              <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
-              <textarea matInput formControlName="commentaire"></textarea>
-            </mat-form-field>
+
+          <!-- Commentaire -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
+            <textarea matInput rows="2" formControlName="commentaire" autofocus></textarea>
+          </mat-form-field>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button mat-stroked-button color="warn" type="button"
+                    *ngIf="data_operation===operations.create || data_operation===operations.update"
+                    (click)="crud()">
+              Enregistrer
+            </button>
+
+            <button mat-flat-button color="primary" type="button"
+                    *ngIf="data_operation===operations.transmettre"
+                    (click)="onTransmettre()">
+              Transmettre
+            </button>
+
+            <button mat-flat-button color="primary" type="button" (click)="onFerme()">
+              Fermer
+            </button>
           </div>
         </form>
-        <div class="actions">
-          <button mat-raised-button *ngIf="this.data_operation===this.operations.create ||this.data_operation===this.operations.update" (click)="crud()" color="warn">Enregistrer</button>
-          <button mat-raised-button *ngIf="this.data_operation===this.operations.transmettre" (click)="onTransmettre()" color="warn">Transmettre</button>
-          <button mat-raised-button (click)="onFerme()" color="warn">Fermer</button>
-        </div>
       </div>
-      </mat-card>
 
-      <avis-technique-infos  [ficheTechnique]="ficheTechnique"></avis-technique-infos>
-    </div>
-
-    <!-- Colonne de droite : Historique de la Demande -->
-    <div fxFlex="25%">
-      <div class="section">
-        <h5>Historique de la demande</h5>
-        <historique-traitement [historiqueFicheTechniques]="historiqueFicheTechniques" ></historique-traitement>
+      <div align="center">
+        <avis-technique-infos
+          [ficheTechnique]="ficheTechnique">
+        </avis-technique-infos>
       </div>
-    </div>
+
+    </section>
+
+    <!-- ===== Colonne droite : HISTORIQUE / AVIS ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Historique de la demande</h3>
+      </div>
+
+      <div class="list-body">
+        <historique-traitement
+          [historiqueFicheTechniques]="historiqueFicheTechniques">
+        </historique-traitement>
+      </div>
+    </section>
+
   </div>
-</div>
+</mat-card>

@@ -17,8 +17,7 @@ import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traite
 
 @Component({
   selector: 'agrement-installeur-crud',
-  templateUrl: './agrement-installeur-crud.component.html',
-  styleUrl: './agrement-installeur-crud.component.scss'
+  templateUrl: './agrement-installeur-crud.component.html'
 })
 export class AgrementInstalleurCrudComponent implements OnInit {
   @Input() fixeCategorie: number;

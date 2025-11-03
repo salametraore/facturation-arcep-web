@@ -34,8 +34,7 @@ interface SCSearchCriteria {
 
 @Component({
   selector: 'app-service-confiance',
-  templateUrl: './service-confiance.component.html',
-  styleUrl: './service-confiance.component.scss'
+  templateUrl: './service-confiance.component.html'
 })
 export class ServiceConfianceComponent implements OnInit, AfterViewInit {
 

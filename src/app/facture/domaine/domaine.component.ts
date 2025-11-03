@@ -34,8 +34,7 @@ interface FTSearchCriteria {
 
 @Component({
   selector: 'app-domaine',
-  templateUrl: './domaine.component.html',
-  styleUrl: './domaine.component.scss'
+  templateUrl: './domaine.component.html'
 })
 export class DomaineComponent implements OnInit, AfterViewInit {
 

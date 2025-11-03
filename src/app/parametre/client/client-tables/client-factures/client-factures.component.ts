@@ -18,8 +18,7 @@ import {MatSort} from "@angular/material/sort";
 
 @Component({
   selector: 'client-factures',
-  templateUrl: './client-factures.component.html',
-  styleUrl: './client-factures.component.scss'
+  templateUrl: './client-factures.component.html'
 })
 export class ClientFacturesComponent implements OnInit,AfterViewInit{
 

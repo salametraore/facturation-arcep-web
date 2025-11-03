@@ -1,151 +1,201 @@
-<div class="dashboard-container">
+<!-- src/app/features/recouvrement/encaissements/encaissements-list-page.component.html -->
+<mat-card>
 
-  <div class="dashboard-header">
-    <h3 class="dashboard-title" style="color: #030303">Liste des encaissements</h3>
-    <div class="dashboard-actions">
-
-      <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="crud(null,this.operations.create)" color="warn"
-              mat-flat-button>
-        <mat-icon>add</mat-icon>
-        Nouvel encaissement de facture
-      </button>
-
-      <button *ngIf="  hasOperationCode('ENCAISSER') " (click)="openEncaissementDirect()" color="warn" mat-flat-button>
-        <mat-icon>add</mat-icon>
-        Encaissement de frais dossier sans facture
-      </button>
-
-      <!--      <button color="warn" mat-flat-button>
-              <mat-icon>print</mat-icon>
-              Exporter
-            </button>-->
-    </div>
+  <!-- Titre de page (barre rose) -->
+  <div class="page-title">
+    <h2>Liste des encaissements</h2>
   </div>
 
-  <div class="filter-section">
-    <div class="filter-group one-line">
-      <mat-form-field class="mf mf-client" floatLabel="always">
+  <!-- Filtres compacts et centrés -->
+  <div class="filters filters--one-line">
+    <div class="filters-grid">
+
+      <!-- Client (autocomplete) -->
+      <mat-form-field class="client-field">
         <mat-label>Nom du client</mat-label>
-        <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client" (keyup.enter)="checher()" required>
+        <input
+          matInput
+          placeholder="Nom du client"
+          matTooltip="Nom du client"
+          [matAutocomplete]="auto_cl"
+          [(ngModel)]="nomClient"
+          (keyup.enter)="chercher()">
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option *ngFor="let item of clients | search:nomClient" [value]="item.denomination_sociale">
-            <span>{{item.denomination_sociale}}</span>
+          <mat-option *ngFor="let item of clients | search: nomClient"
+                      [value]="item.denomination_sociale">
+            <span>{{ item.denomination_sociale }}</span>
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
 
-      <mat-form-field class="mf mf-date" floatLabel="always">
+      <!-- Date début -->
+      <mat-form-field>
         <mat-label>Date début</mat-label>
-        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate"
-               (dateChange)="checher()">
+        <input
+          matInput
+          [matDatepicker]="pickerStart"
+          [(ngModel)]="startDate"
+          (dateChange)="chercher()"
+          (keyup.enter)="chercher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
         <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field class="mf mf-date" floatLabel="always">
+      <!-- Date fin -->
+      <mat-form-field>
         <mat-label>Date fin</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate"
-               (dateChange)="checher()">
+        <input
+          matInput
+          [matDatepicker]="pickerEnd"
+          [(ngModel)]="endDate"
+          (dateChange)="chercher()"
+          (keyup.enter)="chercher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
         <mat-datepicker #pickerEnd></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field class="mf mf-select" floatLabel="always">
+      <!-- Mode paiement -->
+      <mat-form-field>
         <mat-label>Mode paiement</mat-label>
-        <mat-select [(ngModel)]="modeFilter" (selectionChange)="checher()">
+        <mat-select [(ngModel)]="modeFilter" (selectionChange)="chercher()">
           <mat-option *ngFor="let item of modePaiements" [value]="item.id">
             {{ item.libelle }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <div class="actions">
-        <button (click)="checher()" color="primary" mat-mini-fab class="icon-btn">
-          <mat-icon>search</mat-icon>
-        </button>
-        <button (click)="reset()" color="primary" mat-mini-fab class="icon-btn">
-          <mat-icon>cached</mat-icon>
-        </button>
-      </div>
+      <!-- Boutons actions filtres -->
+      <button mat-mini-fab color="primary" class="action-btn" (click)="chercher()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button mat-mini-fab color="primary" class="action-btn" (click)="reset()">
+        <mat-icon>cached</mat-icon>
+      </button>
+
     </div>
   </div>
 
-  <div class="mat-elevation-z10 compact-table">
-    <table [dataSource]="t_RecouvListeEncaissement" mat-table matSort style="width: 100%">
+  <!-- Cadre standard -->
+  <section class="list-box">
 
-      <!--      <ng-container matColumnDef="reference">
-             <th *matHeaderCellDef mat-header-cell mat-sort-header> Référence</th>
-             <td *matCellDef="let element" mat-cell> {{element.reference}} </td>
-           </ng-container>-->
-      <ng-container matColumnDef="client">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Client</th>
-        <td *matCellDef="let element" mat-cell> {{element.client}} </td>
-      </ng-container>
-      <ng-container matColumnDef="montant">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant</th>
-        <td *matCellDef="let element" mat-cell> {{element.montant_encaisse}} </td>
-      </ng-container>
-      <ng-container matColumnDef="affecte">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant affecté</th>
-        <td *matCellDef="let element" mat-cell> {{element.montant_affecte}} </td>
-      </ng-container>
-      <ng-container matColumnDef="solde_non_affecte">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Montant restant</th>
-        <td *matCellDef="let element" mat-cell> {{element.montant_restant}} </td>
-      </ng-container>
+    <!-- En-tête : titre + actions à droite -->
+    <div class="list-header">
+      <h3 class="list-title">Liste — Encaissements</h3>
 
-      <ng-container matColumnDef="date_encaissement">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Date encais.</th>
-        <td *matCellDef="let element" mat-cell> {{element.date_encaissement|date: 'dd/MM/yyyy'}} </td>
-      </ng-container>
+      <div class="list-actions">
+        <button
+          *ngIf="hasOperationCode('ENCAISSER')"
+          mat-flat-button
+          color="primary"
+          (click)="crud(null, operations.create)">
+          <mat-icon>add</mat-icon>
+          Nouvel encaissement de facture
+        </button>
 
-      <ng-container matColumnDef="mode_paiement">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Mode paiement</th>
-        <td *matCellDef="let element" mat-cell> {{element.mode_paiement_libelle}} </td>
-      </ng-container>
+        <button
+          *ngIf="hasOperationCode('ENCAISSER')"
+          mat-stroked-button
+          color="primary"
+          (click)="openEncaissementDirect()">
+          <mat-icon>point_of_sale</mat-icon>
+          Encaissement frais dossier (sans facture)
+        </button>
 
-      <ng-container matColumnDef="actions">
-        <th *matHeaderCellDef mat-header-cell>Actions</th>
-        <td *matCellDef="let element" mat-cell>
-          <button [matMenuTriggerFor]="menu" color="warn" mat-icon-button>
-            <mat-icon>settings</mat-icon>
-          </button>
+        <!--
+        <button mat-stroked-button color="primary" (click)="onExport()">
+          <mat-icon>print</mat-icon>
+          Exporter
+        </button>
+        -->
+      </div>
+    </div>
 
-          <mat-menu #menu="matMenu">
-            <button (click)="crud(element, this.operations.update)" mat-menu-item>
-              <mat-icon color="warn">edit</mat-icon>
-              Modifier
-            </button>
+    <!-- Corps : table + pagination -->
+    <div class="list-body">
+      <div class="mat-elevation-z10 compact-table">
+        <table mat-table [dataSource]="t_RecouvListeEncaissement" matSort style="width: 100%">
 
-            <!-- Optionnel : séparateur -->
-            <mat-divider></mat-divider>
+          <!-- Client -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let element">{{ element.client }}</td>
+          </ng-container>
 
-            <button (click)="onPrintRecu(element)" mat-menu-item>
-              <mat-icon color="accent">print</mat-icon>
-              Editer Reçu
-            </button>
-<!--
-            <button *ngIf="hasOperationCode('ENCAISSER')" (click)="onPrintRecu(element)" mat-menu-item>
-              <mat-icon color="accent">print</mat-icon>
-              Editer Reçu
-            </button>-->
+          <!-- Montants -->
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant encaissé</th>
+            <td mat-cell *matCellDef="let element">{{ element.montant_encaisse | number:'1.0-0' }}</td>
+          </ng-container>
 
-          </mat-menu>
-        </td>
-      </ng-container>
-      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-      <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
-          [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+          <ng-container matColumnDef="affecte">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant affecté</th>
+            <td mat-cell *matCellDef="let element">{{ element.montant_affecte | number:'1.0-0' }}</td>
+          </ng-container>
 
-      <!-- Row shown when there is no matching data. -->
-      <tr *matNoDataRow class="mat-row">
-        <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au critère
-          de
-          recherche
-        </td>
-      </tr>
-    </table>
-    <mat-paginator [pageSizeOptions]="[3,5, 10, 15]" [pageSize]="10" showFirstLastButtons></mat-paginator>
-  </div>
-</div>
+          <ng-container matColumnDef="solde_non_affecte">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant restant</th>
+            <td mat-cell *matCellDef="let element">{{ element.montant_restant | number:'1.0-0' }}</td>
+          </ng-container>
+
+          <!-- Date / Mode -->
+          <ng-container matColumnDef="date_encaissement">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date encaissement</th>
+            <td mat-cell *matCellDef="let element">{{ element.date_encaissement | date:'dd/MM/yyyy' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="mode_paiement">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Mode paiement</th>
+            <td mat-cell *matCellDef="let element">{{ element.mode_paiement_libelle }}</td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
+                <mat-icon>settings</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="crud(element, operations.update)">
+                  <mat-icon color="primary">edit</mat-icon>
+                  Modifier
+                </button>
+
+                <mat-divider></mat-divider>
+
+                <button mat-menu-item (click)="onPrintRecu(element)">
+                  <mat-icon color="primary">print</mat-icon>
+                  Éditer reçu
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <!-- Lignes -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let element; columns: displayedColumns"
+            (click)="onRowClicked(element)"
+            [ngClass]="{ 'selected': element === selectedRow }">
+          </tr>
+
+          <!-- Ligne vide -->
+          <tr mat-row *matNoDataRow>
+            <td class="mat-cell" colspan="6">
+              Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[3, 5, 10, 15]"
+          [pageSize]="5"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </div> <!-- /list-body -->
+
+  </section>
+</mat-card>

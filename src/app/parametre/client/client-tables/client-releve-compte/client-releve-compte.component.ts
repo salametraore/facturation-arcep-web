@@ -21,8 +21,7 @@ import {RecouvDashboardClient} from "../../../../shared/models/recouv-dashboard-
 
 @Component({
   selector: 'client-releve-compte',
-  templateUrl: './client-releve-compte.component.html',
-  styleUrl: './client-releve-compte.component.scss'
+  templateUrl: './client-releve-compte.component.html'
 })
 export class ClientReleveCompteComponent implements OnInit,AfterViewInit {
 

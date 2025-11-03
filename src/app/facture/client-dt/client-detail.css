@@ -1,0 +1,137 @@
+.page-container {
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+/* 1️⃣ En-tête */
+.client-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap; /* les boutons restent sur la même ligne */
+}
+
+.upload-label-create {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  background-color: #c62828;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0; /* empêche les boutons de se réduire et de passer à la ligne */
+  transition: all 0.2s ease;
+}
+
+.upload-label-create mat-icon {
+  font-size: 20px;
+}
+
+
+/* 2️⃣ Box principal */
+.client-main-box {
+  display: flex;
+  gap: 20px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-col {
+  align-items: center;
+  text-align: center;
+}
+
+.client-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.client-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.client-registered {
+  font-size: 12px;
+  color: gray;
+}
+
+.info-col div {
+  margin-bottom: 8px;
+}
+
+.card-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.unpaid-invoices-card {
+  background-color: #ffc107;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.unpaid-invoices-card .invoice-count {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Tabs */
+.tab-table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .client-main-box {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-col, .card-col {
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+  }
+
+  .client-header {
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .header-buttons {
+    justify-content: center;
+    margin-top: 10px;
+  }
+}

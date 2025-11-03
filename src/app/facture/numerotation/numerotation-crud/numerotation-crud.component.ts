@@ -21,8 +21,7 @@ import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traite
 
 @Component({
   selector: 'numerotation-crud',
-  templateUrl: './numerotation-crud.component.html',
-  styleUrl: './numerotation-crud.component.scss'
+  templateUrl: './numerotation-crud.component.html'
 })
 export class NumerotationCrudComponent implements OnInit, AfterViewInit {
 

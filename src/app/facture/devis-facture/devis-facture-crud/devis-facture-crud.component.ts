@@ -20,8 +20,7 @@ import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 
 @Component({
   selector: 'app-devis-facture-crud',
-  templateUrl: './devis-facture-crud.component.html',
-  styleUrl: './devis-facture-crud.component.scss'
+  templateUrl: './devis-facture-crud.component.html'
 })
 export class DevisFactureCrudComponent implements OnInit {
 
@@ -209,6 +208,11 @@ export class DevisFactureCrudComponent implements OnInit {
     // Logique pour ajouter un nouveau client
     console.log('Ajouter un nouveau client');
   }
+
+  getClientNameById(id: number | string) {
+    return this.clients?.find(c => c.id === id)?.denomination_sociale ?? '';
+  }
+
 
   onFerme() {
     this.dialogRef.close('Yes');

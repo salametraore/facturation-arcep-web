@@ -17,11 +17,11 @@ import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {DialogService} from "../../../shared/services/dialog.service";
 import {operations,bouton_names} from "../../../constantes";
+import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 
 @Component({
   selector: 'service-a-valeur-ajoute-crud',
-  templateUrl: './service-a-valeur-ajoute-crud.component.html',
-  styleUrl: './service-a-valeur-ajoute-crud.component.scss'
+  templateUrl: './service-a-valeur-ajoute-crud.component.html'
 })
 export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit {
 
@@ -39,6 +39,7 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
   form_ficheTechnique: FormGroup;
   form_ficheTechniquesProduit: FormGroup;
   t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
+  historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
   public operations = operations;
   public bouton_names = bouton_names;
@@ -98,6 +99,12 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
     });
+
+    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
+      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+    });
+
+
   }
 
   initFormCommandeClient_create() {

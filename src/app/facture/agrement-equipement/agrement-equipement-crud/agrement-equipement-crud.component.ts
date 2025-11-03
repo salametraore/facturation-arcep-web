@@ -17,13 +17,13 @@ import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {DialogService} from "../../../shared/services/dialog.service";
 import {operations,bouton_names} from "../../../constantes";
+import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 
 
 
 @Component({
   selector: 'agrement-equipement-crud',
-  templateUrl: './agrement-equipement-crud.component.html',
-  styleUrl: './agrement-equipement-crud.component.scss'
+  templateUrl: './agrement-equipement-crud.component.html'
 })
 export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
 
@@ -53,6 +53,7 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
   montant_de_la_commade: number = 0;
   produits: Produit[];
   productAllowedIds = [72, 73, 74];
+  historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
   // IDs des 3 "produits" d'agrément
   private readonly PRODUCT_BASE_ID = 72;
@@ -139,6 +140,11 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
         }
       }
     });
+
+    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
+      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+    });
+
 
   }
 

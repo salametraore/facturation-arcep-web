@@ -1,200 +1,209 @@
-<div class="dashboard-container">
+<!-- src/app/features/sva/fiche-technique/sva-ft-list-page.component.html -->
+<mat-card>
 
-  <div class="dashboard-header">
-    <h3 class="dashboard-title" style="color: #030303">Fiche technique : Services à valeur ajoutée</h3>
-    <div class="dashboard-actions">
-      <button (click)="crud(null,this.operations.create)" color="warn" mat-flat-button>
-        <mat-icon>add</mat-icon>
-        Nouvelle fiche technique
-      </button>
-<!--      <button color="warn" mat-flat-button>
-        <mat-icon>print</mat-icon>
-        Exporter
-      </button>-->
-    </div>
+  <!-- Titre de page (barre rose) -->
+  <div class="page-title">
+    <h2>Fiche technique : services à valeur ajoutée</h2>
   </div>
 
-<!--  <div class="filter-section">
-    <div class="filter-group">
+  <!-- Filtres compacts et centrés -->
+  <div class="filters filters--one-line">
+    <div class="filters-grid">
 
-      <mat-form-field>
-        <mat-label>Nom du client</mat-label>
-        <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client" placeholder="Nom du client" (keyup.enter)="chercher()" required>
-        <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option *ngFor="let item of clients | search:nomClient"  (click)="onGetClient(item)" [value]="item.denomination_sociale">
-            <span>{{item.denomination_sociale}}</span>
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Date début</mat-label>
-        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (dateChange)="chercher()">
-        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
-        <mat-datepicker #pickerStart></mat-datepicker>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Date fin</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (dateChange)="chercher()">
-        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-        <mat-datepicker #pickerEnd></mat-datepicker>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Catégorie de service</mat-label>
-        <mat-select [(ngModel)]="serviceFilter" (selectionChange)="chercher()">
-          <mat-option *ngFor="let item of produits" [value]="item.id">
-            {{item.libelle}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Statut</mat-label>
-        <mat-select [(ngModel)]="statusFilter" (selectionChange)="chercher()">
-          <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">
-            {{item.libelle}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <button (click)="chercher()" color="primary" mat-mini-fab>
-        <mat-icon>search</mat-icon>
-      </button>
-      <button (click)="reset()" color="primary" mat-mini-fab>
-        <mat-icon>cached</mat-icon>
-      </button>
-    </div>
-  </div>-->
-
-  <div class="filter-section">
-    <div class="filter-group grid-filters">
+      <!-- Client (autocomplete) -->
       <mat-form-field class="client-field">
         <mat-label>Nom du client</mat-label>
-        <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl"
-               matInput matTooltip="Nom du client" placeholder="Nom du client">
+        <input
+          matInput
+          placeholder="Nom du client"
+          matTooltip="Nom du client"
+          [matAutocomplete]="auto_cl"
+          [(ngModel)]="nomClient">
         <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option *ngFor="let item of clients | search:nomClient" (click)="onGetClient(item)"
-                      [value]="item.denomination_sociale">
-            <span>{{item.denomination_sociale}}</span>
+          <mat-option
+            *ngFor="let item of clients | search: nomClient"
+            (click)="onGetClient(item)"
+            [value]="item.denomination_sociale">
+            <span>{{ item.denomination_sociale }}</span>
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
 
+      <!-- Date début -->
       <mat-form-field>
         <mat-label>Date début</mat-label>
-        <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (dateChange)="chercher()">
+        <input
+          matInput
+          [matDatepicker]="pickerStart"
+          [(ngModel)]="startDate"
+          (dateChange)="chercher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
         <mat-datepicker #pickerStart></mat-datepicker>
       </mat-form-field>
 
+      <!-- Date fin -->
       <mat-form-field>
         <mat-label>Date fin</mat-label>
-        <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (dateChange)="chercher()">
+        <input
+          matInput
+          [matDatepicker]="pickerEnd"
+          [(ngModel)]="endDate"
+          (dateChange)="chercher()">
         <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
         <mat-datepicker #pickerEnd></mat-datepicker>
       </mat-form-field>
 
+      <!-- Catégorie de service -->
       <mat-form-field>
         <mat-label>Catégorie de service</mat-label>
         <mat-select [(ngModel)]="serviceFilter" (selectionChange)="chercher()">
           <mat-option *ngFor="let item of produits" [value]="item.id">
-            {{item.libelle}}
+            {{ item.libelle }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
+      <!-- Statut -->
       <mat-form-field>
         <mat-label>Statut</mat-label>
         <mat-select [(ngModel)]="statusFilter" (selectionChange)="chercher()">
           <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">
-            {{item.libelle}}
+            {{ item.libelle }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <button (click)="chercher()" color="primary" mat-mini-fab class="action-btn">
+      <!-- Boutons actions filtres -->
+      <button mat-mini-fab color="primary" class="action-btn" (click)="chercher()">
         <mat-icon>search</mat-icon>
       </button>
-      <button (click)="reset()" color="primary" mat-mini-fab class="action-btn">
+      <button mat-mini-fab color="primary" class="action-btn" (click)="reset()">
         <mat-icon>cached</mat-icon>
       </button>
+
     </div>
   </div>
 
-  <div class="table-frame mat-elevation-z10 compact-table">
-    <table [dataSource]="ficheTechniques" mat-table matSort style="width: 100%">
+  <!-- Cadre standard -->
+  <section class="list-box">
 
-      <ng-container matColumnDef="client_nom">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Client</th>
-        <td *matCellDef="let element" mat-cell> {{element.client_nom}} </td>
-      </ng-container>
+    <!-- En-tête : titre + actions à droite -->
+    <div class="list-header">
+      <h3 class="list-title">Liste des fiches techniques — Services à valeur ajoutée</h3>
 
-      <ng-container matColumnDef="date_creation">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Date soumission</th>
-        <td *matCellDef="let element" mat-cell> {{element.date_creation|date: 'dd/MM/yyyy'}} </td>
-      </ng-container>
-      <ng-container matColumnDef="categorie_produit">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Catégorie</th>
-        <td *matCellDef="let element" mat-cell> {{getCategorie(element.categorie_produit)}} </td>
-      </ng-container>
-      <ng-container matColumnDef="statut.libelle">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header> Statut</th>
-        <td *matCellDef="let element" mat-cell> {{element.statut?.libelle}} </td>
-      </ng-container>
+      <div class="list-actions">
+        <button mat-flat-button color="primary" (click)="crud(null, this.operations.create)">
+          <mat-icon>add</mat-icon>
+          Nouvelle fiche technique
+        </button>
+        <!--
+        <button mat-stroked-button color="primary">
+          <mat-icon>print</mat-icon>
+          Exporter
+        </button>
+        -->
+      </div>
+    </div>
 
-      <ng-container matColumnDef="actions">
-        <th *matHeaderCellDef mat-header-cell>Actions
-        </th>
-        <td *matCellDef="let element" mat-cell>
-          <button [matMenuTriggerFor]="menu" color="warn" mat-icon-button>
-            <mat-icon>settings</mat-icon>
-          </button>
-          <mat-menu #menu="matMenu">
-            <button (click)="crud(element,this.operations.update)" mat-menu-item>
-              <mat-icon color="warn">edit</mat-icon>
-              Modifier
-            </button>
-            <button *ngIf="element.statut?.code==='INIT' && hasOperationCode('TRANSMETTRE_FICHE') "   (click)="crud(element,this.operations.transmettre)"
-                    mat-menu-item>
-              <mat-icon color="warn">edit</mat-icon>
-              Transmettre
-            </button>
+    <!-- Corps : table + pagination -->
+    <div class="list-body">
+      <div class="mat-elevation-z10 compact-table">
+        <table mat-table [dataSource]="ficheTechniques" matSort style="width: 100%">
 
-            <button *ngIf="element.statut?.code==='FTD' && hasOperationCode('AVIS_TECHNIQUE_FICHE')"
-                    (click)="onSetAvis(element,this.operations.transmettre)"
-                    mat-menu-item>
-              <mat-icon color="warn">check</mat-icon>
-              Donner un avis
-            </button>
+          <!-- Client -->
+          <ng-container matColumnDef="client_nom">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let element">{{ element.client_nom }}</td>
+          </ng-container>
 
-            <button *ngIf="element.statut?.id>5 && hasOperationCode('RETRAIT_FICHE') "
-                    (click)="onRetraitAutorisation(element,this.operations.transmettre)"
-                    mat-menu-item>
-              <mat-icon color="warn">check</mat-icon>
-              Retrait autorisation/licence
-            </button>
+          <!-- Date soumission -->
+          <ng-container matColumnDef="date_creation">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date soumission</th>
+            <td mat-cell *matCellDef="let element">{{ element.date_creation | date:'dd/MM/yyyy' }}</td>
+          </ng-container>
 
-            <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
-              <mat-icon color="warn">delete</mat-icon>
-              Supprimer
-            </button>
-          </mat-menu>
-        </td>
-      </ng-container>
-      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-      <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
-          [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
+          <!-- Catégorie -->
+          <ng-container matColumnDef="categorie_produit">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
+            <td mat-cell *matCellDef="let element">{{ getCategorie(element.categorie_produit) }}</td>
+          </ng-container>
 
-      <!-- Row shown when there is no matching data. -->
-      <tr *matNoDataRow class="mat-row">
-        <td class="mat-cell" colspan="4">Aucune correspondance trouvée dans la base de données correspondant au critère
-          de recherche
-        </td>
-      </tr>
-    </table>
-    <mat-paginator [pageSizeOptions]="[3,5, 10, 15]" [pageSize]="10" showFirstLastButtons></mat-paginator>
-  </div>
-</div>
+          <!-- Statut -->
+          <ng-container matColumnDef="statut.libelle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+            <td mat-cell *matCellDef="let element">{{ element.statut?.libelle }}</td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
+                <mat-icon>settings</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item class="btn_edit" (click)="crud(element, this.operations.update)">
+                  <mat-icon color="primary">edit</mat-icon>
+                  Modifier
+                </button>
+
+                <button
+                  *ngIf="element.statut?.code==='INIT' && hasOperationCode('TRANSMETTRE_FICHE')"
+                  mat-menu-item
+                  (click)="crud(element, this.operations.transmettre)">
+                  <mat-icon color="warn">edit</mat-icon>
+                  Transmettre
+                </button>
+
+                <button
+                  *ngIf="element.statut?.code==='FTD' && hasOperationCode('AVIS_TECHNIQUE_FICHE')"
+                  mat-menu-item
+                  (click)="onSetAvis(element, this.operations.transmettre)">
+                  <mat-icon color="warn">check</mat-icon>
+                  Donner un avis
+                </button>
+
+                <button
+                  *ngIf="element.statut?.id>5 && hasOperationCode('RETRAIT_FICHE')"
+                  mat-menu-item
+                  (click)="onRetraitAutorisation(element, this.operations.transmettre)">
+                  <mat-icon color="warn">check</mat-icon>
+                  Retrait autorisation/licence
+                </button>
+
+                <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
+                  <mat-icon color="warn">delete</mat-icon>
+                  Supprimer
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <!-- Lignes -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let element; columns: displayedColumns"
+            (click)="onRowClicked(element)"
+            [ngClass]="{ 'selected': element === selectedRow }">
+          </tr>
+
+          <!-- Ligne vide -->
+          <tr mat-row *matNoDataRow>
+            <td class="mat-cell" colspan="4">
+              Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[3, 5, 10, 15]"
+          [pageSize]="5"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </div> <!-- /list-body -->
+
+  </section>
+</mat-card>

@@ -1,0 +1,167 @@
+<div class="page-container">
+  <!-- 1️⃣ En-tête -->
+  <div class="client-header">
+    <h2>Profil du client {{ client.name }}</h2>
+    <div class="header-buttons">
+      <button class="upload-label-create" (click)="goToServiceCreate('nom-de-domaine')">
+        <mat-icon>add_circle_outline</mat-icon>
+        FT NOM DE DOMAINE
+      </button>
+      <button class="upload-label-create" (click)="goToServiceCreate('service-de-confiance')">
+        <mat-icon>add_circle_outline</mat-icon>
+        FT SERVICE DE CONFIANCE
+      </button>
+    </div>
+  </div>
+
+  <!-- 2️⃣ Box principal (3 colonnes) -->
+  <div class="client-main-box">
+    <!-- Colonne 1 -->
+    <div class="col logo-col">
+      <img [src]="client.logo" (click)="editLogo()" class="client-logo" alt="{{ client.name }}">
+      <div class="client-name">{{ client.name }}</div>
+      <div class="client-registered">Enregistré le {{ client.registeredAt }}</div>
+    </div>
+
+    <!-- Colonne 2 -->
+    <div class="col info-col">
+      <div><strong>Numéro de compte:</strong> {{ client.accountNumber }}</div>
+      <div><strong>IFU:</strong> {{ client.ifu }}</div>
+      <div><strong>RCCM:</strong> {{ client.rccm }}</div>
+      <div><strong>Téléphone:</strong> {{ client.phone }}</div>
+      <div><strong>Email:</strong> {{ client.email }}</div>
+      <div><strong>Adresse:</strong> {{ client.address }}</div>
+    </div>
+
+    <!-- Colonne 3 -->
+    <div class="col card-col">
+      <div class="unpaid-invoices-card">
+        <div class="invoice-count">{{ client.unpaidInvoices }}</div>
+        <div>factures impayées</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3️⃣ Tabs -->
+  <mat-tab-group>
+    <!-- Fiche technique -->
+    <mat-tab label="Fiche technique">
+      <div class="tab-table-container">
+        <table mat-table [dataSource]="ficheTechnique" class="mat-elevation-z1">
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>Référence de la demande</th>
+            <td mat-cell *matCellDef="let element">{{element.reference}}</td>
+          </ng-container>
+          <ng-container matColumnDef="serviceType">
+            <th mat-header-cell *matHeaderCellDef>Type de service</th>
+            <td mat-cell *matCellDef="let element">{{element.serviceType}}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Statut global</th>
+            <td mat-cell *matCellDef="let element">{{element.status}}</td>
+          </ng-container>
+          <ng-container matColumnDef="submissionDate">
+            <th mat-header-cell *matHeaderCellDef>Date de soumission</th>
+            <td mat-cell *matCellDef="let element">{{element.submissionDate}}</td>
+          </ng-container>
+          <ng-container matColumnDef="lastAction">
+            <th mat-header-cell *matHeaderCellDef>Dernière action</th>
+            <td mat-cell *matCellDef="let element">{{element.lastAction}}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="primary" (click)="viewDocument(element)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['reference','serviceType','status','submissionDate','lastAction','action']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['reference','serviceType','status','submissionDate','lastAction','action'];"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Devis -->
+    <mat-tab label="Devis">
+      <div class="tab-table-container">
+        <table mat-table [dataSource]="devis" class="mat-elevation-z1">
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>Référence de devis</th>
+            <td mat-cell *matCellDef="let element">{{element.reference}}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Montant</th>
+            <td mat-cell *matCellDef="let element">{{element.amount | currency:'XOF'}}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let element">{{element.status}}</td>
+          </ng-container>
+          <ng-container matColumnDef="dueDate">
+            <th mat-header-cell *matHeaderCellDef>Échéance</th>
+            <td mat-cell *matCellDef="let element">{{element.dueDate}}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['reference','amount','status','dueDate']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['reference','amount','status','dueDate']"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Factures -->
+    <mat-tab label="Factures">
+      <div class="tab-table-container">
+        <table mat-table [dataSource]="factures" class="mat-elevation-z1">
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>Référence de facture</th>
+            <td mat-cell *matCellDef="let element">{{element.reference}}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Montant</th>
+            <td mat-cell *matCellDef="let element">{{element.amount | currency:'XOF'}}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let element">{{element.status}}</td>
+          </ng-container>
+          <ng-container matColumnDef="dueDate">
+            <th mat-header-cell *matHeaderCellDef>Échéance</th>
+            <td mat-cell *matCellDef="let element">{{element.dueDate}}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['reference','amount','status','dueDate']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['reference','amount','status','dueDate']"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Documents -->
+    <mat-tab label="Documents">
+      <div class="tab-table-container">
+        <table mat-table [dataSource]="documents" class="mat-elevation-z1">
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Titre du document</th>
+            <td mat-cell *matCellDef="let element">{{element.title}}</td>
+          </ng-container>
+          <ng-container matColumnDef="uploadedAt">
+            <th mat-header-cell *matHeaderCellDef>Date d'enregistrement</th>
+            <td mat-cell *matCellDef="let element">{{element.uploadedAt}}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="primary" (click)="viewDocument(element)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['title','uploadedAt','action']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['title','uploadedAt','action']"></tr>
+        </table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

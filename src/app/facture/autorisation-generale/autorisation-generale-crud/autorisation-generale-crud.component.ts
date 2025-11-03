@@ -13,11 +13,11 @@ import {DialogService} from "../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {AuthService} from "../../../authentication/auth.service";
 import {bouton_names, operations} from "../../../constantes";
+import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 
 @Component({
   selector: 'autorisation-generale-crud',
-  templateUrl: './autorisation-generale-crud.component.html',
-  styleUrl: './autorisation-generale-crud.component.scss'
+  templateUrl: './autorisation-generale-crud.component.html'
 })
 export class AutorisationGeneraleCrudComponent implements OnInit {
   @Input() fixeCategorie: number;
@@ -39,6 +39,7 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
+  historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -77,6 +78,13 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
       this.produits = produits?.filter(f => f.id === 76);
       this.form.get('produit').setValue(this.produits[0]?.id);
     });
+
+    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
+      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+    });
+
+
+
   }
 
   initForm_update() {

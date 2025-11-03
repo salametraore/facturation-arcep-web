@@ -1,0 +1,817 @@
+/* ===== Thème local (noir) ===== */
+:host {
+  --brand-primary: #000000;            /* noir */
+  --focus-overlay: rgba(0,0,0,0.06);   /* halo focus */
+
+  /* ======= Variables barre de filtres (UNE SEULE FOIS) ======= */
+  --filter-field-height: 50px;   /* Hauteur de tous les champs: 46/48/50/54 au choix */
+  --filter-gap: 16px;            /* Espace entre éléments dans la barre */
+  --btn-size: 48px;              /* Taille des mini-fab (loupe/refresh) */
+  --label-font: 15px;            /* Label normal */
+  --label-float-font: 14px;      /* Label flottant */
+}
+
+/* ========== Angular Material (MDC) ========== */
+/* Outline en focus */
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--brand-primary) !important;
+}
+
+/* Halo de focus */
+:host ::ng-deep .mat-mdc-form-field-focus-overlay {
+  background-color: var(--focus-overlay) !important;
+}
+
+/* Label */
+:host ::ng-deep .mdc-floating-label { color: #333 !important; opacity: 0.95; }
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label,
+:host ::ng-deep .mdc-floating-label--float-above {
+  color: var(--brand-primary) !important;
+  opacity: 1 !important;
+  font-weight: 600;
+}
+
+/* Notch propre */
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch {
+  padding-inline-start: 0 !important;
+  padding-inline-end: 0 !important;
+  background: transparent !important;
+  display: block !important;
+}
+
+/* Input & placeholder */
+:host ::ng-deep .mat-mdc-input-element { color: #111 !important; }
+:host ::ng-deep .mat-mdc-form-field .mat-mdc-input-element::placeholder {
+  color: #666 !important; opacity: 1 !important;
+}
+
+/* Marqueur requis */
+:host ::ng-deep .mat-mdc-form-field-required-marker {
+  color: var(--brand-primary) !important; opacity: 1 !important; font-weight: 700;
+}
+
+/* ========== Mat-select & Autocomplete ========== */
+:host ::ng-deep .mat-mdc-select.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .mat-mdc-select.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .mat-mdc-select.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--brand-primary) !important;
+}
+:host ::ng-deep .mat-mdc-autocomplete-panel
+.mdc-list-item--selected .mdc-list-item__primary-text,
+:host ::ng-deep .mat-mdc-autocomplete-panel
+.mdc-list-item--activated .mdc-list-item__primary-text {
+  color: var(--brand-primary) !important;
+}
+
+/* ========== Stepper (si utilisé) ========== */
+:host ::ng-deep .mat-step-icon-selected,
+:host ::ng-deep .mat-step-icon-state-edit { background-color: var(--brand-primary) !important; color: #fff !important; }
+:host ::ng-deep .mat-step-label.mat-step-label-active { color: var(--brand-primary) !important; font-weight: 600; }
+
+/* ========== Cartes & layout ========== */
+.dark-card {
+  background-color: #efebeb;
+  margin: 10px 0;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.dark-card .mat-card-content { padding: 16px; }
+.dark-card ul { padding-left: 20px; }
+
+/* Section fiche technique (bloc blanc) */
+.tech-sheet-section {
+  background: #fff;
+  padding: 8px 20px 20px;     /* top compacté */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Titre de sous-section centré, compact */
+.subsection-label {
+  display: block;
+  text-align: center;
+  margin: 4px 0 12px;
+  font-weight: 600;
+}
+
+/* ========== Dashboard ========== */
+.dashboard-container { padding: 20px; }
+.dashboard-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+}
+.dashboard-title { color: #030303; font-size: 24px; margin-bottom: 20px; }
+.dashboard-actions { display: flex; gap: 10px; }
+
+/* ========== Barre de filtres (version patchée) ========== */
+.filter-section { display:flex; flex-direction:column; gap:20px; margin-bottom: 12px; }
+.filter-group.one-line{
+  display:flex;
+  align-items:flex-end;               /* baseline commune */
+  gap:var(--filter-gap);
+  flex-wrap:nowrap;                   /* tout sur une ligne */
+  overflow-x:auto;                    /* scroll si pas assez de place */
+  padding-right: 8px;                 /* anti rognage boutons */
+}
+mat-form-field { width:100%; margin:0 !important; } /* pas de marge parasite */
+
+/* Hauteur & densité communes pour TOUS les champs */
+.mf{ flex:0 0 auto; }
+:host ::ng-deep .mf .mat-mdc-text-field-wrapper{
+  height: var(--filter-field-height) !important;
+  box-sizing: border-box !important;
+}
+:host ::ng-deep .mf .mat-mdc-form-field-flex{ height:100% !important; }
+:host ::ng-deep .mf .mat-mdc-form-field-infix{
+  height:100% !important;
+  min-height:0 !important;
+  padding:0 12px !important;
+  display:flex !important;
+  align-items:center !important;      /* centre le contenu verticalement */
+}
+:host ::ng-deep .mf .mdc-notched-outline__notch{ padding-inline:0 !important; }
+:host ::ng-deep .mf .mat-mdc-form-field-subscript-wrapper{ display:none !important; height:0 !important; }
+:host ::ng-deep .mf .mat-mdc-input-element{ line-height:1.2 !important; }
+
+/* Labels plus grands */
+:host ::ng-deep .mat-mdc-form-field .mdc-floating-label{
+  font-size: var(--label-font) !important;
+  font-weight: 600;
+  color:#222; opacity:.95;
+}
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label,
+:host ::ng-deep .mat-mdc-form-field .mdc-floating-label--float-above{
+  font-size: var(--label-float-font) !important;
+  font-weight: 700; opacity:1;
+}
+
+/* Largeurs (ajuste si besoin) */
+.mf-client{ flex:1 1 360px; max-width: 460px; min-width: 280px; }
+.mf-date{   flex:0 0 200px; min-width: 180px; }
+.mf-select{ flex:0 0 210px; min-width: 190px; }
+
+/* Datepicker : normalisation stricte du suffix */
+:host ::ng-deep .mf-date .mat-mdc-form-field-icon-suffix{ margin:0 !important; }
+:host ::ng-deep .mf-date .mat-datepicker-toggle{
+  height:100% !important; display:flex !important; align-items:center !important;
+}
+:host ::ng-deep .mf-date .mat-datepicker-toggle .mat-mdc-icon-button{
+  height: calc(var(--filter-field-height) - 12px) !important;
+  width:  calc(var(--filter-field-height) - 12px) !important;
+  line-height: calc(var(--filter-field-height) - 12px) !important;
+  margin:0 !important;
+}
+:host ::ng-deep .mf-date .mat-datepicker-toggle .mat-icon{
+  font-size:22px !important; width:22px !important; height:22px !important;
+}
+
+/* Mat-select : même rendu vertical */
+:host ::ng-deep .mf .mat-mdc-select-trigger{
+  height: calc(var(--filter-field-height) - 12px) !important;
+  line-height: calc(var(--filter-field-height) - 12px) !important;
+}
+
+/* Actions (boutons) */
+.actions{
+  display:flex; align-items:center; gap:20px; margin-left:16px; min-height:var(--filter-field-height);
+}
+.icon-btn.mat-mdc-mini-fab{
+  width:var(--btn-size); height:var(--btn-size); line-height:var(--btn-size);
+}
+:host ::ng-deep .mat-mdc-mini-fab .mat-button-wrapper{ padding:0; }
+:host ::ng-deep .icon-btn .mat-icon{ font-size:26px; width:26px; height:26px; }
+
+/* Réactivité douce : on réduit un peu avant de scroller */
+@media (max-width: 1366px){
+  .mf-client{ flex-basis:320px; max-width:400px; min-width:240px; }
+  .mf-date{   flex-basis:190px; }
+  .mf-select{ flex-basis:195px; }
+}
+
+/* ========== MatTable : contour + header sticky ========== */
+:host ::ng-deep .mat-elevation-z10 {
+  border: 1px solid rgba(0,0,0,0.24);
+  border-radius: 8px;
+  background: #fff;
+  max-height: 360px;
+  overflow: auto;
+}
+:host ::ng-deep .mat-elevation-z10 table.mat-mdc-table,
+:host ::ng-deep .mat-elevation-z10 table.mat-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-row,
+:host ::ng-deep .mat-elevation-z10 .mat-header-row {
+  background: #f7f7f7;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky; top: 0; z-index: 3;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.06);
+}
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-row,
+:host ::ng-deep .mat-elevation-z10 .mat-row { border-bottom: 1px solid #f0f0f0; }
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-header-cell {
+  padding: 12px 16px; border-right: none; vertical-align: middle; color: #111;
+}
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-row:nth-child(even),
+:host ::ng-deep .mat-elevation-z10 .mat-row:nth-child(even) { background-color: #fafafa; }
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-row:hover,
+:host ::ng-deep .mat-elevation-z10 .mat-row:hover { background-color: rgba(0,0,0,0.03); }
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-footer-row,
+:host ::ng-deep .mat-elevation-z10 .mat-footer-row {
+  background: #fff; border-top: 1px solid #e0e0e0; font-weight: 600;
+  position: sticky; bottom: 0; z-index: 3;
+  box-shadow: 0 -2px 3px rgba(0,0,0,0.04);
+}
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-header-cell { font-weight: 700; }
+
+/* Carte plus compacte en haut */
+.dark-card.mat-card { padding-top: 8px; }
+
+/* ========== Statuts (SCSS avec modifieurs) ========== */
+.getStatusColor {
+  &.Transmis { color: green; }
+  &.En\ attente { color: orange; }
+  &.Clos { color: darkred; }
+  &.Abandon { color: gray; }
+}
+
+/* Cadre externe plus visible */
+:host ::ng-deep .table-frame {
+  border: 1px solid #9e9e9e;
+  border-radius: 8px;
+  background: #fff;
+  overflow: auto;
+}
+
+/* Le tableau occupe tout l’espace sans écraser le cadre */
+:host ::ng-deep .table-frame .mat-mdc-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+/* Entête : séparation nette */
+:host ::ng-deep .table-frame .mat-mdc-header-row {
+  background: #f7f7f7;
+  border-bottom: 1px solid #bdbdbd;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+/* Lignes : traits horizontaux visibles */
+:host ::ng-deep .table-frame .mat-mdc-row { border-bottom: 1px solid #e0e0e0; }
+
+/* Bordures verticales entre cellules */
+:host ::ng-deep .table-frame .mat-mdc-cell,
+:host ::ng-deep .table-frame .mat-mdc-header-cell,
+:host ::ng-deep .table-frame .mat-mdc-footer-cell {
+  border-right: 1px solid #e0e0e0;
+  padding: 12px 16px;
+  vertical-align: middle;
+  color: #111;
+}
+
+/* Pas de trait à droite sur la dernière cellule de chaque ligne */
+:host ::ng-deep .table-frame .mat-mdc-row .mat-mdc-cell:last-child,
+:host ::ng-deep .table-frame .mat-mdc-header-row .mat-mdc-header-cell:last-child,
+:host ::ng-deep .table-frame .mat-mdc-footer-row .mat-mdc-footer-cell:last-child {
+  border-right: none;
+}
+
+/* Coins supérieurs arrondis de l’entête */
+:host ::ng-deep .table-frame .mat-mdc-header-row .mat-mdc-header-cell:first-child { border-top-left-radius: 8px; }
+:host ::ng-deep .table-frame .mat-mdc-header-row .mat-mdc-header-cell:last-child  { border-top-right-radius: 8px; }
+
+/* Footer sticky */
+:host ::ng-deep .table-frame .mat-mdc-footer-row {
+  background: #fff;
+  border-top: 1px solid #bdbdbd;
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+}
+
+/* ===== Densifier le tableau ===== */
+:host ::ng-deep .compact-table .mat-mdc-header-row,
+:host ::ng-deep .compact-table .mat-mdc-row { height: 36px; }
+
+:host ::ng-deep .compact-table .mat-mdc-header-cell,
+:host ::ng-deep .compact-table .mat-mdc-cell,
+:host ::ng-deep .compact-table .mat-mdc-footer-cell {
+  padding: 6px 12px;
+  line-height: 1.25;
+  font-size: 14px;
+}
+
+/* Boutons d'action compacts */
+:host ::ng-deep .compact-table .mat-mdc-icon-button { width: 28px; height: 28px; padding: 0; }
+
+/* Paginator plus serré */
+:host ::ng-deep .compact-table .mat-mdc-paginator-container {
+  min-height: 36px; padding: 0 8px; gap: 6px; font-size: 13px;
+}
+
+/* Réduire largeur de la colonne Actions */
+:host ::ng-deep .compact-table .mat-column-actions {
+  width: 60px; min-width: 60px; max-width: 60px;
+  text-align: center; padding-left: 0 !important; padding-right: 0 !important; white-space: nowrap;
+}
+
+/* Scroll vertical uniquement dans les cadres */
+:host ::ng-deep .table-frame,
+:host ::ng-deep .mat-elevation-z10 {
+  overflow-x: hidden; overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
+  box-sizing: border-box;
+}
+
+/* Le tableau ne dépasse pas son parent */
+:host ::ng-deep .table-frame .mat-mdc-table,
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-table,
+:host ::ng-deep .mat-elevation-z10 table.mat-table {
+  width: 100%; max-width: 100%; min-width: 0;
+  table-layout: fixed; border-collapse: separate; border-spacing: 0; box-sizing: border-box;
+}
+
+/* Cellules : pas de débordement */
+:host ::ng-deep .table-frame .mat-mdc-cell,
+:host ::ng-deep .table-frame .mat-mdc-header-cell,
+:host ::ng-deep .table-frame .mat-mdc-footer-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-footer-cell {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* Colonnes autorisées à aller à la ligne (si besoin) */
+:host ::ng-deep .mat-column-client_nom,
+:host ::ng-deep .mat-column-statut\.libelle,
+:host ::ng-deep .mat-column-categorie_produit {
+  white-space: normal; overflow-wrap: anywhere; word-break: break-word;
+}
+
+/* Paginator largeur pleine */
+:host ::ng-deep .mat-mdc-paginator { display:block; width:100%; box-sizing:border-box; }
+:host ::ng-deep .mat-mdc-paginator-container { flex-wrap: wrap; gap: 6px; }
+
+
+/* === FIT COMPACT (sans scroll horizontal) === */
+/* cible: desktop ~1280–1366px de large */
+
+:host {
+  --filter-field-height: 46px;   /* ↓ hauteur champs */
+  --filter-gap: 10px;            /* ↓ espace entre éléments */
+  --btn-size: 40px;              /* ↓ taille boutons loupe/refresh */
+  --label-font: 14px;
+  --label-float-font: 13px;
+}
+
+/* alignement baseline + pas de débordement */
+:host ::ng-deep .filter-group.one-line{
+  align-items:flex-end;
+  gap:var(--filter-gap);
+  flex-wrap:nowrap;          /* on reste sur une ligne */
+  overflow-x:hidden;         /* pas de barre horizontale */
+  padding-right: 6px;
+  min-width:0;
+}
+:host ::ng-deep .filter-group.one-line .mf{ min-width:0; }
+
+/* mêmes hauteurs pour tous */
+:host ::ng-deep .mf .mat-mdc-text-field-wrapper{ height:var(--filter-field-height) !important; }
+:host ::ng-deep .mf .mat-mdc-form-field-infix{
+  height:100% !important; min-height:0 !important;
+  padding:0 10px !important;     /* ↓ padding horizontal */
+  display:flex !important; align-items:center !important;
+}
+:host ::ng-deep .mf .mdc-notched-outline__notch{ padding-inline:0 !important; }
+:host ::ng-deep .mf .mat-mdc-form-field-subscript-wrapper{ display:none !important; height:0 !important; }
+
+/* largeurs plus étroites (mais lisibles) */
+.mf-client{ flex:1 1 300px; max-width:360px; min-width:230px; }
+.mf-date  { flex:0 0 160px; min-width:140px; }   /* Date début/fin */
+.mf-select{ flex:0 0 170px; min-width:150px; }   /* Type/Statut */
+
+/* normalisation datepicker (ne gonfle pas la hauteur) */
+:host ::ng-deep .mf-date .mat-mdc-form-field-icon-suffix{ margin:0 !important; }
+:host ::ng-deep .mf-date .mat-datepicker-toggle{ height:100% !important; display:flex !important; align-items:center !important; }
+:host ::ng-deep .mf-date .mat-datepicker-toggle .mat-mdc-icon-button{
+  height:calc(var(--filter-field-height) - 12px) !important;
+  width: calc(var(--filter-field-height) - 12px) !important;
+  line-height:calc(var(--filter-field-height) - 12px) !important;
+  margin:0 !important;
+}
+:host ::ng-deep .mf-date .mat-datepicker-toggle .mat-icon{ font-size:20px !important; width:20px !important; height:20px !important; }
+
+/* mat-select à la même hauteur visuelle */
+:host ::ng-deep .mf .mat-mdc-select-trigger{
+  height:calc(var(--filter-field-height) - 12px) !important;
+  line-height:calc(var(--filter-field-height) - 12px) !important;
+}
+
+/* Actions (boutons) plus compacts et moins d’espace */
+.actions{
+  display:flex; align-items:center;
+  gap:12px;                 /* ↓ espace entre les deux boutons */
+  margin-left:8px;          /* ↓ espace après les champs */
+  min-height:var(--filter-field-height);
+}
+.icon-btn.mat-mdc-mini-fab{
+  width:var(--btn-size); height:var(--btn-size); line-height:var(--btn-size);
+}
+:host ::ng-deep .icon-btn .mat-icon{ font-size:22px; width:22px; height:22px; }
+
+/* ===== Encore plus compact si l'écran est serré (≤1280px) ===== */
+@media (max-width: 1280px){
+  .mf-client{ flex-basis:280px; max-width:330px; min-width:210px; }
+  .mf-date  { flex-basis:150px; min-width:130px; }
+  .mf-select{ flex-basis:160px; min-width:140px; }
+  :host { --filter-gap: 8px; --btn-size: 36px; }
+  .actions{ gap:10px; }
+}
+
+/* === Patch no-scroll + labels visibles === */
+
+/* 1) On neutralise tout scroll sur la ligne de filtres */
+:host ::ng-deep .filter-section,
+:host ::ng-deep .filter-group.one-line{
+  overflow: visible !important;      /* pas de scroll interne */
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Cacher toute scrollbar potentielle côté WebKit (Chrome/Edge) */
+:host ::ng-deep .filter-group.one-line::-webkit-scrollbar,
+:host ::ng-deep .filter-section::-webkit-scrollbar{
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Firefox */
+:host ::ng-deep .filter-group.one-line{
+  scrollbar-width: none !important;
+}
+
+/* Eviter qu’un enfant force un overflow vertical */
+:host ::ng-deep .filter-group.one-line .mf,
+:host ::ng-deep .filter-group.one-line .actions{
+  min-height: var(--filter-field-height);
+}
+:host ::ng-deep .filter-group.one-line .actions{
+  margin-right: 0;                 /* pas d’espace qui pousserait à droite */
+  padding-right: 0;
+}
+
+/* 2) Labels plus grands et bien contrastés */
+:host {
+  --label-font: 16.5px;           /* taille label normal */
+  --label-float-font: 15.5px;     /* taille label flottant */
+}
+:host ::ng-deep .mat-mdc-form-field .mdc-floating-label{
+  font-size: var(--label-font) !important;
+  font-weight: 700 !important;
+  letter-spacing: .2px;
+  color: #111 !important;
+  opacity: 1 !important;
+}
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label,
+:host ::ng-deep .mat-mdc-form-field .mdc-floating-label--float-above{
+  font-size: var(--label-float-font) !important;
+  font-weight: 800 !important;
+  color: #111 !important;
+  opacity: 1 !important;
+}
+
+/* 3) On garde la ligne sur une seule rangée, sans scroll */
+:host ::ng-deep .filter-group.one-line{
+  flex-wrap: nowrap !important;
+  align-items: flex-end;
+  gap: 10px;                       /* ajuste si besoin */
+}
+
+/* 4) Sécurité: si le navigateur ajoute malgré tout un scroll page,
+      on s’assure que la barre ne vienne pas de la ligne de filtres */
+:host ::ng-deep .filter-group.one-line,
+:host ::ng-deep .filter-section{
+  max-height: calc(var(--filter-field-height) + 18px); /* hauteur exacte + label */
+}
+
+/* === Labels des filtres = même police que les entêtes du tableau === */
+/* règle ici la “police” de référence (on aligne aussi les headers dessus) */
+:host{
+  --tbl-head-font-family: inherit;  /* mets 'Inter, Roboto, ...' si tu as une police dédiée */
+  --tbl-head-font-size: 16px;       /* taille des entêtes (et labels) */
+  --tbl-head-font-weight: 700;      /* graisse des entêtes (et labels) */
+  --tbl-head-letter-spacing: .2px;  /* léger tracking comme sur les headers */
+}
+
+/* 1) On fixe explicitement la typo des entêtes (source de vérité) */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-header-cell{
+  font-family: var(--tbl-head-font-family) !important;
+  font-size:   var(--tbl-head-font-size)   !important;
+  font-weight: var(--tbl-head-font-weight) !important;
+  letter-spacing: var(--tbl-head-letter-spacing) !important;
+  color:#111;
+}
+
+/* 2) Labels des champs = même famille/graisse/“look” que les entêtes */
+:host ::ng-deep .filter-section .mat-mdc-form-field .mdc-floating-label{
+  font-family: var(--tbl-head-font-family) !important;
+  font-size:   var(--tbl-head-font-size)   !important;   /* visible comme un header */
+  font-weight: var(--tbl-head-font-weight) !important;
+  letter-spacing: var(--tbl-head-letter-spacing) !important;
+  color:#111 !important;
+  opacity:1 !important;
+}
+
+/* État focus/flottant : on garde la même police (MDC réduit l’étiquette via scale) */
+:host ::ng-deep .filter-section .mat-mdc-form-field.mat-focused .mdc-floating-label,
+:host ::ng-deep .filter-section .mat-mdc-form-field .mdc-floating-label--float-above{
+  font-family: var(--tbl-head-font-family) !important;
+  font-weight: var(--tbl-head-font-weight) !important;
+  letter-spacing: var(--tbl-head-letter-spacing) !important;
+  color:#111 !important;
+}
+
+/* Placeholders/select: même famille/poids pour l’homogénéité */
+:host ::ng-deep .filter-section .mat-mdc-input-element,
+:host ::ng-deep .filter-section .mat-mdc-select-value{
+  font-family: var(--tbl-head-font-family) !important;
+  font-weight: 600; /* un cran en dessous du header pour le contenu */
+  letter-spacing: .1px;
+}
+
+/* === Revert taille des entêtes & aligner les labels des filtres === */
+
+/* 1) Taille des entêtes du tableau (valeur "ancienne") */
+:host {
+  --table-head-size: 14px;   /* ← mets ici la taille précédente si différente */
+  --table-head-tracking: .1px;
+}
+
+/* remet la taille des entêtes */
+:host ::ng-deep .mat-elevation-z10 .mat-mdc-header-cell,
+:host ::ng-deep .mat-elevation-z10 .mat-header-cell{
+  font-size: var(--table-head-size) !important;
+  letter-spacing: var(--table-head-tracking) !important;
+  /* on ne touche pas à font-weight: 700 déjà défini plus haut dans ton CSS */
+}
+
+/* 2) Labels des champs de recherche = même taille que les entêtes */
+:host {
+  --filter-label-size: var(--table-head-size);
+}
+
+/* label normal */
+:host ::ng-deep .filter-section .mat-mdc-form-field .mdc-floating-label{
+  font-size: var(--filter-label-size) !important;
+  font-weight: 700 !important;
+  letter-spacing: var(--table-head-tracking) !important;
+  color:#111 !important;
+  opacity:1 !important;
+}
+
+/* label flottant (quand il remonte) : on garde la même “présence” visuelle
+   sans grossir les entêtes */
+:host ::ng-deep .filter-section .mat-mdc-form-field.mat-focused .mdc-floating-label,
+:host ::ng-deep .filter-section .mat-mdc-form-field .mdc-floating-label--float-above{
+  font-size: calc(var(--filter-label-size) * 0.95) !important; /* léger -5% pour éviter le chevauchement */
+  font-weight: 700 !important;
+  letter-spacing: var(--table-head-tracking) !important;
+  color:#111 !important;
+}
+
+/* ==== Barre de recherche sur UNE ligne ==== */
+.filter-section .filter-group{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;        /* empêche le retour à la ligne */
+  overflow-x: hidden;       /* pas de barre de défilement */
+}
+
+/* le mat-form-field ne prend plus 100% */
+.filter-section .filter-group mat-form-field{
+  width: auto;              /* override du 100% global */
+  flex: 1 1 520px;          /* s'étire mais laisse la place aux boutons */
+  margin: 0 !important;
+  min-width: 260px;         /* borne basse pour petits écrans */
+}
+
+/* boutons à droite, même ligne */
+.filter-section .filter-group button[mat-mini-fab]{
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  flex: 0 0 auto;
+}
+.filter-section .filter-group button[mat-mini-fab] + button[mat-mini-fab]{
+  margin-left: 8px;
+}
+
+/* un peu plus compact si l'écran rétrécit */
+@media (max-width: 1280px){
+  .filter-section .filter-group mat-form-field{ flex-basis: 360px; min-width: 220px; }
+}
+
+/* === Labels des champs de recherche : plus visibles === */
+.filter-section .mat-mdc-form-field .mdc-floating-label{
+  color: #111 !important;        /* contraste fort */
+  opacity: 1 !important;         /* pas de transparence */
+  font-weight: 700 !important;   /* gras */
+  font-size: 15px !important;    /* lisible (ajuste 14–16) */
+  letter-spacing: .2px;
+}
+
+/* État flottant (focus/valeur) : reste lisible sans devenir minuscule */
+.filter-section .mat-mdc-form-field.mat-focused .mdc-floating-label,
+.filter-section .mat-mdc-form-field .mdc-floating-label--float-above{
+  color: #111 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;    /* légèrement plus petit quand flottant */
+  opacity: 1 !important;
+}
+
+/* Élargit un peu l’encoche pour ne pas couper le label agrandi */
+.filter-section .mat-mdc-form-field .mdc-notched-outline__notch{
+  padding-inline: 8px !important;  /* ↑ on annule le padding:0 précédent */
+}
+
+/* Fond bien blanc derrière le champ (améliore la lisibilité du label) */
+.filter-section .mat-mdc-text-field-wrapper{
+  background: #fff !important;
+}
+
+/* Option : si tu gardes un placeholder, rends-le discret pour qu’il ne
+   “concurrence” pas le label */
+.filter-section .mat-mdc-form-field .mat-mdc-input-element::placeholder{
+  color: #9e9e9e !important;
+  opacity: 1 !important;
+}
+
+/* === PATCH: label coupé (barre de recherche) =================== */
+/* Redonne un peu d'air à l'infix & empêche la coupe du label */
+.filter-section .mf .mat-mdc-text-field-wrapper{
+  height: var(--filter-field-height, 50px) !important;
+  overflow: visible !important;                /* le label peut dépasser sans être masqué */
+  box-sizing: border-box !important;
+}
+
+.filter-section .mf .mat-mdc-form-field-flex{
+  height: auto !important;                     /* ne force plus 100% */
+  align-items: center !important;
+}
+
+.filter-section .mf .mat-mdc-form-field-infix{
+  height: auto !important;                     /* <- crucial */
+  min-height: auto !important;
+  padding-top: 8px !important;                 /* espace pour le label */
+  padding-bottom: 10px !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+.filter-section .mf .mdc-notched-outline__notch{
+  padding-inline: 6px !important;              /* évite que l’encoche coupe le label */
+}
+
+/* Garde le label lisible sans être écrasé en position flottante */
+.filter-section .mat-mdc-form-field .mdc-floating-label{
+  color: #111 !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  letter-spacing: .2px;
+}
+.filter-section .mat-mdc-form-field.mat-focused .mdc-floating-label,
+.filter-section .mat-mdc-form-field .mdc-floating-label--float-above{
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #111 !important;
+}
+
+/* Optionnel: si tu gardes un placeholder, rends-le discret */
+.filter-section .mat-mdc-form-field .mat-mdc-input-element::placeholder{
+  color: #9e9e9e !important;
+  opacity: 1 !important;
+}
+
+
+/* === PATCH anti-rognage du label (barre de recherche) =================== */
+/* 1) Empêcher la découpe par la notch */
+.filter-section .mat-mdc-form-field .mdc-notched-outline,
+.filter-section .mat-mdc-form-field .mdc-notched-outline__notch{
+  overflow: visible !important;            /* clé : plus de clip en haut */
+}
+
+/* 2) Donner un poil d’air à la notch */
+.filter-section .mat-mdc-form-field .mdc-notched-outline__notch{
+  padding-top: 2px !important;             /* 2–3px suffisent en général */
+  padding-inline: 6px !important;          /* évite que le texte touche le bord */
+}
+
+/* 3) Décaler très légèrement le label vers le bas quand il n’est pas flottant */
+.filter-section .mat-mdc-form-field .mdc-floating-label:not(.mdc-floating-label--float-above){
+  transform: translateY(2px) !important;   /* descend de 2px, pas d’effet visuel négatif */
+}
+
+/* 4) Garder le comportement normal quand le label est flottant (focus/valeur) */
+.filter-section .mat-mdc-form-field.mat-focused .mdc-floating-label,
+.filter-section .mat-mdc-form-field .mdc-floating-label--float-above{
+  transform: none !important;              /* on laisse l’animation/scale par défaut */
+}
+
+/* 5) Un peu plus d’espace vertical interne pour sécuriser le rendu */
+.filter-section .mf .mat-mdc-form-field-infix{
+  padding-top: 8px !important;
+  padding-bottom: 10px !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* --- Anti rognage label pour le champ Nom du client --- */
+.filter-section .no-clip .mat-mdc-text-field-wrapper{
+  height: auto !important;                 /* laisse la hauteur s’ajuster */
+  min-height: var(--filter-field-height) !important;
+  overflow: visible !important;            /* pas de coupe du label */
+}
+
+.filter-section .no-clip .mat-mdc-form-field-infix{
+  height: auto !important;
+  min-height: auto !important;
+  padding: 10px 12px 12px !important;      /* un peu d’air pour le label */
+}
+
+.filter-section .no-clip .mdc-notched-outline,
+.filter-section .no-clip .mdc-notched-outline__notch{
+  overflow: visible !important;            /* clé: ne pas clipper le haut */
+  padding-top: 2px !important;             /* évite la “morsure” du haut */
+}
+
+.filter-section .no-clip .mdc-floating-label:not(.mdc-floating-label--float-above){
+  transform: translateY(2px) !important;   /* descend très légèrement le label */
+}
+
+
+/* === [PATCH] Champ "Nom du client" : empêcher le label d'être coupé === */
+/* on cible le 1er mat-form-field de la barre de filtres (Nom du client) */
+.filter-section .filter-group mat-form-field:first-of-type .mat-mdc-text-field-wrapper{
+  height: auto !important;                         /* laisse s'ajuster */
+  min-height: var(--filter-field-height, 50px) !important;
+  overflow: visible !important;                    /* pas de clipping du label */
+  background: #fff !important;
+}
+
+.filter-section .filter-group mat-form-field:first-of-type .mat-mdc-form-field-infix{
+  height: auto !important;
+  min-height: auto !important;
+  padding: 10px 12px 12px !important;              /* espace pour le label */
+  box-sizing: border-box !important;
+}
+
+.filter-section .filter-group mat-form-field:first-of-type .mdc-notched-outline,
+.filter-section .filter-group mat-form-field:first-of-type .mdc-notched-outline__notch{
+  overflow: visible !important;                    /* clé anti-rognage */
+  padding-top: 2px !important;                     /* évite la "morsure" en haut */
+  padding-inline: 6px !important;
+}
+
+/* descend très légèrement le label quand il n'est pas flottant */
+.filter-section .filter-group mat-form-field:first-of-type
+.mdc-floating-label:not(.mdc-floating-label--float-above){
+  transform: translateY(2px) !important;
+}
+
+/* garde le rendu normal quand il flotte (focus/valeur) */
+.filter-section .filter-group mat-form-field:first-of-type .mdc-floating-label--float-above{
+  transform: none !important;
+}
+
+/* renforce la lisibilité du label */
+.filter-section .filter-group mat-form-field:first-of-type .mdc-floating-label{
+  color:#111 !important; opacity:1 !important; font-weight:700 !important;
+  font-size: 15px !important; letter-spacing:.2px;
+}
+.filter-section .filter-group mat-form-field:first-of-type.mat-mdc-form-field .mdc-floating-label--float-above{
+  font-size: 14px !important;
+}
+
+/* === [PATCH] Barre de recherche : supprimer toute scrollbar locale === */
+.filter-section,
+.filter-group{
+  overflow: visible !important;
+}
+.filter-group::-webkit-scrollbar{ width:0 !important; height:0 !important; display:none !important; }
+.filter-group{ scrollbar-width: none !important; }

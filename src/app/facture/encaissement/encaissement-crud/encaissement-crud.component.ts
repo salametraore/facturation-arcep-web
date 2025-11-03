@@ -31,8 +31,7 @@ type AffectationX = Affectation & {
 
 @Component({
   selector: 'app-encaissement-crud',
-  templateUrl: './encaissement-crud.component.html',
-  styleUrl: './encaissement-crud.component.scss'
+  templateUrl: './encaissement-crud.component.html'
 })
 export class EncaissementCrudComponent implements OnInit, AfterViewInit {
 

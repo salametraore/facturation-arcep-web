@@ -32,8 +32,7 @@ import {bouton_names, date_converte, operations} from "../../../constantes";
 
 @Component({
   selector: 'app-encaissement-direct-crud',
-  templateUrl: './encaissement-direct-crud.component.html',
-  styleUrls: ['./encaissement-direct-crud.component.scss']
+  templateUrl: './encaissement-direct-crud.component.html'
 })
 export class EncaissementDirectCrudComponent implements OnInit {
 

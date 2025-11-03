@@ -17,6 +17,7 @@ import {Produit} from "../../../shared/models/produit";
 import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/ficheTechniques";
 import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
 import {FicheTechniqueProduit} from "../../../shared/models/ficheTechniquesProduits";
+import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 
 interface FTProduitFilter {
   q?: string;          // recherche globale
@@ -28,8 +29,7 @@ interface FTProduitFilter {
 
 @Component({
   selector: 'ficher-technique-dfc-crud',
-  templateUrl: './ficher-technique-dfc-crud.component.html',
-  styleUrl: './ficher-technique-dfc-crud.component.scss'
+  templateUrl: './ficher-technique-dfc-crud.component.html'
 })
 export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
 
@@ -48,6 +48,7 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
   form_ficheTechnique: FormGroup;
   form_ficheTechniquesProduit: FormGroup;
   t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
+  historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
   public operations = operations;
   public bouton_names = bouton_names;
@@ -111,6 +112,10 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
       this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
       this.form_ficheTechnique.get('produit').setValue(this.ficheTechnique?.produits_detail[0]?.produit);
+    });
+
+    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
+      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
     });
   }
 
