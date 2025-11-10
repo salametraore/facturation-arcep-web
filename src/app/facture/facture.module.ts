@@ -83,6 +83,9 @@ import {ClientDetailsFacturesComponent} from "./client-direction-technique/clien
 import {ClientDetailsFichesTechniques} from "./client-direction-technique/client-details/client-details-fiches-techniques/client-details-fiches-techniques";
 
 
+import { MaterialModules } from '../material-modules';
+
+
 @NgModule({
   declarations: [
     DomaineComponent,
@@ -143,6 +146,7 @@ import {ClientDetailsFichesTechniques} from "./client-direction-technique/client
   ],
   imports: [
     CommonModule,
+    MaterialModules,
     FactureRoutingModule,
     SharedModule,
     ReactiveFormsModule,

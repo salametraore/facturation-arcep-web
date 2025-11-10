@@ -18,7 +18,8 @@ import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traite
 
 @Component({
   selector: 'app-service-confiance-crud',
-  templateUrl: './service-confiance-crud.component.html'
+  templateUrl: './service-confiance-crud.component.html',
+  styleUrls: ['./service-confiance-crud.component.scss']
 })
 export class ServiceConfianceCrudComponent implements OnInit {
 

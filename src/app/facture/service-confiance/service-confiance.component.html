@@ -1,203 +1,153 @@
-<!-- src/app/features/service-confiance/fiche-technique/service-confiance-ft-list-page.component.html -->
-<mat-card>
 
-  <!-- Titre de page (barre rose) -->
-  <div class="page-title">
-    <h2>Fiche technique : service de confiance</h2>
+
+
+<!-- src/app/features/service-confiance/fiche-technique/service-confiance-ft-list-page-modele.component.html -->
+<div class="page-container">
+  <h2 class="page-title">Liste des demandes Services de Confiance</h2>
+
+  <!-- 🔍 Zone de filtres -->
+  <div class="filter-bar">
+    <!-- Recherche / Nom du client -->
+    <mat-form-field appearance="outline">
+      <mat-label>Nom du client</mat-label>
+      <input matInput placeholder="Nom du client" [(ngModel)]="nomClient" (input)="chercher()" />
+    </mat-form-field>
+
+    <!-- Statut -->
+    <mat-form-field appearance="outline">
+      <mat-label>Statut</mat-label>
+      <mat-select [(ngModel)]="statusFilter" (selectionChange)="chercher()">
+        <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">{{ item.libelle }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Date début -->
+    <mat-form-field appearance="outline">
+      <mat-label>Du</mat-label>
+      <input matInput [matDatepicker]="fromPicker" [(ngModel)]="startDate" (dateChange)="chercher()" />
+      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+      <mat-datepicker #fromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Date fin -->
+    <mat-form-field appearance="outline">
+      <mat-label>Au</mat-label>
+      <input matInput [matDatepicker]="toPicker" [(ngModel)]="endDate" (dateChange)="chercher()" />
+      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+      <mat-datepicker #toPicker></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Catégorie de service -->
+    <mat-form-field appearance="outline">
+      <mat-label>Catégorie de service</mat-label>
+      <mat-select [(ngModel)]="serviceFilter" (selectionChange)="chercher()">
+        <mat-option *ngFor="let item of produits" [value]="item.id">{{ item.libelle }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Boutons réinitialiser et créer FT -->
+    <button class="upload-label-reset" (click)="reset()">
+      <mat-icon>refresh</mat-icon>
+      Réinitialiser
+    </button>
+
+    <button class="upload-label-create" (click)="crud(null, operations.create)">
+      <mat-icon>add_circle_outline</mat-icon>
+      FT service de confiance
+    </button>
   </div>
 
-  <!-- Filtres compacts et centrés -->
-  <div class="filters filters--one-line">
-    <div class="filters-grid">
+  <!-- 📁 Zone import / actions -->
+  <div class="upload-action-section">
+    <label for="fileUpload" class="upload-label">
+      <mat-icon>cloud_upload</mat-icon>
+      Importer un fichier
+    </label>
+    <input id="fileUpload" type="file" hidden/>
+    <span class="file-name"></span>
 
-      <!-- Client (autocomplete) -->
-      <mat-form-field class="client-field">
-        <mat-label>Nom du client</mat-label>
-        <input
-          matInput
-          placeholder="Nom du client"
-          matTooltip="Nom du client"
-          [matAutocomplete]="auto_cl"
-          [(ngModel)]="nomClient">
-        <mat-autocomplete #auto_cl="matAutocomplete">
-          <mat-option
-            *ngFor="let item of clients | search: nomClient"
-            (click)="onGetClient(item)"
-            [value]="item.denomination_sociale">
-            <span>{{ item.denomination_sociale }}</span>
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+    <button class="upload-label-print">
+      <mat-icon>print</mat-icon>
+      Imprimer
+    </button>
 
-      <!-- Date début -->
-      <mat-form-field>
-        <mat-label>Date début</mat-label>
-        <input
-          matInput
-          [matDatepicker]="pickerStart"
-          [(ngModel)]="startDate"
-          (dateChange)="chercher()">
-        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
-        <mat-datepicker #pickerStart></mat-datepicker>
-      </mat-form-field>
-
-      <!-- Date fin -->
-      <mat-form-field>
-        <mat-label>Date fin</mat-label>
-        <input
-          matInput
-          [matDatepicker]="pickerEnd"
-          [(ngModel)]="endDate"
-          (dateChange)="chercher()">
-        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-        <mat-datepicker #pickerEnd></mat-datepicker>
-      </mat-form-field>
-
-      <!-- Catégorie de service -->
-      <mat-form-field>
-        <mat-label>Catégorie de service</mat-label>
-        <mat-select [(ngModel)]="serviceFilter" (selectionChange)="chercher()">
-          <mat-option *ngFor="let item of produits" [value]="item.id">
-            {{ item.libelle }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <!-- Statut -->
-      <mat-form-field>
-        <mat-label>Statut</mat-label>
-        <mat-select [(ngModel)]="statusFilter" (selectionChange)="chercher()">
-          <mat-option *ngFor="let item of statutFicheTechniques" [value]="item.id">
-            {{ item.libelle }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <!-- Boutons actions filtres -->
-      <button mat-mini-fab color="primary" class="action-btn" (click)="chercher()">
-        <mat-icon>search</mat-icon>
-      </button>
-      <button mat-mini-fab color="primary" class="action-btn" (click)="reset()">
-        <mat-icon>cached</mat-icon>
-      </button>
-
-    </div>
+    <button class="upload-label-export">
+      <mat-icon>file_download</mat-icon>
+      Exporter
+    </button>
   </div>
 
-  <!-- Cadre standard -->
-  <section class="list-box">
+  <mat-divider></mat-divider>
 
-    <!-- En-tête : titre + actions à droite -->
-    <div class="list-header">
-      <h3 class="list-title">Liste des fiches techniques — Services de confiance</h3>
-
-      <div class="list-actions">
-        <button mat-flat-button color="primary" (click)="crud(null, this.operations.create)">
-          <mat-icon>add</mat-icon>
-          Nouvelle fiche technique
-        </button>
-      </div>
-    </div>
-
-    <!-- Corps : table + pagination -->
-    <div class="list-body">
-
-      <div class="mat-elevation-z10 compact-table">
-        <table mat-table [dataSource]="ficheTechniques" matSort style="width: 100%">
-
-          <!-- Client -->
-          <ng-container matColumnDef="client_nom">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
-            <td mat-cell *matCellDef="let element">{{ element.client_nom }}</td>
-          </ng-container>
-
-          <!-- Date soumission -->
-          <ng-container matColumnDef="date_creation">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date soumission</th>
-            <td mat-cell *matCellDef="let element">{{ element.date_creation | date:'dd/MM/yyyy' }}</td>
-          </ng-container>
-
-          <!-- Catégorie -->
-          <ng-container matColumnDef="categorie_produit">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
-            <td mat-cell *matCellDef="let element">{{ getCategorie(element.categorie_produit) }}</td>
-          </ng-container>
-
-          <!-- Statut -->
-          <ng-container matColumnDef="statut.libelle">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
-            <td mat-cell *matCellDef="let element">{{ element.statut?.libelle }}</td>
-          </ng-container>
-
-          <!-- Actions -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let element">
-              <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
-                <mat-icon>settings</mat-icon>
+  <!-- 🗂️ Liste des demandes avec checkbox -->
+  <div class="table-container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th><mat-checkbox></mat-checkbox></th>
+          <th>Nom du Client</th>
+          <th>Catégorie de Service</th>
+          <th>Date soumission</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let element of ficheTechniques">
+          <td><mat-checkbox [(ngModel)]="element.selected"></mat-checkbox></td>
+          <td>{{ element.client_nom }}</td>
+          <td>{{ getCategorie(element.categorie_produit) }}</td>
+          <td>{{ element.date_creation | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="status-chip" [ngClass]="{
+              'status-new': element.statut?.code==='INIT',
+              'status-progress': element.statut?.code==='FTD',
+              'status-valid': element.statut?.code==='VALIDE'
+            }">{{ element.statut?.libelle }}</span>
+          </td>
+          <td>
+            <!-- Boutons action dans chaque ligne -->
+            <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
+              <mat-icon>settings</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item class="btn_edit" (click)="crud(element, operations.update)">
+                <mat-icon color="primary">edit</mat-icon>
+                Modifier
               </button>
-              <mat-menu #menu="matMenu">
+              <button *ngIf="element.statut?.code==='INIT' && hasOperationCode('TRANSMETTRE_FICHE')"
+                      mat-menu-item (click)="crud(element, operations.transmettre)">
+                <mat-icon color="warn">edit</mat-icon>
+                Transmettre
+              </button>
+              <button *ngIf="element.statut?.code==='FTD' && hasOperationCode('AVIS_TECHNIQUE_FICHE')"
+                      mat-menu-item (click)="onSetAvis(element, operations.transmettre)">
+                <mat-icon color="warn">check</mat-icon>
+                Donner un avis
+              </button>
+              <button *ngIf="element.statut?.id>5 && hasOperationCode('RETRAIT_FICHE')"
+                      mat-menu-item (click)="onRetraitAutorisation(element, operations.transmettre)">
+                <mat-icon color="warn">check</mat-icon>
+                Retrait autorisation/licence
+              </button>
+              <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
+                <mat-icon color="warn">delete</mat-icon>
+                Supprimer
+              </button>
+            </mat-menu>
+          </td>
+        </tr>
 
-                <button mat-menu-item class="btn_edit" (click)="crud(element, this.operations.update)">
-                  <mat-icon color="primary">edit</mat-icon>
-                  Modifier
-                </button>
+        <tr>
+          <td colspan="6" class="empty-row">Aucune correspondance trouvée dans la base de données correspondant au critère de recherche</td>
+        </tr>
+      </tbody>
+    </table>
 
-                <button *ngIf="element.statut?.code==='INIT' && hasOperationCode('TRANSMETTRE_FICHE')"
-                        mat-menu-item
-                        (click)="crud(element, this.operations.transmettre)">
-                  <mat-icon color="warn">edit</mat-icon>
-                  Transmettre
-                </button>
-
-                <button *ngIf="element.statut?.code==='FTD' && hasOperationCode('AVIS_TECHNIQUE_FICHE')"
-                        mat-menu-item
-                        (click)="onSetAvis(element, this.operations.transmettre)">
-                  <mat-icon color="warn">check</mat-icon>
-                  Donner un avis
-                </button>
-
-                <button *ngIf="element.statut?.id>5 && hasOperationCode('RETRAIT_FICHE')"
-                        mat-menu-item
-                        (click)="onRetraitAutorisation(element, this.operations.transmettre)">
-                  <mat-icon color="warn">check</mat-icon>
-                  Retrait autorisation/licence
-                </button>
-
-                <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
-                  <mat-icon color="warn">delete</mat-icon>
-                  Supprimer
-                </button>
-
-              </mat-menu>
-            </td>
-          </ng-container>
-
-          <!-- Lignes -->
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row
-              *matRowDef="let element; columns: displayedColumns"
-              (click)="onRowClicked(element)"
-              [ngClass]="{ 'selected': element === selectedRow }">
-          </tr>
-
-          <!-- Row vide -->
-          <tr mat-row *matNoDataRow>
-            <td class="mat-cell" colspan="4">
-              Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
-            </td>
-          </tr>
-
-        </table>
-
-        <mat-paginator
-          [pageSizeOptions]="[3, 5, 10, 15]"
-          [pageSize]="5"
-          showFirstLastButtons>
-        </mat-paginator>
-      </div>
-
-    </div> <!-- /list-body -->
-
-  </section>
-</mat-card>
+    <mat-paginator
+      [pageSizeOptions]="[3,5,10,15]"
+      [pageSize]="5"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>

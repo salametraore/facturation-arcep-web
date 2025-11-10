@@ -14,6 +14,9 @@ import {AuthInterceptor} from "./authentication/auth.interceptor";
 
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import {ScrollingModule} from "@angular/cdk/scrolling";
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+
+import { MaterialModules } from './material-modules';
 
 registerLocaleData(localeFR);
 
@@ -34,6 +37,7 @@ export const MY_FORMAT: MatDateFormats = {
     AppComponent
   ],
   imports: [
+    MaterialModules,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -60,7 +64,8 @@ export const MY_FORMAT: MatDateFormats = {
         floatLabel: 'always',
         subscriptSizing: 'dynamic'
       }
-    }
+    },
+    provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })

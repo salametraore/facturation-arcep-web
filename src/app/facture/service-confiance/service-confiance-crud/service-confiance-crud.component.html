@@ -1,16 +1,12 @@
-<!-- src/app/features/fiche-technique/services-confiance/fiche-technique-page.component.html -->
-<mat-card>
+<mat-card class="ft-card">
 
-  <!-- Titre de page -->
-  <div class="page-title">
+  <div class="page-crud-title">
     <h2>Saisie et mise à jour d'une fiche technique — Service de confiance</h2>
   </div>
 
-  <!-- Grille 2 colonnes : 2fr / 1fr -->
   <div class="two-col two-col--75-25">
 
-    <!-- ===== Colonne gauche : FICHE TECHNIQUE ===== -->
-    <section class="list-box">
+    <section class="list-box fiche-technique-box">
       <div class="list-header">
         <h3 class="list-title">Fiche technique</h3>
       </div>
@@ -18,7 +14,6 @@
       <div class="list-body">
         <form [formGroup]="form" class="form-grid">
 
-          <!-- Client (autocomplete) -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Client</mat-label>
             <input
@@ -37,15 +32,6 @@
             </mat-autocomplete>
           </mat-form-field>
 
-          <!-- Service de confiance (sélecteur produit) -->
-<!--
-          <div class="form-section-title">
-            Service de confiance
-            <span matTooltip="Choisissez le service de confiance demandé"> </span>
-          </div>
--->
-
-          <!-- Laisse le select (si tu préfères des radios, on peut le convertir comme pour “domaine”) -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Service de confiance</mat-label>
             <mat-select formControlName="produit" matTooltip="Service de confiance">
@@ -55,21 +41,19 @@
             </mat-select>
           </mat-form-field>
 
-          <!-- Commentaire -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
             <textarea matInput rows="2" formControlName="commentaire" autofocus></textarea>
           </mat-form-field>
 
-          <!-- Actions -->
-          <div class="form-actions">
+          <div class="form-actions form-actions--buttons">
             <button
-              mat-stroked-button
-              color="warn"
+              mat-flat-button
+              class="custom-save-button"
               type="button"
               *ngIf="data_operation===operations.create || data_operation===operations.update"
               (click)="crud()">
-              Enregistrer
+              <mat-icon>save</mat-icon> Enregistrer
             </button>
 
             <button
@@ -81,8 +65,8 @@
               Transmettre
             </button>
 
-            <button mat-flat-button color="primary" type="button" (click)="onFerme()">
-              Fermer
+            <button mat-stroked-button class="custom-close-button" type="button" (click)="onFerme()">
+              <mat-icon>close</mat-icon> Fermer
             </button>
           </div>
         </form>
@@ -96,8 +80,7 @@
 
     </section>
 
-    <!-- ===== Colonne droite : HISTORIQUE ===== -->
-    <section class="list-box">
+    <section class="list-box historique-box">
       <div class="list-header">
         <h3 class="list-title">Historique de la demande</h3>
       </div>

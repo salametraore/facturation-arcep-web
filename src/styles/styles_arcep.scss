@@ -3,9 +3,11 @@
 /* ============ THEME MATERIAL (ARCEP Rose) ============ */
 @include mat.core();
 
-$primary: mat.define-palette(mat.$pink-palette, 800);    // ~ #ad1457
-$accent:  mat.define-palette(mat.$pink-palette, A200);
-$warn:    mat.define-palette(mat.$deep-orange-palette);
+/* Utilisation de la palette RED avec le shade 800 pour #c62828 */
+$primary-color-code: #c62828;
+$primary: mat.define-palette(mat.$red-palette, 800);    // ~ #c62828
+$accent:  mat.define-palette(mat.$red-palette, A200);   // Teinte pour les éléments secondaires
+$warn:    mat.define-palette(mat.$deep-orange-palette); // Conservez Warn pour les alertes/erreurs
 
 $theme: mat.define-light-theme((
   color: (primary: $primary, accent: $accent, warn: $warn),
@@ -21,19 +23,28 @@ $theme: mat.define-light-theme((
 
   /* surfaces & texte */
   --surface: #ffffff;
-  --surface-alt: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%); /* rose très pâle */
-  --text: #2b2b2b;
+  --surface-alt: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%);
+  --text: #2b2b2b; /* Noir/Gris foncé */
   --text-muted: #5a5a5a;
 
   /* bordures */
-  --border-weak: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%);
-  --border-strong: color-mix(in srgb, var(--brand-primary) 30%, #fff 70%);
+  --border-weak:  color-mix(in srgb, var(--brand-primary) 22%, #fff 78%);
+  --border-strong: color-mix(in srgb, var(--brand-primary) 40%, #fff 60%);
 }
 
 /* SCSS legacy (si besoin ponctuel) */
 $brand: #ad1457;
 $brand-600: #c2185b;
 $brand-400: #ec407a;
+
+/* Fallback si color-mix n’est pas supporté */
+@supports not (color: color-mix(in srgb, #000, #fff)) {
+  :root {
+    --border-weak:  #e8b9cc;
+    --border-strong:#d98aa8;
+    --surface-alt: #fff6fa;
+  }
+}
 
 /* ============ GLOBAL / WATERMARK ============ */
 html, body { height: 100%; background: #FAFAFA; color: var(--text); }
@@ -54,49 +65,160 @@ mat-sidenav-content > * { position: relative; z-index: 1; }
 
 /* ============ SIDENAV ============ */
 .sidenav {
-  background-color: var(--surface-alt);
-  color: #7A003D;
+  background-color: var(--surface);
+  color: var(--text);
+  box-shadow: 2px 0 6px rgba(0,0,0,0.1);
 }
+
+/* Styles des liens (mat-list-item) */
 .sidenav .mat-list-item,
 .sidenav a.mat-list-item {
-  color: inherit; border-radius: 10px; margin: 4px 6px;
+  color: var(--text);
+  border-radius: 10px;
+  margin: 4px 6px;
+  font-weight: 500;
+  background: transparent !important;
 }
-.sidenav .mat-list-item:hover,
-.sidenav a.mat-list-item:hover {
-  background: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%);
+
+/* 🟥 Style au survol (hover) en rose/rouge */
+.sidenav a.mat-list-item:hover,
+.sidenav mat-nav-list a.mat-list-item:hover {
+  background: color-mix(in srgb, var(--brand-primary) 18%, #fff 82%) !important;
+  color: var(--text) !important;
+}
+
+/* 🟥 Style de l'élément ACTIF (Fond Rouge ARCEP et Texte/Icône Blanc) ⬜ */
+.sidenav a.mat-list-item.active-link {
+    background-color: var(--brand-primary) !important;
+    color: var(--brand-primary-contrast) !important;
+    font-weight: 600 !important;
+}
+.sidenav a.mat-list-item.active-link .mat-icon {
+    color: var(--brand-primary-contrast) !important;
+}
+
+/* Expansion panel (même marge que les liens) */
+.menu-panel.mat-expansion-panel {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  border-radius: 10px;
+  margin: 4px 6px;
 }
 .menu-panel .mat-expansion-panel-header { background: transparent; }
-.menu-panel.mat-expansion-panel {
-  background: transparent; box-shadow: none;
-  border: 1px solid var(--border-weak); border-radius: 12px; margin: 6px 6px 10px;
+.menu-panel .mat-expansion-panel-header {
+  color: var(--text);
+  font-weight: 500;
+}
+.menu-header { color: var(--text); }
+.menu-header .mat-icon { color: var(--text); }
+
+/* Titres des modules (en-tête des panneaux) en gras */
+.sidenav .mat-expansion-panel-header-title {
+  font-weight: 700;
 }
 
-/* ============ TOOLBAR / TITRE ============ */
-mat-toolbar { height: 30px; .mat-mdc-toolbar-row { min-height: 30px; } }
+/* Items de 1er niveau (modules SANS sous-menus) en gras */
+.sidenav mat-nav-list > a.mat-mdc-list-item .mdc-list-item__primary-text {
+  font-weight: 600;
+}
 
+
+/* ============ TOOLBAR / TITRE (FIX DEFINITIF) ============ */
+mat-toolbar { height: 30px; padding: 0 4px; } /* Force la hauteur à 30px */
+
+/* CORRECTION ALIGNEMENT : on s'assure que les éléments du row sont bien centrés */
+mat-toolbar .mat-mdc-toolbar-row {
+  min-height: 30px;
+  align-items: center; /* Centrage vertical */
+  height: 30px; /* Force la hauteur */
+}
+
+/* Cible la mat-toolbar avec color="primary" et la classe app-toolbar */
+.mat-toolbar.mat-primary.app-toolbar {
+  background-color: var(--surface) !important; /* Fond Blanc */
+  color: var(--text) !important; /* Texte Noir */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+  padding: 0 8px 0 0; /* Petit padding à droite, aucun à gauche */
+}
+
+/* Boutons et Icônes dans la Toolbar principale (couleur par défaut : Noir) */
+.mat-toolbar.mat-primary.app-toolbar .mat-icon,
+.mat-toolbar.mat-primary.app-toolbar button {
+  /* FIX VISIBILITÉ : Force la couleur de l'icône à Noir pour qu'elle soit visible */
+  color: var(--text) !important; 
+  opacity: 1 !important; /* S'assurer qu'elles ne sont pas transparentes */
+  
+  margin: 0; /* Suppression des marges externes par défaut */
+  padding: 0; /* Suppression des paddings par défaut du bouton */
+  height: 30px; /* Taille compacte */
+  width: 30px; /* Taille compacte */
+}
+
+/* Le bouton burger a souvent besoin d'un ajustement spécifique pour coller au bord gauche */
+.mat-toolbar.mat-primary.app-toolbar button:first-child {
+  margin-left: -8px; /* Tire légèrement le premier bouton vers la gauche (ajustement visuel) */
+}
+
+/* ❌ FIX FINAL ANTI-CERCLE : Supprime le fond et l'effet de survol */
+.mat-toolbar.mat-primary.app-toolbar .mat-mdc-icon-button {
+  /* Annule les effets de survol de MD3 */
+  --mat-icon-button-state-layer-color: transparent !important;
+  --mat-icon-button-hover-state-layer-opacity: 0 !important;
+  --mat-icon-button-focus-state-layer-opacity: 0 !important;
+  --mat-icon-button-pressed-state-layer-opacity: 0 !important;
+}
+
+/* Fallback/Règle plus générale pour s'assurer que l'ombre/le fond disparaissent */
+.mat-toolbar.mat-primary.app-toolbar button:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+.mat-toolbar.mat-primary.app-toolbar .mat-mdc-button-persistent-ripple::before {
+  background-color: transparent !important;
+  opacity: 0 !important;
+}
+
+
+/* 🚀 Effet de Survol SOUHAITÉ : Icônes de la Toolbar au Survol (Hover) : Couleur Rouge ARCEP */
+.mat-toolbar.mat-primary.app-toolbar button:hover .mat-icon,
+.mat-toolbar.mat-primary.app-toolbar .auth-btn:hover .mat-icon {
+  color: var(--brand-primary) !important; /* Rouge ARCEP */
+}
+
+
+/* Le titre central : SUPPRESSION DU RECTANGLE */
 .app-toolbar .app-title {
   display: inline-flex; align-items: center;
-  padding: 4px 10px; margin-left: 8px;
-  border-radius: 8px;
-  background-color: var(--surface-alt);
-  border: 1px solid var(--border-weak);
-  color: color-mix(in srgb, var(--brand-primary) 70%, #000 30%);
+  padding: 0;
+  margin-left: 8px;
+  border-radius: 0;
+  background-color: transparent;
+  border: none;
+  color: var(--text);
   font-weight: 600; line-height: 1.2; white-space: nowrap;
 }
 
 /* ============ BLOCS / CARTES / LISTES ============ */
 .list-box, mat-card.card, mat-card.list-box {
   background: var(--surface);
-  border: 1px solid var(--border-weak) !important;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  border: 2px solid;
+  border-color: #c2c2c2;
+  //border-radius: 8px;
+  box-shadow: none;
 }
 .list-header{
   display: flex; align-items: center; gap: 12px;
   padding: 10px 12px;
-  border-bottom: 2px solid var(--border-weak) !important;
+  border-bottom: 2px solid;
+  border-color: #ffc421 !important;
 }
-.list-title{ margin: .25rem 0; font-weight: 600; font-size: 1.1rem; }
+.list-title{ 
+  color: #222222 !important;
+  margin: .25rem 0 !important;
+  font-weight: 600 !important;
+  font-size: 16px !important; 
+}
 .list-actions{ margin-left: auto; display: flex; gap: 8px; }
 .list-body{ padding: 10px 12px 12px; }
 .blank-row{ height: 12px; }
@@ -130,12 +252,17 @@ button { margin-left: 5px; }
   --mat-paginator-container-size: 36px;
   --mat-paginator-enabled-icon-color: var(--brand-primary);
 }
+.compact-table {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  overflow: hidden;
+}
 
 /* ============ FILTRES (centrés, compacts) ============ */
 .filters{
   display: flex; justify-content: center;
-  border: 1px solid var(--border-weak) !important;
-  border-radius: 6px; background: var(--surface);
+  border: 2px solid var(--brand-primary) !important;
+  border-radius: 8px; background: #fff;
   padding: 12px 14px; margin-bottom: 12px;
 }
 .filters-grid{
@@ -196,14 +323,28 @@ button { margin-left: 5px; }
 .page-title{
   background: var(--brand-primary);
   color: var(--brand-primary-contrast);
-  border: 2px solid var(--brand-primary);
-  border-radius: 6px;
+  border: 2px solid var(--brand-primary) !important;
+  border-radius: 8px;
   padding: 10px 12px; margin-bottom: 12px;
 }
 .page-title h2{ margin: 0; font-size: 1.3rem; font-weight: 600; }
 .page-title.with-icon{ display: flex; align-items: center; gap: 8px; }
 .page-title.with-icon .mat-icon{ color: var(--brand-primary-contrast); }
 
+.page-crud-title{
+  background: #ffc421;
+  color: var(--brand-primary-contrast);
+  border-radius: 0px;
+  padding: 10px 0px 0px 12px;
+  margin-bottom: 12px;
+}
+
+.page-crud-title h2 {
+    color: #ffffff;
+    font-size: 16px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
 /* ============ CHECKBOX / RADIO COULEURS MARQUE ============ */
 mat-checkbox {
   --mdc-checkbox-selected-focus-state-layer-color: #{$brand};
@@ -230,6 +371,59 @@ mat-checkbox {
   .mat-mdc-card.dark-card { background-color: #fbe8f1 !important; }
 }
 
+/* Scrollbar optionnelle */
+.timeline-viewport {
+  height: 60vh;
+  width: 100%;
+  overflow: auto;
+  padding: 8px 6px;
+  box-sizing: border-box;
+  scrollbar-gutter: stable;
+}
+
+/* garde l’espacement/arrondis/ombre, mais PAS de background ici */
+.dark-card {
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-viewport::-webkit-scrollbar { width: 8px; }
+.timeline-viewport::-webkit-scrollbar-thumb { background: #bdbdbd; border-radius: 4px; }
+
+.empty { padding: 8px; color: #666; text-align: center; }
+
+/* Carte d'info avec bordure rose clair et fond très léger */
+.info-card {
+  border: 2px solid color-mix(in srgb, var(--brand-primary) 35%, #fff 65%) !important;
+  background: color-mix(in srgb, var(--brand-primary) 6%, #fff 94%);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: none;
+}
+
+/* Centrage horizontal + wrap s'il manque de place */
+.info-card--center,
+.info-card--center .mat-mdc-card-content,
+.info-card--center mat-card-content,
+.info-card--center .info-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  text-align: center;
+  margin: 0;
+}
+
+/* Fallback si color-mix non supporté */
+@supports not (color: color-mix(in srgb, #000, #fff)) {
+  .info-card {
+    border-color: #e8b9cc;
+    background: #fff6fa;
+  }
+}
+
 /* ============ ACCESSIBILITÉ : focus visible ============ */
 .mat-focus-indicator:focus-visible,
 button:focus-visible,
@@ -253,7 +447,6 @@ input, textarea { text-transform: uppercase; }
 .mat-mdc-menu-item .mat-icon { margin-right: .5rem; }
 div[cdkDrag] { cursor: move; }
 
-
 /* Variante 75 / 25 pour les pages avec historique à droite */
 .two-col--75-25 {
   display: grid;
@@ -266,119 +459,6 @@ div[cdkDrag] { cursor: move; }
   .two-col--75-25 { grid-template-columns: 1fr; }
 }
 
-.timeline-viewport {
-  height: 60vh;
-  width: 100%;
-  overflow: auto;
-  padding: 8px 6px;
-  box-sizing: border-box;
-  scrollbar-gutter: stable;
-}
-
-/* garde l’espacement/arrondis/ombre, mais PAS de background ici */
-.dark-card {
-  margin: 10px 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Scrollbar optionnelle */
-.timeline-viewport::-webkit-scrollbar { width: 8px; }
-.timeline-viewport::-webkit-scrollbar-thumb { background: #bdbdbd; border-radius: 4px; }
-
-.empty { padding: 8px; color: #666; text-align: center; }
-
-/* === PATCH "limites des zones" — bordures nettes et visibles === */
-
-/* 1) Renforcer les variables de bordure */
-:root {
-  /* augmente légèrement l’intensité */
-  --border-weak:  color-mix(in srgb, var(--brand-primary) 22%, #fff 78%);
-  --border-strong: color-mix(in srgb, var(--brand-primary) 40%, #fff 60%);
-}
-
-/* 2) Filtres : cadre bien visible */
-.filters {
-  background: #fff;
-  border: 2px solid var(--brand-primary) !important;
-  border-radius: 8px;
-}
-
-/* 3) Cadres “list-box” (sections + mat-card éventuels) */
-section.list-box,
-.list-box,
-mat-card.list-box {
-  background: #fff;
-  border: 2px solid var(--brand-primary) !important;
-  border-radius: 8px;
-  box-shadow: none; /* on s’appuie sur la bordure, pas sur l’ombre */
-}
-
-/* 4) En-tête du bloc (séparateur bas marqué) */
-.list-header {
-  border-bottom: 2px solid var(--border-strong) !important;
-}
-
-/* 5) Barre de titre de page (rose) */
-.page-title {
-  background: var(--brand-primary);
-  color: var(--brand-primary-contrast);
-  border: 2px solid var(--brand-primary) !important;
-  border-radius: 8px;
-}
-
-/* 6) Encadrer le conteneur table + paginator pour une limite continue */
-.compact-table {
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  overflow: hidden; /* la bordure entoure l’ensemble */
-}
-
-/* 7) (Optionnel) Donner un trait très léger à TOUTES les cartes, si tu le souhaites */
-.mat-mdc-card:not(.list-box) {
-  border: 1px solid var(--border-weak);
-  border-radius: 8px;
-}
-
-/* 8) Fallback si color-mix n’est pas supporté */
-@supports not (color: color-mix(in srgb, #000, #fff)) {
-  :root {
-    --border-weak:  #e8b9cc;  /* rose très pâle */
-    --border-strong:#d98aa8;  /* rose un peu plus soutenu */
-  }
-}
-
-/* Carte d'info avec bordure rose clair et fond très léger */
-.info-card {
-  border: 2px solid color-mix(in srgb, var(--brand-primary) 35%, #fff 65%) !important;
-  background: color-mix(in srgb, var(--brand-primary) 6%, #fff 94%);
-  border-radius: 10px;
-  padding: 10px 14px;
-  box-shadow: none; /* look propre, bordure bien lisible */
-}
-
-/* Centrage horizontal + wrap s'il manque de place */
-.info-card--center,
-.info-card--center .mat-mdc-card-content,
-.info-card--center mat-card-content,
-.info-card--center .info-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  text-align: center;
-  margin: 0;
-}
-
-/* Fallback si color-mix non supporté */
-@supports not (color: color-mix(in srgb, #000, #fff)) {
-  .info-card {
-    border-color: #e8b9cc;   /* rose clair */
-    background: #fff6fa;     /* très léger rose */
-  }
-}
-
 /* 2 colonnes équilibrées comme dans la capture */
 .row-2col {
   display: grid;
@@ -386,30 +466,15 @@ mat-card.list-box {
   gap: 10px;
 }
 
-/* Ligne “Ajout de produit” : Désignation plus large + bouton à droite */
-.row-add-line {
-  display: grid;
-  grid-template-columns: 1.6fr 0.8fr 0.8fr 0.8fr auto; /* ≈ 45% / 18% / 18% / 18% / bouton */
-  gap: 10px;
-  align-items: end;
-}
-
-.row-add-line .action-btn {
-  height: 40px;
-  align-self: end;
-  white-space: nowrap;
-}
-
-
 /* Ligne “Ajout de produit” : tout sur une seule ligne */
 .product-row{
   display: grid;
   grid-template-columns:
-    minmax(260px, 1.8fr)  /* Désignation */
-    130px                  /* Prix Unit. */
-    110px                  /* Quantité */
-    140px                  /* Total */
-    auto;                  /* Bouton */
+    minmax(260px, 1.8fr)
+    130px
+    110px
+    140px
+    auto;
   gap: 10px;
   align-items: end;
 }
@@ -424,15 +489,6 @@ mat-card.list-box {
   height: 40px;
   white-space: nowrap;
   align-self: end;
-}
-
-/* BLOC avec bordure rose clair (tu l’as déjà via .list-box) — renfort visuel léger */
-.list-box--compact{
-  border: 2px solid color-mix(in srgb, var(--brand-primary) 45%, #fff 55%);
-  border-radius: 6px;
-}
-.list-box--compact .list-header{
-  border-bottom: 2px solid color-mix(in srgb, var(--brand-primary) 45%, #000 55%);
 }
 
 /* Réactivité : passe sous 5 colonnes si l’espace manque */
@@ -472,8 +528,8 @@ mat-card.list-box {
   border:2px solid color-mix(in srgb, var(--brand-primary) 35%, #fff 65%);
   border-radius:8px; padding:10px;
   /* variables de taille uniformes */
-  --ui-compact-w: 120px;   /* largeur des petits champs + bouton */
-  --ui-compact-h: 40px;    /* hauteur des champs + bouton */
+  --ui-compact-w: 120px;
+  --ui-compact-h: 40px;
 }
 
 /* champs : aucune marge basse supplémentaire */
@@ -495,7 +551,7 @@ mat-card.list-box {
   height:var(--ui-compact-h);
 }
 .product-row--tight .mat-mdc-form-field-infix{
-  padding:6px 0 8px;   /* compacter la zone de saisie */
+  padding:6px 0 8px;
 }
 
 /* Bouton “Ajouter” exactement même taille */
@@ -510,7 +566,7 @@ mat-card.list-box {
 /* (optionnel) Très étroit : passe à 2 lignes proprement */
 @media (max-width: 900px){
   .product-row--tight{ flex-wrap:wrap; }
-  .product-row--tight .add-btn{ width:160px; } /* un peu plus large en mobile */
+  .product-row--tight .add-btn{ width:160px; }
 }
 
 .list-header{
@@ -522,7 +578,7 @@ mat-card.list-box {
 }
 .list-title{ margin:.25rem 0; font-weight:600; font-size:1.1rem; }
 .list-actions{
-  margin-left:auto;            /* pousse les boutons à droite */
+  margin-left:auto;
   display:flex; gap:8px; flex-wrap:wrap;
 }
 
@@ -534,7 +590,7 @@ mat-card.list-box {
 }
 
 .facture-edit .cols-70-30 { grid-template-columns: 70% 30%; }
-.facture-edit .cols-50-50 { grid-template-columns: 1fr 1fr; } /* 50/50 */
+.facture-edit .cols-50-50 { grid-template-columns: 1fr 1fr; }
 
 .facture-edit .row .w-full,
 .facture-edit .row .mat-form-field {
@@ -550,10 +606,9 @@ mat-card.list-box {
 }
 
 .facture-edit .form-grid > .row { display: grid !important; }
-/* Réduit uniquement l’écart HORIZONTAL entre les 2 colonnes */
 .facture-edit .row {
-  column-gap: 8px;   /* ← mets 6px ou 4px si tu veux encore plus serré */
-  row-gap: 12px;     /* l’écart VERTICAL reste confortable (tu peux baisser si besoin) */
+  column-gap: 8px;
+  row-gap: 12px;
 }
 
 /* Optionnel : élimine toute marge par défaut sur les champs */
