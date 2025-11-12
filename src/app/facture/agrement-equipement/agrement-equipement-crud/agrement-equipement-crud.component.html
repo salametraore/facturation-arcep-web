@@ -63,10 +63,16 @@
           </mat-form-field>
         </form>
 
+        <div align="center" *ngIf="ficheTechnique?.statut?.id > 5">
+          <avis-technique-infos
+            [ficheTechnique]="ficheTechnique">
+          </avis-technique-infos>
+        </div>
+
         <div class="blank-row"></div>
 
         <!-- ===== Sous-collection : Ajout d'un type d'agrément ===== -->
-        <section class="list-box list-box--compact">
+        <section class="list-box list-box--compact" *ngIf="ficheTechnique?.statut?.id<4">
           <div class="list-header">
             <h3 class="list-title">Ajout d'un type d’agrément</h3>
           </div>

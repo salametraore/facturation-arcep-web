@@ -4,8 +4,7 @@ import {operations} from "../../constantes";
 
 @Component({
   selector: 'app-agrement-installeur',
-  templateUrl: './agrement-installeur.component.html',
-  styleUrl: './agrement-installeur.component.scss'
+  templateUrl: './agrement-installeur.component.html'
 })
 export class AgrementInstalleurComponent {
   fichetTechnique: FicheTechniques;

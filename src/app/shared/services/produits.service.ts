@@ -1,14 +1,21 @@
-import {environment} from '../../../environments/environment';
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {Produit} from 'src/app/shared/models/produit';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Produit } from 'src/app/shared/models/produit';
+import { AppConfigService } from '../../core/config/app-config.service';
 
-@Injectable({providedIn: 'root',})
+@Injectable({ providedIn: 'root' })
 export class ProduitService {
-  private baseUrl = environment.baseUrl + '/produits';
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private cfg: AppConfigService
+  ) {}
+
+  /** Base normalisée: {baseUrl}/produits */
+  private get baseUrl(): string {
+    const base = this.cfg.baseUrl.replace(/\/$/, '');
+    return `${base}/produits`;
   }
 
   getItem(id: number): Observable<Produit> {
@@ -24,7 +31,7 @@ export class ProduitService {
   }
 
   delete(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}/`, {responseType: 'text'});
+    return this.http.delete(`${this.baseUrl}/${id}/`, { responseType: 'text' });
   }
 
   getListItems(): Observable<Produit[]> {
@@ -34,5 +41,4 @@ export class ProduitService {
   getListeProduitsByDirection(directionId: number): Observable<Produit[]> {
     return this.http.get<Produit[]>(`${this.baseUrl}/direction/${directionId}/`);
   }
-
 }

@@ -4,8 +4,7 @@ import {operations} from "../../constantes";
 
 @Component({
   selector: 'app-ficher-technique-dfc',
-  templateUrl: './ficher-technique-dfc.component.html',
-  styleUrl: './ficher-technique-dfc.component.scss'
+  templateUrl: './ficher-technique-dfc.component.html'
 })
 export class FicherTechniqueDfcComponent {
 
@@ -22,4 +21,6 @@ export class FicherTechniqueDfcComponent {
   onGetFicheTechnique(ficheTechnique: FicheTechniques) {
     this.fichetTechnique = ficheTechnique;
   }
+
+
 }

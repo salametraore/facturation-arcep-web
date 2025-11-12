@@ -100,9 +100,15 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
       this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
+    if (this.ficheTechnique?.id) {
+      this.ficheTechniquesService
+        .getHistoriqueTraitementFicheTechnique(this.ficheTechnique.id)
+        .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+          this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+        });
+    } else {
+      this.historiqueFicheTechniques = [];
+    }
 
 
   }
@@ -255,6 +261,7 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
@@ -276,6 +283,11 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
       }
     );
   }
+
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
+  }
+
 
   onRetour() {
     this.notifyActionOperation.emit(operations.table);

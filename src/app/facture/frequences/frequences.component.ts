@@ -4,8 +4,7 @@ import {operations} from "../../constantes";
 
 @Component({
   selector: 'frequences',
-  templateUrl: './frequences.component.html',
-  styleUrl: './frequences.component.scss'
+  templateUrl: './frequences.component.html'
 })
 export class FrequencesComponent {
 

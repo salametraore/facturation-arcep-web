@@ -5,7 +5,7 @@
 }
 
 .background-container {
- /* background-image: url('/assets/images/background.png');*/
+  /* background-image: url('/assets/images/background.png');*/
   background-size: cover;
   background-position: center;
   height: 100%;
@@ -124,4 +124,23 @@
 /* Optionnel : un peu d'air au-dessus du bouton */
 .login-form-container form button[type="submit"] {
   margin-top: 6px;
+}
+
+/* ============================================
+   Patch outline Material : garder les bordures
+   mais enlever le petit trait du notch
+   ============================================ */
+
+/* Segment gauche : on force juste la présence de la bordure,
+   Angular Material garde sa couleur d'origine */
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__leading {
+  border-left-width: 1px !important;
+  border-left-style: solid !important;
+  display: block !important;
+}
+
+/* Notch : on enlève la petite bordure verticale
+   à l’endroit où s’accroche le label */
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch {
+  border-left: none !important;
 }

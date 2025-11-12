@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Optional, Inject, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from "@angular/material/table";
 import {SelectionModel} from "@angular/cdk/collections";
 import {MatPaginator} from "@angular/material/paginator";
@@ -11,6 +11,8 @@ import {DetailFicheClient} from "../../../shared/models/detail-fiche-client";
 import {FactureService} from "../../../shared/services/facture.service";
 import {CategorieProduitService} from "../../../shared/services/categorie-produit.service";
 import {ClientService} from "../../../shared/services/client.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import {MatSort} from "@angular/material/sort";
 
 @Component({
   selector: 'client-details',
@@ -27,35 +29,70 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   clients: Client[];
   client: Client;
   nomClient: any;
+  fixeCategorie: number;
 
   public operations = operations;
   public data_operation: string = '';
 
   detailFicheClient?: RecouvDashboardClient;
-  t_Factures?: MatTableDataSource<Facture>;
+  t_Factures: MatTableDataSource<Facture> = new MatTableDataSource<Facture>([]);
 
 
   constructor(
-    public dialogRef: MatDialogRef<ClientDetailsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    private route: ActivatedRoute,
+    private router: Router,
+    @Optional() public dialogRef: MatDialogRef<ClientDetailsComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private factureService: FactureService,
     private categorieProduitService: CategorieProduitService,
     private clientService: ClientService,
   ) {
-    this.detailFicheClient = data.detailFicheClient;
-    this.data_operation = data.operation;
+    this.detailFicheClient = this.data?.detailFicheClient ?? this.data?.recouvDashboardClient;
+    this.data_operation = this.data?.operation;
+    this.fixeCategorie = this.data?.fixeCategorie;
     this.t_Factures = new MatTableDataSource<Facture>([]);
   }
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator?: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngAfterViewInit() {
-  //  this.t_Factures.paginator = this.paginator;
+    this.t_Factures.paginator = this.paginator;
+    // si tri utilisé :
+    if (this.sort) {
+      this.t_Factures.sort = this.sort;
+    }
   }
 
   ngOnInit(): void {
-    this.reloadData();
+    ///this.reloadData();
+
+    // 1) Si on vient du dialog, data est présent
+    if (this.data?.recouvDashboardClient || this.data?.detailFicheClient) {
+      this.detailFicheClient = this.data?.recouvDashboardClient ?? this.data?.detailFicheClient;
+      this.data_operation = this.data?.operation;
+      this.fixeCategorie = this.data?.fixeCategorie;
+      this.reloadData();
+      return;
+    }
+
+
+    // 2) Sinon, on est en mode page : on lit l'id route
+    this.route.paramMap.subscribe(pm => {
+      const id = Number(pm.get('id'));
+      if (id) {
+        this.clientService.getItem(id).subscribe(client => {
+          this.client = client;
+          this.nomClient = client?.denomination_sociale;
+          this.clientService.getReleveCompteClientByIdClient(id).subscribe(lignes => {
+            const toTime = (d: any) => d ? new Date(d).getTime() : Number.MAX_SAFE_INTEGER;
+            this.paginator?.firstPage?.();
+          });
+        });
+      }
+    });
   }
+
 
   isAllSelected() {
     const numSelected = this.selection.selected.length;
@@ -72,7 +109,11 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   }
 
   onFerme() {
-    this.dialogRef.close('Yes');
+    if (this.dialogRef) {
+      this.dialogRef.close('Yes');
+    } else {
+      this.router.navigate(['/clients']); // ou history.back();
+    }
   }
 
   private reloadData() {
@@ -80,13 +121,13 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
 
-      if(this.detailFicheClient){
-        this.client = clients?.find(c=>c.id ===this.detailFicheClient?.client_id);
+      if (this.detailFicheClient) {
+        this.client = clients?.find(c => c.id === this.detailFicheClient?.client_id);
         this.nomClient = this.client?.denomination_sociale;
 
         this.factureService.getListeFacturesByClientId(this.detailFicheClient?.client_id).subscribe((lignesFactures: Facture[]) => {
 
-          this.factures=lignesFactures;
+          this.factures = lignesFactures;
           this.t_Factures.data = this.factures;
         });
       }

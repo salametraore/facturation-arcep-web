@@ -1,38 +1,68 @@
-<h2 mat-dialog-title>Génération des redevances annuelles</h2>
-<br>
+<mat-card>
 
-<mat-dialog-content [formGroup]="form" class="space-y-4" style="min-width: 420px;">
-  <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Catégorie de produit</mat-label>
-    <mat-select formControlName="categorie" required>
-      <mat-option *ngFor="let c of categories" [value]="c.id">{{ c.libelle }}</mat-option>
-    </mat-select>
-    <mat-error *ngIf="form.controls.categorie.hasError('required')">
-      La catégorie est requise.
-    </mat-error>
-  </mat-form-field>
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Génération des redevances annuelles</h2>
+  </div>
 
-  <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Année</mat-label>
-    <input matInput type="number" formControlName="annee" required>
-    <mat-error *ngIf="form.controls.annee.hasError('required')">L'année est requise.</mat-error>
-    <mat-error *ngIf="form.controls.annee.hasError('min')">Année minimale : 2000.</mat-error>
-    <mat-error *ngIf="form.controls.annee.hasError('max')">Année maximale : 2100.</mat-error>
-  </mat-form-field>
-</mat-dialog-content>
+  <div class="blank-row"></div>
 
-<mat-dialog-actions align="end" class="gap-2">
-  <button mat-stroked-button (click)="fermer()" [disabled]="isLoading">Fermer</button>
+  <mat-dialog-content [formGroup]="form" class="dialog-body field-xl">
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Catégorie de produit</mat-label>
+      <mat-select formControlName="categorie" required>
+        <mat-option *ngFor="let c of categories" [value]="c.id">{{ c.libelle }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls.categorie.hasError('required')">
+        La catégorie est requise.
+      </mat-error>
+    </mat-form-field>
 
-  <button
-    mat-flat-button
-    color="primary"
-    (click)="submit()"
-    [disabled]="form.invalid || isLoading || generated">
-    <span *ngIf="!isLoading">Générer</span>
-    <span *ngIf="isLoading" class="inline-flex items-center gap-2">
-      <mat-progress-spinner mode="indeterminate" [diameter]="16"></mat-progress-spinner>
-      Traitement...
-    </span>
-  </button>
-</mat-dialog-actions>
+    <div class="blank-row"></div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Année</mat-label>
+      <input formControlName="annee" matInput required type="number">
+      <mat-error *ngIf="form.controls.annee.hasError('required')">L'année est requise.</mat-error>
+      <mat-error *ngIf="form.controls.annee.hasError('min')">Année minimale : 2000.</mat-error>
+      <mat-error *ngIf="form.controls.annee.hasError('max')">Année maximale : 2100.</mat-error>
+    </mat-form-field>
+
+    <div class="blank-row"></div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Signataire</mat-label>
+      <input formControlName="signataire" matInput required type="text">
+      <mat-error *ngIf="form.controls.signataire.hasError('required')">Le signataire est requis.</mat-error>
+    </mat-form-field>
+
+    <div class="blank-row"></div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Client</mat-label>
+      <mat-select formControlName="client">
+        <mat-option *ngFor="let c of clients" [value]="c.id">{{ c.denomination_sociale }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+
+    <button mat-flat-button
+      (click)="genererRedevancesAnnuelles()"
+      [color]="canGenerate() ? 'primary' : null"
+      [disabled]="!canGenerate()">
+      <span *ngIf="!isLoading">Générer</span>
+      <span *ngIf="isLoading" class="inline-flex items-center gap-2">
+        <mat-progress-spinner [diameter]="16" mode="indeterminate"></mat-progress-spinner>
+        Traitement...
+      </span>
+    </button>
+
+    <button (click)="fermer()" [disabled]="isLoading" cdkFocusInitial color="warn" mat-stroked-button>Fermer</button>
+
+  </mat-dialog-actions>
+
+
+</mat-card>
+

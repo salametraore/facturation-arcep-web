@@ -3,7 +3,7 @@
 
   <!-- Titre de page (barre rose) -->
   <div class="page-title">
-    <h2>Liste factures / devis</h2>
+    <h2>Liste des Factures</h2>
   </div>
 
   <!-- Filtres compacts et centrés -->
@@ -89,7 +89,7 @@
 
     <!-- En-tête : titre + actions à droite -->
     <div class="list-header">
-      <h3 class="list-title">Liste — Factures et devis</h3>
+      <h3 class="list-title">Liste des Factures</h3>
 
       <div class="list-actions">
         <!-- Actions secondaires éventuelles
@@ -98,6 +98,10 @@
           Exporter
         </button>
         -->
+        <button mat-flat-button color="primary" (click)="openGenererRedevancesAnnuelles()">
+<!--          <mat-icon>add</mat-icon>-->
+          Générer Rédevances
+        </button>
       </div>
     </div>
 
@@ -156,25 +160,22 @@
                   Détail
                 </button>
 
-                <button mat-menu-item (click)="crud(element, this.operations.update)">
+                <button mat-menu-item   *ngIf="element.etat === 'EMISE'" (click)="crud(element, this.operations.update)">
                   <mat-icon color="primary">edit</mat-icon>
                   Modifier
                 </button>
 
-                <button mat-menu-item (click)="onPrintDevis(element)">
-                  <mat-icon color="primary">print</mat-icon>
-                  Éditer devis
-                </button>
+                <button mat-menu-item class="btn_delete"   *ngIf="element.etat === 'EMISE'"   (click)="onAnnulerFacture(element)">
+                <mat-icon color="warn">delete</mat-icon>
+                Annuler facture
+              </button>
+
 
                 <button mat-menu-item (click)="onPrint(element)">
                   <mat-icon color="primary">print</mat-icon>
                   Éditer facture
                 </button>
 
-                <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
-                  <mat-icon color="warn">delete</mat-icon>
-                  Supprimer
-                </button>
 
               </mat-menu>
             </td>

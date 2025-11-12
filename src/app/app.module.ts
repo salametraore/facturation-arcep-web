@@ -1,4 +1,4 @@
-import {NgModule, LOCALE_ID} from '@angular/core';
+import {NgModule, LOCALE_ID, APP_INITIALIZER} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -11,11 +11,17 @@ import localeFR from '@angular/common/locales/fr';
 import {MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDateFormats} from '@angular/material/core';
 import {SharedModule} from './shared/shared.module';
 import {AuthInterceptor} from "./authentication/auth.interceptor";
+import { AppConfigService } from './core/config/app-config.service';
 
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import {ScrollingModule} from "@angular/cdk/scrolling";
 
 registerLocaleData(localeFR);
+
+function initAppConfig(cfg: AppConfigService) {
+  return () => cfg.load(); // doit retourner une fonction qui renvoie une Promise<void>
+}
+
 
 export const MY_FORMAT: MatDateFormats = {
   parse: {
@@ -60,6 +66,13 @@ export const MY_FORMAT: MatDateFormats = {
         floatLabel: 'always',
         subscriptSizing: 'dynamic'
       }
+    },
+    AppConfigService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initAppConfig,
+      deps: [AppConfigService],
+      multi: true
     }
   ],
   bootstrap: [AppComponent]

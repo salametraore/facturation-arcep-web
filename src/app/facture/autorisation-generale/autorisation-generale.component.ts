@@ -4,8 +4,7 @@ import {operations} from "../../constantes";
 
 @Component({
   selector: 'app-autorisation-generale',
-  templateUrl: './autorisation-generale.component.html',
-  styleUrl: './autorisation-generale.component.scss'
+  templateUrl: './autorisation-generale.component.html'
 })
 export class AutorisationGeneraleComponent {
 

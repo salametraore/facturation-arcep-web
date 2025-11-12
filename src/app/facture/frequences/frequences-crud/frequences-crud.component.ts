@@ -20,8 +20,7 @@ import {operations,bouton_names} from "../../../constantes";
 
 @Component({
   selector: 'frequences-crud',
-  templateUrl: './frequences-crud.component.html',
-  styleUrl: './frequences-crud.component.scss'
+  templateUrl: './frequences-crud.component.html'
 })
 export class FrequencesCrudComponent implements OnInit, AfterViewInit {
 

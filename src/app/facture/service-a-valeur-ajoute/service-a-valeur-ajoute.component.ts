@@ -4,8 +4,7 @@ import {operations} from "../../constantes";
 
 @Component({
   selector: 'service-a-valeur-ajoute',
-  templateUrl: './service-a-valeur-ajoute.component.html',
-  styleUrl: './service-a-valeur-ajoute.component.scss'
+  templateUrl: './service-a-valeur-ajoute.component.html'
 })
 export class ServiceAValeurAjouteComponent {
 

@@ -92,9 +92,15 @@ export class ServiceConfianceCrudComponent implements OnInit {
       this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
+    if (this.ficheTechnique?.id) {
+      this.ficheTechniquesService
+        .getHistoriqueTraitementFicheTechnique(this.ficheTechnique.id)
+        .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+          this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+        });
+    } else {
+      this.historiqueFicheTechniques = [];
+    }
   }
 
   initForm_update() {
@@ -104,7 +110,7 @@ export class ServiceConfianceCrudComponent implements OnInit {
       produit: [this.ficheTechnique?.produits_detail[0].produit],
       commentaire: [this.ficheTechnique?.commentaire],
       direction: [2],
-      statut: [1],
+      statut:  [this.ficheTechnique?.statut.id],
       position: [1],
       etat: ['INIT'],
     });
@@ -153,6 +159,7 @@ export class ServiceConfianceCrudComponent implements OnInit {
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits));
@@ -179,6 +186,10 @@ export class ServiceConfianceCrudComponent implements OnInit {
         this.errorMessage = error.error?.message || error.message;
       }
     );
+  }
+
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
   }
 
   onTransmettre(){
@@ -214,4 +225,36 @@ export class ServiceConfianceCrudComponent implements OnInit {
   onGetClient(client: Client) {
     this.client = client;
   }
+
+  onDelete(ficheTechniques: FicheTechniques) {
+    this.dialogService
+      .yes_no({ message: "Voulez-vous supprimer cet enregistrement ?" })
+      .subscribe(yes_no => {
+        if (yes_no === true) {
+
+          // ✅ Vérification du statut avant suppression
+          if (ficheTechniques.statut  && ficheTechniques.statut.id !== 1) {
+            this.dialogService.alert({
+              message: "Impossible de supprimer cette fiche car elle n'est plus à l'étape initiale."
+            });
+            return; // on sort sans appeler le delete
+          }
+
+          // ✅ Statut OK → on peut supprimer
+          this.ficheTechniquesService
+            .delete(ficheTechniques.id)
+            .subscribe(
+              () => {
+                this.msgMessageService.success('Supprimé avec succès');
+                this.reloadData();
+              },
+              (error) => {
+                console.log(error);
+                this.dialogService.alert({ message: error.message });
+              }
+            );
+        }
+      });
+  }
+
 }

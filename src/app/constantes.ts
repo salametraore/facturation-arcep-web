@@ -130,6 +130,14 @@ export const TYPE_FRAIS = [
 ];
 
 export const ETATS_FACTURE = [
-  { code: 'EN_ATTENTE', label: 'En Attente paiement' },
-  { code: 'PAYEE', label: 'Payée' }
+  { code: 'EMISE', label: 'Emise' },
+  { code: 'PAYEE', label: 'Payée' },
+  { code: 'ANNULEE', label: 'Annulée' }
+];
+
+
+export const ETATS_DEVIS = [
+  { code: 'EMIS', label: 'Emis' },
+  { code: 'PAYE', label: 'Payé' },
+  { code: 'ANNULE', label: 'Annulé' }
 ];

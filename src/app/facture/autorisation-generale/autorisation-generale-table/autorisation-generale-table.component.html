@@ -125,7 +125,7 @@
           <!-- Catégorie -->
           <ng-container matColumnDef="categorie_produit">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
-            <td mat-cell *matCellDef="let element">{{ getCategorie(element.categorie_produit) }}</td>
+            <td mat-cell *matCellDef="let element">{{ getProduitsLibelles(element) }}</td>
           </ng-container>
 
           <!-- Statut -->
@@ -152,7 +152,7 @@
                   mat-menu-item
                   (click)="crud(element, this.operations.transmettre)">
                   <mat-icon color="warn">edit</mat-icon>
-                  Transmettre
+                  Transmettre DFC
                 </button>
 
                 <button

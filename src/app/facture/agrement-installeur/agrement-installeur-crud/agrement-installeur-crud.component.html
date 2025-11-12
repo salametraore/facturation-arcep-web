@@ -81,6 +81,12 @@
             <textarea matInput formControlName="commentaire" rows="1"></textarea>
           </mat-form-field>
 
+          <div align="center"  *ngIf="ficheTechnique?.statut?.id > 5">
+            <avis-technique-infos
+              [ficheTechnique]="ficheTechnique">
+            </avis-technique-infos>
+          </div>
+
         </form>
       </div>
     </section>

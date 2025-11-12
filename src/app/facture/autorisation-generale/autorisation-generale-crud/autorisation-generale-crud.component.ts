@@ -79,10 +79,15 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
       this.form.get('produit').setValue(this.produits[0]?.id);
     });
 
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
-
+    if (this.ficheTechnique?.id) {
+      this.ficheTechniquesService
+        .getHistoriqueTraitementFicheTechnique(this.ficheTechnique.id)
+        .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+          this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+        });
+    } else {
+      this.historiqueFicheTechniques = [];
+    }
 
 
   }
@@ -103,6 +108,10 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
       produit: [76],
       commentaire: [],
     });
+  }
+
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
   }
 
   crud() {
@@ -131,6 +140,7 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
@@ -191,5 +201,6 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
     this.ficheTechnique = undefined;
     this.notifyFicheTechnique.emit(this.ficheTechnique);
   }
+
 
 }

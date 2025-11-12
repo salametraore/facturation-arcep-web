@@ -1,10 +1,11 @@
 @use '@angular/material' as mat;
 
-/* ============ THEME MATERIAL (ARCEP Rose) ============ */
+/* ============ THEME MATERIAL (Rose style “badge”) ============ */
 @include mat.core();
 
-$primary: mat.define-palette(mat.$pink-palette, 800);    // ~ #ad1457
-$accent:  mat.define-palette(mat.$pink-palette, A200);
+/* Palette Material plus douce et proche du chip de la capture */
+$primary: mat.define-palette(mat.$pink-palette, 300);   /* ≈ #F06292 */
+$accent:  mat.define-palette(mat.$pink-palette, A100);  /* ≈ #FF80AB */
 $warn:    mat.define-palette(mat.$deep-orange-palette);
 
 $theme: mat.define-light-theme((
@@ -16,8 +17,9 @@ $theme: mat.define-light-theme((
 
 /* ============ VARIABLES CSS (surfaces/texte/bordures) ============ */
 :root {
-  --brand-primary: #{mat.get-color-from-palette($primary)};
-  --brand-primary-contrast: #{mat.get-color-from-palette($primary, default-contrast)};
+  /* Rose EXACT utilisé par l’UI custom (badges, entêtes, barres, etc.) */
+  --brand-primary: #FF6B8E;
+  --brand-primary-contrast: #ffffff;
 
   /* surfaces & texte */
   --surface: #ffffff;
@@ -26,29 +28,40 @@ $theme: mat.define-light-theme((
   --text-muted: #5a5a5a;
 
   /* bordures */
-  --border-weak: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%);
+  --border-weak:  color-mix(in srgb, var(--brand-primary) 14%, #fff 86%);
   --border-strong: color-mix(in srgb, var(--brand-primary) 30%, #fff 70%);
 }
 
 /* SCSS legacy (si besoin ponctuel) */
-$brand: #ad1457;
-$brand-600: #c2185b;
-$brand-400: #ec407a;
+$brand:     #FF6B8E;
+$brand-600: #FF577F;
+$brand-400: #FF86A3;
 
 /* ============ GLOBAL / WATERMARK ============ */
 html, body { height: 100%; background: #FAFAFA; color: var(--text); }
 
-mat-sidenav-content { position: relative; min-height: 100%; }
-mat-sidenav-content::before {
+.app-content {
+  position: relative;
+  min-height: 100vh;
+}
+
+.app-content::before {
   content: "";
-  position: absolute; inset: 0;
-  background-image: url("/assets/images/arcep-logo.png");
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-image);
   background-repeat: no-repeat;
   background-position: center 20%;
   background-size: 520px auto;
-  opacity: 0.06; pointer-events: none; z-index: 0;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
 }
-mat-sidenav-content > * { position: relative; z-index: 1; }
+
+.app-content > * {
+  position: relative;
+  z-index: 1;
+}
 
 @media print { mat-sidenav-content::before { display: none; } }
 
@@ -239,6 +252,19 @@ a:focus-visible,
   border-radius: 6px;
 }
 
+/* Focus visible : boutons & liens uniquement */
+.mat-focus-indicator:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 30%, #fff 70%);
+  border-radius: 6px;
+}
+
+/* Jamais de halo sur les champs */
+.mat-mdc-form-field:focus-within {
+  box-shadow: none !important;
+}
+
 /* ============ DIVERS UTILES ============ */
 .search-div{ margin: 10px; }
 .search-form-field{ width: 70%; }
@@ -252,7 +278,6 @@ input, textarea { text-transform: uppercase; }
 .mat-mdc-button_label { color: white; }
 .mat-mdc-menu-item .mat-icon { margin-right: .5rem; }
 div[cdkDrag] { cursor: move; }
-
 
 /* Variante 75 / 25 pour les pages avec historique à droite */
 .two-col--75-25 {
@@ -400,7 +425,6 @@ mat-card.list-box {
   white-space: nowrap;
 }
 
-
 /* Ligne “Ajout de produit” : tout sur une seule ligne */
 .product-row{
   display: grid;
@@ -449,7 +473,6 @@ mat-card.list-box {
   .product-row .add-btn{ justify-self: start; }
 }
 
-
 /* Ligne à 2 colonnes 70% / 30% */
 .row-70-30{
   display: grid;
@@ -465,11 +488,10 @@ mat-card.list-box {
   }
 }
 
-
 /* ====== Ligne d'ajout compacte et alignée ====== */
 .product-row--tight{
   display:flex; align-items:flex-end; gap:10px; flex-wrap:nowrap;
-  border:2px solid color-mix(in srgb, var(--brand-primary) 35%, #fff 65%);
+  border-color: transparent !important;
   border-radius:8px; padding:10px;
   /* variables de taille uniformes */
   --ui-compact-w: 120px;   /* largeur des petits champs + bouton */
@@ -552,8 +574,8 @@ mat-card.list-box {
 .facture-edit .form-grid > .row { display: grid !important; }
 /* Réduit uniquement l’écart HORIZONTAL entre les 2 colonnes */
 .facture-edit .row {
-  column-gap: 8px;   /* ← mets 6px ou 4px si tu veux encore plus serré */
-  row-gap: 12px;     /* l’écart VERTICAL reste confortable (tu peux baisser si besoin) */
+  column-gap: 8px;
+  row-gap: 12px;
 }
 
 /* Optionnel : élimine toute marge par défaut sur les champs */
@@ -561,3 +583,922 @@ mat-card.list-box {
   margin: 0;
 }
 .facture-edit .row.grid-50-50 { column-gap: 6px; }
+
+/*
+!* === PATCH: états hover/active plus foncés pour les boutons primaires === *!
+
+!* 1) Définir deux déclinaisons du rose pour les états *!
+:root {
+  --brand-primary-hover: color-mix(in srgb, var(--brand-primary) 88%, #000 12%);
+  --brand-primary-pressed: color-mix(in srgb, var(--brand-primary) 78%, #000 22%);
+}
+*/
+
+/* === PATCH: MatChips en rose brand (filled + outlined) ===================== */
+
+/* Vars d’états déjà utilisées pour les boutons (si absentes, on les redéfinit vite) */
+:root {
+  --brand-primary-hover:   var(--brand-primary-hover,   color-mix(in srgb, var(--brand-primary) 88%, #000 12%));
+  --brand-primary-pressed: var(--brand-primary-pressed, color-mix(in srgb, var(--brand-primary) 78%, #000 22%));
+}
+
+/* ===== Filled chips : color="primary" ===================================== */
+.mat-mdc-chip.mat-primary {
+  /* Tokens MDC (si pris en compte par ton build) */
+  --mdc-chip-elevated-container-color: var(--brand-primary);
+  --mdc-chip-label-text-color: #fff;
+  --mdc-chip-with-icon-icon-color: #fff;
+
+  /* Style direct pour garantir le rendu */
+  background-color: var(--brand-primary) !important;
+  color: #fff !important;
+  border: none;
+}
+
+.mat-mdc-chip.mat-primary:hover {
+  background-color: var(--brand-primary-hover) !important;
+  color: #fff !important;
+}
+
+.mat-mdc-chip.mat-primary:active,
+.mat-mdc-chip.mat-primary.mdc-evolution-chip--selected {
+  background-color: var(--brand-primary-pressed) !important;
+  color: #fff !important;
+}
+
+/* Icône “remove” / trailing action en blanc pour le contraste */
+.mat-mdc-chip.mat-primary .mat-icon,
+.mat-mdc-chip.mat-primary .mdc-evolution-chip__icon,
+.mat-mdc-chip.mat-primary .mdc-evolution-chip__icon--trailing {
+  color: #fff !important;
+  fill: currentColor;
+}
+
+/* ===== Outlined chips : appearance outlined + color="primary" ============== */
+/* Couvrir les deux variantes de classes Angular/MDC */
+.mat-mdc-chip.mat-primary.mat-mdc-chip-outlined,
+.mat-mdc-chip.mat-primary.mdc-evolution-chip--outlined {
+  --mdc-chip-outline-color: color-mix(in srgb, var(--brand-primary) 70%, #000 30%);
+  --mdc-chip-label-text-color: color-mix(in srgb, var(--brand-primary) 92%, #000 8%);
+
+  background-color: transparent !important;
+  color: color-mix(in srgb, var(--brand-primary) 92%, #000 8%) !important;
+  border: 1.5px solid color-mix(in srgb, var(--brand-primary) 70%, #000 30%) !important;
+}
+
+.mat-mdc-chip.mat-primary.mat-mdc-chip-outlined:hover,
+.mat-mdc-chip.mat-primary.mdc-evolution-chip--outlined:hover {
+  background-color: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%) !important;
+  border-color: color-mix(in srgb, var(--brand-primary) 78%, #000 22%) !important;
+  color: color-mix(in srgb, var(--brand-primary) 96%, #000 4%) !important;
+}
+
+.mat-mdc-chip.mat-primary.mat-mdc-chip-outlined:active,
+.mat-mdc-chip.mat-primary.mdc-evolution-chip--outlined:active,
+.mat-mdc-chip.mat-primary.mat-mdc-chip-outlined.mdc-evolution-chip--selected,
+.mat-mdc-chip.mat-primary.mdc-evolution-chip--outlined.mdc-evolution-chip--selected {
+  background-color: color-mix(in srgb, var(--brand-primary) 16%, #fff 84%) !important;
+  border-color: color-mix(in srgb, var(--brand-primary) 85%, #000 15%) !important;
+}
+
+/* ===== Focus visible & states communs ====================================== */
+.mat-mdc-chip.mat-primary:focus-visible,
+.mat-mdc-chip.mat-primary .mdc-evolution-chip__action--primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%) !important;
+  border-radius: 999px;
+}
+
+/* Désactivé */
+.mat-mdc-chip.mdc-evolution-chip--disabled {
+  opacity: .55;
+  filter: grayscale(.1);
+}
+
+/* ChipSet spacing léger (optionnel) */
+.mat-mdc-chip-set {
+  gap: 6px;
+}
+
+
+/* === PATCH: MatBadge en rose brand ======================================== */
+:root {
+  --brand-primary-hover:   var(--brand-primary-hover,   color-mix(in srgb, var(--brand-primary) 88%, #000 12%));
+  --brand-primary-pressed: var(--brand-primary-pressed, color-mix(in srgb, var(--brand-primary) 78%, #000 22%));
+}
+
+/* Contenu du badge */
+.mat-badge .mat-badge-content {
+  background: var(--brand-primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.18);
+}
+
+.mat-badge.mat-badge-overlap .mat-badge-content {
+  box-shadow: 0 0 0 2px #fff, 0 1px 2px rgba(0,0,0,.18);
+}
+.mat-badge.mat-badge-small .mat-badge-content {
+  min-width: 16px; height: 16px; line-height: 16px;
+}
+.mat-badge.mat-badge-large .mat-badge-content {
+  min-width: 22px; height: 22px; line-height: 22px;
+}
+
+button.mat-badge .mat-badge-content,
+a.mat-badge .mat-badge-content,
+[role="button"].mat-badge .mat-badge-content {
+  transition: background-color .15s ease, transform .08s ease;
+}
+button.mat-badge:hover .mat-badge-content,
+a.mat-badge:hover .mat-badge-content,
+[role="button"].mat-badge:hover .mat-badge-content {
+  background: var(--brand-primary-hover) !important;
+}
+button.mat-badge:active .mat-badge-content,
+a.mat-badge:active .mat-badge-content,
+[role="button"].mat-badge:active .mat-badge-content {
+  background: var(--brand-primary-pressed) !important;
+  transform: translateY(0.5px) scale(0.98);
+}
+
+.mat-badge.mat-badge-warn .mat-badge-content {
+  background: var(--brand-primary) !important;
+  color: #fff !important;
+}
+
+.mat-badge:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 6px;
+}
+
+.mat-badge-outline .mat-badge-content {
+  background: #fff !important;
+  color: var(--brand-primary) !important;
+  border: 2px solid var(--brand-primary) !important;
+  box-shadow: none;
+}
+
+
+/* === PATCH: Slide-Toggle (MatSlideToggle) en rose brand ==================== */
+.mat-mdc-slide-toggle.mat-primary {
+  --mdc-switch-selected-track-color: color-mix(in srgb, var(--brand-primary) 32%, #fff 68%);
+  --mdc-switch-selected-handle-color: #fff;
+  --mdc-switch-selected-hover-state-layer-color: var(--brand-primary);
+  --mdc-switch-selected-pressed-state-layer-color: var(--brand-primary);
+  --mdc-switch-selected-focus-state-layer-color: var(--brand-primary);
+
+  .mdc-switch.mdc-switch--selected .mdc-switch__track {
+    background-color: color-mix(in srgb, var(--brand-primary) 32%, #fff 68%) !important;
+    opacity: 1 !important;
+  }
+  .mdc-switch.mdc-switch--selected .mdc-switch__handle-track,
+  .mdc-switch.mdc-switch--selected .mdc-switch__handle {
+    background-color: #fff !important;
+    border-color: #fff !important;
+  }
+}
+
+.mat-mdc-slide-toggle.mat-primary:hover .mdc-switch.mdc-switch--selected .mdc-switch__track {
+  background-color: color-mix(in srgb, var(--brand-primary-hover) 28%, #fff 72%) !important;
+}
+.mat-mdc-slide-toggle.mat-primary:active .mdc-switch.mdc-switch--selected .mdc-switch__track {
+  background-color: color-mix(in srgb, var(--brand-primary-pressed) 28%, #fff 72%) !important;
+}
+
+.mat-mdc-slide-toggle .mdc-switch__track {
+  background-color: #e0e0e0 !important;
+  opacity: 1 !important;
+}
+.mat-mdc-slide-toggle .mdc-switch__handle {
+  background-color: #fafafa !important;
+  border-color: #fafafa !important;
+}
+
+.mat-mdc-slide-toggle.mdc-switch--disabled {
+  opacity: .5;
+}
+
+.mat-mdc-slide-toggle:focus-visible .mdc-switch__track,
+.mat-mdc-slide-toggle .mdc-switch__icons {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 999px;
+}
+
+
+/* === PATCH: Progress Bar (MatProgressBar) en rose brand ==================== */
+.mat-mdc-progress-bar.mat-primary {
+  --mdc-linear-progress-active-indicator-color: var(--brand-primary);
+  --mdc-linear-progress-track-color: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%);
+
+  .mdc-linear-progress__bar-inner {
+    border-color: var(--brand-primary) !important;
+  }
+  .mdc-linear-progress__buffer-bar {
+    background-color: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%) !important;
+  }
+  .mdc-linear-progress__buffer-dots {
+    background-image: radial-gradient(color-mix(in srgb, var(--brand-primary) 18%, #fff 82%) 2px, transparent 2px) !important;
+  }
+}
+
+mat-progress-bar.progress--sm .mdc-linear-progress {
+  height: 4px;
+}
+
+.mat-mdc-progress-bar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 6px;
+}
+
+
+/* === PATCH: Progress Spinner (MatProgressSpinner) en rose brand ============ */
+.mat-mdc-progress-spinner.mat-primary,
+.mat-mdc-progress-spinner.mat-accent {
+  --mdc-circular-progress-active-indicator-color: var(--brand-primary);
+
+  .mdc-circular-progress__indeterminate-circle-graphic,
+  .mdc-circular-progress__determinate-circle-graphic {
+    stroke: var(--brand-primary) !important;
+  }
+}
+
+.mat-mdc-progress-spinner.spinner--soft .mdc-circular-progress__determinate-circle-graphic,
+.mat-mdc-progress-spinner.spinner--soft .mdc-circular-progress__indeterminate-circle-graphic {
+  stroke: var(--brand-primary) !important;
+}
+.mat-mdc-progress-spinner.spinner--soft .mdc-circular-progress__track {
+  stroke: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%) !important;
+}
+
+.mat-mdc-progress-spinner.size-20 { width: 20px !important; height: 20px !important; }
+.mat-mdc-progress-spinner.size-28 { width: 28px !important; height: 28px !important; }
+.mat-mdc-progress-spinner.size-36 { width: 36px !important; height: 36px !important; }
+
+.mat-mdc-progress-spinner:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 999px;
+}
+
+
+/* ========================================================================== */
+/*  MAT TABS (primary)                                                        */
+/* ========================================================================== */
+
+.mat-mdc-tab-group.mat-primary,
+.mat-mdc-tab-nav-bar.mat-primary {
+  --mdc-tab-indicator-active-indicator-color: var(--brand-primary);
+  --mdc-tab-text-label-color: color-mix(in srgb, var(--brand-primary) 50%, #000 50%);
+  --mdc-tab-text-label-color-active: var(--brand-primary);
+}
+
+.mat-mdc-tab-group .mdc-tab-indicator__content--underline,
+.mat-mdc-tab-nav-bar .mdc-tab-indicator__content--underline {
+  border-color: var(--brand-primary) !important;
+}
+
+.mat-mdc-tab.mdc-tab--active .mdc-tab__text-label,
+.mat-mdc-tab.mdc-tab--active .mat-icon {
+  color: var(--brand-primary) !important;
+  font-weight: 600;
+}
+
+.mat-mdc-tab .mdc-tab__ripple::before,
+.mat-mdc-tab .mdc-tab__ripple::after { background: transparent !important; }
+.mat-mdc-tab:hover .mdc-tab__text-label,
+.mat-mdc-tab:hover .mat-icon {
+  color: color-mix(in srgb, var(--brand-primary) 80%, #000 20%) !important;
+}
+.mat-mdc-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 8px;
+}
+
+.mat-tabs--softbar {
+  background: color-mix(in srgb, var(--brand-primary) 6%, #fff 94%);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 20%, #fff 80%);
+}
+
+
+/* ========================================================================== */
+/*  MAT TOOLTIP                                                               */
+/* ========================================================================== */
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background: color-mix(in srgb, var(--brand-primary) 92%, #000 8%) !important;
+  color: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 70%, #000 30%);
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  font-weight: 500;
+}
+
+.mdc-tooltip__caret-surface {
+  background: color-mix(in srgb, var(--brand-primary) 92%, #000 8%) !important;
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 70%, #000 30%) !important;
+}
+
+.tooltip--soft .mdc-tooltip__surface {
+  background: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%) !important;
+  color: color-mix(in srgb, #000 80%, var(--brand-primary) 20%) !important;
+  border-color: color-mix(in srgb, var(--brand-primary) 30%, #fff 70%) !important;
+}
+
+
+/* ========================================================================== */
+/*  MAT SNACK-BAR                                                             */
+/* ========================================================================== */
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: color-mix(in srgb, var(--brand-primary) 92%, #000 8%);
+  --mdc-snackbar-supporting-text-color: #fff;
+  --mdc-snackbar-container-shape: 10px;
+
+  background: var(--mdc-snackbar-container-color) !important;
+  color: var(--mdc-snackbar-supporting-text-color) !important;
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 70%, #000 30%);
+  box-shadow: 0 8px 22px rgba(0,0,0,.22);
+  padding-right: 8px;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__actions .mdc-button,
+.mat-mdc-snack-bar-container .mat-mdc-button {
+  --mdc-text-button-label-text-color: #fff;
+  color: #fff !important;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+.mat-mdc-snack-bar-container .mat-mdc-button:hover {
+  background: color-mix(in srgb, #fff 12%, var(--brand-primary) 88%) !important;
+}
+.mat-mdc-snack-bar-container .mat-mdc-button:active {
+  background: color-mix(in srgb, #fff 18%, var(--brand-primary) 82%) !important;
+}
+
+.snack--soft .mat-mdc-snack-bar-container {
+  background: color-mix(in srgb, var(--brand-primary) 14%, #fff 86%) !important;
+  color: color-mix(in srgb, #000 85%, var(--brand-primary) 15%) !important;
+  border-color: color-mix(in srgb, var(--brand-primary) 28%, #fff 72%) !important;
+}
+.snack--outline .mat-mdc-snack-bar-container {
+  background: #fff !important;
+  color: color-mix(in srgb, #000 80%, var(--brand-primary) 20%) !important;
+  border: 2px solid var(--brand-primary) !important;
+  box-shadow: none;
+}
+
+.mat-mdc-snack-bar-container .mat-icon {
+  color: #fff !important;
+  opacity: .9;
+}
+.mat-mdc-snack-bar-container .mat-icon:hover { opacity: 1; }
+
+.mat-mdc-snack-bar-container:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 10px;
+}
+
+
+/* ========================================================================== */
+/*  MAT DIALOG                                                                */
+/* ========================================================================== */
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 14px !important;
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 22%, #fff 78%) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.18);
+}
+
+.dialog--brand .mdc-dialog__title,
+.dialog--brand .mat-mdc-dialog-title,
+.dialog-title-rose {
+  background: var(--brand-primary);
+  color: #fff;
+  padding: 12px 16px;
+  margin: 0;
+  border-radius: 12px 12px 0 0;
+  font-weight: 700;
+  border-bottom: 1px solid color-mix(in srgb, #000 12%, var(--brand-primary) 88%);
+}
+
+.mat-mdc-dialog-content { padding: 16px 18px !important; }
+.mat-mdc-dialog-actions {
+  padding: 10px 16px 14px !important;
+  border-top: 1px solid color-mix(in srgb, var(--brand-primary) 14%, #fff 86%);
+}
+
+.mat-mdc-dialog-actions .mat-mdc-raised-button.mat-primary,
+.mat-mdc-dialog-actions .mat-mdc-unelevated-button.mat-primary {
+  background: var(--brand-primary);
+  color: #fff;
+}
+.mat-mdc-dialog-actions .mat-mdc-raised-button.mat-primary:hover,
+.mat-mdc-dialog-actions .mat-mdc-unelevated-button.mat-primary:hover {
+  background: var(--brand-primary-hover) !important;
+}
+.mat-mdc-dialog-actions .mat-mdc-raised-button.mat-primary:active,
+.mat-mdc-dialog-actions .mat-mdc-unelevated-button.mat-primary:active {
+  background: var(--brand-primary-pressed) !important;
+}
+
+.mat-mdc-dialog-container:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 14px;
+}
+
+.dialog--outline .mdc-dialog__surface {
+  border: 2px solid var(--brand-primary) !important;
+  box-shadow: 0 8px 26px rgba(0,0,0,.16);
+}
+
+
+
+/* ========================================================================== */
+/*  MAT SELECT                                                                */
+/* ========================================================================== */
+
+/* Panel (overlay) */
+.mat-mdc-select-panel {
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 22%, #fff 78%) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.18) !important;
+  border-radius: 10px !important;
+  padding: 6px 0;
+}
+
+/* Options */
+.mat-mdc-option.mdc-list-item {
+  color: color-mix(in srgb, #000 86%, var(--brand-primary) 14%);
+}
+.mat-mdc-option.mdc-list-item:hover,
+.mat-mdc-option.mdc-list-item.mdc-list-item--hover {
+  background: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%) !important;
+}
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background: color-mix(in srgb, var(--brand-primary) 16%, #fff 84%) !important;
+  color: color-mix(in srgb, #000 80%, var(--brand-primary) 20%) !important;
+}
+.mat-mdc-option .mat-pseudo-checkbox-checked,
+.mat-mdc-option .mat-pseudo-checkbox-indeterminate {
+  background: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+}
+
+/* Icône flèche */
+.mat-mdc-select-arrow {
+  color: color-mix(in srgb, var(--brand-primary) 75%, #000 25%);
+}
+
+/* Multiple: chips alignés au brand (si multiple=true) */
+.mat-mdc-select-value .mat-mdc-chip {
+  background: color-mix(in srgb, var(--brand-primary) 12%, #fff 88%);
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 40%, #fff 60%);
+  color: color-mix(in srgb, #000 85%, var(--brand-primary) 15%);
+}
+.mat-mdc-select-value .mat-mdc-chip .mat-icon {
+  color: color-mix(in srgb, var(--brand-primary) 85%, #000 15%);
+}
+
+/* Focus visible du trigger */
+.mat-mdc-select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 25%, #fff 75%);
+  border-radius: 8px;
+}
+
+
+/* ========================================================================== */
+/*  LIGNE COMPACTE : product-row--tight / bordures roses globales            */
+/* ========================================================================== */
+
+/* BORDURES ROSES POUR TOUS LES MAT-FORM-FIELD EN OUTLINE */
+.mat-mdc-form-field-appearance-outline .mdc-text-field--outlined {
+  --mdc-outlined-text-field-outline-color: #ff9ab3;
+  --mdc-outlined-text-field-hover-outline-color: #ff6b8e;
+  --mdc-outlined-text-field-focus-outline-color: #ff6b8e;
+}
+
+/* BORDURES ROSES GLOBAL POUR TOUS LES CHAMPS ANGULAR MATERIAL (OUTLINE) */
+
+/* Bordure “normale” (repos) */
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: #ff9ab3 !important;   /* rose clair */
+}
+
+/* Au survol : un peu plus soutenu */
+.mat-mdc-form-field .mdc-text-field--outlined:hover .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-text-field--outlined:hover .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-text-field--outlined:hover .mdc-notched-outline__trailing {
+  border-color: #ff6b8e !important;
+}
+
+/* Au focus : rose principal bien visible */
+.mat-mdc-form-field .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__trailing {
+  border-color: #ff6b8e !important;
+}
+
+
+/* ========================================================================== */
+/*  LIGNE COMPACTE : product-row--tight                                       */
+/*  (Catégorie de numéro comme Client + un peu plus long)                     */
+/* ========================================================================== */
+
+/* 1er champ de la ligne (catégorie) plus large, comme le Client */
+.product-row--tight .product-field:first-child {
+  flex: 1.4 1 auto;      /* plus large que les champs “short” */
+  min-width: 260px;
+}
+
+/* Petits champs: on garde la largeur fixe définie par --ui-compact-w */
+.product-row--tight .product-field.short {
+  flex: 0 0 var(--ui-compact-w);
+  max-width: var(--ui-compact-w);
+}
+
+/* Même hauteur que les autres champs compacts */
+.product-row--tight .product-field
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+  height: var(--ui-compact-h);
+  padding-inline: 12px;
+}
+
+/* Infix compacte dans cette ligne */
+.product-row--tight .product-field .mat-mdc-form-field-infix {
+  padding: 6px 0 8px;
+}
+
+/* Label du select de la ligne compacte bien en gras (au cas où) */
+.product-row--tight .product-field .mat-mdc-floating-label {
+  font-weight: 600;
+}
+
+
+/* ========================================================================== */
+/*  BORDURES ROSES POUR TOUS LES MAT-FORM-FIELD EN OUTLINE                    */
+/*  (inputs, textarea, mat-select, y compris Ajout de produit)                */
+/* ========================================================================== */
+
+/* via variables MDC */
+.mat-mdc-form-field-appearance-outline .mdc-text-field--outlined {
+  /* couleur de bordure "normale" */
+  --mdc-outlined-text-field-outline-color: #ff9ab3;
+  /* au survol */
+  --mdc-outlined-text-field-hover-outline-color: #ff6b8e;
+  /* au focus */
+  --mdc-outlined-text-field-focus-outline-color: #ff6b8e;
+}
+
+/* sécurité : on force aussi directement la bordure actuelle */
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined
+.mdc-notched-outline__leading,
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined
+.mdc-notched-outline__notch,
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined
+.mdc-notched-outline__trailing {
+  border-color: #ff9ab3 !important;
+}
+
+/* Au survol : un peu plus soutenu */
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined:hover
+.mdc-notched-outline__leading,
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined:hover
+.mdc-notched-outline__notch,
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined:hover
+.mdc-notched-outline__trailing {
+  border-color: #ff6b8e !important;
+}
+
+/* Au focus : rose principal bien visible */
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined.mdc-text-field--focused
+.mdc-notched-outline__leading,
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined.mdc-text-field--focused
+.mdc-notched-outline__notch,
+.mat-mdc-form-field-appearance-outline
+.mdc-text-field--outlined.mdc-text-field--focused
+.mdc-notched-outline__trailing {
+  border-color: #ff6b8e !important;
+}
+
+
+
+/* ========================================================================== */
+/*  STYLE UNIFIÉ POUR mat-form-field appearance="outline"                     */
+/*  - mêmes bordures pour input / textarea / select                           */
+/*  - pas de petit "tiret" à gauche                                           */
+/*  - labels en gras                                                          */
+/* ========================================================================== */
+
+/* On neutralise la bordure Material "notched" partout (couleur transparente) */
+.mat-mdc-form-field-appearance-outline .mdc-text-field--outlined {
+  --mdc-outlined-text-field-outline-color: transparent !important;
+  --mdc-outlined-text-field-hover-outline-color: transparent !important;
+  --mdc-outlined-text-field-focus-outline-color: transparent !important;
+}
+
+/* On laisse le notch exister (pour que le label fonctionne),
+   mais on ne voit plus sa bordure */
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline,
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-color: transparent !important;
+  border: 0 !important;
+}
+
+/* Cadre simple pour TOUS les champs outlined (input, textarea, select…) */
+.mat-mdc-form-field-appearance-outline
+.mat-mdc-text-field-wrapper.mdc-text-field.mdc-text-field--outlined {
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding-inline: 12px;
+  background-color: #ffffff;
+  box-shadow: none;
+}
+
+/* Cadre rose vif au focus */
+.mat-mdc-form-field-appearance-outline
+.mat-mdc-text-field-wrapper.mdc-text-field.mdc-text-field--outlined.mdc-text-field--focused {
+  border-color: var(--brand-primary) !important;
+}
+
+/* Labels en gras pour tous les champs outline (input, textarea, select…) */
+.mat-mdc-form-field-appearance-outline .mat-mdc-floating-label,
+.mat-mdc-form-field-appearance-outline .mdc-floating-label {
+  font-weight: 600 !important;
+}
+
+
+/* ===================================================== */
+/*  SUPPRIMER LE "TIRET GAUCHE" DANS product-row--tight  */
+/*  (mat-select + inputs de cette ligne)                 */
+/* ===================================================== */
+
+.product-row--tight .mdc-text-field--outlined .mdc-notched-outline__leading,
+.product-row--tight .mdc-text-field--outlined .mdc-notched-outline__notch,
+.product-row--tight .mdc-text-field--outlined .mdc-notched-outline__trailing {
+  border-color: transparent !important;   /* plus aucun morceau d’outline MDC */
+  border: 0 !important;
+}
+
+/* on garde ton cadre externe rose, déjà défini par ailleurs */
+.product-row--tight
+.mat-mdc-text-field-wrapper.mdc-text-field.mdc-text-field--outlined {
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding-inline: 12px;
+  background-color: #fff;
+}
+
+.product-row--tight
+.mat-mdc-text-field-wrapper.mdc-text-field.mdc-text-field--outlined.mdc-text-field--focused {
+  border-color: var(--brand-primary) !important;
+}
+
+
+/* ===================================================== */
+/*  MAT-SELECT dans product-row--tight                   */
+/*  - même look que les inputs                           */
+/*  - plus de tiret gauche                               */
+/*  - label en gras                                      */
+/* ===================================================== */
+
+.product-row--tight .mat-mdc-form-field-type-mat-select.product-field {
+  flex: 1.6 1 auto;
+  min-width: 260px;
+}
+
+/* On coupe l’outline MDC pour ces mat-select */
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mdc-notched-outline,
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mdc-notched-outline__leading,
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mdc-notched-outline__notch,
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mdc-notched-outline__trailing {
+  border: 0 !important;
+}
+
+/* Cadre simple autour du mat-select */
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding-inline: 12px;
+  background-color: #fff;
+}
+
+/* Cadre rose quand le mat-select est focus */
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined.mdc-text-field--focused {
+  border-color: var(--brand-primary) !important;
+}
+
+/* Label du mat-select en gras */
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mat-mdc-floating-label,
+.product-row--tight .mat-mdc-form-field-type-mat-select
+.mdc-floating-label {
+  font-weight: 600 !important;
+}
+
+.list-actions{
+  margin-left:auto;            /* pousse les boutons à droite */
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+
+/* Si form-grid utilise déjà display:grid ailleurs, on neutralise pour nos lignes */
+.form-grid { display: block; }
+
+/* Lignes flex */
+.row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* Colonnes */
+.col { flex: 1 1 0; min-width: 0; }
+.col-70 { flex-basis: 70%; max-width: 70%; }
+.col-30 { flex-basis: 30%; max-width: 30%; }
+.col-80 { flex-basis: 80%; max-width: 80%; }
+.col-20 { flex-basis: 20%; max-width: 20%; }
+
+/* Les mat-form-field doivent occuper toute la colonne */
+.full { width: 100%; display: block; }
+.mat-form-field.full { width: 100%; }
+
+/* Responsive: empile en mobile */
+@media (max-width: 900px) {
+  .row { flex-direction: column; }
+  .col-70, .col-30 { flex-basis: 100%; max-width: 100%; }
+}
+
+
+
+/* Le contenu ne dépasse jamais la boîte du dialog */
+.dialog-body {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 1fr; /* 1 colonne, pleine largeur */
+  gap: 16px;
+}
+
+/* Champs plus hauts mais largeur 100% */
+.w-full { width: 100%; }
+
+.field-xl .mat-mdc-text-field-wrapper {
+  min-height: 56px; /* confort visuel, sans élargir la boîte */
+}
+
+.field-xl .mat-mdc-form-field-infix {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+/* Boutons du bas : pas de dépassement */
+.dialog-actions {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+/* Empêche tout débordement horizontal (sélects, labels longs) */
+:host ::ng-deep .mat-mdc-select-panel,
+:host ::ng-deep .mdc-menu-surface--open {
+  max-width: calc(100vw - 48px);
+}
+
+/*
+tableau encaissement direct sans factures
+ */
+/* ===== Table produits – version compacte et sans conflits ===== */
+
+/* Table et conteneur */
+.products-table { width: 100%; min-width: 0; table-layout: fixed; }
+.compact-table  { overflow-x: auto; }
+
+/* Hauteur compacte par défaut */
+.compact-table .mat-mdc-text-field-wrapper { min-height: 36px; }
+.compact-table .mat-mdc-form-field-infix  { padding: 4px 8px; }
+
+/* --- Largeurs colonnes “textuelles” --- */
+.products-table .mat-column-produit     { width: 20%; }
+.products-table .mat-column-designation { width: 26%; }
+.products-table .mat-column-marque      { width: 9%;  }
+.products-table .mat-column-modele      { width: 9%;  }
+.products-table .mat-column-zone        { width: 14%; }
+
+/* --- Colonnes compactes: Qté / PU / Total (≈ moitié de ce que tu avais) --- */
+.products-table .mat-column-quantite      { width: 36px;  min-width: 36px; }
+.products-table .mat-column-prix_unitaire { width: 60px;  min-width: 60px; }
+.products-table .mat-column-total         { width: 60px;  min-width: 60px; }
+
+/* Empêche mat-form-field de s’étirer dans ces colonnes */
+.products-table .mat-column-quantite      .fit,
+.products-table .mat-column-prix_unitaire .fit,
+.products-table .mat-column-total         .fit {
+  width: 100% !important;          /* l’input remplit la petite cellule */
+  max-width: 100% !important;
+}
+
+/* Infix compact (réduit la “boîte” interne) */
+.products-table .mat-column-quantite      .fit .mat-mdc-form-field-infix,
+.products-table .mat-column-prix_unitaire .fit .mat-mdc-form-field-infix,
+.products-table .mat-column-total         .fit .mat-mdc-form-field-infix {
+  padding: 2px 6px;
+  min-width: 0;
+}
+
+/* Hauteur et alignement compacts */
+.fit .mat-mdc-text-field-wrapper { height: 28px; }
+.fit input[matInput]             { text-align: right; }
+
+/* Colonne actions fixe et visible */
+.products-table .mat-column-actions {
+  width: 56px; min-width: 56px; max-width: 56px;
+  text-align: center; overflow: visible;
+}
+
+/* Aligne les numériques */
+.products-table .mat-column-quantite input,
+.products-table .mat-column-prix_unitaire input,
+.products-table .mat-column-total input { text-align: right; }
+
+/* (Facultatif) retire les flèches number */
+.fit input[type=number]::-webkit-outer-spin-button,
+.fit input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.fit input[type=number] { -moz-appearance: textfield; }
+
+
+/* ===== Ultra-compact: Qté / PU / Total (≈ moitié de la version précédente) ===== */
+
+/* colonnes très étroites */
+.products-table .mat-column-quantite      { width: 28px;  min-width: 28px;  }
+.products-table .mat-column-prix_unitaire { width: 48px;  min-width: 48px;  }
+.products-table .mat-column-total         { width: 48px;  min-width: 48px;  }
+
+/* le mat-form-field ne s'étire pas et reste riquiqui */
+.products-table .mat-column-quantite .fit,
+.products-table .mat-column-prix_unitaire .fit,
+.products-table .mat-column-total .fit {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* réduit la “boîte” interne au maximum */
+.products-table .mat-column-quantite .fit .mat-mdc-form-field-infix,
+.products-table .mat-column-prix_unitaire .fit .mat-mdc-form-field-infix,
+.products-table .mat-column-total .fit .mat-mdc-form-field-infix {
+  padding: 0 4px;          /* moins de padding */
+  min-height: 22px;        /* plus bas */
+}
+
+/* wrapper encore plus bas */
+.fit .mat-mdc-text-field-wrapper { height: 22px; }
+
+/* input minuscule et aligné à droite */
+.fit input[matInput] {
+  font-size: 12px;
+  line-height: 20px;
+  padding: 0;
+  text-align: right;
+}
+
+/* retire les zones d’aide/erreurs sous le champ pour gagner de la hauteur */
+.fit .mat-mdc-form-field-subscript-wrapper { display: none; }
+
+/* garde la colonne actions visible et fixe */
+.products-table .mat-column-actions {
+  width: 56px; min-width: 56px; max-width: 56px;
+  text-align: center;
+}
+
+/* table */
+.products-table { width:100%; table-layout: fixed; }
+.compact-table  { overflow-x: auto; }

@@ -23,3 +23,11 @@ export class Facture {
   type_frais?: string;
   periode?: string;
 }
+
+export class GenererRedevanceRequest {
+  annee?: number;
+  categorie_produit?: number;
+  client?: number;
+  direction?: number;
+  signataire?: string;
+}

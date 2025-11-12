@@ -219,17 +219,6 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onDelete(ficheTechniquesProduit: FicheTechniqueProduit) {
-    this.dialogService.yes_no({
-      title: 'Confirmation de la suppression',
-      message: 'Confirmez-vous supprimer ce produit de la commande ?'
-    }).subscribe(yes_no => {
-      if (yes_no === true) {
-        this.delete_ligneCommande(ficheTechniquesProduit);
-      }
-    });
-  }
-
   delete_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
     this.t_FicheTechniquesProduits.data = this.t_FicheTechniquesProduits.data.filter(p => p.id !== ficheTechniquesProduit.id);
     // Rafraîchir la table
@@ -248,9 +237,10 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onPrint() {
-
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
   }
+
 
   onSave() {
     const formValue = this.form_ficheTechnique.value;
@@ -282,6 +272,7 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
 
     // Produits (JSON stringifié)

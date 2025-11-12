@@ -80,41 +80,54 @@
         </form>
         <br>
 
-        <!-- ===== Sous-collection : Ajout de produit ===== -->
-        <section class="list-box list-box--compact">
+        <!-- ===== Sous-collection : Ajout de produit  ===== -->
+        <section  class="list-box list-box--compact"     *ngIf="ficheTechnique?.statut?.id<4">
           <div class="list-header">
             <h3 class="list-title">Ajout de produit</h3>
-          </div>
 
-          <div class="list-body">
-            <form [formGroup]="form_ficheTechniquesProduit" class="product-row product-row--tight">
-              <mat-form-field appearance="outline" class="product-field designation">
-                <mat-label>Désignation</mat-label>
-                <input matInput formControlName="designation" required>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="product-field short">
-                <mat-label>Prix Unit.</mat-label>
-                <input matInput formControlName="prix_unitaire" (blur)="onGetTotalLigne()" required>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="product-field short">
-                <mat-label>Quantité</mat-label>
-                <input type="number" matInput formControlName="quantite" (blur)="onGetTotalLigne()" required>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="product-field short">
-                <mat-label>Total</mat-label>
-                <input matInput formControlName="total" readonly>
-              </mat-form-field>
-
-              <button mat-flat-button color="primary"
+            <div class="list-actions">
+              <button mat-flat-button
+                      color="primary"
                       class="add-btn"
                       [disabled]="form_ficheTechniquesProduit.invalid"
                       (click)="onAdd()">
                 <mat-icon>add</mat-icon>
                 Ajouter
               </button>
+            </div>
+          </div>
+
+          <div class="list-body">
+            <form [formGroup]="form_ficheTechniquesProduit" >
+<!--              <mat-form-field appearance="outline" class="product-field designation">
+                <mat-label>Désignation</mat-label>class="product-row product-row--tight"
+                <input matInput formControlName="designation" required>
+                class="product-field short"
+              </mat-form-field>-->
+
+
+              <mat-form-field appearance="outline" >
+                <mat-label>Désignation</mat-label>
+                <input matInput formControlName="designation"  required>
+              </mat-form-field>
+
+
+              <mat-form-field appearance="outline" >
+                <mat-label>Prix Unit.</mat-label>
+                <input matInput formControlName="prix_unitaire" (blur)="onGetTotalLigne()" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" >
+                <mat-label>Quantité</mat-label>
+                <input type="number" matInput formControlName="quantite" (blur)="onGetTotalLigne()" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline"  >
+                <mat-label>Total</mat-label>
+                <input matInput formControlName="total" readonly>
+              </mat-form-field>
+
+
             </form>
           </div>
         </section>

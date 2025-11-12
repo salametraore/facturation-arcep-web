@@ -42,21 +42,25 @@
             <!-- Ligne 1 : Client 70% | Objet 30% -->
             <div class="row cols-70-30">
               <!-- Client (liste de sélection, comme facture) -->
-              <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Client</mat-label>
-                <mat-select formControlName="client">
-                  <mat-option *ngFor="let c of clients" [value]="c.id">
-                    {{ c.denomination_sociale }}
+              <mat-form-field>
+                <mat-label>Nom du client</mat-label>
+                <input [(ngModel)]="nomClient" [matAutocomplete]="auto_cl" formControlName="client"
+                       matInput matTooltip="Nom du client"   required>
+                <mat-autocomplete #auto_cl="matAutocomplete">
+                  <mat-option *ngFor="let item of clients | search:nomClient" (click)="getInfosComplementaire(item)"
+                              [value]="item.denomination_sociale">
+                    <span>{{item.denomination_sociale}}</span>
                   </mat-option>
-                </mat-select>
+                </mat-autocomplete>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Objet</mat-label>
-                <input matInput formControlName="objet" placeholder="Objet (facultatif)">
+                <input matInput formControlName="objet" >
               </mat-form-field>
             </div>
 
+            <div class="blank-row"></div>
             <!-- Ligne 2 : Date encaissement 50% | Mode paiement 50% -->
             <div class="row cols-50-50">
               <mat-form-field appearance="outline" class="w-full">
@@ -76,6 +80,7 @@
               </mat-form-field>
             </div>
 
+            <div class="blank-row"></div>
             <!-- Ligne 3 : Référence 50% | Montant 50% -->
             <div class="row cols-50-50">
               <mat-form-field appearance="outline" class="w-full">

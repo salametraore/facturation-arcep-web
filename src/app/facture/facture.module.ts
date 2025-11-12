@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FactureRoutingModule } from './facture-routing.module';
-import {FactureComponent} from "./facture/facture.component";
+
 import {SharedModule} from "../shared/shared.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {PdfViewerModule} from "ng2-pdf-viewer";
@@ -81,6 +81,9 @@ import {ClientDetailsReleveCompteComponent} from "./client-direction-technique/c
 import {ClientDetailsEncaissementsComponent} from "./client-direction-technique/client-details/client-details-encaissements/client-details-encaissements.component";
 import {ClientDetailsFacturesComponent} from "./client-direction-technique/client-details/client-details-factures/client-details-factures.component";
 import {ClientDetailsFichesTechniques} from "./client-direction-technique/client-details/client-details-fiches-techniques/client-details-fiches-techniques";
+import {FactureComponent} from "./facture/facture.component";
+import {GestionDevisComponent} from "./gestion-devis/gestion-devis.component";
+import {GestionDevisCrudComponent} from "./gestion-devis/gestion-devis-crud/gestion-devis-crud.component";
 
 
 @NgModule({
@@ -89,8 +92,8 @@ import {ClientDetailsFichesTechniques} from "./client-direction-technique/client
     DomaineCrudComponent,
     ServiceConfianceComponent,
     ServiceConfianceCrudComponent,
-    FactureComponent,
     FactureDfcComponent,
+    FactureComponent,
     FactureDetailDfcEnergieComponent,
     FactureDetailDfcElectriciteComponent,
     FactureSanctionFinanciereDetailDapComponent,
@@ -102,6 +105,8 @@ import {ClientDetailsFichesTechniques} from "./client-direction-technique/client
     EncaissementComponent,
     EncaissementCrudComponent,
     DevisFactureComponent,
+    GestionDevisComponent,
+    GestionDevisCrudComponent,
     DevisFactureCrudComponent,
     ElementsFactureRecuComponent,
     ElementsFactureRecuCrudComponent,
@@ -140,6 +145,7 @@ import {ClientDetailsFichesTechniques} from "./client-direction-technique/client
     ClientDetailsEncaissementsComponent,
     ClientDetailsFacturesComponent,
     ClientDetailsFichesTechniques,
+
   ],
   imports: [
     CommonModule,

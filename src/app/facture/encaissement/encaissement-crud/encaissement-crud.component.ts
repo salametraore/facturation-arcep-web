@@ -203,7 +203,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
     this.firstFormGroup = this.formBuilder.group({
       client: [''],
       objet: [''],
-      date_encaissement: [''],
+      date_encaissement: [new Date()],
       mode_paiement: [''],
       reference: [''],
       montant: [''],
@@ -224,10 +224,10 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
   getInfosComplementaire(client: Client) {
     this.client = client;
     if (!this.encaissementDetail) {
-      this.factureService.getListFacturesByEtat(client.id,'EN_ATTENTE').subscribe((factures: Facture[]) => {
-        this.facturesImpayees = factures.filter(f => f.etat === 'EN_ATTENTE');
+      this.factureService.getListeDevisEtFacturesImpayesByClientId(client.id).subscribe((impayes: Facture[]) => {
+        this.facturesImpayees =impayes;
         //this.facturesImpayees =factures;
-        console.log(factures);
+        console.log(impayes);
         const affectations: AffectationX[] = this.facturesImpayees.map(f => ({
           facture_id: f.id,
           date_affectation: f.date_echeance,

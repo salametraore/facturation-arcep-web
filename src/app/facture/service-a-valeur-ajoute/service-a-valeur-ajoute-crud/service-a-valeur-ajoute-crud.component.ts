@@ -100,9 +100,15 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
       this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
     });
 
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
+    if (this.ficheTechnique?.id) {
+      this.ficheTechniquesService
+        .getHistoriqueTraitementFicheTechnique(this.ficheTechnique.id)
+        .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+          this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+        });
+    } else {
+      this.historiqueFicheTechniques = [];
+    }
 
 
   }
@@ -187,16 +193,7 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     });
   }
 
-  onDelete(ficheTechniquesProduit: FicheTechniqueProduit) {
-    this.dialogService.yes_no({
-      title: 'Confirmation de la suppression',
-      message: 'Confirmez-vous supprimer ce produit de la commande ?'
-    }).subscribe(yes_no => {
-      if (yes_no === true) {
-        this.delete_ligneCommande(ficheTechniquesProduit);
-      }
-    });
-  }
+
 
   delete_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
     this.t_FicheTechniquesProduits.data = this.t_FicheTechniquesProduits.data.filter(p => p.id !== ficheTechniquesProduit.id);
@@ -243,6 +240,8 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
+
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
@@ -275,7 +274,9 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     return this.produits.find(p => p.id === id)?.libelle;
   }
 
-
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
+  }
 
   onTransmettre(){
     const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();

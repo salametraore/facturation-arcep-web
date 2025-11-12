@@ -1,16 +1,20 @@
-import {Injectable} from '@angular/core';
-import {environment} from "../../../environments/environment";
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs/dist/types";
-import {TypeStation} from "../models/type-station";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { TypeStation } from '../models/type-station';
+import { AppConfigService } from '../../core/config/app-config.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TypeStationService {
-  private baseUrl = environment.baseUrl + '/type-station';
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private cfg: AppConfigService
+  ) {}
+
+  /** Base normalisée: {baseUrl}/type-station */
+  private get baseUrl(): string {
+    return `${this.cfg.baseUrl.replace(/\/$/, '')}/type-station`;
   }
 
   getItem(id: number): Observable<TypeStation> {
@@ -26,11 +30,10 @@ export class TypeStationService {
   }
 
   delete(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}/`, {responseType: 'text'});
+    return this.http.delete(`${this.baseUrl}/${id}/`, { responseType: 'text' });
   }
 
   getListItems(): Observable<TypeStation[]> {
     return this.http.get<TypeStation[]>(`${this.baseUrl}/`);
   }
-
 }

@@ -1,159 +1,131 @@
 <!-- src/app/features/facturation/elements-recus/element-recus-edit-page.component.html -->
-<mat-card>
-
-  <!-- Titre de page -->
+<mat-card> <!-- Titre de page -->
   <div class="page-title">
-    <h2>Saisie et génération — Factures / Devis (éléments reçus)</h2>
+    <h2>Saisie et génération — Devis (éléments reçus)</h2>
   </div>
-
   <!-- Grille 2 colonnes : 75% / 25% -->
   <div class="two-col two-col--75-25">
-
     <!-- ===== Colonne gauche : FICHE TECHNIQUE + LIGNES ===== -->
     <section class="list-box">
       <div class="list-header">
         <h3 class="list-title">Fiche technique</h3>
-
         <!-- Actions globales alignées à droite -->
         <div class="list-actions">
-          <button
-            mat-flat-button
-            color="primary"
-            (click)="crud()"
-            [disabled]="!t_ProduitFiche?.data?.length">
+          <button (click)="crud()" [disabled]="!t_ProduitFiche?.data?.length" color="primary" mat-flat-button>
             <mat-icon>save</mat-icon>
-            Enregistrer / Générer
+            Générer Devis
           </button>
-
-          <button mat-stroked-button color="primary" (click)="onFerme()">
+          <button (click)="onFerme()" color="primary" mat-stroked-button>
             <mat-icon>undo</mat-icon>
             Retour
           </button>
-
         </div>
       </div>
-
       <div class="list-body">
+
         <!-- Formulaire principal -->
+
         <form [formGroup]="form" class="form-grid">
 
-          <!-- Client (autocomplete, plein) -->
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Client</mat-label>
-            <input
-              matInput
-              placeholder="Cliquez et sélectionnez votre client"
-              [(ngModel)]="nomClient"
-              [matAutocomplete]="auto_cl"
-              formControlName="client">
-            <mat-autocomplete #auto_cl="matAutocomplete">
-              <mat-option
-                *ngFor="let item of clients | search: nomClient"
-                [value]="item.denomination_sociale"
-                (click)="onGetClient(item)">
-                <span>{{ item.denomination_sociale }}</span>
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
+          <!-- LIGNE 1 -->
+          <div class="row">
+            <div class="col col-80">
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Client</mat-label>
+                <input
+                  matInput
+                  [value]="ficheTechniqueAFacturer?.client_nom || displayClient(form.get('client')?.value)"
+                  readonly>
+                <input type="hidden" formControlName="client">
+              </mat-form-field>
+            </div>
 
-          <!-- Compte comptable -->
-          <mat-form-field appearance="outline">
-            <mat-label>Compte comptable</mat-label>
-            <input matInput formControlName="numenroCompte" placeholder="Compte comptable">
-          </mat-form-field>
+            <div class="col col-20">
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Compte comptable</mat-label>
+                <input matInput formControlName="numenroCompte" placeholder="Compte comptable">
+              </mat-form-field>
+            </div>
+          </div>
 
-          <!-- Objet -->
-          <mat-form-field appearance="outline">
-            <mat-label>Objet</mat-label>
-            <input matInput formControlName="objet" placeholder="Objet">
-          </mat-form-field>
+          <div class="blank-row"></div>
 
-          <!-- Signataire -->
-          <mat-form-field appearance="outline">
-            <mat-label>Signataire</mat-label>
-            <input matInput formControlName="signataire" placeholder="Signataire">
-          </mat-form-field>
+          <!-- LIGNE 2 -->
+          <div class="row">
+            <div class="col col-70">
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Objet</mat-label>
+                <input matInput formControlName="objet" placeholder="Objet">
+              </mat-form-field>
+            </div>
 
-          <!-- Commentaire (plein) -->
-          <mat-form-field appearance="outline" class="w-full">
+            <div class="col col-30">
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Signataire</mat-label>
+                <input matInput formControlName="signataire" placeholder="Signataire">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="blank-row"></div>
+          <!-- Commentaire full width -->
+          <mat-form-field appearance="outline" class="full">
             <mat-label>Commentaire</mat-label>
             <textarea matInput formControlName="commentaire" placeholder="Commentaire" rows="1"></textarea>
           </mat-form-field>
+
         </form>
+
+
+
 
         <div class="blank-row"></div>
 
         <!-- ===== Tableau des éléments techniques reçus ===== -->
         <div class="mat-elevation-z10 compact-table">
-          <table mat-table [dataSource]="t_ProduitFiche" matSort style="width: 100%">
-
-            <!-- Élément technique -->
+          <table [dataSource]="t_ProduitFiche" mat-table matSort style="width: 100%"> <!-- Élément technique -->
             <ng-container matColumnDef="produit_nom">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Élément technique</th>
-              <td mat-cell *matCellDef="let element">{{ element.produit_nom }}</td>
-              <td mat-footer-cell *matFooterCellDef><strong>Total général</strong></td>
-            </ng-container>
-
-            <!-- Quantité -->
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Élément technique</th>
+              <td *matCellDef="let element" mat-cell>{{ element.produit_nom }}</td>
+              <td *matFooterCellDef mat-footer-cell><strong>Total général</strong></td>
+            </ng-container> <!-- Quantité -->
             <ng-container matColumnDef="quantite">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantité</th>
-              <td mat-cell *matCellDef="let element">{{ element.quantite }}</td>
-              <td mat-footer-cell *matFooterCellDef></td>
-            </ng-container>
-
-            <!-- Prix unitaire -->
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Quantité</th>
+              <td *matCellDef="let element" mat-cell>{{ element.quantite }}</td>
+              <td *matFooterCellDef mat-footer-cell></td>
+            </ng-container> <!-- Prix unitaire -->
             <ng-container matColumnDef="prix_unitaire">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Prix unitaire</th>
-              <td mat-cell *matCellDef="let element">{{ element.prix_unitaire | number:'1.0-0' }}</td>
-              <td mat-footer-cell *matFooterCellDef></td>
-            </ng-container>
-
-            <!-- Total -->
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Prix unitaire</th>
+              <td *matCellDef="let element" mat-cell>{{ element.prix_unitaire | number:'1.0-0' }}</td>
+              <td *matFooterCellDef mat-footer-cell></td>
+            </ng-container> <!-- Total -->
             <ng-container matColumnDef="total">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
-              <td mat-cell *matCellDef="let element">{{ element.total | number:'1.0-0' }}</td>
-              <td mat-footer-cell *matFooterCellDef>
-                <strong>{{ totalGeneral | number:'1.0-0' }}</strong>
-              </td>
-            </ng-container>
-
-            <!-- Header / Rows / Footer -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-            <tr
-              mat-row
-              *matRowDef="let element; columns: displayedColumns"
-              (click)="onRowClicked(element)"
-              [ngClass]="{ 'selected': element === selectedRow }">
-            </tr>
-            <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
-
-            <!-- Aucune donnée -->
-            <tr class="mat-row" *matNoDataRow>
-              <td class="mat-cell" colspan="4">
-                Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Total</th>
+              <td *matCellDef="let element" mat-cell>{{ element.total | number:'1.0-0' }}</td>
+              <td *matFooterCellDef mat-footer-cell><strong>{{ totalGeneral | number:'1.0-0' }}</strong></td>
+            </ng-container> <!-- Header / Rows / Footer -->
+            <tr *matHeaderRowDef="displayedColumns; sticky: true" mat-header-row></tr>
+            <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns"
+                [ngClass]="{ 'selected': element === selectedRow }"
+                mat-row></tr>
+            <tr *matFooterRowDef="displayedColumns" mat-footer-row></tr> <!-- Aucune donnée -->
+            <tr *matNoDataRow class="mat-row">
+              <td class="mat-cell" colspan="4"> Aucune correspondance trouvée dans la base de données correspondant au
+                critère de recherche
               </td>
             </tr>
           </table>
         </div>
-
-      </div> <!-- /list-body -->
-
-      <!-- (Optionnel) Infos d'avis technique comme sur Numérotation -->
-<!--      <div align="center">
-        <avis-technique-infos [ficheTechnique]="ficheTechnique"></avis-technique-infos>
-      </div>-->
-
+      </div>
     </section>
 
     <!-- ===== Colonne droite : HISTORIQUE ===== -->
     <section class="list-box">
-      <div class="list-header">
-        <h3 class="list-title">Historique de la demande</h3>
-      </div>
+      <div class="list-header"><h3 class="list-title">Historique de la demande</h3></div>
       <div class="list-body">
         <historique-traitement [historiqueFicheTechniques]="historiqueFicheTechniques"></historique-traitement>
       </div>
     </section>
-
-  </div> <!-- /two-col -->
+  </div>
+  <!-- /two-col -->
 </mat-card>

@@ -95,6 +95,8 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
       this.t_FicheTechniquesProduits.data = this.ficheTechnique?.produits_detail;
       this.initFormCommandeClient_update();
     }
+
+    console.log(this.ficheTechnique);
   }
 
   loadData() {
@@ -139,12 +141,20 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
           this.add_ligneCommande(this.getBaseRowTemplate());
         }
       }
+
+
     });
 
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
 
+    if (this.ficheTechnique?.id) {
+      this.ficheTechniquesService
+        .getHistoriqueTraitementFicheTechnique(this.ficheTechnique.id)
+        .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+          this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+        });
+    } else {
+      this.historiqueFicheTechniques = [];
+    }
 
   }
 
@@ -326,6 +336,7 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
@@ -356,5 +367,22 @@ export class AgrementEquipementCrudComponent implements OnInit, AfterViewInit {
 
   getProduit(id: number) {
     return this.produits.find(p => p.id === id)?.libelle;
+  }
+
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
+  }
+
+  getProduitsLibelles(fiche: FicheTechniques | null | undefined): string {
+    console.log("fiche");
+    console.log(fiche);
+    if (!fiche || !fiche.produits_detail || fiche.produits_detail.length === 0) {
+      return '';
+    }
+
+    return fiche.produits_detail
+      .map(p => this.getProduit(p.produit))
+      .filter((lib): lib is string => !!lib && lib.trim().length > 0)
+      .join(', ');
   }
 }

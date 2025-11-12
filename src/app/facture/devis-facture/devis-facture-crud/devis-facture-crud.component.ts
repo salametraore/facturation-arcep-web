@@ -24,7 +24,7 @@ import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 })
 export class DevisFactureCrudComponent implements OnInit {
 
-  displayedColumns: string[] = ['produit', 'produit_libelle', 'quantite', 'prix_unitaire', 'total'];
+  displayedColumns: string[] = [ 'produit_libelle', 'quantite', 'prix_unitaire', 'total'];
   t_LignesFactures?: MatTableDataSource<LignesFactures>;
 
   facture?: Facture;
@@ -106,9 +106,7 @@ export class DevisFactureCrudComponent implements OnInit {
       this.t_LignesFactures.data = this.facture?.lignes_facture;
     }
 
-    this.ficheTechniquesService.getWorkflowHistoryById(this.facture?.fiche_technique).subscribe((workflowHistories:WorkflowHistory[]) => {
-      this.workflowHistories = workflowHistories;
-    });
+
   }
 
   initForm_update() {

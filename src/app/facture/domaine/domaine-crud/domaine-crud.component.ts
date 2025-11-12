@@ -90,13 +90,22 @@ export class DomaineCrudComponent implements OnInit {
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
-      this.produits = produits?.filter(f => f.categorieProduit === this.fixeCategorie);
+      this.produits = produits
+        ?.filter(f => f.categorieProduit === this.fixeCategorie)
+        .sort((a, b) => a.id - b.id);   // ✅ tri croissant
     });
 
+    if (this.ficheTechnique?.id) {
+      this.ficheTechniquesService
+        .getHistoriqueTraitementFicheTechnique(this.ficheTechnique.id)
+        .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+          this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+        });
+    } else {
+      this.historiqueFicheTechniques = [];
+    }
 
-    this.ficheTechniquesService.getHistoriqueTraitementFicheTechnique(this.ficheTechnique?.id).subscribe((historiqueFicheTechniquesLoc:HistoriqueFicheTechnique[]) => {
-      this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
-    });
+
   }
 
   initForm_update() {
@@ -151,6 +160,7 @@ export class DomaineCrudComponent implements OnInit {
     formData.append('position', String(dataFicheTechnique.position));
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
@@ -177,6 +187,10 @@ export class DomaineCrudComponent implements OnInit {
         this.errorMessage = error.error?.message || error.message;
       }
     );
+  }
+
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
   }
 
   onTransmettre(){
@@ -212,4 +226,7 @@ export class DomaineCrudComponent implements OnInit {
   onGetClient(client: Client) {
     this.client = client;
   }
+
+
+
 }

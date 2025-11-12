@@ -4,8 +4,7 @@ import {operations} from "../../constantes";
 
 @Component({
   selector: 'agrement-equipement',
-  templateUrl: './agrement-equipement.component.html',
-  styleUrl: './agrement-equipement.component.scss'
+  templateUrl: './agrement-equipement.component.html'
 })
 export class AgrementEquipementComponent {
   fichetTechnique: FicheTechniques;

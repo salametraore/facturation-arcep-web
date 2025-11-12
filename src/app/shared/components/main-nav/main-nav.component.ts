@@ -53,6 +53,8 @@ export class MainNavComponent implements OnInit {
 
   user: User;
 
+  shellBgUrl = 'assets/images/arcep-logo.png';
+
   constructor(private breakpointObserver: BreakpointObserver,
               private router: Router,
               private authService: AuthService) {
@@ -334,13 +336,35 @@ export class MainNavComponent implements OnInit {
         {
           id: 3015,
           direction: 1,
-          titre: 'Factures/Devis',
-          description: 'Factures/Devis',
+          titre: 'Devis',
+          description: 'Devis',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/gestion-devis'
+        },
+        {
+          id: 3020,
+          direction: 1,
+          titre: 'Factures',
+          description: 'Factures',
           actif: 'OUI',
           module: 0,
           feuille: 1,
           sous_menus: null,
           url: 'facture/devis-facure'
+        },
+        {
+          id: 3025,
+          direction: 1,
+          titre: 'Encaissement',
+          description: 'Encaissement',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/encaissement'
         },
       ]
     },
@@ -359,17 +383,6 @@ export class MainNavComponent implements OnInit {
           sous_menus: null,
           url: 'dashboard/recouvrement'
         },*/
-        {
-          id: 4010,
-          direction: 1,
-          titre: 'Encaissement',
-          description: 'Encaissement',
-          actif: 'OUI',
-          module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'facture/encaissement'
-        },
         {
           id: 4015,
           direction: 0,
@@ -390,6 +403,7 @@ export class MainNavComponent implements OnInit {
     this.applyGroupAndSubIcons(this.menuItems);
     this.utilisateurConnecte = this.authService.getConnectedUser();
     this.roleUtilisateurConnecte = this.authService.getConnectedUtilisateurRole();
+    console.log(" main nav : utilisateurConnecte");
     console.log(this.utilisateurConnecte);
   }
 
@@ -416,6 +430,7 @@ export class MainNavComponent implements OnInit {
   }
 
   connect_deconnect() {
+    this.authService.logout();
     this.router.navigate(['/auth/login']);
   }
 

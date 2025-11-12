@@ -1,5 +1,6 @@
 <div class="login-container">
-  <div class="background-container" [style.--bg-image]="'url(' + bgUrl + ')'">>
+  <!-- [FIX] suppression du second '>' à la fin de la ligne -->
+  <div class="background-container" [style.--bg-image]="'url(' + bgUrl + ')'">
     <div class="content-row">
       <!-- Partie gauche avec le slogan -->
       <div class="slogan-section">
@@ -25,33 +26,36 @@
           <mat-card-content>
             <div *ngIf="errorMessage" class="alert alert-danger mat-body-1">{{ errorMessage }}</div>
 
+            <!-- Formulaire de login (inchangé, sauf commentaires) -->
             <form *ngIf="!show2faForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-              <mat-form-field  class="full-width">
+              <mat-form-field class="full-width">
                 <mat-label>Adresse mail</mat-label>
                 <input matInput type="email" formControlName="email" placeholder="exemple@mail.com">
               </mat-form-field>
 
-              <mat-form-field  class="full-width">
+              <mat-form-field class="full-width">
                 <mat-label>Mot de passe</mat-label>
                 <input matInput type="password" formControlName="password" placeholder="Au moins 4 caractères">
               </mat-form-field>
 
               <div class="remember-forgot">
-<!--                <mat-checkbox formControlName="rememberMe">Restez connecté</mat-checkbox>-->
-<!--                <a [routerLink]="['/auth/forgot-password']" class="link">Mot de passe oublié ?</a>-->
+                <!--                <mat-checkbox formControlName="rememberMe">Restez connecté</mat-checkbox>-->
+                <!--                <a [routerLink]="['/auth/forgot-password']" class="link">Mot de passe oublié ?</a>-->
               </div>
 
               <button type="submit" mat-raised-button color="primary" class="full-width">
-                <span *ngIf="isLoading && !show2faForm">Connexion...</span>
-                <span *ngIf="!isLoading || show2faForm">Se connecter</span>
+                <span *ngIf="isLoading">Connexion...</span>
+                <span *ngIf="!isLoading">Se connecter</span>
               </button>
             </form>
 
+            <!-- [BYPASS 2FA] Bloc 2FA mis en commentaire, conservé pour un retour ultérieur -->
+            <!--
             <form *ngIf="show2faForm" [formGroup]="twoFaForm" (ngSubmit)="on2FaSubmit()">
               <h2 class="text-center mat-title">Vérification en deux étapes</h2>
               <p class="text-center mat-body-1">Un code de vérification a été envoyé à votre adresse email.</p>
 
-              <mat-form-field  class="full-width">
+              <mat-form-field class="full-width">
                 <mat-label>Code de vérification</mat-label>
                 <input matInput type="text" formControlName="code" minlength="6" maxlength="6">
                 <mat-error *ngIf="twoFaF['code'].touched && twoFaF['code'].errors">
@@ -65,6 +69,8 @@
                 <span *ngIf="!isLoading || !show2faForm">Vérifier le code</span>
               </button>
             </form>
+            -->
+
           </mat-card-content>
         </mat-card>
       </div>

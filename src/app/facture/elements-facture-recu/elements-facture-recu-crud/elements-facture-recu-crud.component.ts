@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms"; // <-- Validators ici
 import {CategorieProduit} from "../../../shared/models/categorie-produit";
 import {Produit} from "../../../shared/models/produit";
 import {Client} from "../../../shared/models/client";
@@ -16,9 +16,8 @@ import {MatTableDataSource} from "@angular/material/table";
 import {FicheTechniqueAFacturer, ProduitFiche} from "../../../shared/models/fiche-technique-a-facturer";
 import {FactureService} from "../../../shared/services/facture.service";
 import {RequestGenererFacture} from "../../../shared/models/ficheTechniques";
-import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
-import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-elements-facture-recu-crud',
@@ -35,8 +34,6 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   mode: string = '';
   title: string = '';
 
-
-
   window_name = ' FicheTechnique';
   categories: CategorieProduit[];
   produits: Produit[];
@@ -48,6 +45,9 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   errorMessage: any;
   nomClient: any;
   historiqueFicheTechniques: HistoriqueFicheTechnique[];
+
+  isGenerating = false;
+  hasGenerated = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -99,12 +99,13 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       if (this.ficheTechniqueAFacturer) {
         this.client = clients?.find(c => c.id === this.ficheTechniqueAFacturer?.client_id);
         this.nomClient = this.client?.denomination_sociale;
+        // Remplit aussi le champ client du form pour passer la validation
+        this.form.get('client')?.setValue(this.client?.id ?? null);
         this.form.get('numenroCompte')?.setValue(this.client?.compte_comptable);
       }
       if (this.ficheTechniqueAFacturer?.liste_produits?.length > 0) {
         this.t_ProduitFiche!.data = [...this.ficheTechniqueAFacturer?.liste_produits];
       }
-      // PATCH: calcul total supprimé ici — le getter ci-dessous s’en charge dynamiquement
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
@@ -116,24 +117,23 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
         this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
       });
-
-
-
   }
 
-
+  /** Total général dynamique */
   get totalGeneral(): number {
     const data = this.t_ProduitFiche?.data ?? [];
     return data.reduce((sum: number, e: any) => sum + (Number(e?.total) || 0), 0);
   }
 
+  /** Form update: champs requis */
   initForm_update() {
     this.form = this.formBuilder.group({
       id: [this.ficheTechniqueAFacturer?.fiche_technique_id],
-      client: [this.ficheTechniqueAFacturer?.client_id],
-      objet: [this.ficheTechniqueAFacturer?.type_frais_description],
+      // client stocke l'ID ; affichage via nomClient
+      client: [this.ficheTechniqueAFacturer?.client_id ?? null, Validators.required],
+      objet: [this.ficheTechniqueAFacturer?.type_frais_description ?? null, Validators.required],
       numenroCompte: [],
-      signataire: [this.ficheTechniqueAFacturer?.signataire],
+      signataire: [this.ficheTechniqueAFacturer?.signataire ?? null, Validators.required],
       produit: [],
       commentaire: [],
       direction: [2],
@@ -143,13 +143,14 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     });
   }
 
+  /** Form create: champs requis */
   initForm_create() {
     this.form = this.formBuilder.group({
       id: [],
-      client: [],
-      objet: [],
+      client: [null, Validators.required],
+      objet: [null, Validators.required],
       numenroCompte: [],
-      signataire: [],
+      signataire: [null, Validators.required],
       commentaire: [],
       direction: [2],
       statut: [1],
@@ -158,16 +159,21 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     });
   }
 
+  /** Helper pour le bouton: au moins 1 ligne + formulaire valide */
+  isReadyToGenerate(): boolean {
+    const hasRows = !!this.t_ProduitFiche?.data?.length;
+    return hasRows && this.form?.valid && !this.isGenerating && !this.hasGenerated;
+  }
+
   crud() {
+    if (!this.isReadyToGenerate()) { return; }
+
     const payload: RequestGenererFacture = {
       fiche_technique_id: this.ficheTechniqueAFacturer?.fiche_technique_id,
       commentaire: this.form.get('commentaire')?.value,
       objet: this.form.get('objet')?.value,
       signataire: this.form.get('signataire')?.value
     };
-
-    console.log(payload.toString());
-    console.log(this.ficheTechniqueAFacturer?.toString());
 
     const type = this.ficheTechniqueAFacturer?.type_frais;
     const redevanceTypes = new Set(['RD', 'LO', 'EL', 'IN', 'RA', 'DA']);
@@ -181,19 +187,32 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     }
   }
 
+  private onGenerationSuccess(): void {
+    this.msgMessageService.success('Facture générée avec succès !');
+    this.hasGenerated = true;        // 👉 désactive définitivement le bouton
+    this.form.disable({ emitEvent: false }); // (optionnel) figer le formulaire
+  }
+
   genererDossierFacture(payload: RequestGenererFacture) {
-    this.factureService.genererFraisDossier(payload).subscribe({
-      next: () => this.msgMessageService.success('Facture générée avec succès !'),
-      error: (error) => this.dialogService.alert({ message: error?.error?.message })
-    });
+    this.isGenerating = true;
+    this.factureService.genererFraisDossier(payload)
+      .pipe(finalize(() => this.isGenerating = false))
+      .subscribe({
+        next: () => this.onGenerationSuccess(),
+        error: (error) => this.dialogService.alert({ message: error?.error?.message })
+      });
   }
 
   genererRedevanceFacture(payload: RequestGenererFacture) {
-    this.factureService.genererFraisRedevance(payload).subscribe({
-      next: () => this.msgMessageService.success('Facture générée avec succès !'),
-      error: (error) => this.dialogService.alert({ message: error?.error?.message })
-    });
+    this.isGenerating = true;
+    this.factureService.genererFraisRedevance(payload)
+      .pipe(finalize(() => this.isGenerating = false))
+      .subscribe({
+        next: () => this.onGenerationSuccess(),
+        error: (error) => this.dialogService.alert({ message: error?.error?.message })
+      });
   }
+
 
   onSubmit() {
     console.log('this.techSheetForm.value');
@@ -212,8 +231,26 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   }
 
   onGetClient(client: Client) {
+    // Met à jour le modèle d’affichage et les champs du formulaire (validation OK)
     this.client = client;
+    ///this.nomClient = client?.denomination_sociale; // pour l’input visible
+    this.form.patchValue({
+      client: client?.id ?? null,
+      numenroCompte: client?.compte_comptable ?? null
+    });
   }
+
+  // Affiche le nom du client alors que le contrôle 'client' stocke l'ID
+  displayClient = (id?: number) => {
+    if (id == null) return '';
+    // Fallback instantané sur la donnée déjà fournie par la fiche
+    if (this.ficheTechniqueAFacturer?.client_id === id && this.ficheTechniqueAFacturer?.client_nom) {
+      return this.ficheTechniqueAFacturer.client_nom;
+    }
+    // Sinon, chercher dans la liste chargée
+    const found = this.clients?.find(c => c.id === id);
+    return found?.denomination_sociale ?? '';
+  };
 
   protected readonly undefined = undefined;
 }

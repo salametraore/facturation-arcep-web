@@ -4,8 +4,7 @@ import {operations} from "../../constantes";
 
 @Component({
   selector: 'numerotation',
-  templateUrl: './numerotation.component.html',
-  styleUrl: './numerotation.component.scss'
+  templateUrl: './numerotation.component.html'
 })
 export class NumerotationComponent {
 

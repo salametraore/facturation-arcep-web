@@ -21,6 +21,12 @@ import {FactureService} from "../../shared/services/facture.service";
 import {HttpResponse} from "@angular/common/http";
 import {EncaissementDirectCrudComponent} from "../encaissement-direct/encaissement-direct-crud/encaissement-direct-crud.component";
 import {GenerationRedevanceCrudComponent} from "../generation-redevance/generation-redevance-crud/generation-redevance-crud.component";
+import {Devis} from "../../shared/models/devis";
+import {finalize, take} from "rxjs/operators";
+
+
+const NON_CANCELLABLE = new Set<string>(['PAYEE', 'ANNULEE']);
+
 
 @Component({
   selector: 'app-devis-facture',
@@ -243,25 +249,36 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   }
 
   onPrint(facture: Facture) {
-    this.factureService.genererFacturePDF(facture?.id).subscribe((response: HttpResponse<Blob>)=>{
-        this.pdfViewService.printDirectly(response);
+    this.factureService.genererFacturePDF(facture?.id).subscribe({
+      next: (res: HttpResponse<ArrayBuffer>) => {
+        if (!res.body) {
+          this.dialogService.alert({ message: 'Le PDF est vide.' });
+          return;
+        }
+
+        // Convertit l’ArrayBuffer en Blob PDF
+        const blob = new Blob([res.body], { type: 'application/pdf' });
+
+        // (Optionnel) Essaie d’extraire un nom de fichier depuis Content-Disposition
+        const cd = res.headers.get('Content-Disposition') || '';
+        const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(cd);
+        const fallback = `facture_${(facture as any)?.numero ?? facture?.id}.pdf`;
+        const filename = match ? decodeURIComponent(match[1]) : fallback;
+
+        // Si ton service accepte un filename en 2e param, passe-le, sinon envoie juste le Blob
+        // this.pdfViewService.printDirectly(blob, filename);
+        this.pdfViewService.printDirectly(blob);
       },
-      error => {
-        this.dialogService.alert({message: error});
-      })
+      error: (err) => {
+        this.dialogService.alert({ message: 'Erreur lors de la génération du PDF : ' + (err?.message || err) });
+      }
+    });
   }
 
-  onPrintDevis(facture: Facture) {
-    this.factureService.genererDevisPDF(facture?.devis).subscribe((response: HttpResponse<Blob>)=>{
-        this.pdfViewService.printDirectly(response);
-      },
-      error => {
-        this.dialogService.alert({message: error});
-      })
-  }
+
   openGenererRedevancesAnnuelles(): void {
     const dialogRef = this.dialog.open(GenerationRedevanceCrudComponent, {
-      width: '1200px',
+      width: '500px',
       maxWidth: '95vw',
       disableClose: false,
       data: {}
@@ -270,6 +287,60 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
       // rafraîchir si nécessaire
       this.chercher?.();
     });
+  }
+
+  onAnnulerFacture(facture: Facture) {
+    if (!facture?.id) {
+      this.dialogService.alert({ message: "Facture invalide : identifiant manquant." });
+      return;
+    }
+
+    this.dialogService
+      .yes_no({ message: "Voulez-vous annuler cette facture  ?" })
+      .pipe(take(1))
+      .subscribe(yes => {
+        if (!yes) return;
+
+        // Normalisation vers MAJUSCULES (gère string ou {code,label})
+        const rawEtat: any = facture.etat;
+        const etatCode: string =
+          typeof rawEtat === 'string'
+            ? rawEtat.toUpperCase()
+            : String(rawEtat?.code ?? '').toUpperCase();
+
+        if (!etatCode) {
+          this.dialogService.alert({ message: "État de facture inconnu/indéterminé." });
+          return;
+        }
+
+        // Refus si non annulable
+        if (NON_CANCELLABLE.has(etatCode)) {
+          const motif = etatCode === 'ANNULEE'
+            ? "elle est déjà annulée"
+            : "elle a déjà été encaissée/payée";
+          this.dialogService.alert({ message: `Impossible d'annuler cette facture : ${motif}.` });
+          return;
+        }
+
+        // (Optionnel) n’autoriser QUE EMIS
+        if (etatCode !== 'EMISE') {
+          this.dialogService.alert({ message: "Seuls les factures émises peuvent être annulées." });
+          return;
+        }
+
+        this.factureService.annulerFacture(facture.id)
+          .pipe(take(1), finalize(() => {}))
+          .subscribe({
+            next: () => {
+              this.msgMessageService.success('Facture annulée avec succès');
+              this.reloadData();
+            },
+            error: (error) => {
+              const msg = error?.error?.message || error?.message || 'Erreur lors de l’annulation.';
+              this.dialogService.alert({ message: msg });
+            }
+          });
+      });
   }
 
 }

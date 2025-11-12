@@ -13,7 +13,7 @@
       <!-- Direction -->
       <mat-form-field>
         <mat-label>Direction</mat-label>
-        <mat-select [(ngModel)]="directionFilter" (selectionChange)="onDirectionChange($event.value)">
+        <mat-select color="primary" [(ngModel)]="directionFilter" (selectionChange)="onDirectionChange($event.value)">
           <mat-option *ngFor="let item of directions" [value]="item.id">
             {{ item.libelle }}
           </mat-option>
@@ -23,7 +23,7 @@
       <!-- Catégorie de service -->
       <mat-form-field>
         <mat-label>Catégorie de service</mat-label>
-        <mat-select [(ngModel)]="serviceFilter" (selectionChange)="onCategorieChange($event.value)">
+        <mat-select color="primary" [(ngModel)]="serviceFilter" (selectionChange)="onCategorieChange($event.value)">
           <mat-option *ngFor="let item of filteredCategories" [value]="item.id">
             {{ item.libelle }}
           </mat-option>

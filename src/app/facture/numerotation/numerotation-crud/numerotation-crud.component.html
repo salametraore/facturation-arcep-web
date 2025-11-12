@@ -63,15 +63,22 @@
           </mat-form-field>
         </form>
 
+        <div align="center" *ngIf="ficheTechnique?.statut?.id>5">
+          <avis-technique-infos
+            [ficheTechnique]="ficheTechnique">
+          </avis-technique-infos>
+        </div>
+
         <div class="blank-row"></div>
 
         <!-- ===== Sous-collection : Ajout d’une catégorie de numéro ===== -->
-        <section class="list-box list-box--compact">
+        <section class="list-box list-box--compact" *ngIf="ficheTechnique?.statut?.id <4">
           <div class="list-header">
             <h3 class="list-title">Ajout d'une catégorie de numéro</h3>
           </div>
 
           <div class="list-body">
+            <!--<form [formGroup]="form_ficheTechniquesProduit" class="product-row product-row&#45;&#45;tight">-->
             <form [formGroup]="form_ficheTechniquesProduit" class="product-row product-row--tight">
 
               <!-- Catégorie de numéro -->
@@ -171,11 +178,6 @@
 
       </div> <!-- /list-body -->
 
-      <div align="center">
-        <avis-technique-infos
-          [ficheTechnique]="ficheTechnique">
-        </avis-technique-infos>
-      </div>
 
     </section>
 

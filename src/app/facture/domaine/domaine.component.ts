@@ -162,6 +162,7 @@ export class DomaineComponent implements OnInit, AfterViewInit {
 
 
     this.ficheTechniquesService.getFicheTechniques().subscribe((response: FicheTechniques[]) => {
+      console.log(response);
       this.ficheTechniques.data = response
         .filter(f => f.categorie_produit === this.fixeCategorie)
         .sort((a, b) => b.id - a.id);
@@ -201,21 +202,34 @@ export class DomaineComponent implements OnInit, AfterViewInit {
   }
 
   onDelete(ficheTechniques: FicheTechniques) {
-    this.dialogService.yes_no({message: " Voulez-vous supprimer cet enregistrement"}).subscribe(yes_no => {
-      if (yes_no === true) {
-        this.ficheTechniquesService
-          .delete(ficheTechniques.id)
-          .subscribe(
-            (data) => {
-              this.msgMessageService.success('Supprimé avec succès');
-              this.reloadData();
-            },
-            (error => {
-              this.dialogService.alert({message: error});
-            })
-          );
-      }
-    });
+    this.dialogService
+      .yes_no({ message: "Voulez-vous supprimer cet enregistrement ?" })
+      .subscribe(yes_no => {
+        if (yes_no === true) {
+
+          // ✅ Vérification du statut avant suppression
+          if (ficheTechniques.statut  && ficheTechniques.statut.id !== 1) {
+            this.dialogService.alert({
+              message: "Impossible de supprimer cette fiche car elle n'est plus à l'étape initiale."
+            });
+            return; // on sort sans appeler le delete
+          }
+
+          // ✅ Statut OK → on peut supprimer
+          this.ficheTechniquesService
+            .delete(ficheTechniques.id)
+            .subscribe(
+              () => {
+                this.msgMessageService.success('Supprimé avec succès');
+                this.reloadData();
+              },
+              (error) => {
+                console.log(error);
+                this.dialogService.alert({ message: error.message });
+              }
+            );
+        }
+      });
   }
 
   onRowClicked(row) {
@@ -330,5 +344,14 @@ export class DomaineComponent implements OnInit, AfterViewInit {
     return false;
   }
 
+  getProduitsLibelles(fiche: FicheTechniques | null | undefined): string {
+    if (!fiche || !fiche.produits_detail || fiche.produits_detail.length === 0) {
+      return '';
+    }
 
+    return fiche.produits_detail
+      .map(p => p.produit_libelle)
+      .filter((lib): lib is string => !!lib && lib.trim().length > 0)
+      .join(', ');
+  }
 }

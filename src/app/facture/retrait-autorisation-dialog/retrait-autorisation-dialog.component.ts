@@ -13,8 +13,7 @@ import {CategorieProduit} from "../../shared/models/categorie-produit";
 
 @Component({
   selector: 'retrait-autorisation-dialog',
-  templateUrl: './retrait-autorisation-dialog.component.html',
-  styleUrl: './retrait-autorisation-dialog.component.scss'
+  templateUrl: './retrait-autorisation-dialog.component.html'
 })
 export class RetraitAutorisationDialogComponent implements OnInit {
 

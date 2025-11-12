@@ -1,102 +1,110 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../environments/environment";
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {Facture } from "../models/facture";
-import {RequestGenererFacture} from "../models/ficheTechniques";
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+import {Facture, GenererRedevanceRequest} from '../models/facture';
+import { RequestGenererFacture } from '../models/ficheTechniques';
+import { AppConfigService } from '../../core/config/app-config.service';
+
+@Injectable({ providedIn: 'root' })
 export class FactureService {
 
-  private baseUrl = environment.baseUrl + '/factures';
-  private baseUrlDevis = environment.baseUrl + '/devis';
+  constructor(
+    private http: HttpClient,
+    private cfg: AppConfigService
+  ) {}
 
-  constructor(private http: HttpClient) {}
+  /** Helper: assemble proprement sans doubles // */
+  private joinUrl(...parts: string[]): string {
+    return parts
+      .filter(Boolean)
+      .map((p, i) => i === 0 ? p.replace(/\/+$/, '') : p.replace(/^\/+|\/+$/g, ''))
+      .join('/');
+  }
 
+  // Bases d’URL centralisées
+  private get urlFactures()  { return this.joinUrl(this.cfg.baseUrl, 'factures'); }
+  private get urlDevis()     { return this.joinUrl(this.cfg.baseUrl, 'devis'); }
+  private get urlGenDossier(){ return this.joinUrl(this.cfg.baseUrl, 'generer-frais-dossier-facture'); }
+  private get urlGenRed()    { return this.joinUrl(this.cfg.baseUrl, 'generer-frais-redevance-facture'); }
+
+  // ---- CRUD Factures ----
   getItem(id: number): Observable<Facture> {
-    return this.http.get<Facture>(`${this.baseUrl}/${id}`);
+    return this.http.get<Facture>(`${this.urlFactures}/${id}`);
   }
 
-  create(data: Facture ): Observable<Facture> {
-    return this.http.post< Facture>(`${this.baseUrl}`,data);
+  create(data: Facture): Observable<Facture> {
+    return this.http.post<Facture>(`${this.urlFactures}`, data);
   }
 
-
-  update(id: number,value: Facture): Observable<Facture> {
-    return this.http.put<Facture>(`${this.baseUrl}/${id}/`, value);
+  update(id: number, value: Facture): Observable<Facture> {
+    return this.http.put<Facture>(`${this.urlFactures}/${id}/`, value);
   }
-
 
   delete(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
+    return this.http.delete(`${this.urlFactures}/${id}`, { responseType: 'text' });
   }
 
-  getListItems() : Observable<Facture[]> {
-    return this.http.get<Facture[]>(`${this.baseUrl}/`);
+  getListItems(): Observable<Facture[]> {
+    return this.http.get<Facture[]>(`${this.urlFactures}/`);
   }
 
-  getListeFacturesByClientId(id:number) : Observable<Facture[]> {
-    return this.http.get<Facture[]>(`${this.baseUrl}/client/${id}`);
+  getListeFacturesByClientId(id: number): Observable<Facture[]> {
+    return this.http.get<Facture[]>(`${this.urlFactures}/client/${id}`);
   }
 
-  getListFacturesByEtat(id:number,etat:string) : Observable<Facture[]> {//PAYEE ou EN_ATTENTE
+  getListFacturesByEtat(id: number, etat: string): Observable<Facture[]> { // PAYEE | EN_ATTENTE
     let params = new HttpParams();
-    params.set('etat',etat)
-    return this.http.get<Facture[]>(`${this.baseUrl}/client/${id}`,{params});
+    params = params.set('etat', etat); // HttpParams est immuable -> réassigner
+    return this.http.get<Facture[]>(`${this.urlFactures}/client/${id}`, { params });
   }
 
-  getFacturesEnAttentesByClientId(client_id:number) : Observable<Facture[]> {
+  getFacturesEnAttentesByClientId(client_id: number): Observable<Facture[]> {
     let params = new HttpParams();
-    params.set('client',client_id.toString())
-    return this.http.get<Facture[]>(`${this.baseUrl}/`, {params});
+    params = params.set('client', String(client_id));
+    return this.http.get<Facture[]>(`${this.urlFactures}/`, { params });
   }
 
-  /**
-   * Génère une facture de frais de dossier
-   */
+  // ---- Générations côté serveur ----
+  /** Génère une facture de frais de dossier */
   genererFraisDossier(payload: RequestGenererFacture): Observable<any> {
-    console.log(payload);
-    return this.http.post(`${environment.baseUrl}/generer-frais-dossier-facture/`, payload);
+    return this.http.post(`${this.urlGenDossier}/`, payload);
   }
 
-  /**
-   * Génère une facture de frais de redevance
-   */
+  /** Génère une facture de frais de redevance */
   genererFraisRedevance(payload: RequestGenererFacture): Observable<any> {
-    console.log(payload);
-    return this.http.post(`${environment.baseUrl}/generer-frais-redevance-facture/`, payload);
+    return this.http.post(`${this.urlGenRed}/`, payload);
   }
+
+  /** Génère les redevances annuelles */
+  genererRedevancesAnnuelles(payload: GenererRedevanceRequest): Observable<any> {
+    return this.http.post(`${this.cfg.baseUrl}/generer-recurrence-annuelle/`, payload);
+  }
+
+
 
   genererFacturePDF(facture_id: number) {
-    //const url = ${this.baseUrl}/generate-pdf/${facture_id};
-    const url = `${this.baseUrl}/generate-pdf/${facture_id}`
-    const httpOptions = {
-      'responseType': 'arraybuffer' as 'json'
-    };
-    return this.http.get<any>(url, httpOptions);
+    const url = `${this.urlFactures}/generate-pdf/${facture_id}`;
+    return this.http.get<ArrayBuffer>(url, {
+      observe: 'response',
+      responseType: 'arraybuffer' as 'json'
+    }); // Observable<HttpResponse<ArrayBuffer>>
   }
 
-
-   genererDevisPDF(devis_id: number) {
-    //const url = ${this.baseUrl}/generate-pdf/${facture_id};
-    const url = `${this.baseUrlDevis}/generate-pdf/${devis_id}/`
-    const httpOptions = {
-      'responseType': 'arraybuffer' as 'json'
-    };
-    return this.http.get<any>(url, httpOptions);
+  genererDevisPDF(devis_id: number) {
+    const url = `${this.urlDevis}/generate-pdf/${devis_id}/`;
+    return this.http.get<ArrayBuffer>(url, {
+      observe: 'response',
+      responseType: 'arraybuffer' as 'json',
+    }); // Observable<HttpResponse<ArrayBuffer>>
   }
 
-  // génération des redevances annuelles
-  genererRedevancesAnnuelles(categorieId: number, annee: number): Observable<any> {
-    // 2 approches possibles : query params ou body JSON — adaptez à votre API
-    const params = new HttpParams()
-      .set('categorie', String(categorieId))
-      .set('annee', String(annee));
-
-    return this.http.post(`${this.baseUrl}/generation`, null, { params });
-    // Ou:
-    // return this.http.post(`${this.baseUrl}/generation`, { categorie: categorieId, annee });
+  annulerFacture(facture_id: number): Observable<any> {
+    return this.http.get(`${this.cfg.baseUrl}/factures-annuler/${facture_id}/`);
   }
+
+  getListeDevisEtFacturesImpayesByClientId(id: number): Observable<Facture[]> {
+    return this.http.get<Facture[]>(`${this.cfg.baseUrl}/client-factures-devis-impayes/${id}/`);
+  }
+
 }

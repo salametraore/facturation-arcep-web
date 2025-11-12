@@ -19,8 +19,7 @@ interface CategorieProduitDuree {
 
 @Component({
   selector: 'app-avis-etute-technique-dialod',
-  templateUrl: './avis-etute-technique-dialod.component.html',
-  styleUrl: './avis-etute-technique-dialod.component.scss'
+  templateUrl: './avis-etute-technique-dialod.component.html'
 })
 export class AvisEtuteTechniqueDialodComponent implements OnInit {
 

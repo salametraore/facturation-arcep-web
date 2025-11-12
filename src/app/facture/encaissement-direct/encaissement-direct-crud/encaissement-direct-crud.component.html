@@ -1,73 +1,41 @@
 <!-- src/app/features/recouvrement/encaissements/encaissement-direct-crud.component.html -->
-<mat-card class="facture-edit">
-
-  <!-- Titre de page -->
-  <div class="page-title">
-    <h2>Encaissement de frais dossier — Sans facture</h2>
-  </div>
-
-  <!-- Cadre standard -->
-  <section class="list-box">
-
-    <!-- En-tête : titre + actions à droite -->
-    <div class="list-header">
-      <h3 class="list-title">Encaissement direct (sans facture)</h3>
-
+<mat-card class="facture-edit"> <!-- Titre de page -->
+  <div class="page-title"><h2>Encaissement de frais dossier — Sans facture</h2></div> <!-- Cadre standard -->
+  <section class="list-box"> <!-- En-tête : titre + actions à droite -->
+    <div class="list-header"><h3 class="list-title">Encaissement direct (sans facture)</h3>
       <div class="list-actions">
         <button mat-flat-button color="primary" (click)="submit()">
           <mat-icon>save</mat-icon>
           Enregistrer
         </button>
-
         <button mat-stroked-button color="primary" (click)="onFerme()">
           <mat-icon>undo</mat-icon>
           Fermer
         </button>
       </div>
-    </div>
-
-    <!-- Corps -->
+    </div> <!-- Corps -->
     <div class="list-body">
-
       <mat-stepper #stepper (selectionChange)="onStepChange?.($event)">
-
         <!-- ===== Étape 1 : Entête encaissement ===== -->
         <mat-step [stepControl]="encaissementForm">
           <form [formGroup]="encaissementForm" class="form-grid">
             <ng-template matStepLabel>Entête encaissement</ng-template>
-
-            <div class="blank-row"></div>
-
-            <!-- Ligne 1 : Client 70% | Objet 30% -->
-            <div class="row cols-70-30">
-              <!-- Client (autocomplete) -->
+            <div class="blank-row"></div> <!-- Ligne 1 : Client 70% | Objet 30% -->
+            <div class="row cols-70-30"> <!-- Client (autocomplete) -->
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Nom du client</mat-label>
-                <input
-                  matInput
-                  [formControl]="clientDisplay"
-                  [matAutocomplete]="auto_cl"
-                  matTooltip="Nom du client"
-                  placeholder="Saisir ou sélectionner un client"
-                  required>
-                <mat-autocomplete
-                    #auto_cl="matAutocomplete"
-                    (optionSelected)="onClientPicked($event.option.value)">
-                  <mat-option
-                    *ngFor="let item of clients | search: clientDisplay.value"
-                    [value]="item">
-                    {{ item.denomination_sociale }}
-                  </mat-option>
+                <input matInput [formControl]="clientDisplay" [matAutocomplete]="auto_cl" matTooltip="Nom du client"
+                       placeholder="Saisir ou sélectionner un client" required>
+                <mat-autocomplete #auto_cl="matAutocomplete" (optionSelected)="onClientPicked($event.option.value)">
+                  <mat-option *ngFor="let item of clients | search: clientDisplay.value"
+                              [value]="item"> {{ item.denomination_sociale }} </mat-option>
                 </mat-autocomplete>
               </mat-form-field>
-
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Objet</mat-label>
-                <input matInput formControlName="objet" placeholder="Encaissement frais de dossier">
-              </mat-form-field>
+                <input matInput formControlName="objet" placeholder="Encaissement frais de dossier"></mat-form-field>
             </div>
-
-            <!-- Ligne 2 : Date 50% | Mode paiement 50% -->
+            <div class="blank-row"></div> <!-- Ligne 2 : Date 50% | Mode paiement 50% -->
             <div class="row cols-50-50">
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Date d'encaissement</mat-label>
@@ -75,30 +43,23 @@
                 <mat-datepicker-toggle matIconSuffix [for]="dp1"></mat-datepicker-toggle>
                 <mat-datepicker #dp1></mat-datepicker>
               </mat-form-field>
-
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Mode de paiement</mat-label>
                 <mat-select formControlName="mode_paiement" required>
-                  <mat-option *ngFor="let item of modePaiements" [value]="item.id">
-                    {{ item.libelle }}
-                  </mat-option>
+                  <mat-option *ngFor="let item of modePaiements" [value]="item.id"> {{ item.libelle }} </mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
-
-            <!-- Ligne 3 : Référence 50% | Montant 50% -->
+            <div class="blank-row"></div> <!-- Ligne 3 : Référence 50% | Montant 50% -->
             <div class="row cols-50-50">
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Référence chèque / virement</mat-label>
-                <input matInput formControlName="reference" placeholder="N° chèque / virement">
-              </mat-form-field>
-
+                <input matInput formControlName="reference" placeholder="N° chèque / virement"></mat-form-field>
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Montant</mat-label>
                 <input matInput formControlName="montant" type="number" inputmode="decimal" required placeholder="0">
               </mat-form-field>
             </div>
-
             <div class="form-actions">
               <button mat-button matStepperNext [disabled]="encaissementForm.invalid">Suivant</button>
             </div>
@@ -109,7 +70,6 @@
         <mat-step [stepControl]="ficheForm">
           <form [formGroup]="ficheForm" class="form-grid">
             <ng-template matStepLabel>Service à facturer</ng-template>
-
             <div class="blank-row"></div>
 
             <!-- Catégorie produit (centrée, largeur raisonnable) -->
@@ -117,9 +77,7 @@
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Catégorie produit</mat-label>
                 <mat-select formControlName="categorie_produit" (selectionChange)="onCategorieChange()" required>
-                  <mat-option *ngFor="let cp of categories" [value]="cp.id">
-                    {{ cp.libelle }}
-                  </mat-option>
+                  <mat-option *ngFor="let cp of categories" [value]="cp.id"> {{ cp.libelle }} </mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -127,14 +85,11 @@
 
           <!-- Lignes produits -->
           <div class="blank-row"></div>
-
           <div class="actions" style="margin-bottom:8px">
             <button mat-raised-button color="primary" (click)="addProduitLine()">Ajouter une ligne</button>
           </div>
-
           <div class="mat-elevation-z10 compact-table">
-            <table mat-table [dataSource]="produitsDS" class="w-full">
-
+            <table mat-table [dataSource]="produitsDS" class="w-full products-table">
               <!-- Service concerné -->
               <ng-container matColumnDef="produit">
                 <th mat-header-cell *matHeaderCellDef>Service concerné</th>
@@ -145,47 +100,38 @@
                     </mat-select>
                   </mat-form-field>
                 </td>
-              </ng-container>
-
-              <!-- Description / Zone -->
+              </ng-container> <!-- Description / Zone -->
               <ng-container matColumnDef="designation">
                 <th mat-header-cell *matHeaderCellDef>Description / Zone</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
-                  <mat-form-field appearance="outline" class="w-full">
-                    <input matInput formControlName="designation" placeholder="Description (SVA) ou Zone (texte)">
+                  <mat-form-field appearance="outline" class="w-full"><input matInput formControlName="designation"
+                                                                             placeholder="Description (SVA) ou Zone (texte)">
                   </mat-form-field>
                 </td>
-              </ng-container>
-
-              <!-- Marque (cat 12) -->
+              </ng-container> <!-- Marque (cat 12) -->
               <ng-container matColumnDef="marque">
                 <th mat-header-cell *matHeaderCellDef>Marque</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
-                  <mat-form-field appearance="outline" class="w-full">
-                    <input matInput formControlName="marque" placeholder="Marque (agrément équipement)">
+                  <mat-form-field appearance="outline" class="w-full"><input matInput formControlName="marque"
+                                                                             placeholder="Marque (agrément équipement)">
                   </mat-form-field>
                 </td>
-              </ng-container>
-
-              <!-- Modèle (cat 12) -->
+              </ng-container> <!-- Modèle (cat 12) -->
               <ng-container matColumnDef="modele">
                 <th mat-header-cell *matHeaderCellDef>Modèle</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
-                  <mat-form-field appearance="outline" class="w-full">
-                    <input matInput formControlName="modele" placeholder="Modèle (agrément équipement)">
+                  <mat-form-field appearance="outline" class="w-full"><input matInput formControlName="modele"
+                                                                             placeholder="Modèle (agrément équipement)">
                   </mat-form-field>
                 </td>
-              </ng-container>
-
-              <!-- Zone de desserte (cat 13) -->
+              </ng-container> <!-- Zone de desserte (cat 13) -->
               <ng-container matColumnDef="zone">
                 <th mat-header-cell *matHeaderCellDef>Zone de desserte</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
                   <mat-form-field appearance="outline" class="w-full">
                     <mat-select formControlName="zone_couverture" placeholder="Zone de desserte">
-                      <mat-option *ngFor="let z of zoneCouverture" [value]="z.id">
-                        {{ z.code ? (z.code + ' — ') : ''}}{{ z.libelle }}
-                      </mat-option>
+                      <mat-option *ngFor="let z of zoneCouverture"
+                                  [value]="z.id"> {{ z.code ? (z.code + ' — ') : ''}}{{ z.libelle }} </mat-option>
                     </mat-select>
                   </mat-form-field>
                 </td>
@@ -195,7 +141,7 @@
               <ng-container matColumnDef="quantite">
                 <th mat-header-cell *matHeaderCellDef>Qté</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
-                  <mat-form-field appearance="outline" class="w-full">
+                  <mat-form-field appearance="outline" class="fit">
                     <input matInput formControlName="quantite" type="number" required>
                   </mat-form-field>
                 </td>
@@ -205,7 +151,7 @@
               <ng-container matColumnDef="prix_unitaire">
                 <th mat-header-cell *matHeaderCellDef>PU</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
-                  <mat-form-field appearance="outline" class="w-full">
+                  <mat-form-field appearance="outline" class="fit">
                     <input matInput formControlName="prix_unitaire" type="number" required>
                   </mat-form-field>
                 </td>
@@ -215,14 +161,14 @@
               <ng-container matColumnDef="total">
                 <th mat-header-cell *matHeaderCellDef>Total</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroup]="produitsFormArray.at(i)">
-                  <mat-form-field appearance="outline" class="w-full">
+                  <mat-form-field appearance="outline" class="fit">
                     <input matInput formControlName="total" disabled>
                   </mat-form-field>
                 </td>
               </ng-container>
 
               <!-- Actions -->
-              <ng-container matColumnDef="actions">
+              <ng-container matColumnDef="actions" stickyEnd>
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let row; let i = index">
                   <button mat-icon-button color="warn" (click)="removeProduitLine(i)">
@@ -236,82 +182,59 @@
 
             </table>
           </div>
-
           <div class="form-actions">
             <button mat-button matStepperPrevious>Retour</button>
             <button mat-button matStepperNext [disabled]="ficheForm.invalid">Suivant</button>
           </div>
         </mat-step>
 
+
+
+
         <!-- ===== Étape 3 : Récapitulatif ===== -->
         <mat-step>
           <ng-template matStepLabel>Récapitulatif</ng-template>
-
           <div class="info-card info-card--center" style="margin-bottom:12px">
             <div><strong>{{ getClientName() }}</strong></div>
             <div class="info-line">
-              <span>Montant encaissé :
-                <strong>{{ (encaissementForm.value.montant || 0) | number:'1.0-0' }} XOF</strong>
-              </span>
-              <span>Total services :
-                <strong>{{ sommeProduits() | number:'1.0-0' }} XOF</strong>
-              </span>
-              <span>Crédit :
-                <strong>{{ ((encaissementForm.value.montant || 0) - sommeProduits()) | number:'1.0-0' }} XOF</strong>
-              </span>
-            </div>
+              <span>Montant encaissé : <strong>{{ (encaissementForm.value.montant || 0) | number:'1.0-0' }} XOF</strong> </span>
+              <span>Total services : <strong>{{ sommeProduits() | number:'1.0-0' }} XOF</strong> </span> <span>Crédit : <strong>{{ ((encaissementForm.value.montant || 0) - sommeProduits()) | number:'1.0-0' }}
+              XOF</strong> </span></div>
           </div>
-
           <div class="mat-elevation-z10 compact-table">
             <table mat-table [dataSource]="produitsDS" matSort class="w-full">
-
               <ng-container matColumnDef="libelle">
                 <th mat-header-cell *matHeaderCellDef>Service</th>
-                <td mat-cell *matCellDef="let row; let i = index">
-                  {{ produitsFormArray.at(i).get('produit_libelle')?.value || '' }}
-                </td>
+                <td mat-cell
+                    *matCellDef="let row; let i = index"> {{ produitsFormArray.at(i).get('produit_libelle')?.value || '' }} </td>
               </ng-container>
-
               <ng-container matColumnDef="desc">
                 <th mat-header-cell *matHeaderCellDef>Desc/Zone</th>
-                <td mat-cell *matCellDef="let row; let i = index">
-                  {{ getDesignationOrZone(i) }}
-                </td>
+                <td mat-cell *matCellDef="let row; let i = index"> {{ getDesignationOrZone(i) }} </td>
               </ng-container>
-
               <ng-container matColumnDef="qte">
                 <th mat-header-cell *matHeaderCellDef>Qté</th>
-                <td mat-cell *matCellDef="let row; let i = index">
-                  {{ produitsFormArray.at(i).value.quantite }}
-                </td>
+                <td mat-cell *matCellDef="let row; let i = index"> {{ produitsFormArray.at(i).value.quantite }} </td>
               </ng-container>
-
               <ng-container matColumnDef="pu">
                 <th mat-header-cell *matHeaderCellDef>PU</th>
-                <td mat-cell *matCellDef="let row; let i = index">
-                  {{ produitsFormArray.at(i).value.prix_unitaire | number:'1.0-0' }}
-                </td>
+                <td mat-cell
+                    *matCellDef="let row; let i = index"> {{ produitsFormArray.at(i).value.prix_unitaire | number:'1.0-0' }} </td>
               </ng-container>
-
               <ng-container matColumnDef="tt">
                 <th mat-header-cell *matHeaderCellDef>Total</th>
-                <td mat-cell *matCellDef="let row; let i = index">
-                  {{ lineTotal(i) | number:'1.0-0' }}
-                </td>
+                <td mat-cell *matCellDef="let row; let i = index"> {{ lineTotal(i) | number:'1.0-0' }} </td>
               </ng-container>
-
               <tr mat-header-row *matHeaderRowDef="['libelle','desc','qte','pu','tt']"></tr>
               <tr mat-row *matRowDef="let r; columns: ['libelle','desc','qte','pu','tt'];"></tr>
             </table>
           </div>
-
           <div class="form-actions">
             <button mat-button matStepperPrevious>Retour</button>
             <button mat-raised-button color="primary" (click)="submit()">Enregistrer</button>
             <button mat-raised-button color="warn" (click)="onFerme()">Fermer</button>
           </div>
         </mat-step>
-
       </mat-stepper>
     </div>
   </section>

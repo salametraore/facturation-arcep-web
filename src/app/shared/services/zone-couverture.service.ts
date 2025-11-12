@@ -1,18 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {ZoneCouverture} from "../models/zone-couverture";
-import {environment} from "../../../environments/environment";
+import { ZoneCouverture } from '../models/zone-couverture';
+import { AppConfigService } from '../../core/config/app-config.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ZoneCouvertureService {
 
-  private baseUrl = environment.baseUrl +'/zone-couverture'
+  constructor(
+    private http: HttpClient,
+    private cfg: AppConfigService
+  ) {}
 
-  constructor(private http: HttpClient) { }
-
+  /** Base normalisée: {baseUrl}/zone-couverture */
+  private get baseUrl(): string {
+    return `${this.cfg.baseUrl.replace(/\/$/, '')}/zone-couverture`;
+  }
 
   create(zoneCouverture: ZoneCouverture): Observable<ZoneCouverture> {
     return this.http.post<ZoneCouverture>(`${this.baseUrl}/`, zoneCouverture);

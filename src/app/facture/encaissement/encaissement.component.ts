@@ -305,14 +305,18 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
 
 
   onPrintRecu(encaissement: RecouvListeEncaissement) {
-    console.log("encaissement");
-    console.log(encaissement);
-    this.encaissementsService.genererRecuPDF(encaissement?.encaissement_id).subscribe((response: HttpResponse<Blob>)=>{
-        this.pdfViewService.printDirectly(response);
-      },
-      error => {
-        this.dialogService.alert({message: error});
-      })
+    this.encaissementsService.genererRecuPDF(encaissement?.encaissement_id)
+      .subscribe({
+        next: (arrayBuffer: ArrayBuffer) => {
+          const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+          this.pdfViewService.printDirectly(blob);
+        },
+        error: (err) => {
+          this.dialogService.alert({ message: 'Erreur : ' + err.message });
+        }
+      });
   }
+
+
 }
 

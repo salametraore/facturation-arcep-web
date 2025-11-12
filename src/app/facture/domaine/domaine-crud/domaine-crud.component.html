@@ -69,6 +69,12 @@
             <textarea matInput rows="2" formControlName="commentaire" autofocus></textarea>
           </mat-form-field>
 
+          <div align="center" *ngIf="ficheTechnique?.statut?.id > 5">
+            <avis-technique-infos
+              [ficheTechnique]="ficheTechnique">
+            </avis-technique-infos>
+          </div>
+
           <!-- Actions -->
           <div class="form-actions">
             <button mat-stroked-button color="warn" type="button"
@@ -90,16 +96,12 @@
         </form>
       </div>
 
-      <div align="center">
-        <avis-technique-infos
-          [ficheTechnique]="ficheTechnique">
-        </avis-technique-infos>
-      </div>
+
 
     </section>
 
     <!-- ===== Colonne droite : HISTORIQUE / AVIS ===== -->
-    <section class="list-box">
+    <section class="list-box" *ngIf="historiqueFicheTechniques?.length > 0" >
       <div class="list-header">
         <h3 class="list-title">Historique de la demande</h3>
       </div>

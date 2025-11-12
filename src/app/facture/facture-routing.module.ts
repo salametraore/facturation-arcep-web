@@ -30,6 +30,8 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import {ClientDirectionTechniqueComponent} from "./client-direction-technique/client-direction-technique.component";
  import {ClientPage} from "./client-dt/client";
  import {ClientDetailPage} from "./client-dt/client-detail";
+ import {ClientResolver} from "./client-direction-technique/client-details/client.resolver";
+ import {GestionDevisComponent} from "./gestion-devis/gestion-devis.component";
 
 const routes: Routes = [
   {
@@ -50,6 +52,7 @@ const routes: Routes = [
       {path: 'facture-recu-dfc', component: FactureRecuDfcComponent},
       {path: 'encaissement', component: EncaissementComponent},
       {path: 'devis-facure', component: DevisFactureComponent},
+      {path: 'gestion-devis', component: GestionDevisComponent},
       {path: 'prestations-divers', component: FicherTechniqueDfcComponent},
       {path: 'service-a-valeur-ajoute', component: ServiceAValeurAjouteComponent},
       {path: 'autorisation-generale', component: AutorisationGeneraleComponent},
@@ -58,7 +61,7 @@ const routes: Routes = [
       {path: 'agrement-equipement', component:AgrementEquipementComponent},
       {path: 'frequences', component:FrequencesComponent},
       {path: 'client-dt', component:ClientPage},
-      {path: 'client-detail/:id', component:ClientDetailPage},
+      {path: 'client-dt-detail/:id', component:ClientDetailPage, resolve: { client: ClientResolver }},
       {path: 'client-direction-technique', component:ClientDirectionTechniqueComponent},
     ]
   }

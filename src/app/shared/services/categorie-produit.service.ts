@@ -1,18 +1,26 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {CategorieProduit} from "../models/categorie-produit";
-import {environment} from "../../../environments/environment";
+import { CategorieProduit } from '../models/categorie-produit';
+import { AppConfigService } from '../../core/config/app-config.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CategorieProduitService {
 
-  private baseUrl = environment.baseUrl +'/categories-produits'
+  /** segment d’API (toujours sans slash de début/fin) */
+  private readonly resource = 'categories-produits';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private cfg: AppConfigService
+  ) {}
 
+  /** Base URL normalisée: {baseUrl}/{resource} (sans doubles slash) */
+  private get baseUrl(): string {
+    const base = this.cfg.baseUrl.replace(/\/$/, '');          // retire slash final s'il existe
+    const res  = this.resource.replace(/^\/|\/$/g, '');        // retire slashes début/fin
+    return `${base}/${res}`;
+  }
 
   create(categorie: CategorieProduit): Observable<CategorieProduit> {
     return this.http.post<CategorieProduit>(`${this.baseUrl}/`, categorie);

@@ -25,6 +25,8 @@ export class FicheTechniques {
   date_fin?: string | null;
   date_debut?: string | null;
   periode?: string | null;
+
+
 }
 
 export class MiseAJourStatutFiche {
@@ -62,4 +64,15 @@ export class ChercheFiche{
   statut?: number;
   date_debut?: string;
   date_fin?: string;
+}
+
+export function buildProduitsLibelles(fiche: FicheTechniques | null | undefined): string {
+  if (!fiche || !fiche.produits_detail || fiche.produits_detail.length === 0) {
+    return '';
+  }
+
+  return fiche.produits_detail
+    .map(p => p.produit_libelle)
+    .filter((lib): lib is string => !!lib && lib.trim().length > 0)
+    .join(', ');
 }
