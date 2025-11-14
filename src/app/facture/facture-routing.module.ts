@@ -17,7 +17,7 @@ import {FactureRecuDfcComponent} from "./facture-recu-dfc/facture-recu-dfc.compo
 import {EncaissementComponent} from "./encaissement/encaissement.component";
 import {DevisFactureComponent} from "./devis-facture/devis-facture.component";
 import {ElementsFactureRecuComponent} from "./elements-facture-recu/elements-facture-recu.component";
-import {FicherTechniqueDfcComponent} from "./ficher-technique-dfc/ficher-technique-dfc.component";
+import {FicherTechniqueDfcComponent} from "./gestion-prestations-diverses/ficher-technique-dfc.component";
 import {ServiceAValeurAjouteComponent} from "./service-a-valeur-ajoute/service-a-valeur-ajoute.component";
 import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisation-generale.component";
  import {AgrementInstalleurComponent} from "./agrement-installeur/agrement-installeur.component";
@@ -32,6 +32,12 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import {ClientDetailPage} from "./client-dt/client-detail";
  import {ClientResolver} from "./client-direction-technique/client-details/client.resolver";
  import {GestionDevisComponent} from "./gestion-devis/gestion-devis.component";
+ import {ClientDetailsComponent} from "./client-direction-technique/client-details/client-details.component";
+ import {ClientCrudPrestationsDiversesComponent} from "./client-direction-technique/client-details/client-crud-prestations-diverses/client-crud-prestations-diverses.component";
+ import {ClientCrudServiceAValeurAjouteComponent} from "./client-direction-technique/client-details/client-crud-service-a-valeur-ajoute/client-crud-service-a-valeur-ajoute.component";
+ import {ClientCrudAutorisationGeneraleComponent} from "./client-direction-technique/client-details/client-crud-autorisation-generale/client-crud-autorisation-generale.component";
+ import {ClientCrudAgrementInstalleurComponent} from "./client-direction-technique/client-details/client-crud-agrement-installeur/client-crud-agrement-installeur.component";
+ import {ClientCrudAgrementEquipementComponent} from "./client-direction-technique/client-details/client-crud-agrement-equipement/client-crud-agrement-equipement.component";
 
 const routes: Routes = [
   {
@@ -63,6 +69,13 @@ const routes: Routes = [
       {path: 'client-dt', component:ClientPage},
       {path: 'client-dt-detail/:id', component:ClientDetailPage, resolve: { client: ClientResolver }},
       {path: 'client-direction-technique', component:ClientDirectionTechniqueComponent},
+      {path: 'client-direction-technique-detail/:id', component:ClientDetailsComponent, resolve: { client: ClientResolver }},
+      {path: 'client-crud-prestations-diverses/:clientId', component: ClientCrudPrestationsDiversesComponent },
+      {path: 'client-crud-service-a-valeur-ajoute/:clientId', component: ClientCrudServiceAValeurAjouteComponent },
+     /* {path: 'client-crud-numerotation/:clientId', component: ClientCrudNumerotationComponent },*/
+      {path: 'client-crud-autorisation-generale/:clientId', component: ClientCrudAutorisationGeneraleComponent },
+      {path: 'client-crud-agrement-installeur/:clientId', component: ClientCrudAgrementInstalleurComponent },
+      {path: 'client-crud-agrement-equipement/:clientId', component: ClientCrudAgrementEquipementComponent },
     ]
   }
 ];

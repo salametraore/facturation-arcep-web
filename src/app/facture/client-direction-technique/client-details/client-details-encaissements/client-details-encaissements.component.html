@@ -1,44 +1,87 @@
-<!-- Tableau des factures -->
-<div class="table-container">
-  <table mat-table [dataSource]="t_Encaissements" class="mat-elevation-z8">
-    <!-- Colonnes du tableau -->
+<!-- Cadre standard -->
+<section class="list-box">
 
-    <ng-container matColumnDef="reference">
-      <th mat-header-cell *matHeaderCellDef> Reference </th>
-      <td mat-cell *matCellDef="let facture"> {{ facture.reference }} </td>
-    </ng-container>
+  <!-- En-tête : titre + actions à droite -->
+  <div class="list-header">
 
-    <ng-container matColumnDef="date_encaissement">
-      <th mat-header-cell *matHeaderCellDef> Date </th>
-      <td mat-cell *matCellDef="let facture"> {{ facture.date_encaissement | date:'dd/MM/yyyy'  }} </td>
-    </ng-container>
+    <div class="list-actions">
+      <!-- Actions éventuelles (export, impression, etc.)
+      <button mat-stroked-button color="primary">
+        <mat-icon>print</mat-icon>
+        Exporter
+      </button>
+      -->
+    </div>
+  </div>
 
+  <!-- Corps : table + pagination -->
+  <div class="list-body">
 
-    <ng-container matColumnDef="montant">
-      <th mat-header-cell *matHeaderCellDef> Montant encaissé</th>
-      <td mat-cell *matCellDef="let facture"> {{ facture.montant }} </td>
-    </ng-container>
+    <div class="mat-elevation-z10 compact-table">
+      <table mat-table [dataSource]="t_Encaissements" matSort style="width: 100%">
 
-    <ng-container matColumnDef="affecte">
-      <th mat-header-cell *matHeaderCellDef> Montant affecté </th>
-      <td mat-cell *matCellDef="let facture"> {{ facture.affecte }} </td>
-    </ng-container>
+        <!-- Référence -->
+        <ng-container matColumnDef="reference">
+          <th mat-header-cell *matHeaderCellDef>Référence</th>
+          <td mat-cell *matCellDef="let encaissement">
+            {{ encaissement.reference }}
+          </td>
+        </ng-container>
 
-    <ng-container matColumnDef="solde_non_affecte">
-      <th mat-header-cell *matHeaderCellDef> Montant non affecté </th>
-      <td mat-cell *matCellDef="let facture"> {{ facture.solde_non_affecte }} </td>
-    </ng-container>
+        <!-- Date encaissement -->
+        <ng-container matColumnDef="date_encaissement">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let encaissement">
+            {{ encaissement.date_encaissement | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
 
-    <ng-container matColumnDef="mode_paiement">
-      <th mat-header-cell *matHeaderCellDef> Mode paiement </th>
-      <td mat-cell *matCellDef="let facture"> {{ getModePaiement(facture.mode_paiement) }} </td>
-    </ng-container>
+        <!-- Montant encaissé -->
+        <ng-container matColumnDef="montant">
+          <th mat-header-cell *matHeaderCellDef>Montant encaissé</th>
+          <td mat-cell *matCellDef="let encaissement">
+            {{ encaissement.montant }}
+          </td>
+        </ng-container>
 
-    <!-- Ligne des colonnes -->
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</div>
+        <!-- Montant affecté -->
+        <ng-container matColumnDef="affecte">
+          <th mat-header-cell *matHeaderCellDef>Montant affecté</th>
+          <td mat-cell *matCellDef="let encaissement">
+            {{ encaissement.affecte }}
+          </td>
+        </ng-container>
 
-<!-- Pagination -->
-<mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+        <!-- Montant non affecté -->
+        <ng-container matColumnDef="solde_non_affecte">
+          <th mat-header-cell *matHeaderCellDef>Montant non affecté</th>
+          <td mat-cell *matCellDef="let encaissement">
+            {{ encaissement.solde_non_affecte }}
+          </td>
+        </ng-container>
+
+        <!-- Mode de paiement -->
+        <ng-container matColumnDef="mode_paiement">
+          <th mat-header-cell *matHeaderCellDef>Mode de paiement</th>
+          <td mat-cell *matCellDef="let encaissement">
+            {{ getModePaiement(encaissement.mode_paiement) }}
+          </td>
+        </ng-container>
+
+        <!-- Lignes -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      </table>
+
+      <!-- Pagination -->
+      <mat-paginator
+        [pageSizeOptions]="[5,10, 20, 50]"
+        [pageSize]="5"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
+  </div> <!-- /list-body -->
+
+</section>

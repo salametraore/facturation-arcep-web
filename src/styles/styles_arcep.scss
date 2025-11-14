@@ -1502,3 +1502,212 @@ tableau encaissement direct sans factures
 /* table */
 .products-table { width:100%; table-layout: fixed; }
 .compact-table  { overflow-x: auto; }
+
+
+/* client dashboard */
+
+/* === Filtres spécifiques au dashboard clients === */
+
+/* Conteneur des filtres */
+.filters-client-dashboard {
+  margin-bottom: 1rem;
+}
+
+/* Grille : gros champ client + 2 petits boutons */
+.filters-client-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) auto auto; // le champ prend tout l'espace
+  column-gap: 0.75rem;
+  align-items: center;
+}
+
+/* Le mat-form-field du client s'étire au max */
+.client-field {
+  width: 100%;
+}
+
+/* Les boutons restent compacts */
+.action-btn {
+  justify-self: start;
+}
+
+
+
+/* Totaux (2 lignes, alignés à droite) */
+.solde-global { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-top: 10px; font-weight: bold; }
+.solde-l1 { display: inline-flex; justify-content: flex-end; align-items: center; gap: 24px; flex-wrap: wrap; text-align: right; }
+.solde-l2 { display: inline-flex; justify-content: flex-end; align-items: center; text-align: right; }
+.solde-global .pair { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.solde-global .val { font-weight: 600; }
+
+/* noir gras pour les titres des mat-tab */
+/* Alignement déjà défini */
+.pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* Icônes dans les labels d'onglets */
+.mat-mdc-tab .pair mat-icon {
+  font-size: 18px;          /* un peu plus petit que le 24px par défaut */
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+
+  /* couleur icône onglet normal */
+  color: var(--brand-primary, #ad1457);  /* fallback rose ARCEP si var non définie */
+}
+
+/* Texte des labels (onglet normal) */
+.mat-mdc-tab .pair span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Onglet actif : on renforce légèrement */
+.mat-mdc-tab.mdc-tab--active .pair mat-icon {
+  color: var(--brand-primary-strong, #d81b60); /* un rose un peu plus vif si tu as cette var */
+}
+
+.mat-mdc-tab.mdc-tab--active .pair span {
+  font-weight: 600;
+}
+
+
+/*
+dashboard resumé client
+ */
+
+/* Conteneur 2 colonnes */
+.client-summary {
+  display: flex;
+  gap: 2rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
+}
+
+/* Chaque colonne prend 50% */
+.client-summary__col {
+  flex: 1 1 0;
+}
+
+/* Colonne gauche : texte client */
+.client-summary__col--info {
+  flex: 0 0 50%;
+  max-width: 50%;
+  display: flex;
+  align-items: flex-start;
+}
+
+.client-info {
+  width: 100%;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.client-info-row {
+  margin-bottom: 0.25rem;
+}
+
+.client-info-label {
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+
+.client-info-value {
+  font-weight: 400;
+}
+
+/* Colonne droite : centrage du bloc d’actions */
+.client-summary__col--actions {
+  flex: 0 0 50%;
+  max-width: 50%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-right: 1.5rem;  /* ⬅ espace à droite pour respirer */
+}
+
+.client-kpi-card {
+  background: #ffc107;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  text-align: center;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.client-kpi-main {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.client-kpi-label {
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+/* Responsive : en dessous d’une certaine largeur, les 2 colonnes passent en vertical */
+@media (max-width: 960px) {
+  .client-summary {
+    flex-direction: column;
+  }
+
+  .client-summary__col--actions {
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  .client-actions {
+    justify-content: flex-start;
+  }
+}
+
+
+/* Titre "Client : ..." en gras noir */
+.client-header .mat-card-title,
+.client-header .mat-mdc-card-title,   /* pour la nouvelle version Material */
+.client-header .title-row .label,
+.client-header .title-row .value {
+  font-weight: 700;   /* gras */
+  color: #000000;     /* noir */
+}
+
+
+.client-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));  /* 2 colonnes */
+  gap: 0.75rem 1rem;
+  width: 100%;
+  max-width: 100%;                                   /* utilise toute la zone d'actions */
+  justify-content: flex-start;                       /* inutile mais explicite */
+}
+
+/* Les boutons prennent toute la largeur de leur cellule */
+.client-actions button[mat-flat-button] {
+  width: 100%;
+  justify-content: flex-start;  /* texte + icône alignés à gauche */
+}
+
+
+.client-info--two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 2 colonnes égales */
+  column-gap: 2rem;
+}
+
+.client-info-col {
+  flex: 1 1 0;
+}
+
+/* Mobile : repasser en 1 seule colonne */
+@media (max-width: 768px) {
+  .client-info--two-cols {
+    flex-direction: column;
+  }
+}

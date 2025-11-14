@@ -1,0 +1,7 @@
+
+<fiche-technique-dfc-table *ngIf="operation===operations.table" (notifyActionOperation)="onGetOperation($event)"
+(notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></fiche-technique-dfc-table>
+
+
+<ficher-technique-dfc-crud *ngIf="operation!=operations.table" [operation]="operation"  [ficheTechnique]="fichetTechnique"   (notifyActionOperation)="onGetOperation($event)"
+                           (notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></ficher-technique-dfc-crud>

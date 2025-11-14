@@ -1,32 +1,76 @@
-<!-- Tableau des fiches techniques (scrollable + header sticky) -->
-<div class="table-container table-scroll">
-  <table mat-table [dataSource]="ficheTechniques" matSort class="mat-elevation-z8" style="width: 100%">
+<!-- Cadre standard -->
+<section class="list-box">
 
-    <ng-container matColumnDef="objet">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Objet</th>
-      <td mat-cell *matCellDef="let element">{{ element.objet }}</td>
-    </ng-container>
+  <!-- En-tête : titre + actions à droite -->
+  <div class="list-header">
 
-    <ng-container matColumnDef="date_creation">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date soumission</th>
-      <td mat-cell *matCellDef="let element">{{ element.date_creation | date:'dd/MM/yyyy' }}</td>
-    </ng-container>
+    <div class="list-actions">
+      <!-- Actions éventuelles (bouton export, etc.) -->
+      <!--
+      <button mat-stroked-button color="primary">
+        <mat-icon>print</mat-icon>
+        Exporter
+      </button>
+      -->
+    </div>
+  </div>
 
-    <ng-container matColumnDef="categorie_produit">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
-      <td mat-cell *matCellDef="let element">{{ getCategorie(element.categorie_produit) }}</td>
-    </ng-container>
+  <!-- Corps : table + pagination -->
+  <div class="list-body">
 
-    <ng-container matColumnDef="statut.libelle">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
-      <td mat-cell *matCellDef="let element">{{ element.statut?.libelle }}</td>
-    </ng-container>
+    <div class="mat-elevation-z10 compact-table">
+      <table mat-table [dataSource]="t_FicheTechniques" matSort style="width: 100%">
 
-    <!-- Lignes -->
-    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</div>
+        <!-- id -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
+          <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+        </ng-container>
 
-<!-- Pagination (optionnelle si tu gardes le scroll) -->
-<!-- <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator> -->
+        <!-- Objet -->
+        <ng-container matColumnDef="objet">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Objet</th>
+          <td mat-cell *matCellDef="let element">{{ element.objet }}</td>
+        </ng-container>
+
+        <!-- Date soumission -->
+        <ng-container matColumnDef="date_creation">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date soumission</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.date_creation | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <!-- Catégorie -->
+        <ng-container matColumnDef="categorie_produit">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
+          <td mat-cell *matCellDef="let element">
+            {{ getCategorie(element.categorie_produit) }}
+          </td>
+        </ng-container>
+
+        <!-- Statut -->
+        <ng-container matColumnDef="statut.libelle">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.statut?.libelle }}
+          </td>
+        </ng-container>
+
+        <!-- Lignes -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      </table>
+
+      <!-- Pagination -->
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20]"
+        [pageSize]="5"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
+  </div> <!-- /list-body -->
+
+</section>

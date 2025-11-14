@@ -51,13 +51,20 @@
 
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Catégorie de service</mat-label>
-              <mat-select formControlName="produit" matTooltip="Catégorie de service">
+              <mat-select
+                formControlName="produit"
+                matTooltip="Catégorie de service"
+                (selectionChange)="onChangeProduit($event.value)">
                 <mat-option *ngFor="let item of produits" [value]="item.id">
                   {{ item.libelle }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
+
+
           </div>
+
+          <div class="blank-row"></div>
 
           <!-- Objet 70% / Période 30% -->
           <div class="row-70-30">
@@ -71,7 +78,7 @@
               <input matInput formControlName="periode" matTooltip="Période">
             </mat-form-field>
           </div>
-
+          <div class="blank-row"></div>
           <!-- Commentaire -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>

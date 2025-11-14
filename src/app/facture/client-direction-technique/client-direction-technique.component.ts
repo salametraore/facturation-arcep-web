@@ -13,18 +13,18 @@ import {CategorieProduitService} from "../../shared/services/categorie-produit.s
 import {ProduitService} from "../../shared/services/produits.service";
 import {ClientService} from "../../shared/services/client.service";
 import {StatutFicheTechniqueService} from "../../shared/services/statut-fiche-technique.service";
-import {DialogService} from "../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../shared/services/msg-message-service.service";
 import {operations} from "../../constantes";
 import {DetailFicheClient} from "../../shared/models/detail-fiche-client";
 import {ClientDetailsComponent} from "./client-details/client-details.component";
 import {RecouvDashboardClient} from "../../shared/models/recouv-dashboard-client";
+import {MatOptionSelectionChange} from "@angular/material/core";
+import { Router } from '@angular/router';
 
 
 @Component({
   selector: 'client-direction-technique',
-  templateUrl: './client-direction-technique.component.html',
-  styleUrl: './client-direction-technique.component.scss'
+  templateUrl: './client-direction-technique.component.html'
 })
 export class ClientDirectionTechniqueComponent implements OnInit, AfterViewInit {
 
@@ -56,8 +56,7 @@ export class ClientDirectionTechniqueComponent implements OnInit, AfterViewInit 
     private produitService: ProduitService,
     private clientService: ClientService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
-    public dialog: MatDialog,
-    public dialogService: DialogService,
+    private router: Router,
     private msgMessageService: MsgMessageServiceService,
   ) {
     this.t_RecouvDashboardClient = new MatTableDataSource<RecouvDashboardClient>([]);
@@ -102,39 +101,14 @@ export class ClientDirectionTechniqueComponent implements OnInit, AfterViewInit 
 
 
 
-  onViewfiche(detailFicheClient: RecouvDashboardClient, operation?: string) {
-    const dialogConfig = new MatDialogConfig();
-    const fixeCategorie = this.fixeCategorie;
-    dialogConfig.width = '1024px';
-    dialogConfig.autoFocus = true;
-    console.log(detailFicheClient);
-    dialogConfig.data = {detailFicheClient, fixeCategorie, operation};
-    dialogConfig.disableClose = true;
-    let ref = this.dialog.open(ClientDetailsComponent, dialogConfig);
-    ref.afterClosed().subscribe(() => {
-      this.reloadData();
-    }, error => {
+  onViewfiche(detailFicheClient: RecouvDashboardClient) {
 
-    });
+    this.router.navigate(
+      ['/facture/client-direction-technique-detail', detailFicheClient.client_id],
+    );
   }
 
-  onDelete(ficheTechniques: FicheTechniques) {
-    this.dialogService.yes_no({message: " Voulez-vous supprimer cet enregistrement"}).subscribe(yes_no => {
-      if (yes_no === true) {
-        this.ficheTechniquesService
-          .delete(ficheTechniques.id)
-          .subscribe(
-            (data) => {
-              this.msgMessageService.success('Supprimé avec succès');
-              this.reloadData();
-            },
-            (error => {
-              this.dialogService.alert({message: error});
-            })
-          );
-      }
-    });
-  }
+
 
   onRowClicked(row) {
     if (this.selectedRow && this.selectedRow != row) {
@@ -169,12 +143,21 @@ export class ClientDirectionTechniqueComponent implements OnInit, AfterViewInit 
     });
   }
 
-  checher() {
+  chercher() {
     this.clientService.getDetailFicheClients().subscribe((detailClients: RecouvDashboardClient[]) => {
       const rows = detailClients.filter(l => l?.client_id === this.client?.id);
       this.t_RecouvDashboardClient.data =rows;
     });
   }
+
+  onClientSelectionChange(event: MatOptionSelectionChange, item: any): void {
+    // Ne réagit qu'à la sélection réelle par l'utilisateur
+    if (event.isUserInput) {
+      this.onGetClient(item);   // ta méthode existante
+      this.chercher();          // déclenche la recherche
+    }
+  }
+
 
   getCategorie(id: number) {
     return this.categories?.find(cat => cat.id === id).libelle;

@@ -294,7 +294,7 @@ export class MainNavComponent implements OnInit {
           sous_menus: null,
           url: 'facture/frequences'
         },*/
-/*        {
+        {
           id: 2100,
           direction: 0,
           titre: 'Clients',
@@ -304,7 +304,7 @@ export class MainNavComponent implements OnInit {
           feuille: 1,
           sous_menus: null,
           url: 'facture/client-direction-technique'
-        },*/
+        },
       ]
     },
     {
@@ -477,7 +477,7 @@ export class MainNavComponent implements OnInit {
   visibleSousMenus(item: any) {
     const dir = this.utilisateurConnecte?.direction;
     return (item.sous_menus || []).filter(
-      (sm: any) => dir === 0 || sm.direction === dir
+      (sm: any) => dir === 0 || sm.direction === dir || sm.direction === 0
     );
   }
 

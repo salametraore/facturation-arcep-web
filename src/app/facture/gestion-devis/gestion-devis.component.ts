@@ -38,8 +38,7 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['reference','client','montant', 'date','objet', 'etat','actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  public operations = operations;
-  selectedRow: any = undefined;
+
   nomClient:any;
   startDate :any;
   endDate :any;
@@ -94,7 +93,7 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
 
       // Client (par nom)
       const okClient = (devis.client.denomination_sociale || '').toLowerCase();
-     // const okClient = !f.nomClient || clientName.includes(f.nomClient.toLowerCase().trim());
+      // const okClient = !f.nomClient || clientName.includes(f.nomClient.toLowerCase().trim());
 
       // Date (sur date_echeance)
       const d = devis?.date_echeance ? new Date(devis.date_echeance) : null;
@@ -181,15 +180,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onRowClicked(row) {
-    if (this.selectedRow && this.selectedRow != row) {
-      this.selectedRow = row;
-    } else if (!this.selectedRow) {
-      this.selectedRow = row;
-    } else if (this.selectedRow === row) {
-      this.selectedRow = undefined;
-    }
-  }
 
   getStatusColor(status: string): string {
     switch (status.toLowerCase()) {
@@ -337,4 +327,57 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
       });
   }
 
+  onGenererFacture(devis: Devis) {
+    if (!devis?.id) {
+      this.dialogService.alert({ message: "Devis invalide : identifiant manquant." });
+      return;
+    }
+
+    this.dialogService
+      .yes_no({ message: "Voulez-vous generer la facture de ce devis ?" })
+      .pipe(take(1))
+      .subscribe(yes => {
+        if (!yes) return;
+
+        // Normalisation vers MAJUSCULES (gère string ou {code,label})
+        const rawEtat: any = devis.etat;
+        const etatCode: string =
+          typeof rawEtat === 'string'
+            ? rawEtat.toUpperCase()
+            : String(rawEtat?.code ?? '').toUpperCase();
+
+        if (!etatCode) {
+          this.dialogService.alert({ message: "État de devis inconnu/indéterminé." });
+          return;
+        }
+
+        // Refus si non annulable
+        if (NON_CANCELLABLE.has(etatCode)) {
+          const motif = etatCode === 'ANNULE'
+            ? "il est déjà annulé"
+            : "il a déjà été encaissé/payé";
+          this.dialogService.alert({ message: `Impossible de generer la facture de ce devis : ${motif}.` });
+          return;
+        }
+
+        // (Optionnel) n’autoriser QUE EMIS
+        if (etatCode !== 'EMIS') {
+          this.dialogService.alert({ message: "Seuls les devis émis peuvent transformés en facture." });
+          return;
+        }
+
+        this.devisService.genererFactureFromDevis(devis.id)
+          .pipe(take(1), finalize(() => {}))
+          .subscribe({
+            next: () => {
+              this.msgMessageService.success('Facture generée avec succès');
+              this.reloadData();
+            },
+            error: (error) => {
+              const msg = error?.error?.message || error?.message || 'Erreur lors de la generation de la facture.';
+              this.dialogService.alert({ message: msg });
+            }
+          });
+      });
+  }
 }

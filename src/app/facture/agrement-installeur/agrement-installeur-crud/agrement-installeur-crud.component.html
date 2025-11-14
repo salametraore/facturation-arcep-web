@@ -65,6 +65,8 @@
               </mat-autocomplete>
             </mat-form-field>
 
+            <div class="blank-row"></div>
+
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Catégorie de service</mat-label>
               <mat-select formControlName="produit" matTooltip="Catégorie de service">
@@ -75,13 +77,15 @@
             </mat-form-field>
           </div>
 
+          <div class="blank-row"></div>
+
           <!-- Commentaire -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
             <textarea matInput formControlName="commentaire" rows="1"></textarea>
           </mat-form-field>
 
-          <div align="center"  *ngIf="ficheTechnique?.statut?.id > 5">
+          <div align="center"  *ngIf="ficheTechnique &&  ficheTechnique?.statut?.id > 5">
             <avis-technique-infos
               [ficheTechnique]="ficheTechnique">
             </avis-technique-infos>

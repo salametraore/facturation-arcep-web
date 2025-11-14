@@ -27,13 +27,13 @@ import {ElementsFactureRecuComponent} from "./elements-facture-recu/elements-fac
 import {
   ElementsFactureRecuCrudComponent
 } from "./elements-facture-recu/elements-facture-recu-crud/elements-facture-recu-crud.component";
-import {FicherTechniqueDfcComponent} from "./ficher-technique-dfc/ficher-technique-dfc.component";
+import {FicherTechniqueDfcComponent} from "./gestion-prestations-diverses/ficher-technique-dfc.component";
 import {
   FicherTechniqueDfcCrudComponent
-} from "./ficher-technique-dfc/ficher-technique-dfc-crud/ficher-technique-dfc-crud.component";
+} from "./gestion-prestations-diverses/ficher-technique-dfc-crud/ficher-technique-dfc-crud.component";
 import {
   FicheTechniqueDfcTableComponent
-} from "./ficher-technique-dfc/fiche-technique-dfc-table/fiche-technique-dfc-table.component";
+} from "./gestion-prestations-diverses/fiche-technique-dfc-table/fiche-technique-dfc-table.component";
 import {ServiceAValeurAjouteComponent} from "./service-a-valeur-ajoute/service-a-valeur-ajoute.component";
 import {
   ServiceAValeurAjouteTableComponent
@@ -84,6 +84,14 @@ import {ClientDetailsFichesTechniques} from "./client-direction-technique/client
 import {FactureComponent} from "./facture/facture.component";
 import {GestionDevisComponent} from "./gestion-devis/gestion-devis.component";
 import {GestionDevisCrudComponent} from "./gestion-devis/gestion-devis-crud/gestion-devis-crud.component";
+import {ClientDetailsDevisComponent} from "./client-direction-technique/client-details/client-details-devis/client-details-devis.component";
+import {ClientCrudDomaineComponent} from "./client-direction-technique/client-details/client-crud-domaine/client-crud-domaine.component";
+import {ClientCrudServiceConfianceComponent} from "./client-direction-technique/client-details/client-crud-service-confiance/client-crud-service-confiance.component";
+import {ClientCrudPrestationsDiversesComponent} from "./client-direction-technique/client-details/client-crud-prestations-diverses/client-crud-prestations-diverses.component";
+import {ClientCrudServiceAValeurAjouteComponent} from "./client-direction-technique/client-details/client-crud-service-a-valeur-ajoute/client-crud-service-a-valeur-ajoute.component";
+import {ClientCrudAutorisationGeneraleComponent} from "./client-direction-technique/client-details/client-crud-autorisation-generale/client-crud-autorisation-generale.component";
+import {ClientCrudAgrementInstalleurComponent} from "./client-direction-technique/client-details/client-crud-agrement-installeur/client-crud-agrement-installeur.component";
+import {ClientCrudAgrementEquipementComponent} from "./client-direction-technique/client-details/client-crud-agrement-equipement/client-crud-agrement-equipement.component";
 
 
 @NgModule({
@@ -145,7 +153,14 @@ import {GestionDevisCrudComponent} from "./gestion-devis/gestion-devis-crud/gest
     ClientDetailsEncaissementsComponent,
     ClientDetailsFacturesComponent,
     ClientDetailsFichesTechniques,
-
+    ClientDetailsDevisComponent,
+    ClientCrudDomaineComponent,
+    ClientCrudServiceConfianceComponent,
+    ClientCrudPrestationsDiversesComponent,
+    ClientCrudServiceAValeurAjouteComponent,
+    ClientCrudAutorisationGeneraleComponent,
+    ClientCrudAgrementInstalleurComponent,
+    ClientCrudAgrementEquipementComponent,
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,338 @@
+import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {MatPaginator} from "@angular/material/paginator";
+import {MatSort} from "@angular/material/sort";
+import {FormBuilder, FormGroup} from "@angular/forms";
+import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
+import {DialogService} from "../../../shared/services/dialog.service";
+import {MatTableDataSource} from "@angular/material/table";
+import {CategorieProduit} from "../../../shared/models/categorie-produit";
+import {Client} from "../../../shared/models/client";
+import {FicheTechniquesService} from "../../../shared/services/fiche-techniques.service";
+import {CategorieProduitService} from "../../../shared/services/categorie-produit.service";
+import {ProduitService} from "../../../shared/services/produits.service";
+import {ClientService} from "../../../shared/services/client.service";
+import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
+import {operations,bouton_names} from "../../../constantes";
+import {Produit} from "../../../shared/models/produit";
+import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/ficheTechniques";
+import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
+import {FicheTechniqueProduit} from "../../../shared/models/ficheTechniquesProduits";
+import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
+
+interface FTProduitFilter {
+  q?: string;          // recherche globale
+  designation?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minQty?: number;
+}
+
+@Component({
+  selector: 'ficher-technique-dfc-crud',
+  templateUrl: './ficher-technique-dfc-crud.component.html'
+})
+export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
+
+  @Input() fixeCategorie: number;
+  @Input() ficheTechnique: FicheTechniques;
+  @Input() operation: string;
+  @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
+  @Output() notifyActionOperation: EventEmitter<string> = new EventEmitter<string>();
+  clients: Client[];
+  client: Client;
+  categories: CategorieProduit[];
+  categoriesFiltered: CategorieProduit[];
+  categorie: CategorieProduit;
+  statutFicheTechniques: StatutFicheTechnique[];
+  statutFicheTechnique: StatutFicheTechnique;
+  form_ficheTechnique: FormGroup;
+  form_ficheTechniquesProduit: FormGroup;
+  t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
+  historiqueFicheTechniques:HistoriqueFicheTechnique[];
+
+  public operations = operations;
+  public bouton_names = bouton_names;
+  public data_operation: string = '';
+
+  displayedColumns: string[] = ['designation', 'prix_unitaire', 'quantite', 'actions'];
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+  montant_de_la_commade: number = 0;
+  produits: Produit[];
+
+  filterForm!: FormGroup;
+  private filterValues: FTProduitFilter = {};
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private ficheTechniquesService: FicheTechniquesService,
+    private categorieProduitService: CategorieProduitService,
+    private produitService: ProduitService,
+    private clientService: ClientService,
+    private statutFicheTechniqueService: StatutFicheTechniqueService,
+    private msgMessageService: MsgMessageServiceService,
+    private dialogService: DialogService,
+  ) {
+    this.t_FicheTechniquesProduits = new MatTableDataSource<FicheTechniqueProduit>([]);
+  }
+
+  ngAfterViewInit(): void {
+    this.t_FicheTechniquesProduits.paginator = this.paginator;
+    this.t_FicheTechniquesProduits.sort = this.sort;
+  }
+
+  ngOnInit(): void {
+    console.log(this.ficheTechnique)
+    this.loadData();
+    this.initFormCommandeClient_create();
+    this.initFormFicheTechniquesProduit_create();
+    if (this.ficheTechnique) {
+      this.t_FicheTechniquesProduits.data = this.ficheTechnique?.produits_detail;
+      this.initFormCommandeClient_update();
+    }
+  }
+
+  loadData() {
+    this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
+      this.categories = categories;
+      this.categoriesFiltered=categories.filter(f => f.id === this.fixeCategorie);
+    });
+    this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
+      this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
+      this.statutFicheTechnique = statutFicheTechniques.find(st => st.id === 1);
+    });
+    this.clientService.getItems().subscribe((clients: Client[]) => {
+      this.clients = clients;
+    });
+
+    this.clientService.getItems().subscribe((clients: Client[]) => {
+      this.clients = clients;
+    });
+
+    this.produitService.getListItems().subscribe((produits: Produit[]) => {
+      this.produits = produits.filter(f => f.categorieProduit === this.fixeCategorie);
+      this.form_ficheTechnique.get('produit').setValue(this.ficheTechnique?.produits_detail[0]?.produit);
+    });
+
+    if (this.ficheTechnique?.id) {
+      this.ficheTechniquesService
+        .getHistoriqueTraitementFicheTechnique(this.ficheTechnique.id)
+        .subscribe((historiqueFicheTechniquesLoc: HistoriqueFicheTechnique[]) => {
+          this.historiqueFicheTechniques = historiqueFicheTechniquesLoc;
+        });
+    } else {
+      this.historiqueFicheTechniques = [];
+    }
+
+  }
+
+  get totalGeneral(): number {
+    const data = this.t_FicheTechniquesProduits?.data ?? [];
+    return data.reduce((sum: number, e: any) => sum + (Number(e?.total) || 0), 0);
+  }
+
+
+  initFormCommandeClient_create() {
+    this.form_ficheTechnique = this.formBuilder.group({
+      id: [],
+      client: [this.ficheTechnique?.client],
+      objet: [],
+      periode: [],
+      type: [],
+      numeroCompte: [],
+      commentaire: [],
+      produit: [],
+    });
+  }
+
+  initFormCommandeClient_update() {
+    this.form_ficheTechnique = this.formBuilder.group({
+      id: [],
+      client: [this.ficheTechnique?.client],
+      objet: [this.ficheTechnique?.objet],
+      periode: [this.ficheTechnique?.periode],
+      type: [],
+      numeroCompte: [],
+      commentaire: [this.ficheTechnique?.commentaire],
+      produit: [this.ficheTechnique?.produits_detail[0]?.produit],
+    });
+  }
+
+  onGetClient(item: Client) {
+    this.client = item;
+    this.form_ficheTechnique.get('numeroCompte').setValue(item.compte_comptable);
+  }
+
+  initFormFicheTechniquesProduit_create() {
+    this.form_ficheTechniquesProduit = this.formBuilder.group({
+      id: [''],
+      designation: [''],
+      prix_unitaire: [''],
+      quantite: [''],
+      total: [''],
+    });
+  }
+
+  onGetTotalLigne() {
+    const formValue = this.form_ficheTechniquesProduit.value;
+    if (formValue['quantite'] && formValue['prix_unitaire']) {
+      const total = formValue['quantite'] * formValue['prix_unitaire'];
+      this.form_ficheTechniquesProduit.get('total').setValue(total);
+    }
+
+  }
+
+  onAdd() {
+    const ficheTechniquesProduit: FicheTechniqueProduit = new FicheTechniqueProduit();
+    const formValue = this.form_ficheTechniquesProduit.value;
+    ficheTechniquesProduit.designation = formValue['designation'];
+    ficheTechniquesProduit.quantite = formValue['quantite'];
+    ficheTechniquesProduit.prix_unitaire = formValue['prix_unitaire'];
+    ficheTechniquesProduit.total = formValue['total'];
+    ficheTechniquesProduit.produit = this.form_ficheTechnique.value['produit'];
+    console.log(ficheTechniquesProduit);
+    this.add_ligneCommande(ficheTechniquesProduit);
+    // if (this.t_FicheTechniquesProduits.data?.find(ap => (ap.designation === ficheTechniquesProduit.designation&&))) {
+    //   this.dialogService.yes_no({
+    //     title: 'Confirmation de modifiaction',
+    //     message: 'Ce produit existe déjà dans la commande, voulez-vous le modifier  ?'
+    //   }).subscribe(yes_no => {
+    //     if (yes_no === true) {
+    //       this.delete_ligneCommande(ficheTechniquesProduit);
+    //       this.add_ligneCommande(ficheTechniquesProduit);
+    //     }
+    //   });
+    // } else {
+    //   this.add_ligneCommande(ficheTechniquesProduit);
+    // }
+  }
+
+  add_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
+    // Ajouter l'élément à la liste existante
+    this.t_FicheTechniquesProduits.data.push(ficheTechniquesProduit);
+
+// Réaffecter le tableau mis à jour à la source de données
+    this.t_FicheTechniquesProduits.data = [...this.t_FicheTechniquesProduits.data]; // Création d'une nouvelle référence
+    this.initFormFicheTechniquesProduit_create();
+    this.getMontantTotal([...this.t_FicheTechniquesProduits.data]);
+  }
+
+  onUpdate(ficheTechniquesProduit: FicheTechniqueProduit) {
+    this.form_ficheTechniquesProduit = this.formBuilder.group({
+      id: [ficheTechniquesProduit?.id],
+      designation: [ficheTechniquesProduit?.designation],
+      quantite: [ficheTechniquesProduit?.quantite],
+      prix_unitaire: [ficheTechniquesProduit?.prix_unitaire],
+    });
+  }
+
+  delete_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
+    this.t_FicheTechniquesProduits.data = this.t_FicheTechniquesProduits.data.filter(p => p.id !== ficheTechniquesProduit.id);
+    // Rafraîchir la table
+    this.t_FicheTechniquesProduits._updateChangeSubscription();
+    this.getMontantTotal([...this.t_FicheTechniquesProduits.data]);
+  }
+
+  getMontantTotal(ficheTechniquesProduits: FicheTechniqueProduit[]) {
+    this.montant_de_la_commade = 0;
+    if (ficheTechniquesProduits?.length > 0) {
+      this.t_FicheTechniquesProduits.data.forEach((ficheTechniquesProduit: FicheTechniqueProduit) => {
+        this.montant_de_la_commade += ficheTechniquesProduit.quantite * ficheTechniquesProduit.prix_unitaire;
+      });
+    } else {
+      return 0;
+    }
+  }
+
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
+  }
+
+  getLibelleProduit(id: number) {
+    return this.produits.find(p => p.id === id)?.libelle;
+  }
+
+  onChangeProduit(produitId: number): void {
+
+     const libelleProduit = this.produits.find(p => p.id === produitId)?.libelle;
+
+     this.form_ficheTechnique.patchValue({
+      objet: libelleProduit
+     });
+
+  }
+
+
+  onSave() {
+    const formValue = this.form_ficheTechnique.value;
+
+
+    const dataFicheTechnique: FicheTechniques = {
+      client: formValue['client'],
+      direction: 1,
+      objet: formValue['objet'],
+      utilisateur: 1,
+      position: 1,
+      commentaire: formValue['commentaire'],
+      periode: formValue['periode'],
+      categorie_produit: this.fixeCategorie,
+      statut: this.statutFicheTechnique,
+      produits: this.t_FicheTechniquesProduits?.data,
+    };
+
+    console.log(dataFicheTechnique);
+
+    // Construire FormData
+    const formData = new FormData();
+
+    // Champs simples
+    formData.append('client', String(dataFicheTechnique.client));
+    formData.append('objet', String(dataFicheTechnique.objet));
+    formData.append('direction', String(dataFicheTechnique.direction));
+    formData.append('utilisateur', String(dataFicheTechnique.utilisateur));
+    formData.append('position', String(dataFicheTechnique.position));
+    formData.append('commentaire', String(dataFicheTechnique.commentaire));
+    formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
+
+
+    // Produits (JSON stringifié)
+    formData.append('produits', JSON.stringify(dataFicheTechnique.produits));
+
+
+    // Choisir la requête : création ou mise à jour
+    const request$ =
+      this.operation === operations.update
+        ? this.ficheTechniquesService.update(this.ficheTechnique.id, formData)
+        : this.ficheTechniquesService.create(formData);
+
+    request$.subscribe(
+      (data) => {
+        this.msgMessageService.success('Fiche technique enregistrée avec succès');
+
+      },
+      (error) => {
+        this.dialogService.alert({message: error.message});
+      }
+    );
+  }
+
+  onRetour() {
+    this.notifyActionOperation.emit(operations.table);
+    this.ficheTechnique = undefined;
+    this.notifyFicheTechnique.emit(this.ficheTechnique);
+  }
+
+
+  onTransmettre(){
+    const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();
+    miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
+    miseAJourStatutFiche.statut = 2;
+    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone:MiseAJourStatutFiche)=>{
+      this.msgMessageService.success("Fiche transmise avec succès !");
+    },error => {
+      this.dialogService.alert({message:error.message});
+    });
+  }
+
+}

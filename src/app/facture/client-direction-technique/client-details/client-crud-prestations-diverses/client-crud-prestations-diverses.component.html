@@ -1,0 +1,210 @@
+<!-- src/app/features/prestations-diverses/fiche-technique/pd-ft-edit-page.component.html -->
+<mat-card>
+
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Saisie et mise à jour d'une fiche technique ordinaire</h2>
+  </div>
+
+  <!-- Grille 2 colonnes : 75% / 25% -->
+  <div class="two-col two-col--75-25">
+
+    <!-- ===== Colonne gauche : FICHE TECHNIQUE + LIGNES PRODUITS ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Fiche technique</h3>
+
+        <!-- Actions globales
+                         -->
+        <div class="list-actions">
+          <button mat-flat-button color="primary"
+                  *ngIf="operation===operations.create || operation===operations.update"
+                  [disabled]="t_FicheTechniquesProduits.data?.length < 1"
+                  (click)="onSave()"
+                  >
+            <mat-icon>save</mat-icon> Enregistrer
+          </button>
+
+          <button mat-stroked-button color="primary" (click)="onRetour()">
+            <mat-icon>undo</mat-icon> Retour
+          </button>
+
+          <button mat-flat-button color="warn"
+                  *ngIf="operation===operations.transmettre"
+                  (click)="onTransmettre()">
+            <mat-icon>send</mat-icon> Transmettre
+          </button>
+        </div>
+      </div>
+
+      <div class="list-body">
+        <!-- Formulaire principal -->
+        <form [formGroup]="form_ficheTechnique" class="form-grid">
+
+          <!-- Client 70% / Catégorie de service 30% -->
+          <div class="row-70-30">
+            <!-- Client (affiché, non modifiable) -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Client</mat-label>
+              <input
+                matInput
+                [value]="client?.denomination_sociale || nomClient"
+                readonly>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Catégorie de service</mat-label>
+              <mat-select
+                formControlName="produit"
+                matTooltip="Catégorie de service"
+                (selectionChange)="onChangeProduit($event.value)">
+                <mat-option *ngFor="let item of produits" [value]="item.id">
+                  {{ item.libelle }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="blank-row"></div>
+
+          <!-- Objet 70% / Période 30% -->
+          <div class="row-70-30">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Objet</mat-label>
+              <input matInput formControlName="objet" matTooltip="Objet">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Période</mat-label>
+              <input matInput formControlName="periode" matTooltip="Période">
+            </mat-form-field>
+          </div>
+
+          <div class="blank-row"></div>
+
+          <!-- Commentaire -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
+            <textarea matInput rows="1" formControlName="commentaire" matTooltip="Commentaire"></textarea>
+          </mat-form-field>
+        </form>
+        <br>
+
+        <!-- ===== Sous-collection : Ajout de produit  ===== -->
+        <section class="list-box list-box--compact" *ngIf="canAddProduit">
+          <div class="list-header">
+            <h3 class="list-title">Ajout de produit</h3>
+
+            <div class="list-actions">
+              <button mat-flat-button
+                      color="primary"
+                      class="add-btn"
+                      [disabled]="form_ficheTechniquesProduit.invalid"
+                      (click)="onAdd()">
+                <mat-icon>add</mat-icon>
+                Ajouter
+              </button>
+            </div>
+          </div>
+
+          <div class="list-body">
+            <form [formGroup]="form_ficheTechniquesProduit">
+
+              <mat-form-field appearance="outline">
+                <mat-label>Désignation</mat-label>
+                <input matInput formControlName="designation" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Prix Unit.</mat-label>
+                <input matInput formControlName="prix_unitaire" (blur)="onGetTotalLigne()" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Quantité</mat-label>
+                <input type="number" matInput formControlName="quantite" (blur)="onGetTotalLigne()" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Total</mat-label>
+                <input matInput formControlName="total" readonly>
+              </mat-form-field>
+
+            </form>
+          </div>
+        </section>
+
+        <div class="blank-row"></div>
+
+        <!-- ===== Tableau des lignes produits ===== -->
+        <div class="mat-elevation-z10 compact-table">
+          <table mat-table [dataSource]="t_FicheTechniquesProduits" matSort style="width:100%">
+
+            <ng-container matColumnDef="designation">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Désignation</th>
+              <td mat-cell *matCellDef="let e">{{ e.designation }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="prix_unitaire">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Prix unitaire</th>
+              <td mat-cell *matCellDef="let e">{{ e.prix_unitaire?.toLocaleString('fr-FR') | thousandSeparator }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantite">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantité</th>
+              <td mat-cell *matCellDef="let e">{{ e.quantite?.toLocaleString('fr-FR') }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let e">
+                <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
+                  <mat-icon>settings</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item class="btn_edit" (click)="onUpdate(e)">
+                    <mat-icon color="primary">edit</mat-icon>
+                    Modifier
+                  </button>
+                  <button mat-menu-item class="btn_delete" (click)="onDelete(e)">
+                    <mat-icon color="warn">delete</mat-icon>
+                    Supprimer
+                  </button>
+                </mat-menu>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="4">
+                Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+              </td>
+            </tr>
+          </table>
+
+          <div class="list-body" style="display:flex; justify-content:flex-end;">
+            <div class="total-commande">
+              Total global : <b>{{ totalGeneral?.toLocaleString('fr-FR') | thousandSeparator }} FCFA</b>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== Colonne droite : HISTORIQUE ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Historique de la demande</h3>
+      </div>
+      <div class="list-body">
+        <historique-traitement
+          [historiqueFicheTechniques]="historiqueFicheTechniques">
+        </historique-traitement>
+      </div>
+    </section>
+
+  </div> <!-- /two-col -->
+</mat-card>

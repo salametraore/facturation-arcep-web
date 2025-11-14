@@ -1,58 +1,54 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MatTableDataSource} from "@angular/material/table";
-import {SelectionModel} from "@angular/cdk/collections";
-import {MatPaginator} from "@angular/material/paginator";
-import {FicheTechniquesService} from "../../../../shared/services/fiche-techniques.service";
-import {CategorieProduit} from "../../../../shared/models/categorie-produit";
-import {CategorieProduitService} from "../../../../shared/services/categorie-produit.service";
-import {ProduitService} from "../../../../shared/services/produits.service";
-import {Produit} from "../../../../shared/models/produit";
-import {FicheTechniques} from "../../../../shared/models/ficheTechniques";
-import {StatutFicheTechnique} from "../../../../shared/models/statut-fiche-technique";
-import {StatutFicheTechniqueService} from "../../../../shared/services/statut-fiche-technique.service";
-import {Client} from "../../../../shared/models/client";
-import {ClientService} from "../../../../shared/services/client.service";
-import {MatSort} from "@angular/material/sort";
-import {date_converte, operations} from "../../../../constantes";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {DialogService} from "../../../../shared/services/dialog.service";
-import {MsgMessageServiceService} from "../../../../shared/services/msg-message-service.service";
-import {RecouvDashboardClient} from "../../../../shared/models/recouv-dashboard-client";
-import {RecouvListeEncaissement} from "../../../../shared/models/recouv-liste-encaissement";
-import {EncaissementsService} from "../../../../shared/services/encaissements.service";
-import {AuthService} from "../../../../authentication/auth.service";
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
+import { MatTableDataSource } from "@angular/material/table";
+import { SelectionModel } from "@angular/cdk/collections";
+import { MatPaginator } from "@angular/material/paginator";
+import { FicheTechniquesService } from "../../../../shared/services/fiche-techniques.service";
+import { CategorieProduit } from "../../../../shared/models/categorie-produit";
+import { CategorieProduitService } from "../../../../shared/services/categorie-produit.service";
+import { ProduitService } from "../../../../shared/services/produits.service";
+import { Produit } from "../../../../shared/models/produit";
+import { FicheTechniques } from "../../../../shared/models/ficheTechniques";
+import { StatutFicheTechnique } from "../../../../shared/models/statut-fiche-technique";
+import { StatutFicheTechniqueService } from "../../../../shared/services/statut-fiche-technique.service";
+import { Client } from "../../../../shared/models/client";
+import { ClientService } from "../../../../shared/services/client.service";
+import { MatSort } from "@angular/material/sort";
+import { operations } from "../../../../constantes";
+import { RecouvDashboardClient } from "../../../../shared/models/recouv-dashboard-client";
+import { AuthService } from "../../../../authentication/auth.service";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: 'client-details-fiches-techniques',
-  templateUrl: './client-details-fiches-techniques.html',
-  styleUrls: ['./client-details-fiches-techniques.scss']
+  templateUrl: './client-details-fiches-techniques.html'
 })
-export class ClientDetailsFichesTechniques implements OnInit,AfterViewInit{
+export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['objet', 'date_creation', 'categorie_produit', 'statut.libelle'];
+  @Input() clientId!: number;
+
+  displayedColumns: string[] = ['id','objet', 'date_creation', 'categorie_produit', 'statut.libelle'];
 
   selection = new SelectionModel<FicheTechniques>(true, []);
-
   ficheTechniques?: FicheTechniques[];
 
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
-  public operations = operations;
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+
   selectedRow: any = undefined;
   nomClient: any;
   startDate: any;
   endDate: any;
   serviceFilter: any;
   statusFilter: any;
+
   categories: CategorieProduit[];
   produits: Produit[];
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
   client: Client;
 
-  public data_operation: string = '';
 
-  recouvDashboardClient?: RecouvDashboardClient;
   t_FicheTechniques?: MatTableDataSource<FicheTechniques>;
 
   constructor(
@@ -61,27 +57,24 @@ export class ClientDetailsFichesTechniques implements OnInit,AfterViewInit{
     private produitService: ProduitService,
     private clientService: ClientService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
-    public dialog: MatDialog,
-    public dialogService: DialogService,
-    private msgMessageService: MsgMessageServiceService,
-    public dialogRef: MatDialogRef<ClientDetailsFichesTechniques>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
     private authServiceService: AuthService,
-  )
-  {
-    this.recouvDashboardClient = data.detailFicheClient;
-    this.data_operation = data.operation;
+    private route: ActivatedRoute,
+  ) {
+    // Initialisation de la datasource
     this.t_FicheTechniques = new MatTableDataSource<FicheTechniques>([]);
   }
 
+  ngOnInit(): void {
+
+    this.reloadData();
+
+  }
 
   ngAfterViewInit() {
     this.t_FicheTechniques.paginator = this.paginator;
     this.t_FicheTechniques.sort = this.sort;
   }
-  ngOnInit(): void {
-    this.reloadData();
-  }
+
 
   private reloadData() {
 
@@ -92,6 +85,7 @@ export class ClientDetailsFichesTechniques implements OnInit,AfterViewInit{
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
       this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
     });
+
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
     });
@@ -100,37 +94,32 @@ export class ClientDetailsFichesTechniques implements OnInit,AfterViewInit{
       this.produits = produits;
     });
 
-    this.clientService.getItems().subscribe((clients: Client[]) => {
-      this.clients = clients;
-      console.log("recouvDashboardClient")
-      console.log(this.recouvDashboardClient)
-      if(this.recouvDashboardClient){
-        this.client = clients?.find(c=>c.id ===this.recouvDashboardClient?.client_id);
-        this.nomClient = this.client?.denomination_sociale;
-        this.ficheTechniquesService.getListeFichesTechniquesByClientId(this.recouvDashboardClient?.client_id).subscribe((ligneFicheTechniques: FicheTechniques[]) => {
-          console.log(ligneFicheTechniques);
-          this.ficheTechniques=ligneFicheTechniques;
-          this.t_FicheTechniques.data = this.ficheTechniques;
+    this.ficheTechniquesService
+      .getListeFichesTechniquesByClientId(this.clientId)
+      .subscribe((ligneFicheTechniques: FicheTechniques[]) => {
+        console.log(ligneFicheTechniques);
 
-        });
-      }
-    });
+        // 🔽 tri décroissant sur l'id
+        const sorted = [...ligneFicheTechniques].sort(
+          (a, b) => (b.id ?? 0) - (a.id ?? 0)
+        );
+
+        this.ficheTechniques = sorted;
+        this.t_FicheTechniques.data = this.ficheTechniques;
+      });
+
   }
-
 
   getCategorie(id: number) {
-    return this.categories?.find(cat => cat.id === id).libelle;
+    return this.categories?.find(cat => cat.id === id)?.libelle;
   }
-
 
   onGetClient(item: Client) {
     this.client = item;
   }
 
-
-
   getStatut(id: number) {
-    return this.statutFicheTechniques?.find(st => st.id === id).libelle;
+    return this.statutFicheTechniques?.find(st => st.id === id)?.libelle;
   }
 
   isAllSelected() {
@@ -146,4 +135,10 @@ export class ClientDetailsFichesTechniques implements OnInit,AfterViewInit{
       this.t_FicheTechniques.data.forEach(row => this.selection.select(row));
     }
   }
+
+  public refreshFromParent(): void {
+    this.reloadData();
+  }
+
+
 }

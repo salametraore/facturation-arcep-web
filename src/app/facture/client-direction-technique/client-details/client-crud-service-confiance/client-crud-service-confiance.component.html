@@ -1,0 +1,106 @@
+<!-- src/app/features/fiche-technique/services-confiance/fiche-technique-page.component.html -->
+<mat-card>
+
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Saisie et mise à jour d'une fiche technique — Service de confiance</h2>
+  </div>
+
+  <!-- Grille 2 colonnes : 2fr / 1fr -->
+  <div class="two-col two-col--75-25">
+
+    <!-- ===== Colonne gauche : FICHE TECHNIQUE ===== -->
+    <section class="list-box">
+      <div class="list-header">
+        <h3 class="list-title">Fiche technique</h3>
+      </div>
+
+      <div class="list-body">
+        <form [formGroup]="form" class="form-grid">
+
+          <!-- Client (affiché, non modifiable) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Client</mat-label>
+            <input
+              matInput
+              [value]="client?.denomination_sociale || nomClient"
+              readonly>
+          </mat-form-field>
+
+          <!-- Service de confiance (sélecteur produit) -->
+<!--
+          <div class="form-section-title">
+            Service de confiance
+            <span matTooltip="Choisissez le service de confiance demandé"> </span>
+          </div>
+-->
+          <div class="blank-row"></div>
+
+          <!-- Laisse le select (si tu préfères des radios, on peut le convertir comme pour “domaine”) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Service de confiance</mat-label>
+            <mat-select formControlName="produit" matTooltip="Service de confiance">
+              <mat-option *ngFor="let item of produits" [value]="item.id">
+                {{ item.libelle }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Commentaire -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
+            <textarea matInput rows="2" formControlName="commentaire" autofocus></textarea>
+          </mat-form-field>
+
+          <div align="center" *ngIf="ficheTechnique?.statut?.id > 5">
+            <avis-technique-infos
+              [ficheTechnique]="ficheTechnique">
+            </avis-technique-infos>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              *ngIf="data_operation===operations.create || data_operation===operations.update"
+              (click)="crud()">
+              Enregistrer
+            </button>
+
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              *ngIf="data_operation===operations.transmettre"
+              (click)="onTransmettre()">
+              Transmettre
+            </button>
+
+            <button mat-flat-button color="warn" type="button" (click)="onFerme()">
+              Fermer
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </section>
+
+    <!-- ===== Colonne droite : HISTORIQUE ===== -->
+    <section class="list-box" >
+      <div class="list-header">
+        <h3 class="list-title">Historique de la demande</h3>
+      </div>
+
+      <div class="list-body">
+        <historique-traitement
+          [historiqueFicheTechniques]="historiqueFicheTechniques">
+        </historique-traitement>
+      </div>
+    </section>
+
+  </div>
+</mat-card>

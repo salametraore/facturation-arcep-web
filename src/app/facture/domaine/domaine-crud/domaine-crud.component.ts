@@ -81,6 +81,11 @@ export class DomaineCrudComponent implements OnInit {
   }
 
   reloadData() {
+
+    this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
+      this.categories = categories;
+    });
+
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
       if(this.ficheTechnique){
