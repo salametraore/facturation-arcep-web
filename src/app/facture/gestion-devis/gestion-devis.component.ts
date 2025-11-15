@@ -21,10 +21,7 @@ import {HttpResponse} from "@angular/common/http";
 
 import { take, finalize } from 'rxjs/operators';
 
-
-
 const NON_CANCELLABLE = new Set<string>(['PAYE', 'ANNULE']);
-
 
 @Component({
   selector: 'gestion-devis',
@@ -49,11 +46,14 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
 
   clients: Client[];
 
-  TYPE_FRAIS=TYPE_FRAIS;
-  etatsDevis=ETATS_DEVIS;
+  TYPE_FRAIS = TYPE_FRAIS;
+  etatsDevis = ETATS_DEVIS;
 
+  // ✅ exposé au template pour pouvoir appeler operations.details / operations.update
+  public operations = operations;
 
-
+  // ✅ pour la ligne sélectionnée (onRowClicked)
+  selectedRow?: Devis;
 
   constructor(
     private devisService: DevisService,
@@ -91,15 +91,16 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
 
       try { f = JSON.parse(rawFilter); } catch { return true; }
 
-      // Client (par nom)
-      const okClient = (devis.client.denomination_sociale || '').toLowerCase();
-      // const okClient = !f.nomClient || clientName.includes(f.nomClient.toLowerCase().trim());
+      // ✅ Client (par nom) -> booléen
+      const clientName = (devis.client?.denomination_sociale || '').toLowerCase();
+      const okClient =
+        !f.nomClient ||
+        clientName.includes(String(f.nomClient).toLowerCase().trim());
 
       // Date (sur date_echeance)
       const d = devis?.date_echeance ? new Date(devis.date_echeance) : null;
       const start = f.startDate ? new Date(f.startDate) : null;
       const end = f.endDate ? new Date(f.endDate) : null;
-      // normalise end au soir
       if (end) { end.setHours(23,59,59,999); }
       const okDate =
         !d ||
@@ -108,7 +109,7 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
           (!end   || d <= end)
         );
 
-      // Type de frais (on tolère plusieurs noms de champ possibles)
+      // Type de frais
       const typeCode =
         (devis as any).type_frais ??
           (devis as any).type ??
@@ -122,7 +123,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
       return okClient && okDate && okType && okStatut;
     };
   }
-
 
   reloadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
@@ -180,6 +180,11 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // ✅ handler pour le clic sur la ligne
+  onRowClicked(element: Devis) {
+    this.selectedRow = element;
+    console.log('Ligne sélectionnée :', element);
+  }
 
   getStatusColor(status: string): string {
     switch (status.toLowerCase()) {
@@ -203,16 +208,13 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
     this.serviceFilter = null;
     this.statusFilter = null;
 
-    // Filtre “vide” ⇒ tout passe
     this.t_Devis!.filter = '';
     if (this.t_Devis?.paginator) {
       this.t_Devis.paginator.firstPage();
     }
   }
 
-
   chercher() {
-    // Fabrique l’objet filtre depuis les champs du formulaire
     const filter = {
       nomClient: this.nomClient || '',
       startDate: this.startDate ? new Date(this.startDate).toISOString() : null,
@@ -221,23 +223,18 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
       statusFilter:  this.statusFilter  || null,
     };
 
-    // Applique le filtre (JSON pour le predicate custom)
     this.t_Devis!.filter = JSON.stringify(filter);
 
-    // Revenir à la première page si paginator
     if (this.t_Devis?.paginator) {
       this.t_Devis.paginator.firstPage();
     }
   }
 
-
   getCategorie(id:number){
     return this.categories?.find(cat=>cat.id===id)?.libelle;
   }
 
-
   onPrintDevis(devis: Devis) {
-    // Récupère l'id du devis (qu'il soit un nombre ou un objet avec id)
     const devisId =devis?.id;
 
     if (!devisId) {
@@ -252,17 +249,12 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
           return;
         }
 
-        // ArrayBuffer -> Blob(PDF)
         const blob = new Blob([res.body], { type: 'application/pdf' });
 
-        // (Optionnel) Récupère un nom de fichier depuis Content-Disposition
         const cd = res.headers.get('Content-Disposition') || '';
         const m = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(cd);
         const filename = m ? decodeURIComponent(m[1]) : `devis_${devisId}.pdf`;
 
-        // Envoie au service d’impression/affichage
-        // Si ton pdfViewService accepte un 2e param pour le nom, décommente la ligne suivante :
-        // this.pdfViewService.printDirectly(blob, filename);
         this.pdfViewService.printDirectly(blob);
       },
       error: (err) => {
@@ -285,7 +277,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
       .subscribe(yes => {
         if (!yes) return;
 
-        // Normalisation vers MAJUSCULES (gère string ou {code,label})
         const rawEtat: any = devis.etat;
         const etatCode: string =
           typeof rawEtat === 'string'
@@ -297,7 +288,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
           return;
         }
 
-        // Refus si non annulable
         if (NON_CANCELLABLE.has(etatCode)) {
           const motif = etatCode === 'ANNULE'
             ? "il est déjà annulé"
@@ -306,7 +296,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
           return;
         }
 
-        // (Optionnel) n’autoriser QUE EMIS
         if (etatCode !== 'EMIS') {
           this.dialogService.alert({ message: "Seuls les devis émis peuvent être annulés." });
           return;
@@ -339,7 +328,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
       .subscribe(yes => {
         if (!yes) return;
 
-        // Normalisation vers MAJUSCULES (gère string ou {code,label})
         const rawEtat: any = devis.etat;
         const etatCode: string =
           typeof rawEtat === 'string'
@@ -351,7 +339,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
           return;
         }
 
-        // Refus si non annulable
         if (NON_CANCELLABLE.has(etatCode)) {
           const motif = etatCode === 'ANNULE'
             ? "il est déjà annulé"
@@ -360,7 +347,6 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
           return;
         }
 
-        // (Optionnel) n’autoriser QUE EMIS
         if (etatCode !== 'EMIS') {
           this.dialogService.alert({ message: "Seuls les devis émis peuvent transformés en facture." });
           return;

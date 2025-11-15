@@ -38,6 +38,7 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import {ClientCrudAutorisationGeneraleComponent} from "./client-direction-technique/client-details/client-crud-autorisation-generale/client-crud-autorisation-generale.component";
  import {ClientCrudAgrementInstalleurComponent} from "./client-direction-technique/client-details/client-crud-agrement-installeur/client-crud-agrement-installeur.component";
  import {ClientCrudAgrementEquipementComponent} from "./client-direction-technique/client-details/client-crud-agrement-equipement/client-crud-agrement-equipement.component";
+ import {ClientCrudNumerotationComponent} from "./client-direction-technique/client-details/client-crud-numerotation/client-crud-numerotation.component";
 
 const routes: Routes = [
   {
@@ -72,7 +73,7 @@ const routes: Routes = [
       {path: 'client-direction-technique-detail/:id', component:ClientDetailsComponent, resolve: { client: ClientResolver }},
       {path: 'client-crud-prestations-diverses/:clientId', component: ClientCrudPrestationsDiversesComponent },
       {path: 'client-crud-service-a-valeur-ajoute/:clientId', component: ClientCrudServiceAValeurAjouteComponent },
-     /* {path: 'client-crud-numerotation/:clientId', component: ClientCrudNumerotationComponent },*/
+      {path: 'client-crud-numerotation/:clientId', component: ClientCrudNumerotationComponent },
       {path: 'client-crud-autorisation-generale/:clientId', component: ClientCrudAutorisationGeneraleComponent },
       {path: 'client-crud-agrement-installeur/:clientId', component: ClientCrudAgrementInstalleurComponent },
       {path: 'client-crud-agrement-equipement/:clientId', component: ClientCrudAgrementEquipementComponent },

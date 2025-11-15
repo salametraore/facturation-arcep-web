@@ -16,11 +16,13 @@
 
         <!-- Actions alignées à droite -->
         <div class="list-actions">
+
           <button
             mat-flat-button
             color="primary"
             *ngIf="operation===operations.create || operation===operations.update"
-            (click)="crud()">
+            (click)="crud()"
+            [disabled]="saveLocked">
             <mat-icon>save</mat-icon>
             Enregistrer
           </button>

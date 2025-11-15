@@ -19,47 +19,94 @@
   <div class="list-body">
 
     <div class="mat-elevation-z10 compact-table">
-      <table mat-table [dataSource]="t_FicheTechniques" matSort style="width: 100%">
+      <table [dataSource]="t_FicheTechniques" mat-table matSort style="width: 100%">
 
         <!-- id -->
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
-          <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Id</th>
+          <td *matCellDef="let element" mat-cell>{{ element.id }}</td>
         </ng-container>
 
         <!-- Objet -->
         <ng-container matColumnDef="objet">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Objet</th>
-          <td mat-cell *matCellDef="let element">{{ element.objet }}</td>
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Objet</th>
+          <td *matCellDef="let element" mat-cell>{{ element.objet }}</td>
         </ng-container>
 
         <!-- Date soumission -->
         <ng-container matColumnDef="date_creation">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date soumission</th>
-          <td mat-cell *matCellDef="let element">
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Date soumission</th>
+          <td *matCellDef="let element" mat-cell>
             {{ element.date_creation | date:'dd/MM/yyyy' }}
           </td>
         </ng-container>
 
         <!-- Catégorie -->
         <ng-container matColumnDef="categorie_produit">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
-          <td mat-cell *matCellDef="let element">
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Catégorie</th>
+          <td *matCellDef="let element" mat-cell>
             {{ getCategorie(element.categorie_produit) }}
           </td>
         </ng-container>
 
         <!-- Statut -->
         <ng-container matColumnDef="statut.libelle">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
-          <td mat-cell *matCellDef="let element">
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Statut</th>
+          <td *matCellDef="let element" mat-cell>
             {{ element.statut?.libelle }}
           </td>
         </ng-container>
 
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th *matHeaderCellDef mat-header-cell>Actions</th>
+          <td *matCellDef="let element" mat-cell>
+
+            <button [matMenuTriggerFor]="menu" color="primary" mat-icon-button>
+              <mat-icon>settings</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+
+              <button (click)="onModifierFicheTechnique(element)" class="btn_edit" mat-menu-item>
+                <mat-icon color="primary">edit</mat-icon>
+                Modifier
+              </button>
+
+              <button (click)="onTransmettre(element)"
+                      *ngIf="element.statut?.code==='INIT' && hasOperationCode('TRANSMETTRE_FICHE')"
+                      mat-menu-item>
+                <mat-icon color="warn">edit</mat-icon>
+                Transmettre DFC
+              </button>
+
+              <button (click)="onSetAvis(element, this.operations.transmettre)"
+                      *ngIf="element.statut?.code==='FTD' && hasOperationCode('AVIS_TECHNIQUE_FICHE')"
+                      mat-menu-item>
+                <mat-icon color="warn">check</mat-icon>
+                Donner un avis
+              </button>
+
+              <button (click)="onRetraitAutorisation(element, this.operations.transmettre)"
+                      *ngIf="element.statut?.id>5 && hasOperationCode('RETRAIT_FICHE')"
+                      mat-menu-item>
+                <mat-icon color="warn">check</mat-icon>
+                Retrait autorisation/licence
+              </button>
+
+              <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
+                <mat-icon color="warn">delete</mat-icon>
+                Supprimer
+              </button>
+
+            </mat-menu>
+          </td>
+        </ng-container>
+
+
         <!-- Lignes -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+        <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
 
       </table>
 

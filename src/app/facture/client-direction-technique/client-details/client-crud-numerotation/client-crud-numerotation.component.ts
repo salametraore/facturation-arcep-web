@@ -1,35 +1,43 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/ficheTechniques";
-import {Client} from "../../../shared/models/client";
-import {CategorieProduit} from "../../../shared/models/categorie-produit";
-import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
+import {FicheTechniques, MiseAJourStatutFiche} from "../../../../shared/models/ficheTechniques";
+import {Client} from "../../../../shared/models/client";
+import {CategorieProduit} from "../../../../shared/models/categorie-produit";
+import {StatutFicheTechnique} from "../../../../shared/models/statut-fiche-technique";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {MatTableDataSource} from "@angular/material/table";
-import {FicheTechniqueProduit} from "../../../shared/models/ficheTechniquesProduits";
+import {FicheTechniqueProduit} from "../../../../shared/models/ficheTechniquesProduits";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
-import {Produit} from "../../../shared/models/produit";
-import {FicheTechniquesService} from "../../../shared/services/fiche-techniques.service";
-import {CategorieProduitService} from "../../../shared/services/categorie-produit.service";
-import {ProduitService} from "../../../shared/services/produits.service";
-import {ClientService} from "../../../shared/services/client.service";
-import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
-import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
-import {DialogService} from "../../../shared/services/dialog.service";
-import {operations,bouton_names} from "../../../constantes";
-import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
+import {Produit} from "../../../../shared/models/produit";
+import {FicheTechniquesService} from "../../../../shared/services/fiche-techniques.service";
+import {CategorieProduitService} from "../../../../shared/services/categorie-produit.service";
+import {ProduitService} from "../../../../shared/services/produits.service";
+import {ClientService} from "../../../../shared/services/client.service";
+import {StatutFicheTechniqueService} from "../../../../shared/services/statut-fiche-technique.service";
+import {MsgMessageServiceService} from "../../../../shared/services/msg-message-service.service";
+import {DialogService} from "../../../../shared/services/dialog.service";
+import {operations,bouton_names} from "../../../../constantes";
+import {HistoriqueFicheTechnique} from "../../../../shared/models/historique-traitement-fiche-technique";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
-  selector: 'service-a-valeur-ajoute-crud',
-  templateUrl: './service-a-valeur-ajoute-crud.component.html'
+  selector: 'client-crud-numerotation.component',
+  templateUrl: './client-crud-numerotation.component.html'
 })
-export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit {
+export class ClientCrudNumerotationComponent implements OnInit, AfterViewInit {
 
-  @Input() fixeCategorie: number;
-  @Input() ficheTechnique: FicheTechniques;
-  @Input() operation: string;
+  fixeCategorie: number;
+  ficheTechnique: FicheTechniques | undefined;
+  operation: string;
+  canAddProduit = true;
+  nomClient: string;
+  clientId: number;
+  saveLocked = false;
+  
+  
   @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
   @Output() notifyActionOperation: EventEmitter<string> = new EventEmitter<string>();
+  
   clients: Client[];
   client: Client;
   categories: CategorieProduit[];
@@ -45,9 +53,7 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
   public bouton_names = bouton_names;
   public data_operation: string = '';
 
-  saveLocked = false;
-
-  displayedColumns: string[] = ['produit','designation','quantite', 'actions'];
+  displayedColumns: string[] = ['produit','plage_numero','quantite', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   montant_de_la_commade: number = 0;
@@ -62,6 +68,8 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     private statutFicheTechniqueService: StatutFicheTechniqueService,
     private msgMessageService: MsgMessageServiceService,
     private dialogService: DialogService,
+	private route: ActivatedRoute,
+    private router: Router,
   ) {
     this.t_FicheTechniquesProduits = new MatTableDataSource<FicheTechniqueProduit>([]);
   }
@@ -71,16 +79,59 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     this.t_FicheTechniquesProduits.sort = this.sort;
   }
 
-  ngOnInit(): void {
-    console.log(this.ficheTechnique)
-    this.loadData();
+ngOnInit(): void {
+
+    // 1) Récupérer clientId dans l’URL
+    this.clientId = Number(this.route.snapshot.paramMap.get('clientId'));
+
+    // 2) Récupérer operation, fixeCategorie, ficheId dans les query params
+    const qp = this.route.snapshot.queryParamMap;
+
+    this.operation = qp.get('op') || this.operations.create;
+    this.fixeCategorie = Number(qp.get('cat')) || 14;
+
+    const ficheId = Number(qp.get('ficheId'));
+
+    // 3) Initialiser les formulaires AVANT les chargements async
     this.initFormCommandeClient_create();
     this.initFormFicheTechniquesProduit_create();
-    if (this.ficheTechnique) {
-      this.t_FicheTechniquesProduits.data = this.ficheTechnique?.produits_detail;
-      this.initFormCommandeClient_update();
+
+    // 4) Si on a un id de fiche, on la charge puis on remplit le formulaire
+    if (ficheId) {
+      this.ficheTechniquesService.getItem(ficheId).subscribe(ft => {
+        this.ficheTechnique = ft;
+
+        // lignes produits
+        this.t_FicheTechniquesProduits.data = ft.produits_detail ?? [];
+
+        // formulaire en mode update
+        this.initFormCommandeClient_update();
+
+        this.loadData();          // chargement clients / produits / statuts
+        this.updateCanAddProduit();
+      });
+    } else {
+      // mode création
+      this.loadData();
+      this.updateCanAddProduit();
+
+      // pré-positionner le client (transmis dans l’URL)
+      if (this.clientId) {
+        this.form_ficheTechnique.patchValue({ client: this.clientId });
+      }
     }
   }
+
+
+  private updateCanAddProduit(): void {
+    if (!this.ficheTechnique) {
+      this.canAddProduit = true;
+    } else {
+      this.canAddProduit = (this.ficheTechnique.statut?.id ?? 1) < 4;
+    }
+  }
+
+
 
   loadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
@@ -90,12 +141,19 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
       this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
       this.statutFicheTechnique = statutFicheTechniques.find(st => st.id === 1);
     });
-    this.clientService.getItems().subscribe((clients: Client[]) => {
-      this.clients = clients;
-    });
 
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
+
+      if (this.ficheTechnique) {
+        this.client = clients?.find(c => c.id === this.ficheTechnique?.client);
+        this.nomClient = this.client?.denomination_sociale;
+        this.form_ficheTechnique.patchValue({ client: this.client?.id });
+      } else if (this.clientId) {
+        this.client = clients?.find(c => c.id === this.clientId);
+        this.nomClient = this.client?.denomination_sociale;
+        this.form_ficheTechnique.patchValue({ client: this.client?.id });
+      }
     });
 
     this.produitService.getListItems().subscribe((produits: Produit[]) => {
@@ -135,12 +193,24 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     this.client = item;
   }
 
+  onTransmettre(){
+    const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();
+    miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
+    miseAJourStatutFiche.statut = 2;
+    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone:MiseAJourStatutFiche)=>{
+      this.msgMessageService.success("Fiche transmise avec succès !");
+    },error => {
+      this.dialogService.alert({message:error.message});
+    });
+  }
+
+
   initFormFicheTechniquesProduit_create() {
     this.form_ficheTechniquesProduit = this.formBuilder.group({
       id: [''],
-      designation: [''],
+      plage_numero: [''],
       quantite: ['1'],
-      produit: ['1'],
+      produit: [''],
     });
   }
 
@@ -156,7 +226,7 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
   onAdd() {
     const ficheTechniquesProduit: FicheTechniqueProduit = new FicheTechniqueProduit();
     const formValue = this.form_ficheTechniquesProduit.value;
-    ficheTechniquesProduit.designation = formValue['designation'];
+    ficheTechniquesProduit.plage_numero = formValue['plage_numero'];
     ficheTechniquesProduit.quantite = formValue['quantite'];
     ficheTechniquesProduit.produit = formValue['produit'];
     console.log(ficheTechniquesProduit);
@@ -189,13 +259,22 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
   onUpdate(ficheTechniquesProduit: FicheTechniqueProduit) {
     this.form_ficheTechniquesProduit = this.formBuilder.group({
       id: [ficheTechniquesProduit?.id],
-      designation: [ficheTechniquesProduit?.designation],
+      plage_numero: [ficheTechniquesProduit?.plage_numero],
       quantite: [ficheTechniquesProduit?.quantite],
       prix_unitaire: [ficheTechniquesProduit?.prix_unitaire],
     });
   }
 
-
+  onDelete(ficheTechniquesProduit: FicheTechniqueProduit) {
+    this.dialogService.yes_no({
+      title: 'Confirmation de la suppression',
+      message: 'Confirmez-vous supprimer ce produit de la commande ?'
+    }).subscribe(yes_no => {
+      if (yes_no === true) {
+        this.delete_ligneCommande(ficheTechniquesProduit);
+      }
+    });
+  }
 
   delete_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
     this.t_FicheTechniquesProduits.data = this.t_FicheTechniquesProduits.data.filter(p => p.id !== ficheTechniquesProduit.id);
@@ -244,7 +323,6 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
     formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
-
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
 
@@ -254,16 +332,6 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
       this.operation === operations.update
         ? this.ficheTechniquesService.update(this.ficheTechnique.id, formData)
         : this.ficheTechniquesService.create(formData);
-
-    request$.subscribe(
-      (data) => {
-        this.msgMessageService.success('Fiche technique enregistrée avec succès');
-
-      },
-      (error) => {
-        this.dialogService.alert({message: error.message});
-      }
-    );
 
     request$.subscribe(
       (data: FicheTechniques) => {
@@ -280,31 +348,21 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
         this.dialogService.alert({message: error.message});
       }
     );
-  }
-
-  onRetour() {
-    this.notifyActionOperation.emit(operations.table);
-    this.ficheTechnique = undefined;
-    this.notifyFicheTechnique.emit(this.ficheTechnique);
-  }
-
-  getProduit(id: number) {
-    return this.produits.find(p => p.id === id)?.libelle;
+	
   }
 
   getCategorieProduit(id: number) {
     return this.categories.find(p => p.id === id)?.libelle;
   }
 
-  onTransmettre(){
-    const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();
-    miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
-    miseAJourStatutFiche.statut = 2;
-    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone:MiseAJourStatutFiche)=>{
-      this.msgMessageService.success("Fiche transmise avec succès !");
-    },error => {
-      this.dialogService.alert({message:error.message});
-    });
+
+  onRetour() {
+    this.router.navigate(
+      ['/facture/client-direction-technique-detail', this.clientId]
+    );
   }
 
+  getProduit(id: number) {
+    return this.produits.find(p => p.id === id)?.libelle;
+  }
 }

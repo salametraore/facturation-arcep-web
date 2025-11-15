@@ -75,7 +75,7 @@
         <div class="blank-row"></div>
 
         <!-- ===== Sous-collection : Ajout d’un service ===== -->
-        <section class="list-box list-box--compact" *ngIf="ficheTechnique?.statut?.id<4">
+        <section class="list-box list-box--compact" *ngIf="ficheTechnique && ficheTechnique?.statut?.id<4">
           <div class="list-header">
             <h3 class="list-title">Ajout d'un service</h3>
           </div>

@@ -47,6 +47,7 @@ export class ClientCrudPrestationsDiversesComponent implements OnInit, AfterView
   clients: Client[];
   client: Client;
 
+  saveLocked = false;
 
   categories: CategorieProduit[];
   categoriesFiltered: CategorieProduit[];
@@ -366,9 +367,15 @@ export class ClientCrudPrestationsDiversesComponent implements OnInit, AfterView
         : this.ficheTechniquesService.create(formData);
 
     request$.subscribe(
-      (data) => {
+      (data: FicheTechniques) => {
         this.msgMessageService.success('Fiche technique enregistrée avec succès');
 
+        // 🔒 on bloque la sauvegarde après succès
+        this.saveLocked = true;
+
+        // (optionnel) on met à jour l'opération / la fiche en mémoire
+        this.operation = this.operations.update;
+        this.ficheTechnique = data;
       },
       (error) => {
         this.dialogService.alert({message: error.message});
@@ -376,13 +383,7 @@ export class ClientCrudPrestationsDiversesComponent implements OnInit, AfterView
     );
   }
 
-/*
-    onRetour() {
-      this.notifyActionOperation.emit(operations.table);
-      this.ficheTechnique = undefined;
-      this.notifyFicheTechnique.emit(this.ficheTechnique);
-    }
-  */
+
 
   onRetour() {
     this.router.navigate(

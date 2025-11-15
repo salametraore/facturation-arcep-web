@@ -51,6 +51,8 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   montant_de_la_commade: number = 0;
   produits: Produit[];
 
+  saveLocked = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private ficheTechniquesService: FicheTechniquesService,
@@ -274,14 +276,21 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
         : this.ficheTechniquesService.create(formData);
 
     request$.subscribe(
-      (data) => {
+      (data: FicheTechniques) => {
         this.msgMessageService.success('Fiche technique enregistrée avec succès');
 
+        // 🔒 on bloque la sauvegarde après succès
+        this.saveLocked = true;
+
+        // (optionnel) on met à jour l'opération / la fiche en mémoire
+        this.operation = this.operations.update;
+        this.ficheTechnique = data;
       },
       (error) => {
         this.dialogService.alert({message: error.message});
       }
     );
+
   }
 
   getCategorieProduit(id: number) {

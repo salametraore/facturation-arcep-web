@@ -64,6 +64,8 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
 
   private filterValues: FTListFilter = {};
 
+  saveLocked = false;
+
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
     private categorieProduitService: CategorieProduitService,

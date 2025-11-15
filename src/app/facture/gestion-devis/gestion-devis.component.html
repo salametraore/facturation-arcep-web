@@ -151,12 +151,12 @@
               </button>
               <mat-menu #menu="matMenu">
 
-                <button mat-menu-item (click)="crud(element, this.operations.details)">
+                <button mat-menu-item (click)="crud(element, operations.details)">
                   <mat-icon color="primary">info</mat-icon>
                   Détail
                 </button>
 
-                <button mat-menu-item   *ngIf="element.etat === 'EMIS'" (click)="crud(element, this.operations.update)">
+                <button mat-menu-item *ngIf="element.etat === 'EMIS'" (click)="crud(element, operations.update)">
                   <mat-icon color="primary">edit</mat-icon>
                   Modifier
                 </button>

@@ -17,9 +17,10 @@
         <!-- Actions globales
                          -->
         <div class="list-actions">
+
           <button mat-flat-button color="primary"
                   *ngIf="operation===operations.create || operation===operations.update"
-                  [disabled]="t_FicheTechniquesProduits.data?.length < 1"
+                  [disabled]="t_FicheTechniquesProduits.data?.length < 1  || saveLocked "
                   (click)="onSave()"
                   >
             <mat-icon>save</mat-icon> Enregistrer

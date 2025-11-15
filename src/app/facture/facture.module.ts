@@ -92,6 +92,7 @@ import {ClientCrudServiceAValeurAjouteComponent} from "./client-direction-techni
 import {ClientCrudAutorisationGeneraleComponent} from "./client-direction-technique/client-details/client-crud-autorisation-generale/client-crud-autorisation-generale.component";
 import {ClientCrudAgrementInstalleurComponent} from "./client-direction-technique/client-details/client-crud-agrement-installeur/client-crud-agrement-installeur.component";
 import {ClientCrudAgrementEquipementComponent} from "./client-direction-technique/client-details/client-crud-agrement-equipement/client-crud-agrement-equipement.component";
+import {ClientCrudNumerotationComponent} from "./client-direction-technique/client-details/client-crud-numerotation/client-crud-numerotation.component";
 
 
 @NgModule({
@@ -161,6 +162,7 @@ import {ClientCrudAgrementEquipementComponent} from "./client-direction-techniqu
     ClientCrudAutorisationGeneraleComponent,
     ClientCrudAgrementInstalleurComponent,
     ClientCrudAgrementEquipementComponent,
+    ClientCrudNumerotationComponent,
   ],
   imports: [
     CommonModule,

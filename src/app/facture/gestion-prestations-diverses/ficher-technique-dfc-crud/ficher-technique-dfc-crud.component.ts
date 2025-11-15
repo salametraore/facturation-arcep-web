@@ -54,6 +54,8 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
   public bouton_names = bouton_names;
   public data_operation: string = '';
 
+  saveLocked = false;
+
   displayedColumns: string[] = ['designation', 'prix_unitaire', 'quantite', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -307,14 +309,22 @@ export class FicherTechniqueDfcCrudComponent implements OnInit, AfterViewInit {
         : this.ficheTechniquesService.create(formData);
 
     request$.subscribe(
-      (data) => {
+      (data: FicheTechniques) => {
         this.msgMessageService.success('Fiche technique enregistrée avec succès');
 
+        // 🔒 on bloque la sauvegarde après succès
+        this.saveLocked = true;
+
+        // (optionnel) on met à jour l'opération / la fiche en mémoire
+        this.operation = this.operations.update;
+        this.ficheTechnique = data;
       },
       (error) => {
         this.dialogService.alert({message: error.message});
       }
     );
+
+
   }
 
   onRetour() {

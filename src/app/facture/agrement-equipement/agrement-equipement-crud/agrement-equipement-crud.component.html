@@ -21,7 +21,7 @@
             color="primary"
             *ngIf="operation===operations.create || operation===operations.update"
             (click)="onSave()"
-            [disabled]="t_FicheTechniquesProduits.data?.length<1">
+            [disabled]="t_FicheTechniquesProduits.data?.length<1   || saveLocked  ">
             <mat-icon>save</mat-icon>
             Enregistrer
           </button>

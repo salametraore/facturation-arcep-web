@@ -2,12 +2,12 @@
 <mat-card class="facture-edit">
 
   <div class="page-title">
-    <h2>Saisie et mise à jour — Facture / Devis</h2>
+    <h2>Saisie et mise à jour — Factures</h2>
   </div>
 
   <section class="list-box">
     <div class="list-header">
-      <h3 class="list-title">Fiche facture / devis</h3>
+      <h3 class="list-title">Fiche factures</h3>
 
       <div class="list-actions">
         <button
@@ -47,6 +47,7 @@
           </mat-form-field>
         </div>
 
+        <div class="blank-row"></div>
         <!-- Objet 70% | Signataire 30% -->
         <div class="row cols-70-30">
           <mat-form-field appearance="outline" class="w-full">
@@ -59,6 +60,8 @@
             <input matInput formControlName="signataire" placeholder="Signataire">
           </mat-form-field>
         </div>
+
+        <div class="blank-row"></div>
 
         <!-- Date réception 50% | Date échéance 50% -->
         <div class="row cols-50-50">
