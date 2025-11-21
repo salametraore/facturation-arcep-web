@@ -262,3 +262,14 @@ mat-expansion-panel {
   color: var(--brand-primary);
 }
 /* === end ARCEP theme touch-ups === */
+
+
+.sidenav {
+  width: 300px;
+}
+
+@media (max-width: 960px) {
+  .sidenav {
+    width: 220px;      // un peu plus étroit sur petits écrans
+  }
+}

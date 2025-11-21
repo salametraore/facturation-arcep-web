@@ -14,8 +14,7 @@ import {ClientService} from "../../../shared/services/client.service";
 
 @Component({
   selector: 'app-client-tables',
-  templateUrl: './client-tables.component.html',
-  styleUrl: './client-tables.component.scss'
+  templateUrl: './client-tables.component.html'
 })
 export class ClientTablesComponent implements OnInit, AfterViewInit {
 

@@ -174,6 +174,21 @@
           </client-details-factures>
         </mat-tab>
 
+        <!-- Impayes -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair">
+              <mat-icon>money_off</mat-icon>
+              <span>Liste Devis/Factures impayés</span>
+            </span>
+          </ng-template>
+
+          <client-details-impayes
+            [clientId]="clientId">
+          </client-details-impayes>
+        </mat-tab>
+
+
         <!-- Encaissements -->
         <mat-tab>
           <ng-template mat-tab-label>

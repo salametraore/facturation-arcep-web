@@ -8,7 +8,7 @@ import {operations} from "../../constantes";
 })
 export class FrequencesComponent {
 
-  fichetTechnique: FicheTechniques;
+  ficheTechnique: FicheTechniques;
 
   frequencesCategories = [1,2,3,4,5,6,7];
   operation: string = operations.table;
@@ -20,6 +20,7 @@ export class FrequencesComponent {
   }
 
   onGetFicheTechnique(ficheTechnique: FicheTechniques) {
-    this.fichetTechnique = ficheTechnique;
+    this.ficheTechnique = ficheTechnique;
   }
+
 }

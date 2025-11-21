@@ -24,8 +24,7 @@ import {AuthService} from "../../../../authentication/auth.service";
 
 @Component({
   selector: 'client-fiches-techniques',
-  templateUrl: './client-fiches-techniques.html',
-  styleUrl: './client-fiches-techniques.scss'
+  templateUrl: './client-fiches-techniques.html'
 })
 export class ClientFichesTechniques implements OnInit,AfterViewInit{
 

@@ -30,16 +30,16 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   @Input() operation: string;
   @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
   @Output() notifyActionOperation: EventEmitter<string> = new EventEmitter<string>();
-  clients: Client[];
+  clients: Client[]= [];
   client: Client;
-  categories: CategorieProduit[];
+  categories: CategorieProduit[]= [];
   categorie: CategorieProduit;
-  statutFicheTechniques: StatutFicheTechnique[];
+  statutFicheTechniques: StatutFicheTechnique[]= [];
   statutFicheTechnique: StatutFicheTechnique;
   form_ficheTechnique: FormGroup;
   form_ficheTechniquesProduit: FormGroup;
   t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
-  historiqueFicheTechniques:HistoriqueFicheTechnique[];
+  historiqueFicheTechniques:HistoriqueFicheTechnique[]= [];
 
   public operations = operations;
   public bouton_names = bouton_names;
@@ -49,7 +49,7 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   montant_de_la_commade: number = 0;
-  produits: Produit[];
+  produits: Produit[]= [];
 
   saveLocked = false;
 

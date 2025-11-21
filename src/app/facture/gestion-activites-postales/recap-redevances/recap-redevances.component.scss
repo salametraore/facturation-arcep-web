@@ -1,0 +1,176 @@
+/* src/app/facture/gestion-activites-postales/recap-redevances/recap-redevances.component.scss */
+
+.recap-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.3fr;
+  gap: 1.5rem;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-card,
+.redevance-card {
+  border-radius: 12px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.label {
+  font-weight: 500;
+  color: #777;
+}
+
+.value {
+  font-weight: 500;
+}
+
+.doc-row {
+  display: grid;
+  grid-template-columns: auto 90px 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.doc-type {
+  font-weight: 500;
+}
+
+.doc-name {
+  font-size: 0.95rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.total-row {
+  border-top: 1px solid #eee;
+}
+
+.label-total {
+  font-weight: 600;
+  padding-top: 0.35rem;
+}
+
+.col-taux {
+  width: 120px;
+}
+
+.col-montant {
+  width: 170px;
+}
+
+.taux-field {
+  width: 100%;
+}
+
+.redevance-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.flex-spacer {
+  flex: 1 1 auto;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+}
+
+.label-total {
+  font-size: 0.9rem;
+}
+
+.value-total {
+  font-size: 0.95rem;
+}
+
+/* Titres des cards en gras */
+.recap-grid .info-card mat-card-title,
+.recap-grid .redevance-card mat-card-title {
+  font-weight: 700;
+}
+
+/* largeur et alignement des colonnes numériques */
+.col-base {
+  width: 130px;
+}
+
+.col-taux {
+  width: 70px;
+}
+
+.col-montant {
+  width: 130px;
+}
+
+/* Appliquer l'alignement à la fois aux th et aux td */
+th.col-base,
+td.col-base,
+th.col-taux,
+td.col-taux,
+th.col-montant,
+td.col-montant {
+  text-align: right;
+  padding-right: 8px;
+}
+
+/* Entêtes rose pour tous les tableaux de la page recap */
+.recap-grid table.full-width th {
+  background-color: var(--brand-primary); /* ton rose ARCEP */
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 12px;
+}
+
+/* Bordures roses pour les cards de la page recap */
+.recap-grid .info-card,
+.recap-grid .redevance-card {
+  border: 1px solid var(--brand-primary);   /* rose ARCEP */
+  border-radius: 12px;
+  box-shadow: none;                         /* enlève l'ombre Material par défaut */
+}
+
+/* Optionnel : un peu d’espace entre les cards */
+.left-column .info-card + .info-card {
+  margin-top: 12px;
+}
+.right-column .redevance-card {
+  margin-left: 8px;
+}
+
+.recap-grid .info-card mat-card-title,
+.recap-grid .redevance-card mat-card-title {
+  display: block;
+  text-align: center;
+  margin-bottom: 8px;
+}

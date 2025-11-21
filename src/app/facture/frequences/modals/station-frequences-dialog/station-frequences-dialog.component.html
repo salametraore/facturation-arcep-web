@@ -1,0 +1,122 @@
+<div class="page-title">
+  <h2>{{ title }}</h2>
+</div>
+
+<mat-dialog-content [formGroup]="form" class="grid grid-cols-2 gap-4">
+
+  <!-- Type de station -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.type_station?.visible">
+    <mat-label>Type station</mat-label>
+    <mat-select
+      formControlName="type_station"
+      matTooltip="Type station">
+      <mat-option *ngFor="let item of typeStations" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Puissance -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.puissance?.visible">
+    <mat-label>Puissance</mat-label>
+    <input matInput type="number" formControlName="puissance">
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Nombre de stations -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.nbre_station?.visible">
+    <mat-label>Nombre de stations</mat-label>
+    <input matInput type="number" formControlName="nbre_station">
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Largeur de bande -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.largeur_bande?.visible">
+    <mat-label>Largeur de bande</mat-label>
+    <input matInput type="number" formControlName="largeur_bande">
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Unité de largeur de bande (MHz/kHz/…) -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.largeur_bande_unite?.visible">
+    <mat-label>Unité</mat-label>
+    <mat-select
+      formControlName="largeur_bande_unite"
+      matTooltip="Unité de largeur de bande">
+      <mat-option *ngFor="let u of largeurBandeUnites" [value]="u.id">
+        {{ u.libelle }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Débit -->
+  <!-- Débit -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.debit?.visible">
+    <mat-label>Débit</mat-label>
+    <input matInput type="number" formControlName="debit">
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Bande de fréquence -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.bande_frequence?.visible">
+    <mat-label>Bande de fréquence</mat-label>
+    <mat-select
+      formControlName="bande_frequence"
+      matTooltip="Bande de fréquence">
+      <mat-option *ngFor="let item of typeBandeFrequences" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Caractère commercial -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.caractere_commercial?.visible">
+    <mat-label>Caractère commercial</mat-label>
+    <mat-select formControlName="caractere_commercial">
+      <mat-option value="COMMERCIALE">Commercial</mat-option>
+      <mat-option value="NON_COMMERCIALE">Non commercial</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Nombre de tranches de facturation -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.nbre_tranche?.visible">
+    <mat-label>Nombre de tranches de facturation</mat-label>
+    <input matInput type="number" formControlName="nbre_tranche">
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Localité (sur 2 colonnes) -->
+  <mat-form-field appearance="outline" class="w-full col-span-2"
+                  *ngIf="stationCfg.localite?.visible">
+    <mat-label>Localité</mat-label>
+    <input matInput formControlName="localite">
+  </mat-form-field>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="warn" (click)="onCancel()">Annuler</button>
+  <button mat-flat-button color="primary" (click)="onSave()">Enregistrer</button>
+</mat-dialog-actions>

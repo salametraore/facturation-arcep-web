@@ -14,7 +14,7 @@ export class TypeStationService {
 
   /** Base normalisée: {baseUrl}/type-station */
   private get baseUrl(): string {
-    return `${this.cfg.baseUrl.replace(/\/$/, '')}/type-station`;
+    return `${this.cfg.baseUrl.replace(/\/$/, '')}/type-stations`;
   }
 
   getItem(id: number): Observable<TypeStation> {

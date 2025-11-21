@@ -19,7 +19,7 @@ import {ModePaiementService} from "../../../shared/services/mode-paiement.servic
 import {EncaissementsService} from "../../../shared/services/encaissements.service";
 import {Affectation, EncaissementDetail} from "../../../shared/models/encaissementDetail";
 import {FactureService} from "../../../shared/services/facture.service";
-import {Facture} from "../../../shared/models/facture";
+import {ClientFactureDevisImpayes, Facture} from "../../../shared/models/facture";
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
 import { forkJoin } from 'rxjs';
 
@@ -46,7 +46,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
   produits: Produit[];
   clients: Client[];
   modePaiements: ModePaiement[];
-  facturesImpayees: Facture[];
+  facturesImpayees: ClientFactureDevisImpayes[];
   public operations = operations;
   public bouton_names = bouton_names;
   public data_operation: string = '';
@@ -224,13 +224,13 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
   getInfosComplementaire(client: Client) {
     this.client = client;
     if (!this.encaissementDetail) {
-      this.factureService.getListeDevisEtFacturesImpayesByClientId(client.id).subscribe((impayes: Facture[]) => {
+      this.factureService.getListeDevisEtFacturesImpayesByClientId(client.id).subscribe((impayes: ClientFactureDevisImpayes[]) => {
         this.facturesImpayees =impayes;
         //this.facturesImpayees =factures;
         console.log(impayes);
         const affectations: AffectationX[] = this.facturesImpayees.map(f => ({
           facture_id: f.id,
-          date_affectation: f.date_echeance,
+          date_affectation: null,
           montant: f.montant,
           reference: f.reference,   // ← NEW
           objet: f.objet            // ← NEW
@@ -269,7 +269,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         }
       }, error => {
         console.log(error)
-        this.dialogService.alert({message: error.error});
+        this.dialogService.alert({message: error.error.message.message});
       });
     } else {
       this.encaissementsService.update(this.encaissementDetail?.id, encaissementDetail).subscribe(data => {
@@ -291,6 +291,17 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
   onImport() {
     // Logique pour importer des documents
     console.log('Importer des documents');
+  }
+
+  get montantEncaisseAffiche(): number {
+    // 1) en mise à jour ou détails : on a déjà encaissementDetail.montant
+    if (this.encaissementDetail && this.encaissementDetail.montant != null) {
+      return this.encaissementDetail.montant;
+    }
+
+    // 2) en création : on lit la valeur du formulaire
+    const m = this.firstFormGroup?.get('montant')?.value;
+    return Number(m) || 0;
   }
 
   onNewClient() {

@@ -1,0 +1,137 @@
+<section class="card-import-comptes">
+
+  <!-- En-tête -->
+  <header class="card-header">
+    <div>
+      <h2>Importation des comptes comptables</h2>
+      <div class="doc-subtitle" *ngIf="docNom">
+        <strong>{{ docNom }}</strong> – {{ docEntreprise }} – Exercice {{ docAnnee }}
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Recherche -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher un compte</mat-label>
+        <input
+          matInput
+          placeholder="N° de compte ou libellé"
+          (keyup)="applyFilter($any($event.target).value)"
+        />
+        <button mat-icon-button matSuffix disabled>
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Tout cocher / décocher -->
+      <button mat-stroked-button type="button" (click)="toggleAllSelection()">
+        {{ allSelected ? 'Tout décocher' : 'Tout cocher' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Tableau des comptes -->
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    class="mat-elevation-z1 full-width"
+  >
+
+    <!-- Colonne sélection -->
+    <ng-container matColumnDef="selectionne">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let c">
+        <mat-checkbox [(ngModel)]="c.selectionne"></mat-checkbox>
+      </td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <!-- Statut -->
+    <ng-container matColumnDef="statut">
+      <th mat-header-cell *matHeaderCellDef>Statut</th>
+      <td mat-cell *matCellDef="let c">
+        <span class="status-chip"
+              [ngClass]="{
+                'status-nouveau':   c.statut === 'NOUVEAU',
+                'status-existant':  c.statut === 'EXISTANT',
+                'status-modifie':   c.statut === 'MODIFIE'
+              }">
+          {{ c.statut }}
+        </span>
+      </td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <!-- N° Compte -->
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef>N° Compte</th>
+      <td mat-cell *matCellDef="let c">{{ c.numero }}</td>
+      <td mat-footer-cell *matFooterCellDef class="label-total">
+        Total général
+      </td>
+    </ng-container>
+
+    <!-- Libellé -->
+    <ng-container matColumnDef="libelle">
+      <th mat-header-cell *matHeaderCellDef>Libellé</th>
+      <td mat-cell *matCellDef="let c">{{ c.libelle }}</td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+<!--    &lt;!&ndash; Débit &ndash;&gt;
+    <ng-container matColumnDef="debit">
+      <th mat-header-cell *matHeaderCellDef>Débit</th>
+      <td mat-cell *matCellDef="let c" class="text-right">
+        {{ c.debit | number : '1.0-0' : 'fr-FR' }}
+      </td>
+      <td mat-footer-cell *matFooterCellDef class="text-right font-semibold">
+        {{ totalDebit | number : '1.0-0' : 'fr-FR' }}
+      </td>
+    </ng-container>-->
+
+    <!-- Crédit -->
+    <ng-container matColumnDef="credit">
+      <th mat-header-cell *matHeaderCellDef>Montant</th>
+      <td mat-cell *matCellDef="let c" class="text-right">
+        {{ c.credit | number : '1.0-0' : 'fr-FR' }}
+      </td>
+      <td mat-footer-cell *matFooterCellDef class="text-right font-semibold">
+        {{ totalCredit | number : '1.0-0' : 'fr-FR' }}
+      </td>
+    </ng-container>
+
+    <!-- Lignes / entêtes / pied -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row        *matRowDef="let row; columns: displayedColumns"></tr>
+    <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+  </table>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [pageSize]="10"
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons
+  >
+  </mat-paginator>
+
+  <!-- Résumé sélection + boutons navigation -->
+  <footer class="wizard-footer">
+    <div class="totaux-selection">
+<!--      <div>
+        Débit sélectionné :
+        <strong>{{ totalDebitSelectionne | number : '1.0-0' : 'fr-FR' }}</strong>
+      </div>-->
+      <div>
+        Total lignes sélectionnées :
+        <strong>{{ totalCreditSelectionne | number : '1.0-0' : 'fr-FR' }}</strong>
+      </div>
+    </div>
+
+    <div class="wizard-nav">
+      <button mat-button type="button" (click)="goPrev()">Précédent</button>
+      <button mat-flat-button color="primary" type="button" (click)="goNext()">
+        Suivant
+      </button>
+    </div>
+  </footer>
+</section>

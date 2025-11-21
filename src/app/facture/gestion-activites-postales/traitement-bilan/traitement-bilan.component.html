@@ -1,0 +1,90 @@
+<section class="card-comptes-bilan" [formGroup]="form">
+
+  <header class="card-header">
+    <div>
+      <h2>Traitement des comptes retenus</h2>
+      <div class="doc-subtitle" *ngIf="docNom">
+        <strong>{{ docNom }}</strong> – {{ docEntreprise }} – Exercice {{ docAnnee }}
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button mat-stroked-button type="button" (click)="toggleAllSelection()">
+        {{ allSelected ? 'Tout décocher' : 'Tout cocher' }}
+      </button>
+    </div>
+  </header>
+
+  <table
+    mat-table
+    [dataSource]="lignesFA.controls"
+    formArrayName="lignes"
+    class="mat-elevation-z1 full-width"
+  >
+
+    <!-- checkbox sélection -->
+    <ng-container matColumnDef="selectionne">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+        <mat-checkbox formControlName="selectionne"></mat-checkbox>
+      </td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <!-- numéro -->
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef>N° Compte</th>
+      <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+        {{ row.value.numero }}
+      </td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <!-- libellé -->
+    <ng-container matColumnDef="libelle">
+      <th mat-header-cell *matHeaderCellDef>Libellé</th>
+      <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+        {{ row.value.libelle }}
+      </td>
+      <td mat-footer-cell *matFooterCellDef class="label-total">Total général</td>
+    </ng-container>
+
+    <!-- montant -->
+    <ng-container matColumnDef="montant">
+      <th mat-header-cell *matHeaderCellDef>Montant</th>
+      <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i" class="text-right">
+        {{ row.value.montant | number:'1.0-0':'fr-FR' }}
+      </td>
+      <td mat-footer-cell *matFooterCellDef class="text-right font-semibold">
+        {{ totalMontant | number:'1.0-0':'fr-FR' }}
+      </td>
+    </ng-container>
+
+    <!-- montant estimé -->
+    <ng-container matColumnDef="montantEstime">
+      <th mat-header-cell *matHeaderCellDef>Montant estimé</th>
+      <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+        <mat-form-field appearance="outline" class="w-100">
+          <input matInput type="number" formControlName="montantEstime" />
+        </mat-form-field>
+      </td>
+      <td mat-footer-cell *matFooterCellDef class="text-right font-semibold">
+        {{ totalMontantEstime | number:'1.0-0':'fr-FR' }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row        *matRowDef="let row; columns: displayedColumns"></tr>
+    <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+  </table>
+
+  <footer class="wizard-footer">
+    <div></div>
+    <div class="wizard-nav">
+      <button mat-button type="button" (click)="goPrev()">Précédent</button>
+      <button mat-flat-button color="primary" type="button" (click)="goNext()">
+        Suivant
+      </button>
+    </div>
+  </footer>
+</section>

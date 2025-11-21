@@ -262,6 +262,17 @@ export class MainNavComponent implements OnInit {
           url: 'facture/agrement-installeur'
         },
         {
+          id: 2042,
+          direction: 3,
+          titre: 'Autorisations postales',
+          description: 'Autorisations postales',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/autorisations-postales'
+        },
+        {
           id: 2045,
           direction: 3,
           titre: 'Numérotation',
@@ -283,9 +294,9 @@ export class MainNavComponent implements OnInit {
           sous_menus: null,
           url: 'facture/agrement-equipement'
         },
-/*        {
+        {
           id: 2060,
-          direction: 333333,
+          direction: 3,
           titre: 'Fréquences',
           description: 'Fréquences',
           actif: 'OUI',
@@ -293,7 +304,18 @@ export class MainNavComponent implements OnInit {
           feuille: 1,
           sous_menus: null,
           url: 'facture/frequences'
-        },*/
+        },
+        {
+          id: 2060,
+          direction: 3,
+          titre: 'Activites postales',
+          description: 'Activites postales',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/activites-postales'
+        },
         {
           id: 2100,
           direction: 0,

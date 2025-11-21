@@ -183,7 +183,9 @@
           <div class="info-card info-card--center" style="margin-bottom:12px">
             <div><strong>{{ client?.denomination_sociale }}</strong></div>
             <div class="info-line">
-              <span>Montant encaissé : <strong>{{ encaissementDetail?.montant | number:'1.0-0' }} XOF</strong></span>
+              <span>Montant encaissé :
+                <strong>{{ montantEncaisseAffiche | number:'1.0-0' }} XOF</strong>
+              </span>
               <span>Montant affecté : <strong>{{ somme_affectee | number:'1.0-0' }} XOF</strong></span>
               <span>Crédit : <strong>{{ credit | number:'1.0-0' }} XOF</strong></span>
             </div>

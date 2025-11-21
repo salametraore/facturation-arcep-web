@@ -1,0 +1,7 @@
+
+<autorisations-postales-table *ngIf="operation===operations.table" (notifyActionOperation)="onGetOperation($event)"
+                               (notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></autorisations-postales-table>
+
+
+<autorisations-postales-crud *ngIf="operation!=operations.table" [operation]="operation"  [ficheTechnique]="fichetTechnique"   (notifyActionOperation)="onGetOperation($event)"
+                              (notifyFicheTechnique)="onGetFicheTechnique($event)" [fixeCategorie]="fixeCategorie"></autorisations-postales-crud>

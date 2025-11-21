@@ -93,6 +93,17 @@ import {ClientCrudAutorisationGeneraleComponent} from "./client-direction-techni
 import {ClientCrudAgrementInstalleurComponent} from "./client-direction-technique/client-details/client-crud-agrement-installeur/client-crud-agrement-installeur.component";
 import {ClientCrudAgrementEquipementComponent} from "./client-direction-technique/client-details/client-crud-agrement-equipement/client-crud-agrement-equipement.component";
 import {ClientCrudNumerotationComponent} from "./client-direction-technique/client-details/client-crud-numerotation/client-crud-numerotation.component";
+import {StationFrequencesDialogComponent} from "./frequences/modals/station-frequences-dialog/station-frequences-dialog.component";
+import {CanalFrequencesDialogComponent} from "./frequences/modals/canal-frequences-dialog/canal-frequences-dialog.component";
+import {ClientDetailsImapyesComponent} from "./client-direction-technique/client-details/client-details-impayes/client-details-impayes.component";
+import { ImportDocumentsComponent } from './gestion-activites-postales/import-documents/import-documents.component';
+import { ImportComptesComponent } from './gestion-activites-postales/import-comptes/import-comptes.component';
+import { TraitementBilanComponent } from './gestion-activites-postales/traitement-bilan/traitement-bilan.component';
+import { RecapRedevancesComponent } from './gestion-activites-postales/recap-redevances/recap-redevances.component';
+import {AutorisationsPostalesComponent} from "./autorisations-postales/autorisations-postales.component";
+import {AutorisationsPostalesTableComponent} from "./autorisations-postales/autorisations-postales-table/autorisations-postales-table.component";
+import {AutorisationsPostalesCrudComponent} from "./autorisations-postales/autorisations-postales-crud/autorisations-postales-crud.component";
+import {ImportDocumentDialogComponent} from "./gestion-activites-postales/import-document-dialog/import-document-dialog.component";
 
 
 @NgModule({
@@ -163,6 +174,18 @@ import {ClientCrudNumerotationComponent} from "./client-direction-technique/clie
     ClientCrudAgrementInstalleurComponent,
     ClientCrudAgrementEquipementComponent,
     ClientCrudNumerotationComponent,
+    FrequencesCrudComponent,
+    StationFrequencesDialogComponent,
+    CanalFrequencesDialogComponent,
+    ClientDetailsImapyesComponent,
+    ImportDocumentsComponent,
+    ImportComptesComponent,
+    TraitementBilanComponent,
+    RecapRedevancesComponent,
+    AutorisationsPostalesComponent,
+    AutorisationsPostalesTableComponent,
+    AutorisationsPostalesCrudComponent,
+    ImportDocumentDialogComponent,
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,92 @@
+<section class="card-import-docs">
+
+  <header class="card-header">
+    <h2>Importation des documents comptables</h2>
+
+    <div class="header-actions">
+      <!-- Recherche -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher</mat-label>
+        <input
+          matInput
+          placeholder="Nom du fichier ou entreprise"
+          (keyup)="applyFilter($any($event.target).value)"
+        />
+        <button mat-icon-button matSuffix disabled>
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Bouton Importer -->
+      <button mat-flat-button color="primary" type="button" (click)="onImporter()">
+        <mat-icon>file_upload</mat-icon>
+        Importer
+      </button>
+    </div>
+  </header>
+
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    class="mat-elevation-z1 full-width"
+  >
+
+    <!-- Nom du fichier -->
+    <ng-container matColumnDef="nomFichier">
+      <th mat-header-cell *matHeaderCellDef>Nom du fichier</th>
+      <td mat-cell *matCellDef="let doc">
+        {{ doc.nomFichier }}
+      </td>
+    </ng-container>
+
+    <!-- Entreprise -->
+    <ng-container matColumnDef="entreprise">
+      <th mat-header-cell *matHeaderCellDef>Client</th>
+      <td mat-cell *matCellDef="let doc">
+        {{ doc.ClientNom }}
+      </td>
+    </ng-container>
+
+    <!-- Année fiscale -->
+    <ng-container matColumnDef="anneeFiscale">
+      <th mat-header-cell *matHeaderCellDef>Année fiscale</th>
+      <td mat-cell *matCellDef="let doc">
+        {{ doc.anneeFiscale }}
+      </td>
+    </ng-container>
+
+    <!-- Date d’importation -->
+    <ng-container matColumnDef="dateImport">
+      <th mat-header-cell *matHeaderCellDef>Date d’importation</th>
+      <td mat-cell *matCellDef="let doc">
+        {{ doc.dateImport | date : 'd MMM y' : undefined : 'fr-FR' }}
+      </td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Action</th>
+      <td mat-cell *matCellDef="let doc">
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          (click)="traiter(doc)"
+        >
+          Traiter
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Lignes / entêtes -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row        *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator
+    [pageSize]="10"
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons
+  >
+  </mat-paginator>
+</section>

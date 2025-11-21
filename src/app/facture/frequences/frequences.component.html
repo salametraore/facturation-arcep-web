@@ -3,5 +3,21 @@
                                (notifyFicheTechnique)="onGetFicheTechnique($event)" [frequencesCategories]="frequencesCategories"></frequences-table>
 
 
-<frequences-crud *ngIf="operation!=operations.table" [operation]="operation"  [ficheTechnique]="fichetTechnique"   (notifyActionOperation)="onGetOperation($event)"
+<frequences-crud *ngIf="operation!=operations.table" [operation]="operation"  [ficheTechnique]="ficheTechnique"   (notifyActionOperation)="onGetOperation($event)"
                               (notifyFicheTechnique)="onGetFicheTechnique($event)" [frequencesCategories]="frequencesCategories"></frequences-crud>
+
+<!--<frequences-table
+  *ngIf="operation === operations.table"
+  (notifyActionOperation)="onGetOperation($event)"
+  (notifyFicheTechnique)="onGetFicheTechnique($event)"
+  [frequencesCategories]="frequencesCategories">
+</frequences-table>
+
+<frequences-crud
+  *ngIf="operation !== operations.table"
+  [operation]="operation"
+  [ficheTechnique]="ficheTechnique"
+  (notifyActionOperation)="onGetOperation($event)"
+  (notifyFicheTechnique)="onGetFicheTechnique($event)">
+</frequences-crud>-->
+

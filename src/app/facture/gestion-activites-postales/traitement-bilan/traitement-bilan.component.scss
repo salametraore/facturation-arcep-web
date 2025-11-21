@@ -1,0 +1,59 @@
+/* src/app/facture/gestion-activites-postales/traitement-bilan/comptes-bilan.component.scss */
+
+.card-comptes-bilan {
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.doc-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.label-total {
+  font-weight: 600;
+}
+
+.wizard-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wizard-nav {
+  display: flex;
+  gap: 0.75rem;
+}

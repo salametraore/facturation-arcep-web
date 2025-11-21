@@ -1,0 +1,54 @@
+/* ===== Styles du stepper fréquences ===== */
+
+:host ::ng-deep .mat-horizontal-stepper-header {
+  border-radius: 24px;
+  padding-inline: 12px 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* 🔹 STEP COURANT = fond blanc, contour rose, texte noir */
+:host ::ng-deep .mat-horizontal-stepper-header.mat-step-header-selected {
+  background-color: #fff;                              /* fond blanc */
+  border: 2px solid var(--brand-primary, #FF6B8E);     /* contour rose fort */
+  color: #111;
+  opacity: 1;
+  box-shadow: none;
+}
+
+/* pastille numérotée du step courant */
+:host ::ng-deep .mat-horizontal-stepper-header.mat-step-header-selected .mat-step-icon {
+  background-color: #fff;
+  border: 2px solid var(--brand-primary, #FF6B8E);     /* cercle rose */
+  color: var(--brand-primary, #FF6B8E);
+  font-weight: 700;
+}
+
+/* label de l’onglet courant : bien noir et gras */
+:host ::ng-deep .mat-horizontal-stepper-header.mat-step-header-selected
+.mat-step-text-label,
+:host ::ng-deep .mat-horizontal-stepper-header.mat-step-header-selected
+.mat-step-label {
+  color: #111 !important;                             /* noir/gris très foncé */
+  font-weight: 700;
+}
+
+/* 🔸 Steps NON sélectionnés : plus discrets */
+:host ::ng-deep .mat-horizontal-stepper-header:not(.mat-step-header-selected) {
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  opacity: 0.6;
+}
+
+:host ::ng-deep .mat-horizontal-stepper-header:not(.mat-step-header-selected)
+.mat-step-text-label,
+:host ::ng-deep .mat-horizontal-stepper-header:not(.mat-step-header-selected)
+.mat-step-label {
+  color: #999;
+}
+
+:host ::ng-deep .mat-horizontal-stepper-header:not(.mat-step-header-selected)
+.mat-step-icon {
+  background-color: #fff;
+  border: 1px solid rgba(255, 107, 142, 0.5);
+  color: var(--brand-primary, #FF6B8E);
+}

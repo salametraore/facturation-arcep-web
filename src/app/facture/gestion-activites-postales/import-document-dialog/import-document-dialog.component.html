@@ -1,0 +1,117 @@
+<!-- src/app/facture/activites-postales/import-document-dialog/import-document-dialog.component.html -->
+<mat-card>
+
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Importation d'un document comptable</h2>
+  </div>
+
+  <div>
+
+    <mat-dialog-content class="dialog-body">
+
+      <section class="list-box">
+
+        <div class="list-body">
+          <form [formGroup]="form" class="form-grid">
+
+            <!-- Client -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Client</mat-label>
+              <mat-select formControlName="client" matTooltip="Client concerné">
+                <mat-option *ngFor="let c of clients" [value]="c.id">
+                  {{ c.denomination_sociale || c.raison_sociale || c.nom }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="blank-row"></div>
+
+            <!-- Titre section : Paramètres comptables -->
+            <!-- Année fiscale -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Année fiscale</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="anne_fiscale"
+                placeholder="Année fiscale"
+              />
+            </mat-form-field>
+
+            <div class="blank-row"></div>
+
+            <!-- Date d'importation -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Date d'importation</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerStart"
+                formControlName="date_emission"
+                matTooltip="Date d'importation du document"
+                placeholder="Date d'importation"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+              <mat-datepicker #pickerStart></mat-datepicker>
+            </mat-form-field>
+
+            <div class="blank-row"></div>
+
+            <!-- Nom interne -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Nom du document</mat-label>
+              <input
+                matInput
+                formControlName="nom"
+                placeholder="Libellé interne du document"
+              />
+            </mat-form-field>
+
+            <div class="blank-row"></div>
+
+            <!-- Titre section : Fichier -->
+            <div class="form-section-title">
+              Fichier comptable
+            </div>
+
+            <!-- Fichier -->
+            <div class="file-field">
+              <label for="file-input">Fichier comptable (Excel / CSV…)</label>
+              <input
+                id="file-input"
+                type="file"
+                (change)="onFileChange($event)"
+                accept=".xlsx,.xls,.csv"
+              />
+              <div class="file-name" *ngIf="selectedFile">
+                Fichier sélectionné : {{ selectedFile.name }}
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="form-actions">
+      <button mat-flat-button color="warn" type="button" (click)="onCancel()">
+        Annuler
+      </button>
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="onSubmit()"
+        [disabled]="isSubmitting"
+      >
+        <mat-icon>file_upload</mat-icon>
+        Importer
+      </button>
+    </mat-dialog-actions>
+
+
+  </div>
+</mat-card>
+

@@ -1,0 +1,91 @@
+.card-import-comptes {
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.doc-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-field {
+  width: 260px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.label-total {
+  font-weight: 600;
+}
+
+.wizard-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.totaux-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.wizard-nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+
+.status-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.status-nouveau {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.status-existant {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-modifie {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+

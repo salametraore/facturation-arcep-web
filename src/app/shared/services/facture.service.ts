@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import {Facture, GenererRedevanceRequest} from '../models/facture';
+import {ClientFactureDevisImpayes, Facture, GenererRedevanceRequest} from '../models/facture';
 import { RequestGenererFacture } from '../models/ficheTechniques';
 import { AppConfigService } from '../../core/config/app-config.service';
 
@@ -103,8 +103,8 @@ export class FactureService {
     return this.http.get(`${this.cfg.baseUrl}/factures-annuler/${facture_id}/`);
   }
 
-  getListeDevisEtFacturesImpayesByClientId(id: number): Observable<Facture[]> {
-    return this.http.get<Facture[]>(`${this.cfg.baseUrl}/client-factures-devis-impayes/${id}/`);
+  getListeDevisEtFacturesImpayesByClientId(id: number): Observable<ClientFactureDevisImpayes[]> {
+    return this.http.get<ClientFactureDevisImpayes[]>(`${this.cfg.baseUrl}/client-factures-devis-impayes/${id}/`);
   }
 
 }

@@ -34,12 +34,11 @@ interface FTListFilter {
 
 @Component({
   selector: 'frequences-table',
-  templateUrl: './frequences-table.component.html',
-  styleUrl: './frequences-table.component.scss'
+  templateUrl: './frequences-table.component.html'
 })
 export class FrequencesTableComponent implements OnInit, AfterViewInit {
 
-  @Input() frequencesCategories: number;
+  @Input() frequencesCategories: number[] = [1,2,3,4,5,6,7];
 
   @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
   @Output() notifyActionOperation: EventEmitter<string> = new EventEmitter<string>();
@@ -107,11 +106,11 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
       }
 
       // 2) Service/Produit (si un id produit existe sur la ligne)
-/*      if (f.serviceId != null) {
-        const produitId = (row as any).produit ?? (row as any).produit_id ?? null;
-        if (produitId != null && produitId !== f.serviceId) return false;
-        // si la ligne ne porte pas l'info produit, on ne bloque pas
-      }*/
+      /*      if (f.serviceId != null) {
+              const produitId = (row as any).produit ?? (row as any).produit_id ?? null;
+              if (produitId != null && produitId !== f.serviceId) return false;
+              // si la ligne ne porte pas l'info produit, on ne bloque pas
+            }*/
 
       if (f.serviceId != null) {
         const topLevelProduit = (row as any).produit ?? (row as any).produit_id ?? null;
@@ -150,7 +149,7 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
 
   reloadData() {
 
-    const FREQUENCES_CATEGORIES = new Set<number>([1,2,3,4,5,6,7]);
+    const FREQUENCES_CATEGORIES = new Set<number>(this.frequencesCategories ?? [1,2,3,4,5,6,7]);
 
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories = categories;

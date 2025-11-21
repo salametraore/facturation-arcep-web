@@ -59,8 +59,10 @@ export class DevisService {
   }
 
   genererFactureFromDevis(devis_id: number) {
-    const url = `${this.cfg.baseUrl}/generate-pdf/${devis_id}/`;
-    return this.http.get<GenererFactureFromDevisResponse>(url);
+    const url = `${this.cfg.baseUrl}/generer-facture-from-devis/`;
+    return this.http.post<GenererFactureFromDevisResponse>(url, {
+      devis_id: devis_id
+    });
   }
 
   genererDevisPDF(devis_id: number) {

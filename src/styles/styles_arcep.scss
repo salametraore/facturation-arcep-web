@@ -1711,3 +1711,141 @@ dashboard resumé client
     flex-direction: column;
   }
 }
+
+.category-tabs {
+  margin-bottom: 0.75rem;
+}
+
+/* Barre d’actions alignée à droite (Retour / Continuer / Enregistrer…) */
+.actions-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;      /* espacement horizontal entre les boutons */
+  margin-top: 0.75rem; /* équivalent à mt-3 */
+}
+
+/* Barre de type "toolbar" en haut des sections (boutons Ajouter …) */
+.toolbar-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem; /* léger espace sous la barre */
+}
+
+/* Variante pour la barre de boutons du step 4 */
+.actions-right--bottom {
+  margin-bottom: 0.75rem;
+}
+
+/** recap frequence **/
+.recap-container {
+  padding: 1rem 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recap-card {
+  border-radius: 12px;
+  padding: 16px 20px;
+  background: #fff;
+
+  /* 🔹 Bordure rose visible */
+  border: 1px solid var(--brand-primary, #FF6B8E);
+
+  /* Ombre légère uniquement pour le relief */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.recap-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.recap-dl {
+  display: grid;
+  grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+  row-gap: 0.25rem;
+  column-gap: 1.5rem;
+}
+
+.recap-dl dt {
+  font-weight: 600;
+  color: #555;
+}
+
+.recap-dl dd {
+  margin: 0;
+}
+
+.recap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.recap-count {
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.recap-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.recap-list li + li {
+  margin-top: 0.25rem;
+}
+
+.recap-empty {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #777;
+}
+
+.recap-actions {
+  margin-top: 1.5rem;
+}
+
+.recap-table-wrapper {
+  margin-top: 0.75rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.recap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  /* 🔹 Bordure externe du tableau en rose */
+  border: 1px solid var(--brand-primary, #FF6B8E);
+}
+
+.recap-table th,
+.recap-table td {
+  padding: 4px 6px;
+
+  /* 🔹 Lignes internes en rose adouci */
+  border-bottom: 1px solid rgba(255, 107, 142, 0.35);
+  text-align: left;
+}
+
+.recap-table th {
+  font-weight: 600;
+
+  /* 🔹 Fond d’en-tête rosé très léger */
+  background: rgba(255, 107, 142, 0.08);
+}
+
+
+
+
+
+
+

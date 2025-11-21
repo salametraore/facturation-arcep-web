@@ -1,0 +1,140 @@
+<section class="recap-grid" *ngIf="entreprise && document">
+
+  <!-- ===== Colonne gauche : infos + lignes retenues ===== -->
+  <div class="left-column">
+
+    <!-- Infos entreprise -->
+    <mat-card class="redevance-card">
+      <mat-card-title>Informations sur l’opérateur</mat-card-title>
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Client</span>
+          <span class="value">{{ entreprise.ClientNom }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Année fiscale</span>
+          <span class="value">{{ entreprise.anneeFiscale }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Type d’opérateur</span>
+          <span class="value">{{ entreprise.typeOperateur }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- 🔻 Bloc "Document comptable utilisé" SUPPRIMÉ -->
+
+    <!-- Lignes retenues -->
+      <mat-card class="redevance-card">
+        <mat-card-title>Lignes comptables retenues</mat-card-title>
+        <mat-card-content>
+          <table
+            mat-table
+            [dataSource]="lignesRetenues"
+            class="full-width"
+          >
+
+            <ng-container matColumnDef="numero">
+              <th mat-header-cell *matHeaderCellDef>N° Compte</th>
+              <td mat-cell *matCellDef="let l">{{ l.numero }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="libelle">
+              <th mat-header-cell *matHeaderCellDef>Libellé</th>
+              <td mat-cell *matCellDef="let l">{{ l.libelle }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="montantRetenu">
+              <th mat-header-cell *matHeaderCellDef>Montant retenu</th>
+              <td mat-cell *matCellDef="let l" class="text-right">
+                {{ l.montantRetenu | number : '1.0-0' : 'fr-FR' }} FCFA
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="displayedLignesColumns"
+            ></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedLignesColumns"
+            ></tr>
+          </table>
+
+          <!-- ✅ Total sous le tableau -->
+          <div class="total-row">
+            <span class="label-total">Total des montants retenus</span>
+            <span class="value-total">
+        {{ totalMontantRetenu | number : '1.0-0' : 'fr-FR' }} FCFA
+      </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+  </div>
+
+  <!-- ===== Colonne droite : ventilation des redevances ===== -->
+  <div class="right-column" [formGroup]="form">
+    <mat-card class="redevance-card">
+      <mat-card-title>Ventilation des redevances</mat-card-title>
+
+      <mat-card-content>
+        <table class="full-width" formArrayName="redevances">
+          <thead>
+          <tr>
+            <th>Nature</th>
+            <th class="col-base text-right">Base taxable</th>
+            <th class="col-taux text-right">% Taux</th>
+            <th class="col-montant text-right">Montant dû</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr
+            *ngFor="let fg of redevancesFA.controls; let i = index"
+            [formGroupName]="i"
+          >
+            <td>{{ fg.controls.nature.value }}</td>
+
+            <td class="col-base text-right">
+              {{ totalMontantRetenu | number : '1.0-0' : 'fr-FR' }}&nbsp;FCFA
+            </td>
+
+            <td class="col-taux text-right">
+              {{ fg.controls.taux.value | number : '1.1-1' : 'fr-FR' }}&nbsp;%
+            </td>
+
+            <td class="col-montant text-right">
+              {{ fg.controls.montantDu.value | number : '1.0-0' : 'fr-FR' }}&nbsp;FCFA
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <!-- 🔽 Total à reverser sous le tableau, comme à gauche -->
+        <div class="total-row">
+          <span class="label-total">Total à reverser</span>
+          <span class="value-total">
+        {{ totalMontantDu | number : '1.0-0' : 'fr-FR' }} FCFA
+      </span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="redevance-actions">
+
+        <span class="flex-spacer"></span>
+
+        <button mat-button type="button" (click)="goPrev()">
+          Précédent
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="onTransmettre()"
+        >
+          Valider
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</section>

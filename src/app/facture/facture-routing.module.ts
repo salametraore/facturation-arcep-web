@@ -39,6 +39,12 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import {ClientCrudAgrementInstalleurComponent} from "./client-direction-technique/client-details/client-crud-agrement-installeur/client-crud-agrement-installeur.component";
  import {ClientCrudAgrementEquipementComponent} from "./client-direction-technique/client-details/client-crud-agrement-equipement/client-crud-agrement-equipement.component";
  import {ClientCrudNumerotationComponent} from "./client-direction-technique/client-details/client-crud-numerotation/client-crud-numerotation.component";
+ import { ImportDocumentsComponent } from './gestion-activites-postales/import-documents/import-documents.component';
+ import { ImportComptesComponent } from './gestion-activites-postales/import-comptes/import-comptes.component';
+ import { TraitementBilanComponent } from './gestion-activites-postales/traitement-bilan/traitement-bilan.component';
+ import { RecapRedevancesComponent } from './gestion-activites-postales/recap-redevances/recap-redevances.component';
+ import {AutorisationsPostalesComponent} from "./autorisations-postales/autorisations-postales.component";
+
 
 const routes: Routes = [
   {
@@ -63,6 +69,7 @@ const routes: Routes = [
       {path: 'prestations-divers', component: FicherTechniqueDfcComponent},
       {path: 'service-a-valeur-ajoute', component: ServiceAValeurAjouteComponent},
       {path: 'autorisation-generale', component: AutorisationGeneraleComponent},
+      {path: 'autorisations-postales', component: AutorisationsPostalesComponent},
       {path: 'agrement-installeur', component:AgrementInstalleurComponent},
       {path: 'numerotation', component:NumerotationComponent},
       {path: 'agrement-equipement', component:AgrementEquipementComponent},
@@ -77,6 +84,25 @@ const routes: Routes = [
       {path: 'client-crud-autorisation-generale/:clientId', component: ClientCrudAutorisationGeneraleComponent },
       {path: 'client-crud-agrement-installeur/:clientId', component: ClientCrudAgrementInstalleurComponent },
       {path: 'client-crud-agrement-equipement/:clientId', component: ClientCrudAgrementEquipementComponent },
+      {
+        path: 'activites-postales',
+        children: [
+
+          // [2] Import des comptes
+          { path: ':id/comptes', component: ImportComptesComponent },
+
+          // [3] Traitement / Bilan
+          { path: ':id/traitement', component: TraitementBilanComponent },
+
+          // [4] Récap redevances
+          { path: ':id/recap', component: RecapRedevancesComponent },
+
+          // [1] Liste des documents
+          { path: '', component: ImportDocumentsComponent },
+
+        ]
+      },
+
     ]
   }
 ];
