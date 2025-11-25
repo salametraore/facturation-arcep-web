@@ -104,6 +104,13 @@ import {AutorisationsPostalesComponent} from "./autorisations-postales/autorisat
 import {AutorisationsPostalesTableComponent} from "./autorisations-postales/autorisations-postales-table/autorisations-postales-table.component";
 import {AutorisationsPostalesCrudComponent} from "./autorisations-postales/autorisations-postales-crud/autorisations-postales-crud.component";
 import {ImportDocumentDialogComponent} from "./gestion-activites-postales/import-document-dialog/import-document-dialog.component";
+import {ClientDfcComponent} from "./client-dfc/client-dfc.component";
+import {ClientDfcDetailsComponent} from "./client-dfc/client-dfc-details/client-dfc-details.component";
+import {ClientDfcDetailsReleveCompteComponent} from "./client-dfc/client-dfc-details/client-dfc-details-releve-compte/client-dfc-details-releve-compte.component";
+import {ClientDfcDetailsImapyesComponent} from "./client-dfc/client-dfc-details/client-dfc-details-impayes/client-dfc-details-impayes.component";
+import {ClientDfcDetailsFacturesComponent} from "./client-dfc/client-dfc-details/client-dfc-details-factures/client-dfc-details-factures.component";
+import {ClientDfcDetailsEncaissementsComponent} from "./client-dfc/client-dfc-details/client-dfc-details-encaissements/client-dfc-details-encaissements.component";
+import {ClientDfcDetailsDevisComponent} from "./client-dfc/client-dfc-details/client-dfc-details-devis/client-dfc-details-devis.component";
 
 
 @NgModule({
@@ -186,6 +193,13 @@ import {ImportDocumentDialogComponent} from "./gestion-activites-postales/import
     AutorisationsPostalesTableComponent,
     AutorisationsPostalesCrudComponent,
     ImportDocumentDialogComponent,
+    ClientDfcComponent,
+    ClientDfcDetailsComponent,
+    ClientDfcDetailsReleveCompteComponent,
+    ClientDfcDetailsImapyesComponent,
+    ClientDfcDetailsFacturesComponent,
+    ClientDfcDetailsEncaissementsComponent,
+    ClientDfcDetailsDevisComponent,
   ],
   imports: [
     CommonModule,

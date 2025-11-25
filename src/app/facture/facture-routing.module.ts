@@ -28,6 +28,8 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import {GenerationRedevanceComponent} from "./generation-redevance/generation-redevance.component";
  import {FrequencesComponent} from "./frequences/frequences.component";
  import {ClientDirectionTechniqueComponent} from "./client-direction-technique/client-direction-technique.component";
+ import {ClientDfcComponent} from "./client-dfc/client-dfc.component";
+ import {ClientDfcDetailsComponent} from "./client-dfc/client-dfc-details/client-dfc-details.component";
  import {ClientPage} from "./client-dt/client";
  import {ClientDetailPage} from "./client-dt/client-detail";
  import {ClientResolver} from "./client-direction-technique/client-details/client.resolver";
@@ -102,6 +104,9 @@ const routes: Routes = [
 
         ]
       },
+
+      {path: 'client-dfc', component:ClientDfcComponent},
+      {path: 'client-dfc-detail/:id', component:ClientDfcDetailsComponent, resolve: { client: ClientResolver }},
 
     ]
   }

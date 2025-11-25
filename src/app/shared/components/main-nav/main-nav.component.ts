@@ -388,6 +388,17 @@ export class MainNavComponent implements OnInit {
           sous_menus: null,
           url: 'facture/encaissement'
         },
+        {
+          id: 3100,
+          direction: 0,
+          titre: 'Clients',
+          description: 'Clients',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/client-dfc'
+        },
       ]
     },
     {

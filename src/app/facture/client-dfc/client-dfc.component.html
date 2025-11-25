@@ -1,0 +1,134 @@
+<!-- src/app/features/recouvrement/fiches-clients/fiches-clients-list-page.component.html -->
+
+<mat-card>
+
+  <!-- En-tête dashboard -->
+  <div class="page-title">
+    <h2>Clients</h2>
+  </div>
+
+  <!-- Filtres compacts et centrés -->
+  <div class="filters-client-dashboard">
+    <div class="filters-client-dashboard-grid">
+
+      <!-- Client (autocomplete) -->
+      <mat-form-field class="client-field">
+        <mat-label>Nom du client</mat-label>
+        <input
+          matInput
+          placeholder="Nom du client"
+          matTooltip="Nom du client"
+          [matAutocomplete]="auto_cl"
+          [(ngModel)]="nomClient"
+          (keyup.enter)="chercher()"
+          (blur)="chercher()">
+        <!-- blur = appeler chercher() quand on quitte le champ -->
+        <mat-autocomplete #auto_cl="matAutocomplete">
+          <mat-option
+            *ngFor="let item of clients | search: nomClient"
+            [value]="item.denomination_sociale"
+            (onSelectionChange)="onClientSelectionChange($event, item)">
+            <span>{{ item.denomination_sociale }}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <!-- Boutons actions filtres -->
+      <button mat-mini-fab color="primary" class="action-btn" (click)="chercher()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button mat-mini-fab color="primary" class="action-btn" (click)="reset()">
+        <mat-icon>cached</mat-icon>
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- Tableau principal -->
+  <div class="mat-elevation-z10 compact-table">
+    <table
+      mat-table
+      [dataSource]="t_RecouvDashboardClient"
+      matSort
+      style="width: 100%">
+
+      <!-- Client -->
+      <ng-container matColumnDef="client">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+        <td mat-cell *matCellDef="let element">{{ element.client }}</td>
+      </ng-container>
+
+      <!-- Compte comptable -->
+      <ng-container matColumnDef="compte_comptable">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Compte comptable</th>
+        <td mat-cell *matCellDef="let element">{{ element.compte_comptable }}</td>
+      </ng-container>
+
+      <!-- Nombre factures impayées -->
+      <ng-container matColumnDef="nbre_factures_impayes">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nbr factures impayées</th>
+        <td mat-cell *matCellDef="let element">{{ element.nbre_factures_impayes }}</td>
+      </ng-container>
+
+      <!-- Total impayé -->
+      <ng-container matColumnDef="total_du">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Total impayé</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.total_du | number:'1.0-0' }}
+        </td>
+      </ng-container>
+
+      <!-- Crédit (avance) -->
+      <ng-container matColumnDef="avance_du">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Crédit</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.avance_du | number:'1.0-0' }}
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
+            <mat-icon>settings</mat-icon>
+          </button>
+
+          <mat-menu #menu="matMenu">
+
+            <button mat-menu-item (click)="onViewClient(element)">
+              <mat-icon color="primary">visibility</mat-icon>
+              Voir Détails Client
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <!-- Lignes -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let element; columns: displayedColumns"
+        (click)="onRowClicked(element)"
+        [ngClass]="{ 'selected': element === selectedRow }">
+      </tr>
+
+      <!-- Ligne vide -->
+      <tr mat-row *matNoDataRow>
+        <td class="mat-cell" colspan="6">
+          Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+        </td>
+      </tr>
+
+    </table>
+
+    <!-- Pagination -->
+    <mat-paginator
+      [pageSizeOptions]="[3, 5, 10, 15]"
+      [pageSize]="5"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+</mat-card>

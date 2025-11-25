@@ -39,6 +39,7 @@ export class Devis {
   periode_debut?: string;           // optionnel
   periode_fin?: string;             // optionnel
   prorata_valeur?: number;          // optionnel
+  encaissable: boolean;
 }
 
 export class GenererFactureFromDevisResponse {

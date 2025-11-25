@@ -5,6 +5,7 @@ export class Facture {
   reference?:string;
   date_echeance?: Date;
   montant?: number;
+  montant_restant?: number;
   etat?: string;
   objet?:string;
   client?: number;
@@ -54,7 +55,12 @@ export class ClientFactureDevisImpayes {
 
   // infos de la pièce
   reference!: string;
+
   objet!: string;
+
   date_emission!: string;   // ISO string (ex: '2025-11-17')
+
   montant!: number;
+
+  montant_restant!: number;
 }

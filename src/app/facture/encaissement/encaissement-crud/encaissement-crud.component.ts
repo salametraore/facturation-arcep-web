@@ -21,11 +21,18 @@ import {Affectation, EncaissementDetail} from "../../../shared/models/encaisseme
 import {FactureService} from "../../../shared/services/facture.service";
 import {ClientFactureDevisImpayes, Facture} from "../../../shared/models/facture";
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import {DevisService} from "../../../shared/services/devis.service";
+import {Devis} from "../../../shared/models/devis";
 
-type AffectationX = Affectation & {
+
+export type TypeLigne = 'FACTURE' | 'DEVIS';
+
+export type AffectationX = Affectation & {
   reference?: string;
   objet?: string;
+  type_ligne?: TypeLigne;
+  montant_restant?: number;
 };
 
 
@@ -53,7 +60,8 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
   errorMessage: any;
   t_Affectation1?: MatTableDataSource<Affectation>;
   t_Affectation2?: MatTableDataSource<Affectation>;
-  displayedColumns: string[] = ['facture_id', 'reference', 'objet', 'date_affectation', 'montant', 'montant_affecte'];
+  ///displayedColumns: string[] = ['type_ligne', 'reference', 'objet', 'date_affectation', 'montant','montant_restant', 'montant_affecte'];
+  displayedColumns: string[] = ['type_ligne', 'reference', 'objet', 'date_affectation', 'montant', 'montant_affecte'];
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('paginator2') paginator2!: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -73,6 +81,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
     private encaissementsService: EncaissementsService,
     private modePaiementService: ModePaiementService,
     private factureService: FactureService,
+    private devisService: DevisService,
     public dialog: MatDialog,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
@@ -123,42 +132,76 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Appel unitaire par facture_id (forkJoin)
-    const calls = affs.map(a => this.factureService.getItem(a.facture_id)); // ou getById(...) selon ton service
+    const calls = affs.map(a => {
+      if (a.facture_id) {
+        return this.factureService.getItem(a.facture_id);   // Observable<Facture>
+      }
+      if (a.devis_id) {
+        return this.devisService.getItem(a.devis_id);       // Observable<Devis>
+      }
+      return of(null);
+    });
 
-    // important : importer forkJoin
-    // import { forkJoin } from 'rxjs';
     forkJoin(calls).subscribe({
-      next: (factures: Facture[]) => {
-        const merged: AffectationX[] = affs.map(a => {
-          const f = factures.find(ff => ff.id === a.facture_id);
+      next: (docs: (Facture | Devis | null)[]) => {
+
+        const merged: AffectationX[] = affs.map((a, index) => {
+          const doc = docs[index];
+
+          const reference = (doc as any)?.reference;
+          const objet = (doc as any)?.objet;
+
+          // montant vient du doc (Facture ou Devis)
+          const montantDoc = (doc as any)?.montant as number | undefined;
+          // montant_restant uniquement sur la facture
+          const factureDoc = a.facture_id ? (doc as Facture | null) : null;
+          const montantRestantFacture = factureDoc?.montant_restant ?? null;
+
+          const type_ligne: TypeLigne | undefined =
+            a.facture_id ? 'FACTURE' :
+              a.devis_id   ? 'DEVIS'   :
+                undefined;
+
+          const ax = a as AffectationX;
+
+          // Montant affiché : priorité au montant venant des impayés, puis du doc
+          const montantFinal = a.montant ?? montantDoc ?? 0;
+
+          // Montant restant dérivé :
+          // - si ax.montant_restant existe (par ex. DTO impayés), on le garde
+          // - sinon, pour une facture, on prend montant_restant de la facture si dispo
+          // - sinon, on prend montantFinal
+          const montantRestantFinal =
+            ax.montant_restant ??
+              montantRestantFacture ??
+                montantFinal;
+
           return {
             ...a,
-            reference: f?.reference,
-            objet: f?.objet,
-            // au besoin, on peut aussi fiabiliser montant/date depuis la facture:
-            montant: (a as any).montant ?? f?.montant,
-            date_affectation: a.date_affectation ?? f?.date_echeance,
+            type_ligne,
+            reference: ax.reference ?? reference ?? '',
+            objet: ax.objet ?? objet ?? '',
+            montant: montantFinal,
+            montant_restant: montantRestantFinal,
+            date_affectation: (a.date_affectation ?? (doc as any)?.date_echeance ?? null) as any,
           };
         });
 
         this.t_Affectation1.data = [...merged];
         this.t_Affectation2.data = [...merged];
 
-        // recalcul somme affectée si besoin
         this.onMontantAffecteChange1();
       },
       error: (err) => {
         console.error('Hydratation affectations échouée', err);
-        // on garde au moins les data de base
         this.t_Affectation1.data = [...affs];
         this.t_Affectation2.data = [...affs];
       }
     });
   }
 
-
   reloadData() {
+
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
       if (this.encaissementDetail) {
@@ -166,6 +209,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         this.nomClient = this.client?.denomination_sociale;
       }
     });
+
     this.modePaiementService.getItems().subscribe((modePaiements: ModePaiement[]) => {
       this.modePaiements = modePaiements;
     });
@@ -227,18 +271,22 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
       this.factureService.getListeDevisEtFacturesImpayesByClientId(client.id).subscribe((impayes: ClientFactureDevisImpayes[]) => {
         this.facturesImpayees =impayes;
         //this.facturesImpayees =factures;
+        console.log("impayes");
         console.log(impayes);
         const affectations: AffectationX[] = this.facturesImpayees.map(f => ({
-          facture_id: f.ligne_id,
+          facture_id: f.type_ligne === 'DEVIS' ? null       : f.ligne_id,
+          devis_id:   f.type_ligne === 'DEVIS' ? f.ligne_id : null,
           date_affectation: null,
           montant: f.montant,
-          reference: f.reference,   // ← NEW
-          objet: f.objet            // ← NEW
+          reference: f.reference,
+          objet: f.objet,
+          type_ligne: f.type_ligne as TypeLigne
         }));
 
         setTimeout(() => {
           this.t_Affectation1.data = [...affectations];
         }, 0);
+
       });
     }
   }
@@ -256,6 +304,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
       client: this.client?.id || 0,
       affectations: this.t_Affectation2?.data.map(a => ({
         facture_id: a.facture_id,
+        devis_id: a.devis_id,
         montant_affecte: a.montant_affecte,
         date_affectation: a.date_affectation
       })) || []
@@ -269,7 +318,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         }
       }, error => {
         console.log(error)
-        this.dialogService.alert({message: error.error.message.message});
+        this.dialogService.alert({message: error.message});
       });
     } else {
       this.encaissementsService.update(this.encaissementDetail?.id, encaissementDetail).subscribe(data => {

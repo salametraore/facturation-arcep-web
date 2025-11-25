@@ -1,0 +1,216 @@
+<mat-card>
+
+  <!-- Titre de page (barre rose) -->
+<!--
+  <div class="page-title">
+    <h2>Fiche client : </h2>
+  </div>
+-->
+
+  <!-- Cadre standard -->
+  <section class="list-box">
+
+    <!-- En-tête : titre + éventuellement actions à droite -->
+    <div class="list-header">
+      <h3 class="list-title">
+        <span class="label">Client :</span>
+        <span class="value">{{ client?.denomination_sociale }}</span>
+      </h3>
+
+      <div class="list-actions">
+        <button mat-flat-button color="primary" (click)="onRetour()">
+          <mat-icon>close</mat-icon>
+          Retour
+        </button>
+      </div>
+    </div>
+
+    <!-- Corps : résumé client + onglets -->
+    <div class="list-body">
+
+      <!-- ====== Résumé client + actions (2 colonnes) ====== -->
+      <div class="client-summary">
+
+        <!-- Colonne gauche : infos client -->
+        <div class="client-summary__col client-summary__col--info">
+          <div class="client-info client-info--two-cols">
+
+            <!-- Sous-colonne gauche -->
+            <div class="client-info-col">
+              <div class="client-info-row">
+                <span class="client-info-label">Numéro de compte :</span>
+                <span class="client-info-value">{{ client?.compte_comptable }}</span>
+              </div>
+              <div class="client-info-row">
+                <span class="client-info-label">IFU :</span>
+                <span class="client-info-value">{{ client?.ifu }}</span>
+              </div>
+              <div class="client-info-row">
+                <span class="client-info-label">RCCM :</span>
+                <span class="client-info-value">{{ client?.rccm }}</span>
+              </div>
+            </div>
+
+            <!-- Sous-colonne droite -->
+            <div class="client-info-col">
+              <div class="client-info-row">
+                <span class="client-info-label">Téléphone :</span>
+                <span class="client-info-value">{{ client?.telephone }}</span>
+              </div>
+              <div class="client-info-row">
+                <span class="client-info-label">Email :</span>
+                <span class="client-info-value">{{ client?.email }}</span>
+              </div>
+              <div class="client-info-row">
+                <span class="client-info-label">Adresse :</span>
+                <span class="client-info-value">{{ client?.adresse }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Colonne droite : bloc actions -->
+        <div class="client-summary__col client-summary__col--actions">
+          <div class="client-actions">
+
+    <!--        <button mat-flat-button color="primary"  (click)="crudNomDomaine(null, this.operations.create)"
+                    *ngIf="utilisateurConnecte.direction===2 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Nom de domaine
+            </button>
+
+            <button mat-flat-button color="primary" (click)="crudServiceConfiance(null, this.operations.create)"
+                    *ngIf="utilisateurConnecte.direction===2 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Service de confiance
+            </button>
+
+            <button mat-flat-button color="primary"
+                    (click)="crudPrestationsDiverses(null, operations.create)"
+                    *ngIf="utilisateurConnecte.direction===1 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Prestations diverses
+            </button>
+
+            <button mat-flat-button color="primary" (click)="crudServicesAValeurAjoutee(null, operations.create)"
+                    *ngIf="utilisateurConnecte.direction===5 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Services à valeur ajoutée
+            </button>
+
+            <button mat-flat-button color="primary" (click)="crudNumerotation(null, operations.create)"
+                    *ngIf="utilisateurConnecte.direction===3 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Numérotation
+            </button>
+
+            <button mat-flat-button color="primary" (click)="crudAutorisationGenerale(null, operations.create)"
+                    *ngIf="utilisateurConnecte.direction===5 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Autorisation generale
+            </button>
+
+            <button mat-flat-button color="primary" (click)="crudAgrementEquipements(null, operations.create)"
+                    *ngIf="utilisateurConnecte.direction===3 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Agrément d'equipements
+            </button>
+
+            <button mat-flat-button color="primary" (click)="crudAgrementInstallateurs(null, operations.create)"
+                    *ngIf="utilisateurConnecte.direction===3 || utilisateurConnecte.direction===0">
+              <mat-icon>add</mat-icon>
+              FT Agrément d'installateur
+            </button>-->
+
+          </div>
+        </div>
+
+      </div>
+      <!-- ====== /Résumé client + actions ====== -->
+
+      <!-- Onglets de détail -->
+      <mat-tab-group>
+
+        <!-- Fiches Techniques -->
+
+
+        <!-- Devis -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair">
+              <mat-icon>request_quote</mat-icon>
+              <span>Devis</span>
+            </span>
+          </ng-template>
+
+          <client-details-devis
+            [clientId]="clientId">
+          </client-details-devis>
+        </mat-tab>
+
+        <!-- Factures -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair">
+              <mat-icon>receipt_long</mat-icon>
+              <span>Factures</span>
+            </span>
+          </ng-template>
+
+          <client-details-factures
+            [clientId]="clientId">
+          </client-details-factures>
+        </mat-tab>
+
+        <!-- Impayes -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair">
+              <mat-icon>money_off</mat-icon>
+              <span>Liste Devis/Factures impayés</span>
+            </span>
+          </ng-template>
+
+          <client-details-impayes
+            [clientId]="clientId">
+          </client-details-impayes>
+        </mat-tab>
+
+
+        <!-- Encaissements -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair">
+              <mat-icon>payments</mat-icon>
+              <span>Encaissements</span>
+            </span>
+          </ng-template>
+
+          <client-details-encaissements
+            [clientId]="clientId">
+          </client-details-encaissements>
+        </mat-tab>
+
+        <!-- Relevé de compte -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair">
+              <mat-icon>account_balance_wallet</mat-icon>
+              <span>Relevé de compte</span>
+            </span>
+          </ng-template>
+
+          <client-details-releve-compte
+            [clientId]="clientId">
+          </client-details-releve-compte>
+        </mat-tab>
+
+      </mat-tab-group>
+
+
+    </div> <!-- /list-body -->
+
+  </section>
+
+</mat-card>
