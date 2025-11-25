@@ -17,7 +17,7 @@ import { operations } from "../../../../constantes";
 import { AuthService } from "../../../../authentication/auth.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RetraitAutorisationDialogComponent} from "../../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
-import {AvisEtuteTechniqueDialodComponent} from "../../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {AvisEtuteTechniqueDialogComponent} from "../../../avis-etute-technique-dialog/avis-etute-technique-dialog.component";
 import {Utilisateur} from "../../../../shared/models/utilisateur";
 import {UtilisateurRole,Role} from "../../../../shared/models/droits-utilisateur";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
@@ -293,7 +293,7 @@ export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
     dialogConfig.autoFocus = true;
     dialogConfig.data = {ficheTechnique, operation};
     dialogConfig.disableClose = true;
-    let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    let ref = this.dialog.open(AvisEtuteTechniqueDialogComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {

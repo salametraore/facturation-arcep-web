@@ -52,3 +52,98 @@
   border: 1px solid rgba(255, 107, 142, 0.5);
   color: var(--brand-primary, #FF6B8E);
 }
+
+/* ===== Style du stepper fréquences ===== */
+:host ::ng-deep .mat-step-header {
+  border-radius: 24px;
+  padding-inline: 12px 16px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+/* 🔹 STEP COURANT = onglet actif */
+:host ::ng-deep .mat-step-header[aria-selected="true"] {
+  background-color: #fff;                                   /* fond blanc */
+  border-color: var(--brand-primary, #FF6B8E);              /* contour rose */
+  opacity: 1;
+}
+
+/* pastille numérotée du step courant */
+:host ::ng-deep .mat-step-header[aria-selected="true"] .mat-step-icon {
+  background-color: #fff;
+  border: 2px solid var(--brand-primary, #FF6B8E);
+  color: var(--brand-primary, #FF6B8E);
+  font-weight: 700;
+}
+
+/* label du step courant : bien noir et gras */
+:host ::ng-deep .mat-step-header[aria-selected="true"]
+.mat-step-text-label,
+:host ::ng-deep .mat-step-header[aria-selected="true"]
+.mat-step-label {
+  color: #000 !important;
+  font-weight: 700;
+}
+
+/* 🔸 Steps NON sélectionnés : plus discrets */
+:host ::ng-deep .mat-step-header[aria-selected="false"] {
+  background-color: #fff;
+  border-color: rgba(0, 0, 0, 0.08);
+  opacity: 0.6;
+}
+
+:host ::ng-deep .mat-step-header[aria-selected="false"]
+.mat-step-text-label,
+:host ::ng-deep .mat-step-header[aria-selected="false"]
+.mat-step-label {
+  color: #999;
+  font-weight: 500;
+}
+
+:host ::ng-deep .mat-step-header[aria-selected="false"]
+.mat-step-icon {
+  background-color: #fff;
+  border: 1px solid rgba(255, 107, 142, 0.5);
+  color: var(--brand-primary, #FF6B8E);
+}
+
+
+.recap-card {
+  // optionnel : un peu de style général
+  padding: 1rem;
+}
+
+.recap-dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); // 🔥 4 colonnes
+  gap: 1rem; // espace entre les blocs
+  margin: 0;
+}
+
+.recap-dl > div {
+  // optionnel : petit encadrement
+  /* padding: 0.5rem 0; */
+}
+
+.recap-dl dt {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.recap-dl dd {
+  margin: 0;
+  color: #555;
+}
+
+.recap-dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1843,7 +1843,15 @@ dashboard resumé client
   background: rgba(255, 107, 142, 0.08);
 }
 
+.date-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); // 3 colonnes égales
+  gap: 16px; // espace entre les champs
 
+  .mat-form-field {
+    width: 100%;
+  }
+}
 
 
 

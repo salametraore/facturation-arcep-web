@@ -2,5 +2,5 @@ export class TypeStation {
   id?: number;
   code?: string;
   libelle?: string;
-  categorieProduit?: number;
+  categorie_produit?: number;
 }

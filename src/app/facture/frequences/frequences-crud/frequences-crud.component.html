@@ -13,7 +13,7 @@
     <mat-horizontal-stepper [linear]="isLinear" *ngIf="form">
 
       <!-- STEP 1 : Fiche technique -->
-      <mat-step [stepControl]="ficheFG" label="1. Fiche technique">
+      <mat-step [stepControl]="ficheFG" label="La Fiche technique">
 
         <form [formGroup]="ficheFG" class="form-grid">
 
@@ -72,7 +72,7 @@
 
       <!-- STEP 2 : Stations équipement -->
       <ng-container *ngIf="showStationsStep">
-        <mat-step [completed]="isStationsValid()" label="2. Stations (équipement)">
+        <mat-step [completed]="isStationsValid()" label="Les Stations (équipement)">
           <div [formGroup]="form" class="space-y-3">
 
             <!-- Bouton Ajouter une station aligné à droite -->
@@ -185,7 +185,7 @@
 
       <!-- STEP 3 : Canaux -->
       <ng-container *ngIf="showCanauxStep">
-        <mat-step [completed]="isCanauxValid()" label="3. Canaux">
+        <mat-step [completed]="isCanauxValid()" label="Les Canaux">
           <div [formGroup]="form" class="space-y-3">
 
             <!-- Bouton Ajouter un canal aligné à droite -->
@@ -278,7 +278,7 @@
       <!-- STEP 4 : Récapitulatif -->
       <!-- STEP 4 : Récapitulatif -->
       <ng-container *ngIf="showTarifsStep">
-        <mat-step label="4. Récapitulatif">
+        <mat-step label="Récapitulatif">
 
           <div class="recap-container">
 
@@ -305,6 +305,7 @@
                 </div>
               </dl>
             </section>
+
 
             <div class="recap-grid">
 

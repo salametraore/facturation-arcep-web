@@ -80,13 +80,6 @@
 
           <div class="blank-row"></div>
 
-          <!-- chiffre d'affaire -->
-          <mat-form-field appearance="outline" class="w-full" *ngIf="!isProduit81">
-            <mat-label>Chiffre d'affaire annuel estimé</mat-label>
-            <input type="number" matInput formControlName="chiffre_affaire">
-          </mat-form-field>
-
-          <div class="blank-row" *ngIf="!isProduit81"></div>
 
           <!-- Zone de couverture -->
           <mat-form-field appearance="outline" class="w-full" *ngIf="!isProduit81">
@@ -100,12 +93,6 @@
 
           <div class="blank-row"></div>
 
-          <mat-form-field appearance="outline" class="w-full" *ngIf="!isProduit81">
-            <mat-label>Taux postal</mat-label>
-            <input type="number" matInput formControlName="taux_postal">
-          </mat-form-field>
-
-          <div class="blank-row"></div>
 
           <!-- Commentaire -->
           <mat-form-field appearance="outline" class="w-full">

@@ -122,10 +122,8 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
     this.form = this.formBuilder.group({
       id: [this.ficheTechnique?.id],
       client: [this.ficheTechnique?.client],
-      chiffre_affaire: [],
-      zone_id: [],
-      taux_postal: [],
-      produit: [],
+      //zone_id: [this.ficheTechnique?.produits_detail[0].zone_id],
+      produit: [this.ficheTechnique?.produits_detail[0].produit],
       commentaire: [this.ficheTechnique?.commentaire],
     });
 
@@ -137,9 +135,7 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
     this.form = this.formBuilder.group({
       id: [],
       client: [],
-      chiffre_affaire: [],
       zone_id: [],
-      taux_postal: [1],
       produit: [],
       commentaire: [],
     });
@@ -164,21 +160,17 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
   private onProduitChange(produitId: number) {
     this.isProduit81 = (produitId === 81);
 
-    const caCtrl   = this.form.get('chiffre_affaire');
-    const zoneCtrl = this.form.get('zone_id');
-    const tauxCtrl = this.form.get('taux_postal');
 
-    if (!caCtrl || !zoneCtrl || !tauxCtrl) return;
+    const zoneCtrl = this.form.get('zone_id');
+
+
+    if (!zoneCtrl ) return;
 
     if (this.isProduit81) {
       // 🔹 Produit 81 : on rend les champs invisibles + non obligatoires + vides
-      caCtrl.setValue(null);
       zoneCtrl.setValue(null);
-      tauxCtrl.setValue(null);
-
-      caCtrl.clearValidators();
       zoneCtrl.clearValidators();
-      tauxCtrl.clearValidators();
+
     } else {
       // 🔹 Autres produits : on peut remettre des validateurs si tu veux
       // Exemple : les rendre obligatoires
@@ -187,9 +179,7 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
       // tauxCtrl.setValidators([Validators.required]);
     }
 
-    caCtrl.updateValueAndValidity();
     zoneCtrl.updateValueAndValidity();
-    tauxCtrl.updateValueAndValidity();
   }
 
 
@@ -209,7 +199,7 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
       commentaire: formValue['commentaire'],
       categorie_produit: this.fixeCategorie,
       produits_detail: [
-        {produit: Number(formValue['produit']),chiffre_affaire:Number(formValue['chiffre_affaire']),zone_id:Number(formValue['zone_id']), quantite: 1, "taux_postal": 0},
+        {produit: Number(formValue['produit']),zone_id:Number(formValue['zone_id']), quantite: 1},
       ],
     };
 

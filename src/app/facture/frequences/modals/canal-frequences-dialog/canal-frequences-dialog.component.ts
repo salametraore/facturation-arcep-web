@@ -84,21 +84,38 @@ export class CanalFrequencesDialogComponent implements OnInit {
   }
 
   loadData(): void {
+
+    const cat = this.data.cat;
+
     this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanalList[]) => {
-      this.typeCanaux = listeCanaux;
+      this.typeCanaux = listeCanaux.filter(st => st.id < 3);
     });
 
-    this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
-      this.typeStations = listeTypeStations;
-    });
 
-    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
-      this.typeBandeFrequences = listeTypeBandesFreq;
-    });
+    this.typeStationService.getListItems().subscribe(
+      (listeTypeStations: TypeStation[]) => {
+        this.typeStations = listeTypeStations.filter(
+          ts => ts.categorie_produit === cat
+        );
+      }
+    );
 
-    this.zoneCouvertureService.getListItems().subscribe((listeZones: ZoneCouverture[]) => {
-      this.zoneCouvertures = listeZones;
-    });
+    this.typeBandesFrequenceService.getListItems().subscribe(
+      (listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
+        this.typeBandeFrequences = listeTypeBandesFreq.filter(
+          bf => bf.categorie_produit === cat
+        );
+      }
+    );
+
+    this.zoneCouvertureService.getListItems().subscribe(
+      (listeZones: ZoneCouverture[]) => {
+        this.zoneCouvertures = listeZones.filter(
+          z => z.categorie_produit === 2
+        );
+      }
+    );
+
   }
 
   onCancel(): void {

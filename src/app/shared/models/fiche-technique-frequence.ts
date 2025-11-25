@@ -5,10 +5,10 @@ import {StatutFicheTechnique} from "./statut-fiche-technique";
 export class StationCanalRequest {
 
   produit!: number;
-  
+
   type_station?: number  | null;
   type_canal!: number | string;
-  
+
   puissance?: number | null;
   puissance_unite?: string | null;
 
@@ -40,7 +40,7 @@ export class StationCanalRequest {
 export class StationEquipementRequest {
 
   produit?: number | null;
-  
+
   type_station!: number | string;
 
   puissance?: number | null;
@@ -77,7 +77,7 @@ export class FicheTechniqueFrequenceRequest {
   objet?: string | null;
   commentaire?: string | null;
 
-  statut?: StatutFicheTechnique;
+  statut?: number | null;
   direction!: number;
   utilisateur?: number | null;
   date_creation?: string;
@@ -124,7 +124,7 @@ export class StationCanal {
 
   nbre_tranche!: number;
 
-  
+
   zone_couverture!: number | string;
   localite?: string | null;
 

@@ -19,9 +19,9 @@ interface CategorieProduitDuree {
 
 @Component({
   selector: 'app-avis-etute-technique-dialod',
-  templateUrl: './avis-etute-technique-dialod.component.html'
+  templateUrl: './avis-etute-technique-dialog.component.html'
 })
-export class AvisEtuteTechniqueDialodComponent implements OnInit {
+export class AvisEtuteTechniqueDialogComponent implements OnInit {
 
   ficheTechnique?: FicheTechniques;
   form: FormGroup;
@@ -119,7 +119,7 @@ export class AvisEtuteTechniqueDialodComponent implements OnInit {
     private formBuilder: FormBuilder,
     private dialog: MatDialog,
     private dialogService: DialogService,
-    public dialogRef: MatDialogRef<AvisEtuteTechniqueDialodComponent>,
+    public dialogRef: MatDialogRef<AvisEtuteTechniqueDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, private msgMessageService: MsgMessageServiceService,
   ) {
     this.ficheTechnique = data.ficheTechnique;

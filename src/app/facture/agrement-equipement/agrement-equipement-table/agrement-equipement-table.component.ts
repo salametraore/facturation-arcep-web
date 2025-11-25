@@ -16,7 +16,7 @@ import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {DialogService} from "../../../shared/services/dialog.service";
 import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
 import {operations} from "../../../constantes";
-import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {AvisEtuteTechniqueDialogComponent} from "../../avis-etute-technique-dialog/avis-etute-technique-dialog.component";
 import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
@@ -282,7 +282,7 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
     dialogConfig.autoFocus = true;
     dialogConfig.data = {ficheTechnique, operation};
     dialogConfig.disableClose = true;
-    let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    let ref = this.dialog.open(AvisEtuteTechniqueDialogComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {

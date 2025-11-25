@@ -11,6 +11,7 @@ export class FicheTechniqueProduit {
   marque?: string | null;
   modele?: string | null;
   plage_numero?: string | null;
+  zone_id?: number | null;
 }
 
 export class FicheTechniquesProduits {
@@ -25,5 +26,6 @@ export class FicheTechniquesProduits {
   marque?: string | null;
   modele?: string | null;
   plage_numero?: string | null;
+  zone_id?: number | null;
 }
 

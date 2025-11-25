@@ -81,12 +81,17 @@ export class StationFrequencesDialogComponent implements OnInit {
   }
 
   loadData(): void {
+
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
-      this.typeStations = listeTypeStations;
+      this.typeStations = listeTypeStations.filter(
+        ts => ts.categorie_produit === this.data.cat   // adapte le nom du champ
+      );
     });
 
     this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
-      this.typeBandeFrequences = listeTypeBandesFreq;
+      this.typeBandeFrequences = listeTypeBandesFreq.filter(
+        bf => bf.categorie_produit ===this.data.cat   // idem
+      );
     });
   }
 

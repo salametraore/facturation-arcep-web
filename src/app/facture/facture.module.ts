@@ -63,7 +63,7 @@ import {ServiceConfianceComponent} from "./service-confiance/service-confiance.c
 import {
   ServiceConfianceCrudComponent
 } from "./service-confiance/service-confiance-crud/service-confiance-crud.component";
-import {AvisEtuteTechniqueDialodComponent} from "./avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {AvisEtuteTechniqueDialogComponent} from "./avis-etute-technique-dialog/avis-etute-technique-dialog.component";
 import {HistoriqueTraitementComponent} from "./historique-traitement/historique-traitement.component";
 import {AvisTechniqueInfosComponent} from "./avis-technique-infos/avis-technique-infos.component";
 import { EncaissementDirectComponent } from './encaissement-direct/encaissement-direct.component';
@@ -148,7 +148,7 @@ import {ImportDocumentDialogComponent} from "./gestion-activites-postales/import
     AgrementEquipementComponent,
     AgrementEquipementTableComponent,
     AgrementEquipementCrudComponent,
-    AvisEtuteTechniqueDialodComponent,
+    AvisEtuteTechniqueDialogComponent,
     HistoriqueTraitementComponent,
     AvisTechniqueInfosComponent,
     EncaissementDirectComponent,

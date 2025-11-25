@@ -104,7 +104,7 @@ export function buildStationCanalFG(
   const cfg = CATEGORY_CONFIG[cat].canaux;
 
   return fb.group({
-    produit:         new FormControl(c.produit ?? null),
+    produit: new FormControl(c.produit ?? 91),
 
     type_station:    new FormControl(c.type_station ?? null,          requiredIf(cfg.type_station)),
     type_canal:      new FormControl(c.type_canal ?? null,            requiredIf(cfg.type_canal)),

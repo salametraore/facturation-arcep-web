@@ -16,7 +16,7 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
 import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
-import {AvisEtuteTechniqueDialodComponent} from "../../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {AvisEtuteTechniqueDialogComponent} from "../../avis-etute-technique-dialog/avis-etute-technique-dialog.component";
 import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
@@ -284,7 +284,7 @@ export class AutorisationsPostalesTableComponent implements OnInit, AfterViewIni
     dialogConfig.autoFocus = true;
     dialogConfig.data = {ficheTechnique, operation};
     dialogConfig.disableClose = true;
-    let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    let ref = this.dialog.open(AvisEtuteTechniqueDialogComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {

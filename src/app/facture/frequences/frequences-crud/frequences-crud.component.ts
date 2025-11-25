@@ -104,8 +104,8 @@ export class FrequencesCrudComponent implements OnInit {
 
   form: FormGroup;
 
-  // catégorie courante, déduite de la fiche (step 1)
-  cat: CategoryId = 1 as CategoryId;
+
+  cat: CategoryId ;
   cfg = CATEGORY_CONFIG;
 
   loading = false;
@@ -290,19 +290,19 @@ export class FrequencesCrudComponent implements OnInit {
       categorie_produit: null,
       objet: null,
       commentaire: null,
-      direction: null,
-      statut: undefined,
+      direction: 3,
+      statut: 1,
+      avis:  'NOF',
+      duree: 3,
+      date_creation: new Date().toISOString().substring(0, 10),
+      recurrente: true,
+      position: 1,
+      periode: null,
       utilisateur: null,
-      date_creation: null,
-      position: null,
       position_direction: null,
-      avis: null,
       date_avis: null,
-      duree: null,
       date_fin: null,
       date_debut: null,
-      periode: null,
-      recurrente: null,
       stations_canal: [],
       stations_equipement: []
     };
@@ -314,7 +314,7 @@ export class FrequencesCrudComponent implements OnInit {
     this.showCanauxStep = false;
     this.showTarifsStep = false;
 
-    this.cat = 1 as CategoryId;
+    //this.cat = 1 as CategoryId;
     this.updateDisplayedColumns();
 
     this.ficheFG.get('categorie_produit')?.valueChanges.subscribe(val => {
@@ -332,7 +332,7 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.api.getItem(this.ficheTechnique.id).subscribe({
       next: (fiche: FicheTechniqueFrequenceRequest) => {
-        this.cat = (fiche.categorie_produit as CategoryId) || 1;
+        this.cat = (fiche.categorie_produit as CategoryId) ;
         this.form = buildFicheTechniqueFrequenceForm(this.fb, fiche);
 
         // remplir les FormArray avec les stations/canaux existants

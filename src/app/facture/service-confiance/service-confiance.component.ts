@@ -18,7 +18,7 @@ import {StatutFicheTechniqueService} from "../../shared/services/statut-fiche-te
 import {StatutFicheTechnique} from "../../shared/models/statut-fiche-technique";
 import {DomaineCrudComponent} from "../domaine/domaine-crud/domaine-crud.component";
 import {ServiceConfianceCrudComponent} from "./service-confiance-crud/service-confiance-crud.component";
-import {AvisEtuteTechniqueDialodComponent} from "../avis-etute-technique-dialod/avis-etute-technique-dialod.component";
+import {AvisEtuteTechniqueDialogComponent} from "../avis-etute-technique-dialog/avis-etute-technique-dialog.component";
 import {RetraitAutorisationDialogComponent} from "../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 import {Role, UtilisateurRole} from "../../shared/models/droits-utilisateur";
 import {Utilisateur} from "../../shared/models/utilisateur";
@@ -295,7 +295,7 @@ export class ServiceConfianceComponent implements OnInit, AfterViewInit {
     dialogConfig.autoFocus = true;
     dialogConfig.data = {ficheTechnique, operation};
     dialogConfig.disableClose = true;
-    let ref = this.dialog.open(AvisEtuteTechniqueDialodComponent, dialogConfig);
+    let ref = this.dialog.open(AvisEtuteTechniqueDialogComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {

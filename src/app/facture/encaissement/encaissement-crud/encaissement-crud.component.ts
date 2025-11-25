@@ -229,7 +229,7 @@ export class EncaissementCrudComponent implements OnInit, AfterViewInit {
         //this.facturesImpayees =factures;
         console.log(impayes);
         const affectations: AffectationX[] = this.facturesImpayees.map(f => ({
-          facture_id: f.id,
+          facture_id: f.ligne_id,
           date_affectation: null,
           montant: f.montant,
           reference: f.reference,   // ← NEW
