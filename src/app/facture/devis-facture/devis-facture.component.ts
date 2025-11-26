@@ -285,7 +285,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     });
     dialogRef.afterClosed().subscribe(() => {
       // rafraîchir si nécessaire
-      this.chercher?.();
+      this.reloadData();
     });
   }
 

@@ -101,7 +101,7 @@ export class ClientDfcDetailsComponent implements OnInit, AfterViewInit {
 
   onRetour() {
     this.router.navigate(
-      ['/facture/client-direction-technique'],
+      ['/facture/client-dfc'],
     );
   }
 

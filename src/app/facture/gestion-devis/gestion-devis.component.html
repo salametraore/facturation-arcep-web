@@ -166,8 +166,8 @@
                   Annuler Devis
                 </button>
 
-                <button mat-menu-item class="btn_delete"   *ngIf="element.etat === 'EMIS'  && !element.encaissable"   (click)="onGenererFacture(element)">
-                  <mat-icon color="warn">delete</mat-icon>
+                <button mat-menu-item class="btn_delete"   *ngIf="element.etat === 'EMIS'  && element.encaissable"   (click)="onGenererFacture(element)">
+                  <mat-icon color="warn">save</mat-icon>
                   Generer Facture
                 </button>
 

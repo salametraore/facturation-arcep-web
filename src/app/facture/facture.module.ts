@@ -111,6 +111,8 @@ import {ClientDfcDetailsImapyesComponent} from "./client-dfc/client-dfc-details/
 import {ClientDfcDetailsFacturesComponent} from "./client-dfc/client-dfc-details/client-dfc-details-factures/client-dfc-details-factures.component";
 import {ClientDfcDetailsEncaissementsComponent} from "./client-dfc/client-dfc-details/client-dfc-details-encaissements/client-dfc-details-encaissements.component";
 import {ClientDfcDetailsDevisComponent} from "./client-dfc/client-dfc-details/client-dfc-details-devis/client-dfc-details-devis.component";
+import {ClientDfcEncaissementCrudComponent} from "./client-dfc/client-dfc-details/client-dfc-encaissement-crud/client-dfc-encaissement-crud.component";
+import {MaterialModule} from "../material/material.module";
 
 
 @NgModule({
@@ -200,6 +202,7 @@ import {ClientDfcDetailsDevisComponent} from "./client-dfc/client-dfc-details/cl
     ClientDfcDetailsFacturesComponent,
     ClientDfcDetailsEncaissementsComponent,
     ClientDfcDetailsDevisComponent,
+    ClientDfcEncaissementCrudComponent,
   ],
   imports: [
     CommonModule,
@@ -209,6 +212,7 @@ import {ClientDfcDetailsDevisComponent} from "./client-dfc/client-dfc-details/cl
     FormsModule,
     PdfViewerModule,
     ScrollingModule,
+    MaterialModule,
   ] ,
 
 })

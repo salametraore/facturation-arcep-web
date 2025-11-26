@@ -95,7 +95,7 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
     MatStepperModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
-    MatTabGroup
+    MatTabGroup,
   ]
 })
 export class MaterialModule {

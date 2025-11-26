@@ -18,6 +18,7 @@ import {FactureService} from "../../../shared/services/facture.service";
 import {RequestGenererFacture} from "../../../shared/models/ficheTechniques";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 import { finalize } from 'rxjs/operators';
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-elements-facture-recu-crud',
@@ -34,6 +35,9 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   mode: string = '';
   title: string = '';
 
+  isGenerating = false;
+  hasGenerated = false;
+
   window_name = ' FicheTechnique';
   categories: CategorieProduit[];
   produits: Produit[];
@@ -46,8 +50,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   nomClient: any;
   historiqueFicheTechniques: HistoriqueFicheTechnique[];
 
-  isGenerating = false;
-  hasGenerated = false;
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -57,6 +60,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     private clientService: ClientService,
     private factureService: FactureService,
     public dialog: MatDialog,
+    private snack: MatSnackBar,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
     public dialogRef: MatDialogRef<ElementsFactureRecuCrudComponent>,
@@ -166,6 +170,10 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   }
 
   crud() {
+    if (this.hasGenerated) {
+      return;  // déjà généré pour cette fiche, on ne refait pas
+    }
+
     if (!this.isReadyToGenerate()) { return; }
 
     const payload: RequestGenererFacture = {
@@ -187,10 +195,14 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     }
   }
 
+
   private onGenerationSuccess(): void {
-    this.msgMessageService.success('Facture générée avec succès !');
-    this.hasGenerated = true;        // 👉 désactive définitivement le bouton
-    this.form.disable({ emitEvent: false }); // (optionnel) figer le formulaire
+    this.hasGenerated = true;                 // 🔒 on grille le bouton
+    this.form.disable({ emitEvent: false });  // optionnel : figer le formulaire
+
+    const msg = 'Devis généré avec succès 🎉';
+    this.msgMessageService.success(msg);
+    this.snack.open(msg, 'OK', { duration: 4000 });
   }
 
   genererDossierFacture(payload: RequestGenererFacture) {
@@ -212,7 +224,6 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
         error: (error) => this.dialogService.alert({ message: error?.error?.message })
       });
   }
-
 
   onSubmit() {
     console.log('this.techSheetForm.value');

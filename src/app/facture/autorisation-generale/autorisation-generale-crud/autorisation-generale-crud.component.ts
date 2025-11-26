@@ -135,7 +135,7 @@ export class AutorisationGeneraleCrudComponent implements OnInit {
       commentaire: formValue['commentaire'],
       categorie_produit: this.fixeCategorie,
       produits_detail: [
-        {produit: Number(formValue['produit']), quantite: 1},
+        {produit: Number(formValue['produit']), quantite: 1,"zone_id": null},
       ],
     };
 

@@ -11,10 +11,16 @@
         <h3 class="list-title">Fiche technique</h3>
         <!-- Actions globales alignées à droite -->
         <div class="list-actions">
-          <button (click)="crud()" [disabled]="!t_ProduitFiche?.data?.length" color="primary" mat-flat-button>
+
+          <button
+            (click)="crud()"
+            [disabled]="!t_ProduitFiche?.data?.length || isGenerating || hasGenerated"
+            color="primary"
+            mat-flat-button>
             <mat-icon>save</mat-icon>
             Générer Devis
           </button>
+
           <button (click)="onFerme()" color="primary" mat-stroked-button>
             <mat-icon>undo</mat-icon>
             Retour

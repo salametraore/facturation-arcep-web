@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import {ClientFactureDevisImpayes, Facture, GenererRedevanceRequest} from '../models/facture';
+import {ClientFactureDevisImpayes, Facture, GenererRedevanceRequest, GenererRedevanceResponse} from '../models/facture';
 import { RequestGenererFacture } from '../models/ficheTechniques';
 import { AppConfigService } from '../../core/config/app-config.service';
 
@@ -77,8 +77,11 @@ export class FactureService {
   }
 
   /** Génère les redevances annuelles */
-  genererRedevancesAnnuelles(payload: GenererRedevanceRequest): Observable<any> {
-    return this.http.post(`${this.cfg.baseUrl}/generer-recurrence-annuelle/`, payload);
+  genererRedevancesAnnuelles(payload: GenererRedevanceRequest): Observable<GenererRedevanceResponse> {
+    return this.http.post<GenererRedevanceResponse>(
+      `${this.cfg.baseUrl}/generer-recurrence-annuelle/`,
+      payload
+    );
   }
 
 

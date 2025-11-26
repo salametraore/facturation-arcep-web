@@ -79,7 +79,6 @@ export class GenerationRedevanceCrudComponent implements OnInit {
       categorie_produit: this.f.categorie.value ?? undefined,
       client: this.f.client.value ?? undefined,
       signataire: this.f.signataire.value ?? undefined,
-      // direction: ... (si tu as une valeur fixe à envoyer)
     };
 
     this.isLoading = true;
@@ -90,12 +89,15 @@ export class GenerationRedevanceCrudComponent implements OnInit {
         finalize(() => this.isLoading = false)
       )
       .subscribe({
-        next: () => {
-          this.generated = true;             // désactive le bouton
-          this.form.disable({ emitEvent: false }); // fige le formulaire
-          this.msgMessageService.success('Génération terminée avec succès 🎉');
-          this.snack.open('Génération terminée avec succès 🎉', 'OK', { duration: 3000 });
-          // On NE ferme pas la modale, comme souhaité (l’utilisateur devra la rouvrir)
+        next: (res) => {
+          this.generated = true;
+          this.form.disable({ emitEvent: false });
+
+          const nb = res?.resultat ?? 0;
+          const msg = `${res?.message} (${nb} redevance(s) générée(s))`;
+
+          this.msgMessageService.success(msg);
+          this.snack.open(msg, 'OK', { duration: 4000 });
         },
         error: (err) => {
           const msg = err?.error?.message || 'Échec de la génération. Réessayez.';
@@ -104,6 +106,7 @@ export class GenerationRedevanceCrudComponent implements OnInit {
         }
       });
   }
+
 
   fermer() {
     this.dialogRef.close(true);

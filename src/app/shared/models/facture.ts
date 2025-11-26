@@ -1,5 +1,8 @@
 import { LignesFactures } from './lignesFactures';
 
+import { Client } from "./client";
+
+
 export class Facture {
   id?: number;
   reference?:string;
@@ -33,8 +36,12 @@ export class GenererRedevanceRequest {
   signataire?: string;
 }
 
+export interface GenererRedevanceResponse {
+  message: string;
+  resultat: number;
+}
 
-import { Client } from "./client";
+
 
 export class ClientFactureDevisImpayes {
 

@@ -5,12 +5,16 @@
   <div class="list-header">
 
     <div class="list-actions">
-      <!-- Actions éventuelles (export, impression, etc.)
-      <button mat-stroked-button color="primary">
-        <mat-icon>print</mat-icon>
-        Exporter
+
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="onEncaisserSelection()"
+        [disabled]="!selectedLignes.length">
+        <mat-icon>save</mat-icon>
+        Encaisser
       </button>
-      -->
+
     </div>
   </div>
 
@@ -19,6 +23,23 @@
 
     <div class="mat-elevation-z10 compact-table">
       <table mat-table [dataSource]="t_Factures" matSort style="width: 100%">
+
+        <!-- Colonne sélection -->
+
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <!-- Checkbox "tout sélectionner" (optionnel) -->
+            <mat-checkbox
+              (change)="onToggleAll($event.checked)">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let ligne">
+            <mat-checkbox
+              [checked]="isSelected(ligne)"
+              (change)="onToggleLigne(ligne, $event.checked)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
 
         <!-- Type ligne -->
         <ng-container matColumnDef="type_ligne">
