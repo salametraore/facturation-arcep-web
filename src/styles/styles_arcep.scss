@@ -1859,5 +1859,22 @@ dashboard resumé client
 }
 
 
+.mat-mdc-tab .mdc-tab__text-label {
+  color: #000 !important;
+  font-weight: 700;
+}
+
+.step-icon {
+  vertical-align: middle;
+  margin-right: 4px;
+  opacity: 0.6;
+}
+
+.step-icon.done {
+  color: #2e7d32; // vert Material
+  opacity: 1;
+}
+
+
 
 

@@ -32,8 +32,8 @@ export class ImportDocumentDialogComponent {
   ) {
     this.form = this.fb.group({
       client: [null, Validators.required],
-      anne_fiscale: [new Date().getFullYear(), Validators.required],
-      date_emission: [new Date(), Validators.required],
+      annee_fiscale: [new Date().getFullYear(), Validators.required],
+      date_chargement: [new Date(), Validators.required],
       nom: [''],
       fichier: [null, Validators.required],
       fiche_technique_id: 162,
@@ -85,10 +85,8 @@ export class ImportDocumentDialogComponent {
     console.log("construction payload");
     const payload: ChiffreAffairePostaleCreateWithFileRequest = {
       client: Number(value.client),
-      fiche_technique_id:  (value.fiche_technique_id),
-      fiche_technique_autorisation_id:  (value.fiche_technique_autorisation_id),
-      anne_fiscale: Number(value.anne_fiscale),
-      date_emission: (value.date_emission as Date).toISOString(),
+      annee_fiscale: Number(value.annee_fiscale),
+      date_chargement: (value.date_chargement as Date).toISOString(),
       nom: value.nom as string,
       fichier: this.selectedFile as File
     };
@@ -98,10 +96,8 @@ export class ImportDocumentDialogComponent {
     console.log("construction formdata");
     const formData = new FormData();
     formData.append('client', String(payload.client));
-    formData.append('fiche_technique_autorisation_id', String(payload.fiche_technique_autorisation_id));
-    formData.append('fiche_technique_id', String(payload.fiche_technique_id));
-    formData.append('annee_fiscale', String(payload.anne_fiscale));
-    formData.append('date_emission', payload.date_emission);
+    formData.append('annee_fiscale', String(payload.annee_fiscale));
+    formData.append('date_chargement', payload.date_chargement);
     formData.append('nom', payload.nom);
     formData.append('fichier', payload.fichier, payload.fichier.name);
 

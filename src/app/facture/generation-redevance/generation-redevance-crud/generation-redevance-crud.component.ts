@@ -12,7 +12,7 @@ import { FactureService } from '../../../shared/services/facture.service';
 import { MsgMessageServiceService } from '../../../shared/services/msg-message-service.service';
 import { DialogService } from '../../../shared/services/dialog.service';
 
-import { GenererRedevanceRequest } from '../../../shared/models/facture';
+import { GenererRedevanceRequest } from '../../../shared/models/redevances-a-generer';
 
 import { finalize, take } from 'rxjs/operators';
 
@@ -69,6 +69,30 @@ export class GenerationRedevanceCrudComponent implements OnInit {
 
   canGenerate(): boolean {
     return this.form.valid && !this.isLoading && !this.generated;
+  }
+
+  listeRedevancesAgenerer(): void {
+
+    const payload: GenererRedevanceRequest = {
+      annee: this.f.annee.value ?? undefined,
+      categorie_produit: this.f.categorie.value ?? undefined,
+      client: this.f.client.value ?? undefined,
+      signataire: this.f.signataire.value ?? undefined,
+    };
+
+    this.factureService
+      .listeRedevancesAnnuellesAgenerer(payload)
+      .subscribe({
+        next: (res) => {
+          console.log('Résultat de l’API :', res);
+        },
+        error: (err) => {
+          console.error('Erreur API :', err);
+        },
+        complete: () => {
+          console.log('Appel terminé');
+        }
+      });
   }
 
   genererRedevancesAnnuelles() {

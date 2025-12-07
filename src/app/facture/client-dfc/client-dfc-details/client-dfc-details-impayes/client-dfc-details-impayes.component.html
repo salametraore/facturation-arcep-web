@@ -9,6 +9,15 @@
       <button
         mat-flat-button
         color="primary"
+        (click)="onAppliquerPenalitesSelection()"
+        [disabled]="!selectedLignes.length">
+        <mat-icon>save</mat-icon>
+        Appliquer Penalités
+      </button>
+
+      <button
+        mat-flat-button
+        color="primary"
         (click)="onEncaisserSelection()"
         [disabled]="!selectedLignes.length">
         <mat-icon>save</mat-icon>

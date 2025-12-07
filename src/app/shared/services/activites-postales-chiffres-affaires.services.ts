@@ -2,8 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CategorieProduit } from '../models/categorie-produit';
-import { ChiffreAffairePostaleCreateWithFileRequest } from '../models/activites-postales-chiffres-affaires';
+import {
+  ChiffreAffairePostale,
+  ChiffreAffairePostaleCreateWithFileRequest
+} from '../models/activites-postales-chiffres-affaires';
 import { AppConfigService } from '../../core/config/app-config.service';
+import {Client} from "../models/client";
 
 @Injectable({ providedIn: 'root' })
 export class ActivitesPostalesChiffresAffairesService {
@@ -28,16 +32,21 @@ export class ActivitesPostalesChiffresAffairesService {
     return this.http.post<any>(`${this.baseUrl}/initier/`, formData);
   }
 
-  getListItems(): Observable<CategorieProduit[]> {
-    return this.http.get<CategorieProduit[]>(`${this.baseUrl}/`);
+  getListItems(): Observable<ChiffreAffairePostale[]> {
+    return this.http.get<ChiffreAffairePostale[]>(`${this.baseUrl}/`);
   }
 
-  getItem(id: number): Observable<CategorieProduit> {
-    return this.http.get<CategorieProduit>(`${this.baseUrl}/${id}/`);
+  getItem(id: number): Observable<ChiffreAffairePostale> {
+    return this.http.get<ChiffreAffairePostale>(`${this.baseUrl}/${id}/`);
   }
 
-  update(id: number, categorie: CategorieProduit): Observable<CategorieProduit> {
-    return this.http.put<CategorieProduit>(`${this.baseUrl}/${id}/`, categorie);
+  create(chiffreAffairePostale: ChiffreAffairePostale): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/`, chiffreAffairePostale);
+  }
+
+
+  update(id: number, chiffreAffairePostale: ChiffreAffairePostale): Observable<ChiffreAffairePostale> {
+    return this.http.put<ChiffreAffairePostale>(`${this.baseUrl}/${id}/`, chiffreAffairePostale);
   }
 
   delete(id: number): Observable<void> {

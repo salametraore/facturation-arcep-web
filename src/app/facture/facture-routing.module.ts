@@ -46,6 +46,7 @@ import {AutorisationGeneraleComponent} from "./autorisation-generale/autorisatio
  import { TraitementBilanComponent } from './gestion-activites-postales/traitement-bilan/traitement-bilan.component';
  import { RecapRedevancesComponent } from './gestion-activites-postales/recap-redevances/recap-redevances.component';
  import {AutorisationsPostalesComponent} from "./autorisations-postales/autorisations-postales.component";
+ import {FicheTechniquesActivitesPostalesComponent} from "./fiche-techniques-activites-postales/fiche-techniques-activites-postales.component";
 
 
 const routes: Routes = [
@@ -107,7 +108,10 @@ const routes: Routes = [
 
       {path: 'client-dfc', component:ClientDfcComponent},
       {path: 'client-dfc-detail/:id', component:ClientDfcDetailsComponent, resolve: { client: ClientResolver }},
-
+      {
+        path: 'fiche-techniques-activites-postales', component: FicheTechniquesActivitesPostalesComponent
+      },
+      {path: 'generation-redevances-annuelles', component:GenerationRedevanceComponent},
     ]
   }
 ];

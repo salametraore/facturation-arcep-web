@@ -19,8 +19,8 @@
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Client</mat-label>
               <mat-select formControlName="client" matTooltip="Client concerné">
-                <mat-option *ngFor="let c of clients" [value]="c.id">
-                  {{ c.denomination_sociale || c.raison_sociale || c.nom }}
+                <mat-option *ngFor="let c of clients" [value]="c.client_id">
+                  {{ c.client_nom }}
                 </mat-option>
               </mat-select>
             </mat-form-field>

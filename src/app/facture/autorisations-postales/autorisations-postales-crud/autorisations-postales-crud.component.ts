@@ -122,7 +122,7 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
     this.form = this.formBuilder.group({
       id: [this.ficheTechnique?.id],
       client: [this.ficheTechnique?.client],
-      //zone_id: [this.ficheTechnique?.produits_detail[0].zone_id],
+      zone_id: [this.ficheTechnique?.produits_detail[0].zone_id],
       produit: [this.ficheTechnique?.produits_detail[0].produit],
       commentaire: [this.ficheTechnique?.commentaire],
     });
@@ -190,6 +190,15 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
   crud() {
     const formValue = this.form.value;
 
+    const produitId = Number(formValue['produit']);
+
+    // 👉 Si produit = 81, zone_id doit être null
+    const zoneId =
+      produitId === 81
+        ? null
+        : (formValue['zone_id'] != null && formValue['zone_id'] !== ''
+        ? Number(formValue['zone_id'])
+        : null);
 
     const dataFicheTechnique = {
       client: this.client?.id,
@@ -199,7 +208,11 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
       commentaire: formValue['commentaire'],
       categorie_produit: this.fixeCategorie,
       produits_detail: [
-        {produit: Number(formValue['produit']),zone_id:Number(formValue['zone_id']), quantite: 1},
+        {
+          produit: produitId,
+          zone_id: zoneId,      // 🔹 ici on a bien null quand produit = 81
+          quantite: 1
+        },
       ],
     };
 
@@ -215,37 +228,27 @@ export class AutorisationsPostalesCrudComponent implements OnInit {
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
     formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
-    // Produits (JSON stringifié)
+    // Produits (JSON stringifié) => zone_id sera bien null dans le JSON
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
 
-    // Upload fichiers
-    /*    files.forEach(file => {
-          formData.append('documents', file, file.name);
-        });*/
-
-    // Choisir la requête : création ou mise à jour
     const request$ =
-      this.operation === operations.update
+      this.operation === this.operations.update
         ? this.ficheTechniquesService.update(this.ficheTechnique.id, formData)
         : this.ficheTechniquesService.create(formData);
 
     request$.subscribe(
       (data: FicheTechniques) => {
         this.msgMessageService.success('Fiche technique enregistrée avec succès');
-
-        // 🔒 on bloque la sauvegarde après succès
         this.saveLocked = true;
-
-        // (optionnel) on met à jour l'opération / la fiche en mémoire
         this.operation = this.operations.update;
         this.ficheTechnique = data;
       },
       (error) => {
-        this.dialogService.alert({message: error.message});
+        this.dialogService.alert({ message: error.message });
       }
     );
-
   }
+
 
   onTransmettre() {
     const miseAJourStatutFiche: MiseAJourStatutFiche = new MiseAJourStatutFiche();

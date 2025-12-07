@@ -47,9 +47,10 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="dialog-actions">
+    <!--(click)="genererRedevancesAnnuelles()"-->
 
     <button mat-flat-button
-      (click)="genererRedevancesAnnuelles()"
+      (click)="listeRedevancesAgenerer()"
       [color]="canGenerate() ? 'primary' : null"
       [disabled]="!canGenerate()">
       <span *ngIf="!isLoading">Générer</span>

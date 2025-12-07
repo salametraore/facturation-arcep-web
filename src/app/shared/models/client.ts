@@ -1,4 +1,4 @@
-export interface Client {
+export class Client {
   readonly id: number;
   created_at?: string;
   updated_at?: string;
@@ -29,3 +29,9 @@ export interface Client {
 
 }
 
+export class ClientAutorisePostal {
+  client_id?: number | null;
+  client_nom?: string | null;
+  numero_comptable?: string | null;
+  fiche_technique_autorisation_id?: number | null;
+}

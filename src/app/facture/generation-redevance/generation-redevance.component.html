@@ -1,0 +1,479 @@
+<mat-card>
+
+  <div class="page-title">
+    <h2>Génération des redevances annuelles</h2>
+  </div>
+
+  <mat-horizontal-stepper #stepper [linear]="true">
+
+    <!-- STEP 1 : CRITÈRES -->
+    <mat-step [stepControl]="form">
+      <form [formGroup]="form">
+
+        <ng-template matStepLabel>Critères de sélection</ng-template>
+
+        <!-- En-tête avec titre + boutons -->
+        <div class="list-header"
+             style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; margin-bottom: 16px;">
+          <h3 class="list-title">Critères de sélection</h3>
+
+          <div class="list-actions" style="display: flex; gap: 8px;">
+            <button
+              mat-flat-button
+              (click)="listeRedevancesAgenerer(stepper)"
+              [color]="canGenerate() ? 'primary' : null"
+              [disabled]="!canGenerate() || isListing">
+              <span *ngIf="!isListing">Lister les redevances</span>
+              <span *ngIf="isListing" class="inline-flex items-center gap-2">
+                <mat-progress-spinner [diameter]="16" mode="indeterminate"></mat-progress-spinner>
+                Traitement...
+              </span>
+            </button>
+
+            <button mat-stroked-button color="warn" (click)="fermer()">
+              Fermer
+            </button>
+          </div>
+        </div>
+
+        <div class="dialog-body field-xl">
+
+          <!-- Ligne 1 : Catégorie + Signataire -->
+          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+
+            <!-- Catégorie -->
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Catégorie de produit</mat-label>
+              <mat-select formControlName="categorie" required>
+                <mat-option *ngFor="let c of categories" [value]="c.id">
+                  {{ c.libelle }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.controls.categorie.hasError('required')">
+                La catégorie est requise.
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Signataire -->
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Signataire</mat-label>
+              <input formControlName="signataire" matInput required type="text">
+              <mat-error *ngIf="form.controls.signataire.hasError('required')">
+                Le signataire est requis.
+              </mat-error>
+            </mat-form-field>
+
+          </div>
+
+          <!-- Ligne 2 : Année + Client -->
+          <div style="display: flex; gap: 16px;">
+
+            <!-- Année -->
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Année</mat-label>
+              <input formControlName="annee" matInput required type="number">
+              <mat-error *ngIf="form.controls.annee.hasError('required')">
+                L'année est requise.
+              </mat-error>
+              <mat-error *ngIf="form.controls.annee.hasError('min')">
+                Année minimale : 2000.
+              </mat-error>
+              <mat-error *ngIf="form.controls.annee.hasError('max')">
+                Année maximale : 2100.
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Client -->
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Client</mat-label>
+              <mat-select formControlName="client">
+                <mat-option *ngFor="let c of clients" [value]="c.id">
+                  {{ c.denomination_sociale }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+
+        </div>
+
+      </form>
+    </mat-step>
+
+
+    <!-- STEP 2 : LISTE DES REDEVANCES CANDIDATES -->
+    <mat-step>
+      <ng-template matStepLabel>Liste des redevances à générer</ng-template>
+
+      <div *ngIf="listeRedevancesCandidates.length === 0">
+        <p>Aucune redevance candidate. Revenez à l’étape précédente pour modifier les critères.</p>
+      </div>
+
+      <div *ngIf="listeRedevancesCandidates.length > 0">
+
+        <!-- Barre de sélection globale + info -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <mat-checkbox
+            (change)="toggleAll($event.checked)"
+            [checked]="isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+            Tout sélectionner / désélectionner
+          </mat-checkbox>
+
+          <span>
+            Sélectionnées : {{ selection.selected.length }} / {{ listeRedevancesCandidates.length }}
+          </span>
+        </div>
+
+        <!-- Tableau style "factures" avec ligne de détail expandable -->
+        <section class="list-box">
+          <div class="list-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="list-title">Redevances candidates</h3>
+
+            <div class="list-actions" style="display: flex; gap: 8px;">
+              <button mat-stroked-button color="primary" (click)="stepper.previous()">
+                Retour
+              </button>
+
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="goToRecap(stepper)"
+                [disabled]="!hasSelection()">
+                Continuer
+              </button>
+            </div>
+          </div>
+
+          <div class="list-body">
+            <div class="mat-elevation-z10 compact-table">
+              <table
+                mat-table
+                [dataSource]="listeRedevancesCandidates"
+                style="width: 100%"
+                multiTemplateDataRows>
+
+                <!-- Sélection -->
+                <ng-container matColumnDef="select">
+                  <th mat-header-cell *matHeaderCellDef></th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-checkbox
+                      (click)="$event.stopPropagation()"
+                      (change)="selection.toggle(row)"
+                      [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                  </td>
+                </ng-container>
+
+                <!-- Client -->
+                <ng-container matColumnDef="client">
+                  <th mat-header-cell *matHeaderCellDef>Client</th>
+                  <td mat-cell *matCellDef="let row">
+                    {{ getClientName(row.client_id) }}
+                  </td>
+                </ng-container>
+
+                <!-- Montant total -->
+                <ng-container matColumnDef="montant_total">
+                  <th mat-header-cell *matHeaderCellDef>Montant</th>
+                  <td mat-cell *matCellDef="let row">
+                    {{ row.montant_total | number:'1.0-0' }}
+                  </td>
+                </ng-container>
+
+                <!-- Période début -->
+                <ng-container matColumnDef="periode_debut">
+                  <th mat-header-cell *matHeaderCellDef>Date début</th>
+                  <td mat-cell *matCellDef="let row">
+                    {{ row.periode_debut | date:'dd/MM/yyyy' }}
+                  </td>
+                </ng-container>
+
+                <!-- Période fin -->
+                <ng-container matColumnDef="periode_fin">
+                  <th mat-header-cell *matHeaderCellDef>Date fin</th>
+                  <td mat-cell *matCellDef="let row">
+                    {{ row.periode_fin | date:'dd/MM/yyyy' }}
+                  </td>
+                </ng-container>
+
+                <!-- Type de frais -->
+                <ng-container matColumnDef="type_frais">
+                  <th mat-header-cell *matHeaderCellDef>Type frais</th>
+                  <td mat-cell *matCellDef="let row">
+                    {{ row.type_frais }}
+                  </td>
+                </ng-container>
+
+                <!-- Actions -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let row">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      (click)="toggleExpand(row); $event.stopPropagation()">
+                      <mat-icon>
+                        {{ expandedRedevance === row ? 'expand_less' : 'expand_more' }}
+                      </mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+
+                <!-- Ligne principale -->
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="displayedColumnsStep2">
+                </tr>
+
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumnsStep2"
+                  class="element-row"
+                  (click)="toggleExpand(row)"
+                  [ngClass]="{ 'selected': selection.isSelected(row) }">
+                </tr>
+
+                <!-- Ligne de détail expandable -->
+                <ng-container matColumnDef="expandedDetail">
+                  <td mat-cell *matCellDef="let row"
+                      [attr.colspan]="displayedColumnsStep2.length">
+                    <div *ngIf="expandedRedevance === row" class="detail-container">
+
+                      <table mat-table [dataSource]="row.lignes" class="mat-elevation-z1 w-full">
+
+                        <!-- Produit -->
+                        <ng-container matColumnDef="produit">
+                          <th mat-header-cell *matHeaderCellDef>Produit</th>
+                          <td mat-cell *matCellDef="let ligne">
+                            {{ ligne.produit }}
+                          </td>
+                        </ng-container>
+
+                        <!-- Qté -->
+                        <ng-container matColumnDef="quantite">
+                          <th mat-header-cell *matHeaderCellDef>Qté</th>
+                          <td mat-cell *matCellDef="let ligne">
+                            {{ ligne.quantite }}
+                          </td>
+                        </ng-container>
+
+                        <!-- PU -->
+                        <ng-container matColumnDef="prix_unitaire">
+                          <th mat-header-cell *matHeaderCellDef>PU</th>
+                          <td mat-cell *matCellDef="let ligne">
+                            {{ ligne.prix_unitaire | number:'1.0-2' }}
+                          </td>
+                        </ng-container>
+
+                        <!-- Montant ligne -->
+                        <ng-container matColumnDef="montant_ligne">
+                          <th mat-header-cell *matHeaderCellDef>Montant ligne</th>
+                          <td mat-cell *matCellDef="let ligne">
+                            {{ ligne.montant_ligne | number:'1.0-2' }}
+                          </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="['produit','quantite','prix_unitaire','montant_ligne']"></tr>
+                        <tr mat-row *matRowDef="let ligne; columns: ['produit','quantite','prix_unitaire','montant_ligne'];"></tr>
+                      </table>
+
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: ['expandedDetail']"
+                  class="detail-row">
+                </tr>
+
+                <!-- Ligne vide -->
+                <tr mat-row *matNoDataRow>
+                  <td class="mat-cell" [attr.colspan]="displayedColumnsStep2.length">
+                    Aucune redevance candidate.
+                  </td>
+                </tr>
+
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </mat-step>
+
+    <!-- STEP 3 : RÉCAPITULATIF -->
+    <mat-step>
+      <ng-template matStepLabel>Récapitulatif</ng-template>
+
+      <section class="list-box">
+        <div class="list-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="list-title">Récapitulatif des redevances sélectionnées</h3>
+
+          <div class="list-actions" style="display: flex; gap: 8px;">
+            <button mat-stroked-button color="primary" (click)="stepper.previous()">
+              Retour
+            </button>
+
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="genererRedevancesAnnuelles()"
+              [disabled]="isLoading || !hasSelection()">
+              <span *ngIf="!isLoading">Générer les redevances</span>
+              <span *ngIf="isLoading" class="inline-flex items-center gap-2">
+                <mat-progress-spinner [diameter]="16" mode="indeterminate"></mat-progress-spinner>
+                Traitement...
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="list-body">
+          <div class="mat-elevation-z10 compact-table">
+            <table
+              mat-table
+              [dataSource]="selectedRedevances"
+              style="width: 100%"
+              multiTemplateDataRows>
+
+              <!-- Client -->
+              <ng-container matColumnDef="client">
+                <th mat-header-cell *matHeaderCellDef>Client</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ getClientName(row.client_id) }}
+                </td>
+              </ng-container>
+
+              <!-- Montant total -->
+              <ng-container matColumnDef="montant_total">
+                <th mat-header-cell *matHeaderCellDef>Montant</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.montant_total | number:'1.0-0' }}
+                </td>
+              </ng-container>
+
+              <!-- Période début -->
+              <ng-container matColumnDef="periode_debut">
+                <th mat-header-cell *matHeaderCellDef>Date début</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.periode_debut | date:'dd/MM/yyyy' }}
+                </td>
+              </ng-container>
+
+              <!-- Période fin -->
+              <ng-container matColumnDef="periode_fin">
+                <th mat-header-cell *matHeaderCellDef>Date fin</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.periode_fin | date:'dd/MM/yyyy' }}
+                </td>
+              </ng-container>
+
+              <!-- Type de frais -->
+              <ng-container matColumnDef="type_frais">
+                <th mat-header-cell *matHeaderCellDef>Type frais</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.type_frais }}
+                </td>
+              </ng-container>
+
+              <!-- Actions : chevron d’extension -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let row">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="toggleExpand(row); $event.stopPropagation()">
+                    <mat-icon>
+                      {{ expandedRedevance === row ? 'expand_less' : 'expand_more' }}
+                    </mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <!-- Ligne principale -->
+              <tr
+                mat-header-row
+                *matHeaderRowDef="displayedColumnsStep3">
+              </tr>
+
+              <tr
+                mat-row
+                *matRowDef="let row; columns: displayedColumnsStep3"
+                class="element-row"
+                (click)="toggleExpand(row)">
+              </tr>
+
+              <!-- Ligne de détail expandable -->
+              <ng-container matColumnDef="expandedDetailRecap">
+                <td mat-cell *matCellDef="let row"
+                    [attr.colspan]="displayedColumnsStep3.length">
+                  <div *ngIf="expandedRedevance === row" class="detail-container">
+
+                    <table mat-table [dataSource]="row.lignes" class="mat-elevation-z1 w-full">
+
+                      <!-- Produit -->
+                      <ng-container matColumnDef="produit">
+                        <th mat-header-cell *matHeaderCellDef>Produit</th>
+                        <td mat-cell *matCellDef="let ligne">
+                          {{ ligne.produit }}
+                        </td>
+                      </ng-container>
+
+                      <!-- Quantité -->
+                      <ng-container matColumnDef="quantite">
+                        <th mat-header-cell *matHeaderCellDef>Qté</th>
+                        <td mat-cell *matCellDef="let ligne">
+                          {{ ligne.quantite }}
+                        </td>
+                      </ng-container>
+
+                      <!-- Prix unitaire -->
+                      <ng-container matColumnDef="prix_unitaire">
+                        <th mat-header-cell *matHeaderCellDef>PU</th>
+                        <td mat-cell *matCellDef="let ligne">
+                          {{ ligne.prix_unitaire | number:'1.0-2' }}
+                        </td>
+                      </ng-container>
+
+                      <!-- Montant ligne -->
+                      <ng-container matColumnDef="montant_ligne">
+                        <th mat-header-cell *matHeaderCellDef>Montant ligne</th>
+                        <td mat-cell *matCellDef="let ligne">
+                          {{ ligne.montant_ligne | number:'1.0-2' }}
+                        </td>
+                      </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="['produit','quantite','prix_unitaire','montant_ligne']"></tr>
+                      <tr mat-row *matRowDef="let ligne; columns: ['produit','quantite','prix_unitaire','montant_ligne'];"></tr>
+                    </table>
+
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-row
+                *matRowDef="let row; columns: ['expandedDetailRecap']"
+                class="detail-row">
+              </tr>
+
+              <!-- Ligne vide -->
+              <tr mat-row *matNoDataRow>
+                <td class="mat-cell" [attr.colspan]="displayedColumnsStep3.length">
+                  Aucune redevance sélectionnée.
+                </td>
+              </tr>
+
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </mat-step>
+
+  </mat-horizontal-stepper>
+
+</mat-card>

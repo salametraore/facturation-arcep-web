@@ -171,14 +171,42 @@ export class ClientCrudComponent implements OnInit, AfterViewInit {
     this.client = client;
   }
 
+
   onPrintReleveClient(): void {
     if (!this.client?.id) {
       this.dialogService.alert({ message: 'Veuillez d’abord sélectionner un client.' });
       return;
     }
+
     this.clientService.genererRelevePDF(this.client.id).subscribe({
-      next: (response: HttpResponse<Blob>) => this.pdfViewService.printDirectly(response),
-      error: (error) => this.dialogService.alert({ message: error })
+      next: (res: HttpResponse<ArrayBuffer>) => {
+        if (!res.body) {
+          this.dialogService.alert({ message: 'Le PDF est vide.' });
+          return;
+        }
+
+        // Convertit l’ArrayBuffer en Blob PDF
+        const blob = new Blob([res.body], { type: 'application/pdf' });
+
+        // Essaie de récupérer un nom de fichier depuis Content-Disposition
+        const cd = res.headers.get('Content-Disposition') || '';
+        const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(cd);
+        const fallback = `releve_client_${this.client.id}.pdf`;
+        const filename = match ? decodeURIComponent(match[1]) : fallback;
+
+        // Comme pour onPrint : on envoie le Blob (ou Blob + filename si ton service le gère)
+        // this.pdfViewService.printDirectly(blob, filename);
+        this.pdfViewService.printDirectly(blob);
+      },
+      error: (err) => {
+        this.dialogService.alert({
+          message: 'Erreur lors de la génération du relevé PDF : ' + (err?.message || err)
+        });
+      }
     });
   }
+
+
+
+
 }

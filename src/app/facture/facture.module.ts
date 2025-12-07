@@ -113,6 +113,11 @@ import {ClientDfcDetailsEncaissementsComponent} from "./client-dfc/client-dfc-de
 import {ClientDfcDetailsDevisComponent} from "./client-dfc/client-dfc-details/client-dfc-details-devis/client-dfc-details-devis.component";
 import {ClientDfcEncaissementCrudComponent} from "./client-dfc/client-dfc-details/client-dfc-encaissement-crud/client-dfc-encaissement-crud.component";
 import {MaterialModule} from "../material/material.module";
+import {FichesTechniquesDapTableComponent} from "./fiche-techniques-activites-postales/fiches-techniques-table/fiches-techniques-dap-table.component";
+import {CaPostalDeterminationShellComponent} from "./fiche-techniques-activites-postales/ca-postal-determination-shell/ca-postal-determination-shell.component";
+import {FicheTechniquesActivitesPostalesComponent} from "./fiche-techniques-activites-postales/fiche-techniques-activites-postales.component";
+import { ImportBilanDialogComponent } from './fiche-techniques-activites-postales/import-bilan-dialog/import-bilan-dialog.component';
+import {ClientDfcPenalitesCrudComponent} from "./client-dfc/client-dfc-details/client-dfc-penalites-crud/client-dfc-penalites-crud.component";
 
 
 @NgModule({
@@ -203,6 +208,11 @@ import {MaterialModule} from "../material/material.module";
     ClientDfcDetailsEncaissementsComponent,
     ClientDfcDetailsDevisComponent,
     ClientDfcEncaissementCrudComponent,
+    FichesTechniquesDapTableComponent,
+    CaPostalDeterminationShellComponent,
+    FicheTechniquesActivitesPostalesComponent,
+    ImportBilanDialogComponent,
+    ClientDfcPenalitesCrudComponent,
   ],
   imports: [
     CommonModule,

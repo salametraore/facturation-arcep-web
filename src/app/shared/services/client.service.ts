@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Client } from '../models/client';
+import {Client, ClientAutorisePostal} from '../models/client';
 import { DetailFicheClient } from '../models/detail-fiche-client';
 import { LigneReleveCompteClient, ReleveCompteClient } from '../models/ligne-releve-compte-client';
 import { RecouvDashboardClient } from '../models/recouv-dashboard-client';
 import { RecouvListeEncaissement } from '../models/recouv-liste-encaissement';
 
 import { AppConfigService } from '../../core/config/app-config.service';
+import {map} from "rxjs/operators";
 
 @Injectable({ providedIn: 'root' })
 export class ClientService {
@@ -31,6 +32,7 @@ export class ClientService {
   private get urlRecouv()         { return this.joinUrl(this.cfg.baseUrl, 'recouv'); }
   private get urlReleveClient()   { return this.joinUrl(this.cfg.baseUrl, 'releve-client'); }
   private get urlReleveGenerate() { return this.joinUrl(this.cfg.baseUrl, 'releve/generate-pdf'); }
+  private get urlClientAutorisePostal() { return this.joinUrl(this.cfg.baseUrl, 'clients/autorise-postal'); }
 
   // --- CRUD Clients ---
   getItems(): Observable<Client[]> {
@@ -38,7 +40,7 @@ export class ClientService {
   }
 
   getItem(id: any): Observable<Client> {
-    return this.httpClient.get<Client>(`${this.urlClients}/${id}`);
+    return this.httpClient.get<Client>(`${this.urlClients}/${id}/`);
   }
 
   create(client: Client): Observable<any> {
@@ -70,7 +72,19 @@ export class ClientService {
     const url = `${this.urlReleveGenerate}/${client_id}/`;
     return this.httpClient.get(url, {
       observe: 'response',
-      responseType: 'blob'
+      responseType: 'arraybuffer' as 'json'
     }); // -> Observable<HttpResponse<Blob>>
+  }
+
+  /*  getListeClientsAutorisesPostal(): Observable<any> {
+      return this.httpClient.get<any>(`${this.urlClientAutorisePostal}/`);
+    }*/
+
+  getListeClientsAutorisesPostal(): Observable<ClientAutorisePostal[]> {
+    return this.httpClient
+      .get<{ results: ClientAutorisePostal[] }>(`${this.urlClientAutorisePostal}/`)
+      .pipe(
+        map(resp => resp.results)   // 👈 on ne renvoie QUE le tableau
+      );
   }
 }

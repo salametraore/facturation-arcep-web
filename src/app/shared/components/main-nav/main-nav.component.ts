@@ -314,7 +314,7 @@ export class MainNavComponent implements OnInit {
           module: 0,
           feuille: 1,
           sous_menus: null,
-          url: 'facture/activites-postales'
+          url: 'facture/fiche-techniques-activites-postales'
         },
         {
           id: 2100,
@@ -387,6 +387,17 @@ export class MainNavComponent implements OnInit {
           feuille: 1,
           sous_menus: null,
           url: 'facture/encaissement'
+        },
+        {
+          id: 3035,
+          direction: 1,
+          titre: 'Génération des Redevances Annuelles',
+          description: 'Génération des Redevances Annuelles',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'facture/generation-redevances-annuelles'
         },
         {
           id: 3100,

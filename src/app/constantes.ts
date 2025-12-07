@@ -115,7 +115,6 @@ export const AVIS = [
   { value: 'NOF', label: 'Avis non fourni' }
 ];
 
-
 export const TYPE_FRAIS = [
   { code: 'FD', label: 'Frais de dossier' },
   { code: 'GA', label: 'Garantie' },
@@ -126,8 +125,11 @@ export const TYPE_FRAIS = [
   { code: 'IN', label: 'Inscription' },
   { code: 'RA', label: 'Restauration' },
   { code: 'DA', label: "Dossier d'Appel d'Offre" },
-  { code: 'DI', label: "Prestations diverses" }
+  { code: 'DI', label: 'Prestation diverse' },
+  { code: 'DE', label: "Droit d'entrée" }
 ];
+
+
 
 export const ETATS_FACTURE = [
   { code: 'EMISE', label: 'Emise' },

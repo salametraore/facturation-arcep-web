@@ -28,21 +28,6 @@ export class Facture {
   periode?: string;
 }
 
-export class GenererRedevanceRequest {
-  annee?: number;
-  categorie_produit?: number;
-  client?: number;
-  direction?: number;
-  signataire?: string;
-}
-
-export interface GenererRedevanceResponse {
-  message: string;
-  resultat: number;
-}
-
-
-
 export class ClientFactureDevisImpayes {
 
   // identifiant de la ligne d’impayé
@@ -70,4 +55,58 @@ export class ClientFactureDevisImpayes {
   montant!: number;
 
   montant_restant!: number;
+}
+
+export type TypeLigne = 'FACTURE' | 'DEVIS';
+
+export interface FacturePenalite {
+  facture_id?: number;
+  devis_id?: number;
+
+  type_ligne: TypeLigne;
+
+  reference: string;
+  objet: string;
+
+  date_emission: string;    // ← maintenant c’est la date d’émission
+
+  montant: number;
+  montant_restant: number;
+
+  taux_penalite: number;      // % saisi par l’utilisateur
+  montant_penalite: number;   // montant calculé
+}
+
+
+/** Ligne de pénalité pour une facture ou un devis */
+export interface FacturePenaliteLigneRequest {
+  /** 'FACTURE' ou 'DEVIS' */
+  type_ligne: string;
+
+  /** Id de la facture ou du devis (facture_id ou devis_id) */
+  ligne_id: number;
+
+  /** REFERENCE DE LA 'FACTURE' ou 'DEVIS' */
+  reference: string;
+
+  /** Montant restant dû sur la ligne (base de calcul des pénalités) */
+  montant_restant: number;
+
+  /** Taux de pénalité (en %, ou selon la convention backend) */
+  taux_penalite: number;
+
+  /** Montant de la pénalité calculée pour cette ligne */
+  montant_penalite: number;
+}
+
+/** Payload d’appel API pour générer la facture de pénalités */
+export interface FacturePenalitesRequest {
+  /** Identifiant du client concerné */
+  clientId: number;
+
+  /** Total des pénalités sur l’ensemble des lignes */
+  totalPenalites: number;
+
+  /** Liste des lignes de pénalités */
+  lignes: FacturePenaliteLigneRequest[];
 }

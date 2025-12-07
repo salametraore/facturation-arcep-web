@@ -184,7 +184,20 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     };
 
     const type = this.ficheTechniqueAFacturer?.type_frais;
-    const redevanceTypes = new Set(['RD', 'LO', 'EL', 'IN', 'RA', 'DA']);
+    const redevanceTypes = new Set([
+      'FD', // Frais de dossier
+      'GA', // Garantie
+      'RD', // Redevance annuelle
+      'RC', // Redevance de contrôle
+      'EL', // Électricité
+      'LO', // Loyer
+      'IN', // Inscription
+      'RA', // Restauration
+      'DA', // Dossier d’Appel d’Offre
+      'DI', // Prestation diverse
+      'DE', // Droit d’entrée
+    ]);
+
 
     if (type === 'FD') {
       this.genererDossierFacture(payload);

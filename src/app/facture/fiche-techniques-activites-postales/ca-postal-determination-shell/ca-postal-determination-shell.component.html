@@ -1,0 +1,242 @@
+<mat-card class="ca-postal-card">
+
+
+  <div class="list-header">
+
+    <h4>Détermination du chiffre d’affaires postal</h4>
+
+    <div class="list-actions">
+      <button mat-flat-button color="primary" (click)="ouvrirImportDialog()">
+        <mat-icon>upload</mat-icon>
+        Importer un bilan comptable
+      </button>
+    </div>
+  </div>
+
+  <mat-horizontal-stepper [linear]="true" #stepper>
+
+    <!-- ÉTAPE 1 : Import & sélection -->
+    <mat-step [completed]="step1Completed">
+      <ng-template matStepLabel>
+<!--        <mat-icon class="step-icon" [ngClass]="{ done: step1Completed }">
+          {{ step1Completed ? 'check_circle' : 'looks_one' }}
+        </mat-icon>-->
+        <span>sélection du bilan</span>
+      </ng-template>
+
+
+
+      <section class="bloc bloc-documents">
+
+        <div *ngIf="loadingDocs">Chargement des documents...</div>
+
+        <table mat-table [dataSource]="chiffreAffairePostales"
+               class="mat-elevation-z1"
+               *ngIf="!loadingDocs && chiffreAffairePostales.length">
+
+          <!-- Colonne Client -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef> Client </th>
+            <td mat-cell *matCellDef="let row">
+              {{ getClientLibelle(row.client) }}
+            </td>
+          </ng-container>
+
+          <!-- Colonne Date chargement -->
+          <ng-container matColumnDef="date_chargement">
+            <th mat-header-cell *matHeaderCellDef> Date chargement </th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.date_chargement | date:'shortDate' }}
+            </td>
+          </ng-container>
+
+          <!-- Colonne CA postal -->
+          <ng-container matColumnDef="chiffre_affaire">
+            <th mat-header-cell *matHeaderCellDef> CA postal </th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.chiffre_affaire || '-' }}
+            </td>
+          </ng-container>
+
+          <!-- Colonne Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> </th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-button color="primary"
+                      (click)="selectionnerChiffreAFfaireCourant(row); allerEtape2()">
+                Traiter
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="docDisplayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: docDisplayedColumns;"></tr>
+        </table>
+
+        <div *ngIf="!loadingDocs && !chiffreAffairePostales.length" class="empty-state">
+          Aucun bilan importé pour le moment.
+          Utilisez le bouton « Importer un bilan comptable » pour démarrer.
+        </div>
+      </section>
+
+    </mat-step>
+
+    <!-- ÉTAPE 2 : Lignes du bilan & validation -->
+    <mat-step [completed]="step2Completed">
+      <ng-template matStepLabel>
+ <!--       <mat-icon class="step-icon" [ngClass]="{ done: step2Completed }">
+          {{ step2Completed ? 'check_circle' : 'looks_two' }}
+        </mat-icon>-->
+        <span>Lignes du bilan & CA postal</span>
+      </ng-template>
+
+      <section class="bloc bloc-lignes" *ngIf="chiffreAffairePostaleCourant">
+        <h6>
+          Lignes du bilan — {{ getClientLibelle(chiffreAffairePostaleCourant.client) }}
+          (chargé le {{ chiffreAffairePostaleCourant.date_chargement | date:'shortDate' }})
+        </h6>
+
+        <div *ngIf="loadingLignes">Chargement des lignes du bilan...</div>
+
+        <div class="lignes-layout" *ngIf="!loadingLignes">
+
+          <table mat-table [dataSource]="lignesBilan" class="mat-elevation-z1">
+
+            <!-- Sélection -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox [(ngModel)]="row.retenu"></mat-checkbox>
+              </td>
+            </ng-container>
+
+            <!-- Numéro de compte -->
+            <ng-container matColumnDef="numero_compte">
+              <th mat-header-cell *matHeaderCellDef>Compte</th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.numero_compte }}
+              </td>
+            </ng-container>
+
+            <!-- Libellé compte -->
+            <ng-container matColumnDef="libelle_compte">
+              <th mat-header-cell *matHeaderCellDef>Intitulé</th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.libelle_compte }}
+              </td>
+            </ng-container>
+
+            <!-- Montant bilan -->
+            <ng-container matColumnDef="montant">
+              <th mat-header-cell *matHeaderCellDef>Montant bilan</th>
+              <td mat-cell *matCellDef="let row">
+                {{ +row.montant | number:'1.0-0' }}
+              </td>
+            </ng-container>
+
+            <!-- Montant estimé CA postal -->
+            <ng-container matColumnDef="montant_estime">
+              <th mat-header-cell *matHeaderCellDef>Montant estimé CA postal</th>
+              <td mat-cell *matCellDef="let row">
+                <input
+                  matInput
+                  type="number"
+                  [step]="1"
+                  [(ngModel)]="row.montant_estime">
+              </td>
+            </ng-container>
+
+            <!-- lignes du tableau -->
+            <tr mat-header-row *matHeaderRowDef="lignesBilanDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: lignesBilanDisplayedColumns;"></tr>
+
+          </table>
+
+          <div class="recap">
+            <p>
+              Lignes sélectionnées :
+              <strong>{{ lignesSelectionnees.length }}</strong><br>
+              Total CA postal estimé :
+              <strong>{{ totalCaPostal | number:'1.0-0' }}</strong>
+            </p>
+
+            <div class="recap-actions">
+              <button mat-stroked-button color="primary" matStepperPrevious>
+                <mat-icon>arrow_back</mat-icon>
+                Retour
+              </button>
+
+              <button mat-raised-button color="primary"
+                      (click)="validerChiffreAffairePostal()"
+                      [disabled]="saving">
+                <mat-icon>check</mat-icon>
+                Valider et générer la fiche technique
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <div *ngIf="!chiffreAffairePostaleCourant" class="empty-state">
+        Aucun document sélectionné.<br>
+        Revenez à l’étape 1 et cliquez sur « Traiter ».
+      </div>
+    </mat-step>
+
+    <!-- ÉTAPE 3 : Résumé final -->
+    <mat-step [completed]="step3Completed">
+      <ng-template matStepLabel>
+ <!--       <mat-icon class="step-icon" [ngClass]="{ done: step3Completed }">
+          {{ step3Completed ? 'check_circle' : 'looks_3' }}
+        </mat-icon>-->
+        <span>Résumé & fiche</span>
+      </ng-template>
+
+      <section class="bloc bloc-resume" *ngIf="resume && chiffreAffairePostaleCourant">
+
+        <h4>Résumé du chiffre d’affaires postal</h4>
+
+        <p>
+          <strong>Client :</strong>
+          {{ getClientLibelle(chiffreAffairePostaleCourant.client) }}<br>
+          <strong>Année fiscale :</strong> {{ chiffreAffairePostaleCourant.annee_fiscale }}<br>
+          <strong>Date de chargement :</strong>
+          {{ chiffreAffairePostaleCourant.date_chargement | date:'shortDate' }}
+        </p>
+
+        <p>
+          <strong>Message :</strong> {{ resume.message }}<br>
+          <strong>Total CA postal estimé (côté front) :</strong>
+          {{ resume.totalCa | number:'1.0-0' }}<br>
+          <strong>Nombre de lignes retenues :</strong>
+          {{ resume.totalLignes }}
+        </p>
+
+        <p *ngIf="resume.ficheUrl">
+          <a mat-stroked-button color="primary"
+             [href]="resume.ficheUrl"
+             target="_blank">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Télécharger la fiche technique
+          </a>
+        </p>
+
+        <div class="recap-actions">
+          <button mat-stroked-button color="primary" (click)="revenirEtape1()">
+            <mat-icon>arrow_back</mat-icon>
+            Revenir à la liste des bilans
+          </button>
+        </div>
+
+      </section>
+
+      <div *ngIf="!resume" class="empty-state">
+        Aucune validation réalisée pour le moment.
+      </div>
+
+    </mat-step>
+
+  </mat-horizontal-stepper>
+
+</mat-card>

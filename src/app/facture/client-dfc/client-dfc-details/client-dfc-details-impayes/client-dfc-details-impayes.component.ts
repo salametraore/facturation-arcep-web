@@ -16,6 +16,7 @@ import { ActivatedRoute } from "@angular/router";
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import {ClientDfcEncaissementCrudComponent} from "../client-dfc-encaissement-crud/client-dfc-encaissement-crud.component";
+import {ClientDfcPenalitesCrudComponent} from "../client-dfc-penalites-crud/client-dfc-penalites-crud.component";
 
 @Component({
   selector: 'client-dfc-details-impayes',
@@ -130,6 +131,7 @@ export class ClientDfcDetailsImapyesComponent implements OnInit, AfterViewInit {
       }
     });
 
+
     dialogRef.afterClosed().subscribe(result => {
       // si le dialog s’est bien terminé (tu peux ajuster le test selon ton besoin)
       if (result === 'Yes') {
@@ -144,4 +146,33 @@ export class ClientDfcDetailsImapyesComponent implements OnInit, AfterViewInit {
   }
 
 
+  onAppliquerPenalitesSelection() {
+    // aucune ligne sélectionnée → on ne fait rien
+    if (!this.selectedLignes || this.selectedLignes.length === 0) {
+      return;
+    }
+
+    const lignesSelectionnees = [...this.selectedLignes];
+
+    const dialogRef = this.dialog.open(ClientDfcPenalitesCrudComponent, {
+      width: '1200px',
+      data: {
+        clientId: this.clientId,
+        lignesImpayees: lignesSelectionnees
+      }
+    });
+
+
+    dialogRef.afterClosed().subscribe(result => {
+      // si le dialog s’est bien terminé (tu peux ajuster le test selon ton besoin)
+      if (result === 'Yes') {
+        // on vide la sélection
+        this.selectedLignes = [];
+        this.selection.clear();
+
+        // on recharge la liste des impayés
+        this.reloadData();
+      }
+    });
+  }
 }

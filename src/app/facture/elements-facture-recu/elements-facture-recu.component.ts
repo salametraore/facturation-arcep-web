@@ -120,6 +120,8 @@ export class ElementsFactureRecuComponent  implements OnInit, AfterViewInit {
 
     this.ficheTechniquesService.getElementFacturationRecus()
       .subscribe((elementFacturationRecuCreeLists: ElementFacturationRecuCreeList[]) => {
+        console.log("elementFacturationRecuCreeLists");
+        console.log(elementFacturationRecuCreeLists);
         this.t_ElementFacturationRecuCreeList.data = elementFacturationRecuCreeLists
           .sort((a, b) => b.id - a.id); //
         this.updateDataSourceFilter();
