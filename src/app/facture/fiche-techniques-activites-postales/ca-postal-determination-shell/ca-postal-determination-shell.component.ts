@@ -6,7 +6,9 @@ import { MatStepper } from '@angular/material/stepper';
 import {
   ChiffreAffairePostale,
   LigneChiffreAffairePostale,
-  ChiffreAffairePostaleCreateWithFileRequest
+  ChiffreAffairePostaleCreateWithFileRequest,
+  ValiderChiffreAffairePostalRequest,
+  LigneValiderChiffreAffairePostalRequest
 } from '../../../shared/models/activites-postales-chiffres-affaires';
 
 import { ActivitesPostalesChiffresAffairesService } from '../../../shared/services/activites-postales-chiffres-affaires.services';
@@ -17,12 +19,18 @@ import {Client} from "../../../shared/models/client";
 
 @Component({
   selector: 'app-ca-postal-determination-shell',
-  templateUrl: './ca-postal-determination-shell.component.html',
-  styleUrls: ['./ca-postal-determination-shell.component.scss']
+  templateUrl: './ca-postal-determination-shell.component.html'
 })
 export class CaPostalDeterminationShellComponent implements OnInit {
 
   @ViewChild('stepper', { static: false }) stepper!: MatStepper;
+
+  // Config unique de la ventilation : UI + payload backend
+  readonly redevanceConfig = [
+    { key: 'fonctionnement', label: 'Redevence de fonctionnement', taux: 0.5 },
+    { key: 'developpement',  label: 'Redevence de développement',  taux: 0.5 },
+    { key: 'compensation',   label: 'Fonds de compensation',       taux: 1.5 }
+  ];
 
   /** Colonnes du tableau de bilans/chiffres d’affaires */
   docDisplayedColumns = ['client', 'date_chargement', 'chiffre_affaire', 'actions'];
@@ -45,18 +53,7 @@ export class CaPostalDeterminationShellComponent implements OnInit {
   /** Lignes du CA postal du document courant (copie modifiable côté front) */
   lignesBilan: LigneChiffreAffairePostale[] = [];
 
-  /** Lignes retenues pour le CA postal */
-  get lignesSelectionnees(): LigneChiffreAffairePostale[] {
-    return this.lignesBilan.filter(l => l.retenu);
-  }
 
-  /** Total du CA postal estimé (somme des montant_estime) */
-  get totalCaPostal(): number {
-    return this.lignesSelectionnees.reduce(
-      (sum, l) => sum + (l.montant_estime ?? 0),
-      0
-    );
-  }
 
   loadingDocs = false;
   loadingLignes = false;
@@ -87,6 +84,44 @@ export class CaPostalDeterminationShellComponent implements OnInit {
     this.chargerClients();
     this.chargerChiffreAffaires();
   }
+
+  /** Lignes retenues pour le CA postal */
+  get lignesSelectionnees(): LigneChiffreAffairePostale[] {
+    return this.lignesBilan.filter(l => l.retenu);
+  }
+
+  /** Total du CA postal estimé (somme des montant_estime) */
+  get totalCaPostal(): number {
+    return this.lignesSelectionnees.reduce(
+      (sum, l) => sum + (l.montant_estime ?? 0),
+      0
+    );
+  }
+  get totalMontantsRetenus(): number {
+    return this.totalCaPostal;
+  }
+
+// Sert à l’affichage de la carte “Ventilation des redevances”
+  get ventilationRedevances() {
+    const base = this.totalCaPostal;
+    return this.redevanceConfig.map(r => ({
+      ...r,
+      base,
+      montant: Math.round(base * r.taux / 100)
+    }));
+  }
+
+  get totalRedevances(): number {
+    return this.ventilationRedevances.reduce((sum, r) => sum + r.montant, 0);
+  }
+
+  private formatMontant(value: number | null | undefined): string | null {
+    if (value == null) {
+      return null;
+    }
+    return `${Math.trunc(value)}`;
+  }
+
 
   chargerClients(): void {
     this.clientService.getItems().subscribe({
@@ -152,12 +187,15 @@ export class CaPostalDeterminationShellComponent implements OnInit {
     this.chargerDetailChiffreAffaire(ca.id);
   }
 
+
+
   /** Aller à l’étape 2 depuis la liste */
   allerEtape2(): void {
     if (this.step1Completed && this.stepper) {
       this.stepper.next();
     }
   }
+
 
   /** Charger le détail (dont les lignes) via getItem(id) */
   chargerDetailChiffreAffaire(id: number): void {
@@ -212,7 +250,6 @@ export class CaPostalDeterminationShellComponent implements OnInit {
   }
 
 
-
   /** Coche/décoche une ligne comme retenue pour le CA postal */
   onToggleSelection(ligne: LigneChiffreAffairePostale): void {
     ligne.retenu = !ligne.retenu;
@@ -234,7 +271,33 @@ export class CaPostalDeterminationShellComponent implements OnInit {
     this.resume = null;
   }
 
-  /** Valider le CA postal : envoie l’objet complet au backend via update() */
+  /** Aller à l’étape 3 : récapitulatif (sans appeler le backend) */
+  allerEtape3(): void {
+    if (!this.chiffreAffairePostaleCourant) {
+      this.snackBar.open('Veuillez d’abord sélectionner un document.', 'Fermer', { duration: 4000 });
+      return;
+    }
+
+    if (!this.lignesSelectionnees.length) {
+      this.snackBar.open('Aucune ligne sélectionnée pour le CA postal.', 'Fermer', { duration: 4000 });
+      return;
+    }
+
+    this.step2Completed = true;
+
+    // On prépare un premier résumé local
+    this.resume = {
+      message: 'Prévisualisation du chiffre d’affaires postal avant validation.',
+      totalCa: this.totalCaPostal,
+      totalLignes: this.lignesSelectionnees.length,
+      ficheUrl: (this.chiffreAffairePostaleCourant as any).fiche_technique_url ?? null
+    };
+
+    if (this.stepper) {
+      this.stepper.next();
+    }
+  }
+
   validerChiffreAffairePostal(): void {
     if (!this.chiffreAffairePostaleCourant) {
       this.snackBar.open('Veuillez d’abord sélectionner un document.', 'Fermer', { duration: 4000 });
@@ -246,15 +309,49 @@ export class CaPostalDeterminationShellComponent implements OnInit {
       return;
     }
 
-    const payload: ChiffreAffairePostale = {
-      ...this.chiffreAffairePostaleCourant,
-      lignes: this.lignesBilan
+    // Base = total des montants estimés retenus (même que dans la carte UI)
+    const base = this.totalCaPostal;
+
+    // Ventilation calculée UNE fois à partir de la config
+    const [fonct, dev, comp] = this.ventilationRedevances;
+
+    // Construction des lignes envoyées au backend
+    const lignesPayload: LigneValiderChiffreAffairePostalRequest[] = this.lignesBilan.map(l => ({
+      id: l.id,
+      taux: l.taux ?? 0,
+      retenu: !!l.retenu,
+      montant_estime: l.montant_estime ?? null
+    }));
+
+    const payload: ValiderChiffreAffairePostalRequest = {
+      chiffre_affaire_postale_id: this.chiffreAffairePostaleCourant.id,
+
+      // CA global (base taxable)
+      chiffre_affaire: this.formatMontant(base),
+
+      // Fonctionnement
+      taux_fonctionnement: `${fonct.taux}`,                    // ex: "0.5"
+      montant_fonctionnement: this.formatMontant(fonct.montant),
+
+      // Développement
+      taux_developpement: `${dev.taux}`,
+      montant_developpement: this.formatMontant(dev.montant),
+
+      // Compensation
+      taux_compensation: `${comp.taux}`,
+      montant_compensation: this.formatMontant(comp.montant),
+
+      // Lignes détaillées
+      lignes: lignesPayload
     };
+
+    console.log("payload a sauvegarder");
+    console.log(payload);
 
     this.saving = true;
 
-    this.caPostalService.update(this.chiffreAffairePostaleCourant.id, payload).subscribe({
-      next: caMaj => {
+    this.caPostalService.validerChiffreAffairePostal(payload).subscribe({
+      next: (res) => {
         this.saving = false;
         this.snackBar.open(
           'Chiffre d’affaires postal validé et fiche générée avec succès.',
@@ -262,8 +359,10 @@ export class CaPostalDeterminationShellComponent implements OnInit {
           { duration: 5000 }
         );
 
+        const caMaj = res as ChiffreAffairePostale;
         this.chiffreAffairePostaleCourant = caMaj;
 
+        // On remet à jour les lignes côté front à partir de la réponse
         this.lignesBilan = (caMaj.lignes || []).map(l => {
           const montantBilan = l.montant
             ? parseFloat(String(l.montant).replace(',', '.'))
@@ -295,28 +394,22 @@ export class CaPostalDeterminationShellComponent implements OnInit {
 
         this.chargerChiffreAffaires();
 
-        this.step2Completed = true;
         this.resume = {
+          ...(this.resume || {
+            totalCa: this.totalCaPostal,
+            totalLignes: this.lignesSelectionnees.length
+          }),
           message: 'Chiffre d’affaires postal validé et fiche générée avec succès.',
-          totalCa: this.totalCaPostal,
-          totalLignes: this.lignesSelectionnees.length,
           ficheUrl: (caMaj as any).fiche_technique_url ?? null
         };
-        this.step3Completed = true;
 
-        // 👉 on bascule bien sur le 3e onglet
-        if (this.stepper) {
-          setTimeout(() => {
-            this.stepper.selectedIndex = 2;   // 0 = étape 1, 1 = étape 2, 2 = étape 3
-          }, 0);
-        }
+        this.step3Completed = true;
       },
       error: () => {
         this.saving = false;
         this.snackBar.open('Erreur lors de la validation du CA postal.', 'Fermer', { duration: 5000 });
       }
     });
-
   }
 
 }

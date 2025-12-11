@@ -28,15 +28,15 @@ export interface LigneChiffreAffairePostale {
 
 // Objet principal
 export interface ChiffreAffairePostale {
-  id: number;                               // readOnly
+  id: number;
 
-  client: number;                           // client_id
+  client: number;
   fiche_technique?: number | null;
   fiche_technique_autorisation?: number | null;
 
-  date_chargement: string;                  // ISO date-time
+  date_chargement: string;
 
-  taux_fonctionnement?: string | null;      // décimaux sous forme de string
+  taux_fonctionnement?: string | null;
   montant_fonctionnement?: string | null;
 
   taux_developpement?: string | null;
@@ -47,6 +47,34 @@ export interface ChiffreAffairePostale {
 
   chiffre_affaire?: string | null;
 
+  etat?: string | null;
+
   documents: DocumentCAP[];                 // readOnly
   lignes: LigneChiffreAffairePostale[];     // readOnly
+}
+
+
+export class ValiderChiffreAffairePostalRequest {
+  chiffre_affaire_postale_id: number;
+
+  chiffre_affaire?: string | null;
+
+  taux_fonctionnement?: string | null;
+  montant_fonctionnement?: string | null;
+
+  taux_developpement?: string | null;
+  montant_developpement?: string | null;
+
+  taux_compensation?: string | null;
+  montant_compensation?: string | null;
+
+  lignes: LigneValiderChiffreAffairePostalRequest[];
+}
+
+
+export class LigneValiderChiffreAffairePostalRequest {
+  id: number;
+  taux?: number | null;
+  retenu: boolean;
+  montant_estime?: number | null;
 }

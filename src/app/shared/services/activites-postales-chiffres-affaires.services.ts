@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { CategorieProduit } from '../models/categorie-produit';
 import {
   ChiffreAffairePostale,
-  ChiffreAffairePostaleCreateWithFileRequest
+  ChiffreAffairePostaleCreateWithFileRequest, ValiderChiffreAffairePostalRequest
 } from '../models/activites-postales-chiffres-affaires';
 import { AppConfigService } from '../../core/config/app-config.service';
 import {Client} from "../models/client";
@@ -47,6 +47,10 @@ export class ActivitesPostalesChiffresAffairesService {
 
   update(id: number, chiffreAffairePostale: ChiffreAffairePostale): Observable<ChiffreAffairePostale> {
     return this.http.put<ChiffreAffairePostale>(`${this.baseUrl}/${id}/`, chiffreAffairePostale);
+  }
+
+  validerChiffreAffairePostal( validerChiffreAffairePostalRequest: ValiderChiffreAffairePostalRequest): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/update-generer-fiche/`, validerChiffreAffairePostalRequest);
   }
 
   delete(id: number): Observable<void> {

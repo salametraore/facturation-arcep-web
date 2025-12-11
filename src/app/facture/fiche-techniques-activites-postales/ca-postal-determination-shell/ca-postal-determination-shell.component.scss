@@ -1,0 +1,194 @@
+/* ==== CARTE LIGNES DE BILAN (ÉTAPE 2) ==== */
+
+.card-comptes-bilan {
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.doc-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.full-width,
+.w-100 {
+  width: 100%;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-semibold,
+.label-total {
+  font-weight: 600;
+}
+
+.wizard-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wizard-nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ===================================================== */
+/* =============== ÉTAPE 3 : RÉCAPITULATIF ============= */
+/* ===================================================== */
+
+.resume-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.resume-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.resume-card {
+  border-radius: 12px;
+  background: #fff;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 0 0 1px #f9c9d6;
+}
+
+.resume-card h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #b5195c; /* titre rosé */
+}
+
+/* Bloc "Informations opérateur" */
+
+.resume-card p {
+  margin: 0.15rem 0;
+  font-size: 0.95rem;
+}
+
+/* Tableau récap (lignes + redevances) */
+
+.resume-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.resume-table thead tr {
+  background: #ffedf4;
+}
+
+.resume-table th,
+.resume-table td {
+  padding: 0.45rem 0.5rem;
+  text-align: left;
+}
+
+.resume-table th {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #444;
+  border-bottom: 1px solid #f4c1d4;
+}
+
+.resume-table td {
+  border-bottom: 1px solid #f9d6e3;
+}
+
+.resume-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Aligner les montants à droite */
+
+.resume-table td:last-child,
+.resume-table th:last-child {
+  text-align: right;
+}
+
+/* Total en bas de carte */
+
+.resume-total {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f4c1d4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.resume-total strong {
+  font-weight: 600;
+}
+
+.resume-total span {
+  font-weight: 600;
+  color: #b5195c;
+}
+
+/* Actions en bas à droite (Précédent / Valider) */
+
+.recap-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.recap-actions--bottom {
+  margin-top: 1.5rem;
+}
+
+/* Message de validation / info */
+
+.resume-message {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Fond général léger pour l’étape 3 (optionnel si tu veux rappeler le rose) */
+
+.bloc-resume {
+  background: #fff5f9;
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
+}
+
+/* ===== Responsive : pile les colonnes sur mobile ===== */
+
+@media (max-width: 960px) {
+  .resume-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .recap-actions {
+    justify-content: space-between;
+  }
+}

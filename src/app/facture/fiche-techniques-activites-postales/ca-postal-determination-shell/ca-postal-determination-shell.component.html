@@ -167,12 +167,13 @@
               </button>
 
               <button mat-raised-button color="primary"
-                      (click)="validerChiffreAffairePostal()"
-                      [disabled]="saving">
-                <mat-icon>check</mat-icon>
-                Valider et générer la fiche technique
+                      (click)="allerEtape3()"
+                      [disabled]="saving || !lignesSelectionnees.length">
+                <mat-icon>arrow_forward</mat-icon>
+                Suivant
               </button>
             </div>
+
           </div>
 
         </div>
@@ -187,52 +188,107 @@
     <!-- ÉTAPE 3 : Résumé final -->
     <mat-step [completed]="step3Completed">
       <ng-template matStepLabel>
- <!--       <mat-icon class="step-icon" [ngClass]="{ done: step3Completed }">
-          {{ step3Completed ? 'check_circle' : 'looks_3' }}
-        </mat-icon>-->
         <span>Résumé & fiche</span>
       </ng-template>
 
       <section class="bloc bloc-resume" *ngIf="resume && chiffreAffairePostaleCourant">
 
-        <h4>Résumé du chiffre d’affaires postal</h4>
+        <div class="resume-layout">
 
-        <p>
-          <strong>Client :</strong>
-          {{ getClientLibelle(chiffreAffairePostaleCourant.client) }}<br>
-          <strong>Année fiscale :</strong> {{ chiffreAffairePostaleCourant.annee_fiscale }}<br>
-          <strong>Date de chargement :</strong>
-          {{ chiffreAffairePostaleCourant.date_chargement | date:'shortDate' }}
-        </p>
+          <!-- Bloc gauche : informations + lignes retenues -->
+          <div class="resume-col">
 
-        <p>
-          <strong>Message :</strong> {{ resume.message }}<br>
-          <strong>Total CA postal estimé (côté front) :</strong>
-          {{ resume.totalCa | number:'1.0-0' }}<br>
-          <strong>Nombre de lignes retenues :</strong>
-          {{ resume.totalLignes }}
-        </p>
+            <mat-card class="resume-card">
+              <h4>Lignes comptables retenues - <p><strong>Client :</strong> {{ getClientLibelle(chiffreAffairePostaleCourant.client) }}</p></h4>
 
-        <p *ngIf="resume.ficheUrl">
-          <a mat-stroked-button color="primary"
-             [href]="resume.ficheUrl"
-             target="_blank">
-            <mat-icon>picture_as_pdf</mat-icon>
-            Télécharger la fiche technique
-          </a>
-        </p>
+              <table class="resume-table">
+                <thead>
+                <tr>
+                  <th>N° Compte</th>
+                  <th>Libellé</th>
+                  <th>Montant retenu</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let l of lignesSelectionnees">
+                  <td>{{ l.numero_compte }}</td>
+                  <td>{{ l.libelle_compte }}</td>
+                  <td>{{ l.montant_estime | number:'1.0-0' }} </td>
+                </tr>
+                </tbody>
+              </table>
 
-        <div class="recap-actions">
-          <button mat-stroked-button color="primary" (click)="revenirEtape1()">
-            <mat-icon>arrow_back</mat-icon>
-            Revenir à la liste des bilans
-          </button>
+              <div class="resume-total">
+                <strong>Total des montants retenus</strong>
+                <span>{{ totalMontantsRetenus | number:'1.0-0' }} </span>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Bloc droit : ventilation des redevances -->
+          <div class="resume-col">
+            <mat-card class="resume-card">
+              <h4>Ventilation des redevances - <p><strong>Client :</strong> {{ getClientLibelle(chiffreAffairePostaleCourant.client) }}</p></h4>
+
+              <table class="resume-table">
+                <thead>
+                <tr>
+                  <th>Nature</th>
+                  <th>Base taxable</th>
+                  <th>% Taux</th>
+                  <th>Montant dû</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let r of ventilationRedevances">
+                  <td>{{ r.label }}</td>
+                  <td>{{ r.base | number:'1.0-0' }}</td>
+                  <td>{{ r.taux }} %</td>
+                  <td>{{ r.montant | number:'1.0-0' }} </td>
+                </tr>
+                </tbody>
+              </table>
+
+              <div class="resume-total">
+                <strong>Total à reverser</strong>
+                <span>{{ totalRedevances | number:'1.0-0' }}</span>
+              </div>
+            </mat-card>
+
+            <div class="recap-actions recap-actions--bottom">
+              <button mat-stroked-button color="primary" (click)="revenirEtape1()">
+                <mat-icon>arrow_back</mat-icon>
+                Revenir à la liste des bilans
+              </button>
+
+              <button mat-raised-button color="primary"
+                      (click)="validerChiffreAffairePostal()"
+                      [disabled]="saving || !lignesSelectionnees.length">
+                <mat-icon>check</mat-icon>
+                Valider
+              </button>
+            </div>
+
+            <p *ngIf="resume.message" class="resume-message">
+              {{ resume.message }}
+            </p>
+
+            <p *ngIf="resume.ficheUrl">
+              <a mat-stroked-button color="primary"
+                 [href]="resume.ficheUrl"
+                 target="_blank">
+                <mat-icon>picture_as_pdf</mat-icon>
+                Télécharger la fiche technique
+              </a>
+            </p>
+          </div>
+
         </div>
 
       </section>
 
       <div *ngIf="!resume" class="empty-state">
-        Aucune validation réalisée pour le moment.
+        Aucune prévisualisation pour le moment.
       </div>
 
     </mat-step>

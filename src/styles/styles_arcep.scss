@@ -1877,4 +1877,145 @@ dashboard resumé client
 
 
 
+/* ========================================================================== */
+/*  CA POSTAL – RÉCAPITULATIF (ÉTAPE 3)                                       */
+/*  Aligné sur la charte rose globale                                         */
+/* ========================================================================== */
 
+.ca-postal-card {
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid var(--border-weak);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* Fond rose très léger pour la zone de récap */
+.bloc-resume {
+  background: var(--surface-alt);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+/* Grille 2 colonnes (infos + ventilation) */
+.resume-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.resume-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Cartes internes (infos opérateur, lignes comptables, ventilation) */
+.resume-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border-weak);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.resume-card h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--brand-primary) 75%, #000 25%);
+}
+
+/* Texte infos opérateur */
+.resume-card p {
+  margin: 0.15rem 0;
+  font-size: 0.9rem;
+}
+
+/* Tableau “lignes comptables retenues” + “ventilation des redevances” */
+.resume-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.86rem;
+}
+
+.resume-table thead tr {
+  background: color-mix(in srgb, var(--brand-primary) 16%, #fff 84%);
+}
+
+.resume-table th,
+.resume-table td {
+  padding: 0.4rem 0.45rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--brand-primary) 16%, #000 84%);
+}
+
+.resume-table th {
+  font-weight: 600;
+  color: #333;
+}
+
+.resume-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Colonnes montants à droite */
+.resume-table th:last-child,
+.resume-table td:last-child {
+  text-align: right;
+}
+
+/* Ligne total (bas des cartes) */
+.resume-total {
+  margin-top: 0.6rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-strong);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+}
+
+.resume-total strong {
+  font-weight: 600;
+}
+
+.resume-total span {
+  font-weight: 600;
+  color: color-mix(in srgb, var(--brand-primary) 80%, #000 20%);
+}
+
+/* Actions à droite (Précédent / Valider) */
+.recap-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.recap-actions--bottom {
+  margin-top: 1.25rem;
+}
+
+/* Message de validation / info */
+.resume-message {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Lignes comptables retenues : petit tableau “carte CNSS style” */
+.resume-table tfoot tr td {
+  border-top: 1px solid var(--border-strong);
+}
+
+/* Responsive : une seule colonne en mobile */
+@media (max-width: 960px) {
+  .resume-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .recap-actions {
+    justify-content: space-between;
+  }
+}
