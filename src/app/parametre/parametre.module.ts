@@ -6,7 +6,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PdfViewerModule} from 'ng2-pdf-viewer';
 import { MatPaginatorModule } from '@angular/material/paginator';
 // import {DomaineComponent} from "./domaine/domaine.component";
-// import {DomaineCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
+// import {FichesTechniquesDapCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
 // import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
 // import {
 //   ServiceConfianceCrudComponent
@@ -52,7 +52,7 @@ import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
 @NgModule({
   declarations: [
     // DomaineComponent,
-    // DomaineCrudComponent,
+    // FichesTechniquesDapCrudComponent,
     // ServiceConfianceComponent,
     // ServiceConfianceCrudComponent,
     ClientComponent,

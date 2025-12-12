@@ -1,0 +1,112 @@
+<!-- src/app/features/fiche-technique/domaines/fiche-technique-page.component.html -->
+<mat-card>
+
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>Saisie et mise à jour d'une fiche technique activités postales</h2>
+  </div>
+
+  <!-- Grille 2 colonnes : 2fr / 1fr (cf. .two-col dans styles_arcep.scss) -->
+  <div class="two-col two-col--75-25">
+
+    <!-- ===== Colonne gauche : FICHE TECHNIQUE ===== -->
+    <section class="list-box">
+
+      <div class="list-header">
+        <h3 class="list-title">Fiche technique</h3>
+        <!-- Actions -->
+        <div class="list-actions">
+          <button mat-stroked-button color="primary" type="button"
+                  *ngIf="data_operation===operations.create || data_operation===operations.update"
+                  (click)="crud()">
+            Enregistrer
+          </button>
+
+          <button mat-flat-button color="primary" type="button"
+                  *ngIf="data_operation===operations.transmettre"
+                  (click)="onTransmettre()">
+            Transmettre DFC
+          </button>
+
+          <button mat-flat-button color="primary" type="button" (click)="onFerme()">
+            Fermer
+          </button>
+        </div>
+      </div>
+
+      <div class="list-body">
+        <form [formGroup]="form" class="form-grid">
+
+          <!-- Client (autocomplete) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Client</mat-label>
+            <input  matInput [value]="nomClient" readonly>
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Commentaire -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Commentaire (ce commentaire ne sera pas visible sur la facture)</mat-label>
+            <textarea matInput rows="2" formControlName="commentaire" autofocus></textarea>
+          </mat-form-field>
+
+        </form>
+      </div>
+
+      <!-- ===== Tableau des lignes produits ===== -->
+      <div class="mat-elevation-z10 compact-table">
+        <table mat-table [dataSource]="t_FicheTechniquesProduits" matSort style="width: 100%">
+
+          <!-- Catégorie -->
+          <ng-container matColumnDef="produit_libelle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Désignation</th>
+            <td mat-cell *matCellDef="let element">{{ element.produit_libelle }}</td>
+          </ng-container>
+
+          <!-- Nombre de numéros -->
+          <ng-container matColumnDef="quantite">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantité</th>
+            <td mat-cell *matCellDef="let element">{{ element.quantite?.toLocaleString('fr-FR') }}</td>
+          </ng-container>
+
+          <!-- Prix unitaire -->
+          <ng-container matColumnDef="prix_unitaire">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Prix unitaire</th>
+            <td mat-cell *matCellDef="let element">{{ element.prix_unitaire }}</td>
+          </ng-container>
+
+
+          <!-- Lignes -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- Aucune donnée -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">
+              Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
+            </td>
+          </tr>
+        </table>
+      </div>
+
+
+
+
+    </section>
+
+    <!-- ===== Colonne droite : HISTORIQUE / AVIS ===== -->
+    <section class="list-box" *ngIf="historiqueFicheTechniques?.length > 0" >
+      <div class="list-header">
+        <h3 class="list-title">Historique de la demande</h3>
+      </div>
+
+      <div class="list-body">
+        <historique-traitement
+          [historiqueFicheTechniques]="historiqueFicheTechniques">
+        </historique-traitement>
+      </div>
+    </section>
+
+  </div>
+</mat-card>

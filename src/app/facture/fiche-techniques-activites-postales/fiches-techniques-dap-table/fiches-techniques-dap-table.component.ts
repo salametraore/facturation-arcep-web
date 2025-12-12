@@ -22,6 +22,7 @@ import {DomaineCrudComponent} from "../../domaine/domaine-crud/domaine-crud.comp
 import {AvisEtuteTechniqueDialogComponent} from "../../avis-etute-technique-dialog/avis-etute-technique-dialog.component";
 import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
 import {date_converte, operations} from "../../../constantes";
+import {FichesTechniquesDapCrudComponent} from "../fiches-techniques-dap-crud/fiches-techniques-dap-crud.component";
 
 
 interface FTSearchCriteria {
@@ -36,7 +37,7 @@ interface FTSearchCriteria {
 
 
 @Component({
-  selector: 'app-fiches-techniques-dap-table',
+  selector: 'fiches-techniques-dap-table',
   templateUrl: './fiches-techniques-dap-table.component.html',
   styleUrl: './fiches-techniques-dap-table.component.scss'
 })
@@ -196,7 +197,7 @@ export class FichesTechniquesDapTableComponent {
     dialogConfig.autoFocus = true;
     dialogConfig.data = {ficheTechnique, fixeCategorie, operation};
     dialogConfig.disableClose = true;
-    let ref = this.dialog.open(DomaineCrudComponent, dialogConfig);
+    let ref = this.dialog.open(FichesTechniquesDapCrudComponent, dialogConfig);
     ref.afterClosed().subscribe(() => {
       this.reloadData();
     }, error => {

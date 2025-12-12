@@ -176,6 +176,9 @@ export class CaPostalDeterminationShellComponent implements OnInit {
 
   /** Sélection d’un document / bilan pour travailler dessus */
   selectionnerChiffreAFfaireCourant(ca: ChiffreAffairePostale): void {
+
+    console.log("ChiffreAffairePostale selectionneé :");
+    console.log(ca);
     if (this.chiffreAffairePostaleCourant?.id === ca.id) {
       return;
     }
@@ -301,6 +304,15 @@ export class CaPostalDeterminationShellComponent implements OnInit {
   validerChiffreAffairePostal(): void {
     if (!this.chiffreAffairePostaleCourant) {
       this.snackBar.open('Veuillez d’abord sélectionner un document.', 'Fermer', { duration: 4000 });
+      return;
+    }
+
+    if (this.chiffreAffairePostaleCourant.etat === 'TRAITE') {
+      this.snackBar.open(
+        'Ce chiffre d’affaires postal est déjà traité, la validation n’est plus possible.',
+        'Fermer',
+        { duration: 4000 }
+      );
       return;
     }
 
