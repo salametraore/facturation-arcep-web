@@ -6,158 +6,177 @@ import { CategoryId } from '../../../shared/models/frequences-category.types';
 import { CATEGORY_CONFIG, requiredIf } from '../config/frequences-category.config';
 
 import {
-  StationEquipementRequest,
-  StationCanalRequest,
-  FicheTechniqueFrequenceRequest
-} from '../../../shared/models/fiche-technique-frequence';
+  FicheTechniqueCanalRequest,
+  FicheTechniqueStationRequest,
+  FicheTechniqueFrequenceCreateRequest
+} from '../../../shared/models/fiche-technique-frequence-create-request';
 
 
 // ===============================================================
-// 1. FORMULAIRE PRINCIPAL
+// 1. FORMULAIRE PRINCIPAL (FicheTechniqueFrequenceCreateRequest)
 // ---------------------------------------------------------------
 export function buildFicheTechniqueFrequenceForm(
   fb: FormBuilder,
-  fiche?: FicheTechniqueFrequenceRequest
+  fiche?: Partial<FicheTechniqueFrequenceCreateRequest>
 ): FormGroup {
 
-  const category: CategoryId = (fiche?.categorie_produit as CategoryId) || 1;
+  const category: CategoryId = (fiche?.categorie_produit as CategoryId) ;
 
   return fb.group({
     fiche: fb.group({
-      client:            new FormControl(fiche?.client, [Validators.required]),
+      client:            new FormControl(fiche?.client ?? null, [Validators.required]),
       categorie_produit: new FormControl(fiche?.categorie_produit ?? category, [Validators.required]),
 
-      // 👉 objet maintenant obligatoire
       objet:             new FormControl(fiche?.objet ?? null, [Validators.required]),
-
-      // 👉 commentaire reste facultatif
       commentaire:       new FormControl(fiche?.commentaire ?? null),
 
-      // tout le reste facultatif
-      statut:            new FormControl(fiche?.statut ?? null),
-      // direction non saisie à cette étape => pas de required
       direction:         new FormControl(fiche?.direction ?? null),
       utilisateur:       new FormControl(fiche?.utilisateur ?? null),
       date_creation:     new FormControl(fiche?.date_creation ?? null),
+
       position:          new FormControl(fiche?.position ?? null),
       position_direction:new FormControl(fiche?.position_direction ?? null),
+
       avis:              new FormControl(fiche?.avis ?? null),
       date_avis:         new FormControl(fiche?.date_avis ?? null),
+
       duree:             new FormControl(fiche?.duree ?? null),
-      date_fin:          new FormControl(fiche?.date_fin ?? null),
       date_debut:        new FormControl(fiche?.date_debut ?? null),
+      date_fin:          new FormControl(fiche?.date_fin ?? null),
+
       periode:           new FormControl(fiche?.periode ?? null),
-      recurrente:        new FormControl(fiche?.recurrente ?? null),
     }),
 
-    stations_equipement: fb.array([]),
-    stations_canal:      fb.array([]),
+    stations: fb.array([]),
+    canaux:   fb.array([]),
   });
 }
 
 
 // ===============================================================
-// 2. STATION EQUIPEMENT (StationEquipementRequest)
+// 2. STATION (FicheTechniqueStationRequest)
+// - champs classe_* gardés dans le FormGroup (cachés dans l’UI)
+// - created_at / updated_at / updated_by ABSENTS du FormGroup
 // ---------------------------------------------------------------
-export function buildStationEquipementFG(
+export function buildStationFG(
   fb: FormBuilder,
-  s: Partial<StationEquipementRequest> = {},
+  s: Partial<FicheTechniqueStationRequest> = {},
   cat: CategoryId
 ): FormGroup {
 
   const cfg = CATEGORY_CONFIG[cat].stations;
 
   return fb.group({
-    produit:             new FormControl(s.produit ?? null),
+    categorie_produit: new FormControl(s.categorie_produit ?? cat),
 
-    type_station:        new FormControl(s.type_station ?? null,          requiredIf(cfg.type_station)),
-    puissance:           new FormControl(s.puissance ?? null,             requiredIf(cfg.puissance)),
-    puissance_unite:     new FormControl(s.puissance_unite ?? null),
+    type_station: new FormControl(s.type_station ?? null, requiredIf(cfg.type_station)),
 
-    nbre_station:        new FormControl(s.nbre_station ?? null,          requiredIf(cfg.nbre_station)),
+    // valeur saisie (visible)
+    puissance: new FormControl(s.puissance ?? null, requiredIf(cfg.puissance)),
+    // classe calculée (cachée)
+    classe_puissance: new FormControl(s.classe_puissance ?? null),
 
-    debit:               new FormControl(s.debit ?? null,                 requiredIf(cfg.debit)),
-    unite_debit:         new FormControl(s.unite_debit ?? null),
+    nombre_station: new FormControl(s.nombre_station ?? null, requiredIf(cfg.nombre_station)),
 
-    largeur_bande:       new FormControl(s.largeur_bande ?? null,         requiredIf(cfg.largeur_bande)),
-    largeur_bande_unite: new FormControl(s.largeur_bande_unite ?? null,   requiredIf(cfg.largeur_bande_unite)),
+    debit_kbps:   new FormControl(s.debit_kbps ?? null, requiredIf(cfg.debit_kbps)),
+    classe_debit: new FormControl(s.classe_debit ?? null), // caché
 
-    bande_frequence:     new FormControl(s.bande_frequence ?? null,       requiredIf(cfg.bande_frequence)),
+    largeur_bande_mhz:    new FormControl(s.largeur_bande_mhz ?? null, requiredIf(cfg.largeur_bande_mhz)),
+    classe_largeur_bande: new FormControl(s.classe_largeur_bande ?? null), // caché
 
-    caractere_commercial:new FormControl(s.caractere_commercial ?? null,  requiredIf(cfg.caractere_commercial)),
-    nbre_tranche:        new FormControl(s.nbre_tranche ?? null,          requiredIf(cfg.nbre_tranche)),
+    nbre_tranche: new FormControl(
+      s.nbre_tranche ?? null,
+      [
+        ...(cfg.nbre_tranche?.required ? [Validators.required] : []),
+        ...(cfg.nbre_tranche?.visible ? [Validators.min(1)] : []),
+      ]
+    ),
 
-    localite:            new FormControl(s.localite ?? null,              requiredIf(cfg.localite)),
+    type_bande_frequence: new FormControl(s.type_bande_frequence ?? null, requiredIf(cfg.type_bande_frequence)),
+    caractere_radio:      new FormControl(s.caractere_radio ?? null, requiredIf(cfg.caractere_radio)),
+
+    zone_couverture: new FormControl(s.zone_couverture ?? null, requiredIf(cfg.zone_couverture)),
+    localite:        new FormControl(s.localite ?? null, requiredIf(cfg.localite)),
   });
 }
 
 
 // ===============================================================
-// 3. STATION CANAL (StationCanalRequest)
+// 3. CANAL (FicheTechniqueCanalRequest)
+// - classe_largeur_bande gardé dans le FormGroup (caché)
+// - created_at / updated_at / updated_by ABSENTS du FormGroup
 // ---------------------------------------------------------------
-export function buildStationCanalFG(
+export function buildCanalFG(
   fb: FormBuilder,
-  c: Partial<StationCanalRequest> = {},
+  c: Partial<FicheTechniqueCanalRequest> = {},
   cat: CategoryId
 ): FormGroup {
 
   const cfg = CATEGORY_CONFIG[cat].canaux;
 
   return fb.group({
-    produit: new FormControl(c.produit ?? 91),
+    categorie_produit: new FormControl(c.categorie_produit ?? cat),
 
-    type_station:    new FormControl(c.type_station ?? null,          requiredIf(cfg.type_station)),
-    type_canal:      new FormControl(c.type_canal ?? null,            requiredIf(cfg.type_canal)),
+    type_station: new FormControl(c.type_station ?? null, requiredIf(cfg.type_station)),
+    type_canal:   new FormControl(c.type_canal ?? null, requiredIf(cfg.type_canal)),
 
-    puissance:       new FormControl(c.puissance ?? null),
-    puissance_unite: new FormControl(c.puissance_unite ?? null),
+    zone_couverture: new FormControl(c.zone_couverture ?? null, requiredIf(cfg.zone_couverture)),
 
-    nbre_station:    new FormControl(c.nbre_station ?? null),
-    debit:           new FormControl(c.debit ?? null),
-    unite_debit:     new FormControl(c.unite_debit ?? null),
-
-    largeur_bande:        new FormControl(c.largeur_bande ?? null,      requiredIf(cfg.largeur_bande)),
-    largeur_bande_unite:  new FormControl(c.largeur_bande_unite ?? null,requiredIf(cfg.largeur_bande_unite)),
-
-    bande_frequence:      new FormControl(c.bande_frequence ?? null,    requiredIf(cfg.bande_frequence)),
-    caractere_commercial: new FormControl(c.caractere_commercial ?? null),
-
-    nbre_tranche:         new FormControl(
-      c.nbre_tranche ?? 1,
+    nbre_tranche_facturation: new FormControl(
+      c.nbre_tranche_facturation ?? 1,
       [
-        ...(cfg.nbre_tranche?.required ? [Validators.required] : []),
-        Validators.min(1)
+        ...(cfg.nbre_tranche_facturation?.required ? [Validators.required] : []),
+        Validators.min(1),
       ]
     ),
 
-    zone_couverture:      new FormControl(c.zone_couverture ?? null,   requiredIf(cfg.zone_couverture)),
-    localite:             new FormControl(c.localite ?? null),
-  });
+    largeur_bande_khz:    new FormControl(c.largeur_bande_khz ?? null, requiredIf(cfg.largeur_bande_khz)),
+    classe_largeur_bande: new FormControl(c.classe_largeur_bande ?? null), // caché
+
+    type_bande_frequence: new FormControl(c.type_bande_frequence ?? null, requiredIf(cfg.type_bande_frequence)),
+
+});
 }
 
 
 // ===============================================================
 // 4. HELPERS
 // ---------------------------------------------------------------
-export const getStationsEquipFA = (form: FormGroup): FormArray =>
-  form.get('stations_equipement') as FormArray;
+export const getStationsFA = (form: FormGroup): FormArray =>
+  form.get('stations') as FormArray;
 
-export const getStationsCanalFA = (form: FormGroup): FormArray =>
-  form.get('stations_canal') as FormArray;
+export const getCanauxFA = (form: FormGroup): FormArray =>
+  form.get('canaux') as FormArray;
 
 
 // ===============================================================
 // 5. MAPPING VERS L’API
+// - ici on ajoute created_at / updated_at / updated_by
+//   juste avant l’envoi au backend
 // ---------------------------------------------------------------
-export function formToFicheTechniqueFrequenceRequest(
-  form: FormGroup
-): FicheTechniqueFrequenceRequest {
+export function formToFicheTechniqueFrequenceCreateRequest(
+  form: FormGroup,
+  opts?: {
+    updatedBy?: number | null;
+    nowIso?: string; // si non fourni => new Date().toISOString()
+  }
+): FicheTechniqueFrequenceCreateRequest {
 
   const raw = form.getRawValue();
+  const nowIso = opts?.nowIso ?? new Date().toISOString();
+  const updatedBy = opts?.updatedBy ?? null;
+
+  const stations = (raw.stations ?? []).map((s: FicheTechniqueStationRequest) => ({
+    ...s,
+  }));
+
+  const canaux = (raw.canaux ?? []).map((c: FicheTechniqueCanalRequest) => ({
+    ...c,
+  }));
 
   return {
-    ...(raw.fiche as FicheTechniqueFrequenceRequest),
-    stations_equipement: raw.stations_equipement ?? [],
-    stations_canal:      raw.stations_canal ?? [],
+    ...(raw.fiche as FicheTechniqueFrequenceCreateRequest),
+    stations,
+    canaux,
   };
 }

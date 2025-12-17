@@ -196,6 +196,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       'DA', // Dossier d’Appel d’Offre
       'DI', // Prestation diverse
       'DE', // Droit d’entrée
+      'RP', // Rédevance Postale
     ]);
 
 

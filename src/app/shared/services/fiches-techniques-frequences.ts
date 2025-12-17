@@ -6,6 +6,11 @@ import { Observable } from 'rxjs';
 
 import { FicheTechniqueFrequenceRequest } from '../models/fiche-technique-frequence';
 import { AppConfigService } from '../../core/config/app-config.service';
+import {
+  CalculFraisFrequenceRequest,
+  FicheTechniqueFrequenceCreateRequest,
+  FicheTechniqueFrequenceDetail
+} from "../models/fiche-technique-frequence-create-request";
 
 @Injectable({ providedIn: 'root' })
 export class FichesTechniquesFrequenceService {
@@ -27,6 +32,19 @@ export class FichesTechniquesFrequenceService {
 
   create(fiche: FicheTechniqueFrequenceRequest): Observable<FicheTechniqueFrequenceRequest> {
     return this.http.post<FicheTechniqueFrequenceRequest>(`${this.baseUrl}/`, fiche);
+  }
+
+  initierFicheTechniqueFrequence(fiche: FicheTechniqueFrequenceCreateRequest): Observable<any> {
+    return this.http.post<any>(`${this.cfg.baseUrl}/fiches-techniques-initier-frequences/`, fiche);
+  }
+
+
+ getFicheTechniqueFrequenceDetail(id: number): Observable<any> {
+    return this.http.get<any>(`${this.cfg.baseUrl}/fiches-techniques-frequences-details/${id}/`);
+  }
+
+  calculerFraisFicheTechniqueFrequence(fiche: CalculFraisFrequenceRequest): Observable<any> {
+    return this.http.post<any>(`${this.cfg.baseUrl}/fiches-frequences/calculer/`, fiche);
   }
 
   getListItems(): Observable<FicheTechniqueFrequenceRequest[]> {

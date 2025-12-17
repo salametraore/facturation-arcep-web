@@ -85,7 +85,7 @@
 
             <table mat-table #stationsTable [dataSource]="stationsFA.controls"
                    class="mat-elevation-z1 w-full"
-                   formArrayName="stations_equipement">
+                   formArrayName="stations">
 
               <ng-container matColumnDef="type_station" *ngIf="cfg[cat]?.stations?.type_station?.visible">
                 <th mat-header-cell *matHeaderCellDef> Type </th>
@@ -101,45 +101,38 @@
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="nbre_station" *ngIf="cfg[cat]?.stations?.nbre_station?.visible">
+              <ng-container matColumnDef="nombre_station" *ngIf="cfg[cat]?.stations?.nombre_station?.visible">
                 <th mat-header-cell *matHeaderCellDef> Nombre </th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.nbre_station }}
+                  {{ row.value.nombre_station }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="debit" *ngIf="cfg[cat]?.stations?.debit?.visible">
+              <ng-container matColumnDef="debit_kbps" *ngIf="cfg[cat]?.stations?.debit_kbps?.visible">
                 <th mat-header-cell *matHeaderCellDef> Débit </th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.debit }}
+                  {{ row.value.debit_kbps }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="largeur_bande" *ngIf="cfg[cat]?.stations?.largeur_bande?.visible">
+              <ng-container matColumnDef="largeur_bande_mhz" *ngIf="cfg[cat]?.stations?.largeur_bande_mhz?.visible">
                 <th mat-header-cell *matHeaderCellDef> Largeur bande </th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.largeur_bande }}
+                  {{ row.value.largeur_bande_mhz }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="largeur_bande_unite" *ngIf="cfg[cat]?.stations?.largeur_bande_unite?.visible">
-                <th mat-header-cell *matHeaderCellDef> Unité largeur bande </th>
-                <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.largeur_bande_unite }}
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="bande_frequence" *ngIf="cfg[cat]?.stations?.bande_frequence?.visible">
+              <ng-container matColumnDef="type_bande_frequence" *ngIf="cfg[cat]?.stations?.type_bande_frequence?.visible">
                 <th mat-header-cell *matHeaderCellDef> Bande fréquence </th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ getLibelleTypeBandeFrequence(row.value.bande_frequence) }}
+                  {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="caractere_commercial" *ngIf="cfg[cat]?.stations?.caractere_commercial?.visible">
-                <th mat-header-cell *matHeaderCellDef> Caractère commercial </th>
+              <ng-container matColumnDef="caractere_radio" *ngIf="cfg[cat]?.stations?.caractere_radio?.visible">
+                <th mat-header-cell *matHeaderCellDef> Caractère </th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.caractere_commercial }}
+                  {{ row.value.caractere_radio }}
                 </td>
               </ng-container>
 
@@ -189,16 +182,16 @@
           <div [formGroup]="form" class="space-y-3">
 
             <!-- Bouton Ajouter un canal aligné à droite -->
-            <div class="toolbar-right">
-              <button mat-flat-button color="primary" (click)="onOpenCanalDialog()">
-                <mat-icon>add</mat-icon>
-                Ajouter un canal
-              </button>
-            </div>
+            <button mat-flat-button color="primary"
+                    (click)="onOpenCanalDialog()"
+                    [disabled]="!hasCanauxToFill()">
+              <mat-icon>add</mat-icon>
+              Ajouter un canal
+            </button>
 
             <table mat-table #canauxTable [dataSource]="canauxFA.controls"
                    class="mat-elevation-z1 w-full"
-                   formArrayName="stations_canal">
+                   formArrayName="canaux">
 
               <ng-container matColumnDef="type_station" *ngIf="cfg[cat]?.canaux?.type_station?.visible">
                 <th mat-header-cell *matHeaderCellDef> Type station </th>
@@ -221,31 +214,24 @@
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="nbre_tranche" *ngIf="cfg[cat]?.canaux?.nbre_tranche?.visible">
+              <ng-container matColumnDef="nbre_tranche_facturation" *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">
                 <th mat-header-cell *matHeaderCellDef> Nombre tranches </th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.nbre_tranche }}
+                  {{ row.value.nbre_tranche_facturation }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="largeur_bande" *ngIf="cfg[cat]?.canaux?.largeur_bande?.visible">
+              <ng-container matColumnDef="largeur_bande_khz" *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">
                 <th mat-header-cell *matHeaderCellDef> Largeur bande </th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.largeur_bande }}
+                  {{ row.value.largeur_bande_khz }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="largeur_bande_unite" *ngIf="cfg[cat]?.canaux?.largeur_bande_unite?.visible">
-                <th mat-header-cell *matHeaderCellDef> Unité largeur bande </th>
-                <td mat-cell *matCellDef="let row; let i=index">
-                  {{ row.value.largeur_bande_unite }}
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="bande_frequence" *ngIf="cfg[cat]?.canaux?.bande_frequence?.visible">
+              <ng-container matColumnDef="type_bande_frequence" *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">
                 <th mat-header-cell *matHeaderCellDef> Bande de fréquence</th>
                 <td mat-cell *matCellDef="let row; let i=index">
-                  {{ getLibelleTypeBandeFrequence(row.value.bande_frequence) }}
+                  {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                 </td>
               </ng-container>
 
@@ -275,7 +261,6 @@
         </mat-step>
       </ng-container>
 
-      <!-- STEP 4 : Récapitulatif -->
       <!-- STEP 4 : Récapitulatif -->
       <ng-container *ngIf="showTarifsStep">
         <mat-step label="Récapitulatif">
@@ -321,7 +306,7 @@
                 <ul class="recap-list" *ngIf="stationsFA.length">
                   <li *ngFor="let row of stationsFA.controls; let i = index">
                     {{ getLibelleTypeStation(row.value.type_station) || 'Type ?' }}
-                    — {{ row.value.nbre_station || 1 }} station(s)
+                    — {{ row.value.nombre_station || 1 }} station(s)
                     <span *ngIf="row.value.localite">
                 — {{ row.value.localite }}
               </span>
@@ -339,12 +324,11 @@
                     <tr>
                       <th *ngIf="cfg[cat]?.stations?.type_station?.visible">Type</th>
                       <th *ngIf="cfg[cat]?.stations?.puissance?.visible">Puissance</th>
-                      <th *ngIf="cfg[cat]?.stations?.nbre_station?.visible">Nb stations</th>
-                      <th *ngIf="cfg[cat]?.stations?.debit?.visible">Débit</th>
-                      <th *ngIf="cfg[cat]?.stations?.largeur_bande?.visible">Largeur bande</th>
-                      <th *ngIf="cfg[cat]?.stations?.largeur_bande_unite?.visible">Unité</th>
-                      <th *ngIf="cfg[cat]?.stations?.bande_frequence?.visible">Bande fréquence</th>
-                      <th *ngIf="cfg[cat]?.stations?.caractere_commercial?.visible">Caractère</th>
+                      <th *ngIf="cfg[cat]?.stations?.nombre_station?.visible">Nb stations</th>
+                      <th *ngIf="cfg[cat]?.stations?.debit_kbps?.visible">Débit</th>
+                      <th *ngIf="cfg[cat]?.stations?.largeur_bande_mhz?.visible">Largeur bande</th>
+                      <th *ngIf="cfg[cat]?.stations?.type_bande_frequence?.visible">Bande fréquence</th>
+                      <th *ngIf="cfg[cat]?.stations?.caractere_radio?.visible">Caractère</th>
                       <th *ngIf="cfg[cat]?.stations?.nbre_tranche?.visible">Tranches</th>
                       <th *ngIf="cfg[cat]?.stations?.localite?.visible">Localité</th>
                     </tr>
@@ -357,23 +341,21 @@
                       <td *ngIf="cfg[cat]?.stations?.puissance?.visible">
                         {{ row.value.puissance }}
                       </td>
-                      <td *ngIf="cfg[cat]?.stations?.nbre_station?.visible">
-                        {{ row.value.nbre_station }}
+                      <td *ngIf="cfg[cat]?.stations?.nombre_station?.visible">
+                        {{ row.value.nombre_station }}
                       </td>
-                      <td *ngIf="cfg[cat]?.stations?.debit?.visible">
-                        {{ row.value.debit }}
+                      <td *ngIf="cfg[cat]?.stations?.debit_kbps?.visible">
+                        {{ row.value.debit_kbps }}
                       </td>
-                      <td *ngIf="cfg[cat]?.stations?.largeur_bande?.visible">
-                        {{ row.value.largeur_bande }}
+                      <td *ngIf="cfg[cat]?.stations?.largeur_bande_mhz?.visible">
+                        {{ row.value.largeur_bande_mhz }}
                       </td>
-                      <td *ngIf="cfg[cat]?.stations?.largeur_bande_unite?.visible">
-                        {{ row.value.largeur_bande_unite }}
+
+                      <td *ngIf="cfg[cat]?.stations?.type_bande_frequence?.visible">
+                        {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                       </td>
-                      <td *ngIf="cfg[cat]?.stations?.bande_frequence?.visible">
-                        {{ getLibelleTypeBandeFrequence(row.value.bande_frequence) }}
-                      </td>
-                      <td *ngIf="cfg[cat]?.stations?.caractere_commercial?.visible">
-                        {{ row.value.caractere_commercial }}
+                      <td *ngIf="cfg[cat]?.stations?.caractere_radio?.visible">
+                        {{ row.value.caractere_radio }}
                       </td>
                       <td *ngIf="cfg[cat]?.stations?.nbre_tranche?.visible">
                         {{ row.value.nbre_tranche }}
@@ -420,10 +402,9 @@
                       <th *ngIf="cfg[cat]?.canaux?.type_station?.visible">Type station</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_canal?.visible">Type canal</th>
                       <th *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">Zone</th>
-                      <th *ngIf="cfg[cat]?.canaux?.nbre_tranche?.visible">Tranches</th>
-                      <th *ngIf="cfg[cat]?.canaux?.largeur_bande?.visible">Largeur bande</th>
-                      <th *ngIf="cfg[cat]?.canaux?.largeur_bande_unite?.visible">Unité</th>
-                      <th *ngIf="cfg[cat]?.canaux?.bande_frequence?.visible">Bande fréquence</th>
+                      <th *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">Tranches</th>
+                      <th *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">Largeur bande</th>
+                      <th *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">Bande fréquence</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -437,17 +418,14 @@
                       <td *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">
                         {{ getLibelleZoneCouverture(row.value.zone_couverture) }}
                       </td>
-                      <td *ngIf="cfg[cat]?.canaux?.nbre_tranche?.visible">
-                        {{ row.value.nbre_tranche }}
+                      <td *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">
+                        {{ row.value.nbre_tranche_facturation }}
                       </td>
-                      <td *ngIf="cfg[cat]?.canaux?.largeur_bande?.visible">
-                        {{ row.value.largeur_bande }}
+                      <td *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">
+                        {{ row.value.largeur_bande_khz }}
                       </td>
-                      <td *ngIf="cfg[cat]?.canaux?.largeur_bande_unite?.visible">
-                        {{ row.value.largeur_bande_unite }}
-                      </td>
-                      <td *ngIf="cfg[cat]?.canaux?.bande_frequence?.visible">
-                        {{ getLibelleTypeBandeFrequence(row.value.bande_frequence) }}
+                      <td *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">
+                        {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                       </td>
                     </tr>
                     </tbody>

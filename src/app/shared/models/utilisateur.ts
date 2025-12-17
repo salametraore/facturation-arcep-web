@@ -12,9 +12,6 @@ import { RoleEnum } from './roleEnum';
 
 export class Utilisateur {
   readonly id: number;
-  /**
-   * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-   */
   username: string;
   last_name?: string;
   first_name?: string;

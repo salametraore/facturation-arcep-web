@@ -5,9 +5,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { CategoryId } from '../../../../shared/models/frequences-category.types';
-import { StationCanalRequest } from '../../../../shared/models/fiche-technique-frequence';
+import { FicheTechniqueCanalRequest } from '../../../../shared/models/fiche-technique-frequence-create-request';
 
-import { buildStationCanalFG } from '../../forms/frequences.form';
+import { buildCanalFG } from '../../forms/frequences.form';
 import { CATEGORY_CONFIG } from '../../config/frequences-category.config';
 
 import { TypeCanalList } from '../../../../shared/models/typeCanalList';
@@ -18,15 +18,19 @@ import { TypeStationService } from '../../../../shared/services/type-station.ser
 import { TypeCanauxService } from '../../../../shared/services/type-canaux.service';
 import { ZoneCouverture } from '../../../../shared/models/zone-couverture';
 import { ZoneCouvertureService } from '../../../../shared/services/zone-couverture.service';
+import {ClasseLargeurBandeService} from "../../../../shared/services/classe-largeur-bande.service";
+import {ClasseDebitService} from "../../../../shared/services/classe-debit.service";
+import {ClassePuissanceService} from "../../../../shared/services/classe-puissance.service";
+import {bindStationClasses} from "../../forms/station-classes-binder";
+import { Subject } from 'rxjs';
+import {bindCanalClasses} from "../../forms/canal-classes-binder";
+
+
+
 
 export interface CanalDialogData {
-  canal?: StationCanalRequest;
+  canal?: FicheTechniqueCanalRequest;
   cat: CategoryId;   // catégorie courante (1..7)
-}
-
-interface UniteOption {
-  id: string;
-  libelle: string;
 }
 
 @Component({
@@ -35,22 +39,19 @@ interface UniteOption {
 })
 export class CanalFrequencesDialogComponent implements OnInit {
 
-  form: FormGroup;
+  form!: FormGroup;
   title = 'Ajouter un canal';
 
   // config de la catégorie courante (surchargée dans ngOnInit)
   cfg = CATEGORY_CONFIG[1 as CategoryId];
+  private destroy$ = new Subject<void>();
 
   typeBandeFrequences: TypeBandeFrequenceList[] = [];
   typeCanaux: TypeCanalList[] = [];
   typeStations: TypeStation[] = [];
   zoneCouvertures: ZoneCouverture[] = [];
 
-  // Options pour largeur_bande_unite (kHz/MHz, etc.)
-  largeurBandeUnites: UniteOption[] = [
-    { id: 'KHZ', libelle: 'kHz' },
-    { id: 'MHZ', libelle: 'MHz' }
-  ];
+
 
   constructor(
     private fb: FormBuilder,
@@ -60,6 +61,7 @@ export class CanalFrequencesDialogComponent implements OnInit {
     private typeStationService: TypeStationService,
     private typeCanauxService: TypeCanauxService,
     private zoneCouvertureService: ZoneCouvertureService,
+    private classeLargeurBande: ClasseLargeurBandeService,
   ) {}
 
   // alias pratique pour le template
@@ -76,46 +78,41 @@ export class CanalFrequencesDialogComponent implements OnInit {
     this.loadData();
 
     // FormGroup construit dynamiquement selon la catégorie + valeurs existantes
-    this.form = buildStationCanalFG(
+    this.form = buildCanalFG(
       this.fb,
       this.data.canal ?? {},
       this.data.cat
     );
+
+    bindCanalClasses(this.form, this.classeLargeurBande, this.destroy$);
+
   }
 
-  loadData(): void {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
+
+  loadData(): void {
     const cat = this.data.cat;
 
     this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanalList[]) => {
-      this.typeCanaux = listeCanaux.filter(st => st.id < 3);
+      this.typeCanaux = listeCanaux;
+      //this.typeCanaux = listeCanaux.filter(ts => ts.categorie_produit === cat);
     });
 
+    this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
+      this.typeStations = listeTypeStations.filter(ts => ts.categorie_produit === cat);
+    });
 
-    this.typeStationService.getListItems().subscribe(
-      (listeTypeStations: TypeStation[]) => {
-        this.typeStations = listeTypeStations.filter(
-          ts => ts.categorie_produit === cat
-        );
-      }
-    );
+    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
+      this.typeBandeFrequences = listeTypeBandesFreq.filter(bf => bf.categorie_produit === cat);
+    });
 
-    this.typeBandesFrequenceService.getListItems().subscribe(
-      (listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
-        this.typeBandeFrequences = listeTypeBandesFreq.filter(
-          bf => bf.categorie_produit === cat
-        );
-      }
-    );
-
-    this.zoneCouvertureService.getListItems().subscribe(
-      (listeZones: ZoneCouverture[]) => {
-        this.zoneCouvertures = listeZones.filter(
-          z => z.categorie_produit === 2
-        );
-      }
-    );
-
+    this.zoneCouvertureService.getListItems().subscribe((listeZones: ZoneCouverture[]) => {
+      this.zoneCouvertures = listeZones.filter(z => z.categorie_produit === 2);
+    });
   }
 
   onCancel(): void {
@@ -128,10 +125,10 @@ export class CanalFrequencesDialogComponent implements OnInit {
       return;
     }
 
-    const value = this.form.getRawValue() as StationCanalRequest;
+    // ⚠️ nouveau type
+    const value = this.form.getRawValue() as FicheTechniqueCanalRequest;
 
     console.log('CANAL renvoyé par la modale :', value);
-    this.dialogRef.close(value);   // renvoi au parent (FrequencesCrudComponent)
+    this.dialogRef.close(value);
   }
-
 }

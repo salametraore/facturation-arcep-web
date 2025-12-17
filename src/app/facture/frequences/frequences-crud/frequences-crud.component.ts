@@ -10,18 +10,18 @@ import { FicheTechniques } from '../../../shared/models/ficheTechniques';
 
 import { CategoryId } from '../../../shared/models/frequences-category.types';
 import {
-  StationEquipementRequest,
-  StationCanalRequest,
-  FicheTechniqueFrequenceRequest
-} from '../../../shared/models/fiche-technique-frequence';
+  FicheTechniqueStationRequest,
+  FicheTechniqueCanalRequest,
+  FicheTechniqueFrequenceCreateRequest, FicheTechniqueFrequenceDetail
+} from '../../../shared/models/fiche-technique-frequence-create-request';
 
 import {
   buildFicheTechniqueFrequenceForm,
-  buildStationEquipementFG,
-  buildStationCanalFG,
-  getStationsEquipFA,
-  getStationsCanalFA,
-  formToFicheTechniqueFrequenceRequest
+  buildStationFG,
+  buildCanalFG,
+  getStationsFA,
+  getCanauxFA,
+  formToFicheTechniqueFrequenceCreateRequest
 } from '../forms/frequences.form';
 
 import { CATEGORY_CONFIG } from '../config/frequences-category.config';
@@ -59,6 +59,8 @@ import { TypeStationService } from '../../../shared/services/type-station.servic
 import { TypeCanauxService } from '../../../shared/services/type-canaux.service';
 import { ZoneCouverture } from '../../../shared/models/zone-couverture';
 import { ZoneCouvertureService } from '../../../shared/services/zone-couverture.service';
+import {Utilisateur} from "../../../shared/models/utilisateur";
+import {AuthService} from "../../../authentication/auth.service";
 
 @Component({
   selector: 'frequences-crud',
@@ -68,21 +70,20 @@ import { ZoneCouvertureService } from '../../../shared/services/zone-couverture.
 export class FrequencesCrudComponent implements OnInit {
 
   @Input() operation: string;
-  @Input() ficheTechnique: FicheTechniques;
+  @Input() ficheTechnique: FicheTechniqueFrequenceDetail;
 
   @Output() notifyActionOperation = new EventEmitter<string>();
-  @Output() notifyFicheTechnique = new EventEmitter<FicheTechniques>();
+  @Output() notifyFicheTechnique = new EventEmitter<FicheTechniqueFrequenceDetail>();
 
   // 🔹 Colonnes alignées avec les nouveaux modèles / configs
   displayedColumnsStations: string[] = [
     'type_station',
     'puissance',
-    'nbre_station',
-    'debit',
-    'largeur_bande',
-    'largeur_bande_unite',
-    'bande_frequence',
-    'caractere_commercial',
+    'nombre_station',
+    'debit_kbps',
+    'largeur_bande_mhz',
+    'type_bande_frequence',
+    'caractere_radio',
     'nbre_tranche',
     'localite',
     'actions'
@@ -92,10 +93,9 @@ export class FrequencesCrudComponent implements OnInit {
     'type_station',
     'type_canal',
     'zone_couverture',
-    'nbre_tranche',
-    'largeur_bande',
-    'largeur_bande_unite',
-    'bande_frequence',
+    'nbre_tranche_facturation',
+    'largeur_bande_khz',
+    'type_bande_frequence',
     'actions'
   ];
 
@@ -138,6 +138,8 @@ export class FrequencesCrudComponent implements OnInit {
   // 🔹 Stepper linéaire uniquement jusqu'à la validation de la fiche
   isLinear = true;
 
+  utilisateurConnecte:Utilisateur;
+
   protected readonly operations = operations;
 
   constructor(
@@ -155,6 +157,7 @@ export class FrequencesCrudComponent implements OnInit {
     private typeCanauxService: TypeCanauxService,
     private zoneCouvertureService: ZoneCouvertureService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
+    private authService:AuthService,
   ) {
   }
 
@@ -164,15 +167,17 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   get stationsFA(): FormArray {
-    return getStationsEquipFA(this.form);
+    return getStationsFA(this.form);
   }
 
   get canauxFA(): FormArray {
-    return getStationsCanalFA(this.form);
+    return getCanauxFA(this.form);
   }
 
   ngOnInit(): void {
     this.loadData();
+
+    this.utilisateurConnecte=this.authService.getConnectedUser();
 
     // Cas création
     if (this.operation === operations.create) {
@@ -196,7 +201,12 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories = categories;
-      this.categoriesFiltered = categories.filter(f => f.id < 8);
+
+      this.categoriesFiltered = categories
+        .filter(c => c.id < 8)
+        .sort((a, b) =>
+          (a.libelle ?? '').localeCompare(b.libelle ?? '', 'fr', { sensitivity: 'base' })
+        );
     });
 
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
@@ -285,26 +295,24 @@ export class FrequencesCrudComponent implements OnInit {
     this.loading = false;
     this.errorMsg = '';
 
-    const ficheFreq: FicheTechniqueFrequenceRequest = {
+    const ficheFreq: Partial<FicheTechniqueFrequenceCreateRequest> = {
       client: null,
       categorie_produit: null,
       objet: null,
       commentaire: null,
       direction: 3,
-      statut: 1,
-      avis:  'NOF',
-      duree: 3,
+      utilisateur: null,
       date_creation: new Date().toISOString().substring(0, 10),
-      recurrente: true,
+      avis: 'NOF',
+      duree: 3,
       position: 1,
       periode: null,
-      utilisateur: null,
       position_direction: null,
       date_avis: null,
       date_fin: null,
       date_debut: null,
-      stations_canal: [],
-      stations_equipement: []
+      stations: [],
+      canaux: []
     };
 
     this.form = buildFicheTechniqueFrequenceForm(this.fb, ficheFreq);
@@ -331,17 +339,16 @@ export class FrequencesCrudComponent implements OnInit {
     this.errorMsg = '';
 
     this.api.getItem(this.ficheTechnique.id).subscribe({
-      next: (fiche: FicheTechniqueFrequenceRequest) => {
-        this.cat = (fiche.categorie_produit as CategoryId) ;
+      next: (fiche: FicheTechniqueFrequenceCreateRequest) => {
+        this.cat = (fiche.categorie_produit as CategoryId);
         this.form = buildFicheTechniqueFrequenceForm(this.fb, fiche);
 
-        // remplir les FormArray avec les stations/canaux existants
-        (fiche.stations_equipement || []).forEach((s: StationEquipementRequest) => {
-          this.stationsFA.push(buildStationEquipementFG(this.fb, s, this.cat));
+        (fiche.stations || []).forEach((s: FicheTechniqueStationRequest) => {
+          this.stationsFA.push(buildStationFG(this.fb, s, this.cat));
         });
 
-        (fiche.stations_canal || []).forEach((c: StationCanalRequest) => {
-          this.canauxFA.push(buildStationCanalFG(this.fb, c, this.cat));
+        (fiche.canaux || []).forEach((c: FicheTechniqueCanalRequest) => {
+          this.canauxFA.push(buildCanalFG(this.fb, c, this.cat));
         });
 
         this.loading = false;
@@ -370,37 +377,31 @@ export class FrequencesCrudComponent implements OnInit {
 
   // ---------- STATIONS : TABLE + MODALE ----------
   onOpenStationDialog(index?: number): void {
-    let stationValue: StationEquipementRequest | undefined;
+    let stationValue: FicheTechniqueStationRequest | undefined;
 
     if (index != null) {
       const fg = this.stationsFA.at(index) as FormGroup;
-      stationValue = fg.getRawValue() as StationEquipementRequest;
+      stationValue = fg.getRawValue() as FicheTechniqueStationRequest;
     }
 
-    const dialogRef = this.dialog.open<
-      StationFrequencesDialogComponent,
-      StationDialogData,
-      StationEquipementRequest
-      >(StationFrequencesDialogComponent, {
+    const dialogRef = this.dialog.open<StationFrequencesDialogComponent,StationDialogData,
+      FicheTechniqueStationRequest >(StationFrequencesDialogComponent, {
       width: '800px',
-      data: {
-        station: stationValue,
-        cat: this.cat
-      }
+      data: { station: stationValue, cat: this.cat }
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (!result) {
-        return;
-      }
+      if (!result) return;
+
       if (index != null) {
         (this.stationsFA.at(index) as FormGroup).patchValue(result);
       } else {
-        this.stationsFA.push(buildStationEquipementFG(this.fb, result, this.cat));
+        this.stationsFA.push(buildStationFG(this.fb, result, this.cat));
       }
       this.stationsTable?.renderRows();
     });
   }
+
 
   onRemoveStation(index: number): void {
     this.dialogService.yes_no({ message: 'Supprimer cette station ?' })
@@ -411,48 +412,46 @@ export class FrequencesCrudComponent implements OnInit {
       });
   }
 
-  // ---------- CANAUX : TABLE + MODALE ----------
-  onOpenCanalDialog(index?: number): void {
-    let canalValue: StationCanalRequest | undefined;
-
-    if (index != null) {
-      const fg = this.canauxFA.at(index) as FormGroup;
-      canalValue = fg.getRawValue() as StationCanalRequest;
-    }
-
-    const dialogRef = this.dialog.open<
-      CanalFrequencesDialogComponent,
-      CanalDialogData,
-      StationCanalRequest
-      >(CanalFrequencesDialogComponent, {
-      width: '800px',
-      data: {
-        canal: canalValue,
-        cat: this.cat
-      }
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (!result) {
-        return;
-      }
-      if (index != null) {
-        (this.canauxFA.at(index) as FormGroup).patchValue(result);
-      } else {
-        this.canauxFA.push(buildStationCanalFG(this.fb, result, this.cat));
-      }
-      this.canauxTable?.renderRows();
-    });
-  }
-
   onRemoveCanal(index: number): void {
     this.dialogService.yes_no({ message: 'Supprimer ce canal ?' })
       .subscribe(yes => {
         if (yes) {
           this.canauxFA.removeAt(index);
+          this.canauxTable?.renderRows();
         }
       });
   }
+
+  // ---------- CANAUX : TABLE + MODALE ----------
+  onOpenCanalDialog(index?: number): void {
+    let canalValue: FicheTechniqueCanalRequest | undefined;
+
+    if (index != null) {
+      const fg = this.canauxFA.at(index) as FormGroup;
+      canalValue = fg.getRawValue() as FicheTechniqueCanalRequest;
+    }
+
+    const dialogRef = this.dialog.open<
+      CanalFrequencesDialogComponent,
+      CanalDialogData,
+      FicheTechniqueCanalRequest
+      >(CanalFrequencesDialogComponent, {
+      width: '800px',
+      data: { canal: canalValue, cat: this.cat }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+
+      if (index != null) {
+        (this.canauxFA.at(index) as FormGroup).patchValue(result);
+      } else {
+        this.canauxFA.push(buildCanalFG(this.fb, result, this.cat));
+      }
+      this.canauxTable?.renderRows();
+    });
+  }
+
 
   // ---------- VALIDATIONS PAR STEP ----------
   isFicheValid(): boolean {
@@ -502,12 +501,12 @@ export class FrequencesCrudComponent implements OnInit {
       return;
     }
 
-    const payload = formToFicheTechniqueFrequenceRequest(this.form);
+    const payload = formToFicheTechniqueFrequenceCreateRequest(this.form);
     this.loading = true;
     this.errorMsg = '';
 
     const obs = this.isNew
-      ? this.api.create(payload)
+      ? this.api.initierFicheTechniqueFrequence(payload)
       : this.api.update(this.ficheTechnique.id, payload);
 
     obs.subscribe({
@@ -527,7 +526,7 @@ export class FrequencesCrudComponent implements OnInit {
   // ---------- Mise à jour des colonnes dynamiques ----------
   private updateDisplayedColumns(): void {
     const stationCfg = this.cfg[this.cat]?.stations;
-    const canalCfg   = this.cfg[this.cat]?.canaux;
+    const canalCfg = this.cfg[this.cat]?.canaux;
 
     // ---------- STATIONS ----------
     const sCols: string[] = [];
@@ -538,24 +537,12 @@ export class FrequencesCrudComponent implements OnInit {
     if (!stationCfg || stationCfg.puissance?.visible !== false) {
       sCols.push('puissance');
     }
-    if (!stationCfg || stationCfg.nbre_station?.visible !== false) {
-      sCols.push('nbre_station');
-    }
-    if (!stationCfg || stationCfg.debit?.visible !== false) {
-      sCols.push('debit');
-    }
-    if (!stationCfg || stationCfg.largeur_bande?.visible !== false) {
-      sCols.push('largeur_bande');
-    }
-    if (!stationCfg || stationCfg.largeur_bande_unite?.visible !== false) {
-      sCols.push('largeur_bande_unite');
-    }
-    if (!stationCfg || stationCfg.bande_frequence?.visible !== false) {
-      sCols.push('bande_frequence');
-    }
-    if (!stationCfg || stationCfg.caractere_commercial?.visible !== false) {
-      sCols.push('caractere_commercial');
-    }
+    if (!stationCfg || stationCfg.nombre_station?.visible !== false) sCols.push('nombre_station');
+    if (!stationCfg || stationCfg.debit_kbps?.visible !== false) sCols.push('debit_kbps');
+    if (!stationCfg || stationCfg.largeur_bande_mhz?.visible !== false) sCols.push('largeur_bande_mhz');
+    if (!stationCfg || stationCfg.type_bande_frequence?.visible !== false) sCols.push('type_bande_frequence');
+    if (!stationCfg || stationCfg.caractere_radio?.visible !== false) sCols.push('caractere_radio');
+
     if (!stationCfg || stationCfg.nbre_tranche?.visible !== false) {
       sCols.push('nbre_tranche');
     }
@@ -578,18 +565,9 @@ export class FrequencesCrudComponent implements OnInit {
     if (!canalCfg || canalCfg.zone_couverture?.visible !== false) {
       cCols.push('zone_couverture');
     }
-    if (!canalCfg || canalCfg.nbre_tranche?.visible !== false) {
-      cCols.push('nbre_tranche');
-    }
-    if (!canalCfg || canalCfg.largeur_bande?.visible !== false) {
-      cCols.push('largeur_bande');
-    }
-    if (!canalCfg || canalCfg.largeur_bande_unite?.visible !== false) {
-      cCols.push('largeur_bande_unite');
-    }
-    if (!canalCfg || canalCfg.bande_frequence?.visible !== false) {
-      cCols.push('bande_frequence');
-    }
+    if (!canalCfg || canalCfg.nbre_tranche_facturation?.visible !== false) cCols.push('nbre_tranche_facturation');
+    if (!canalCfg || canalCfg.largeur_bande_khz?.visible !== false) cCols.push('largeur_bande_khz');
+    if (!canalCfg || canalCfg.type_bande_frequence?.visible !== false) cCols.push('type_bande_frequence');
 
     cCols.push('actions');
     this.displayedColumnsCanaux = cCols;
@@ -619,5 +597,22 @@ export class FrequencesCrudComponent implements OnInit {
   onRetourListe(): void {
     this.notifyFicheTechnique.emit(this.ficheTechnique);
     this.notifyActionOperation.emit(operations.table);
+  }
+
+  hasCanauxToFill(): boolean {
+    const canalCfg = this.cfg?.[this.cat]?.canaux;
+    if (!canalCfg) return false;
+
+    const keys: (keyof typeof canalCfg)[] = [
+      'type_station',
+      'type_canal',
+      'zone_couverture',
+      'nbre_tranche_facturation',
+      'largeur_bande_khz',
+      'type_bande_frequence',
+      // (ajoute ici si tu as d’autres champs canaux visibles)
+    ];
+
+    return keys.some(k => canalCfg[k]?.visible === true);
   }
 }

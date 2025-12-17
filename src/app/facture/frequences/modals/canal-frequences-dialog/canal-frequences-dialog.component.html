@@ -10,9 +10,7 @@
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="canalCfg.type_station?.visible">
     <mat-label>Type station</mat-label>
-    <mat-select
-      formControlName="type_station"
-      matTooltip="Type station">
+    <mat-select formControlName="type_station" matTooltip="Type station">
       <mat-option *ngFor="let item of typeStations" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
@@ -25,9 +23,7 @@
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="canalCfg.type_canal?.visible">
     <mat-label>Type canal</mat-label>
-    <mat-select
-      formControlName="type_canal"
-      matTooltip="Type canal">
+    <mat-select formControlName="type_canal" matTooltip="Type canal">
       <mat-option *ngFor="let item of typeCanaux" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
@@ -36,37 +32,20 @@
 
   <div class="blank-row"></div>
 
-  <!-- Largeur de bande -->
+  <!-- Largeur de bande (kHz) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.largeur_bande?.visible">
-    <mat-label>Largeur de bande</mat-label>
-    <input matInput type="number" formControlName="largeur_bande">
-  </mat-form-field>
-
-  <div class="blank-row"></div>
-
-  <!-- Unité de largeur de bande (kHz / MHz / …) -->
-  <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.largeur_bande_unite?.visible">
-    <mat-label>Unité</mat-label>
-    <mat-select
-      formControlName="largeur_bande_unite"
-      matTooltip="Unité de largeur de bande">
-      <mat-option *ngFor="let u of largeurBandeUnites" [value]="u.id">
-        {{ u.libelle }}
-      </mat-option>
-    </mat-select>
+                  *ngIf="canalCfg.largeur_bande_khz?.visible">
+    <mat-label>Largeur de bande (kHz)</mat-label>
+    <input matInput type="number" formControlName="largeur_bande_khz">
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Bande de fréquence -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.bande_frequence?.visible">
+                  *ngIf="canalCfg.type_bande_frequence?.visible">
     <mat-label>Bande de fréquence</mat-label>
-    <mat-select
-      formControlName="bande_frequence"
-      matTooltip="Bande de fréquence">
+    <mat-select formControlName="type_bande_frequence" matTooltip="Bande de fréquence">
       <mat-option *ngFor="let item of typeBandeFrequences" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
@@ -79,9 +58,7 @@
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="canalCfg.zone_couverture?.visible">
     <mat-label>Zone de couverture</mat-label>
-    <mat-select
-      formControlName="zone_couverture"
-      matTooltip="Zone de couverture">
+    <mat-select formControlName="zone_couverture" matTooltip="Zone de couverture">
       <mat-option *ngFor="let item of zoneCouvertures" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
@@ -90,16 +67,19 @@
 
   <div class="blank-row"></div>
 
-  <!-- Nombre de tranches -->
+  <!-- Nombre de tranches (facturation) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.nbre_tranche?.visible">
+                  *ngIf="canalCfg.nbre_tranche_facturation?.visible">
     <mat-label>Nombre de tranches</mat-label>
     <input
       matInput
       type="number"
-      formControlName="nbre_tranche"
+      formControlName="nbre_tranche_facturation"
       min="1">
   </mat-form-field>
+
+  <div class="blank-row"></div>
+
 
 </mat-dialog-content>
 

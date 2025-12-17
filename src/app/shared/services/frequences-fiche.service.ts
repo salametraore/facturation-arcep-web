@@ -66,6 +66,8 @@ export class FrequencesFicheService {
     return this.http.delete<void>(`${this.cfg.baseUrl}/fiches/${ficheId}/frequences`);
   }
 
+
+
   // -------- (optionnels) autres aides déjà présents --------
   saveStations(ficheId: number, payload: FicheFrequencesStation[]) {
     return this.http.post<FicheFrequencesStation[]>(`${this.cfg.baseUrl}/fiches/${ficheId}/frequences/stations`, payload);

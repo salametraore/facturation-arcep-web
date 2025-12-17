@@ -126,7 +126,8 @@ export const TYPE_FRAIS = [
   { code: 'RA', label: 'Restauration' },
   { code: 'DA', label: "Dossier d'Appel d'Offre" },
   { code: 'DI', label: 'Prestation diverse' },
-  { code: 'DE', label: "Droit d'entrée" }
+  { code: 'DE', label: "Droit d'entrée" },
+  { code: 'RP', label: "Rédevance Postale" },
 ];
 
 

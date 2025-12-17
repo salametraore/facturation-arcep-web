@@ -1,3 +1,5 @@
+//frequences-table.component.ts
+
 import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {FicheTechniques} from "../../../shared/models/ficheTechniques";
 import {MatTableDataSource} from "@angular/material/table";
@@ -21,6 +23,11 @@ import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dia
 import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
 import {Utilisateur} from "../../../shared/models/utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
+import {
+  CalculFraisFrequenceRequest,
+  FicheTechniqueFrequenceDetail
+} from "../../../shared/models/fiche-technique-frequence-create-request";
+import {FichesTechniquesFrequenceService} from "../../../shared/services/fiches-techniques-frequences";
 
 
 interface FTListFilter {
@@ -40,7 +47,7 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
 
   @Input() frequencesCategories: number[] = [1,2,3,4,5,6,7];
 
-  @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
+  @Output() notifyFicheTechnique: EventEmitter<FicheTechniqueFrequenceDetail> = new EventEmitter<FicheTechniqueFrequenceDetail>();
   @Output() notifyActionOperation: EventEmitter<string> = new EventEmitter<string>();
 
   ficheTechniques?: MatTableDataSource<FicheTechniques>;
@@ -66,6 +73,21 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
 
   private filterValues: FTListFilter = {};
 
+
+  action: string = operations.table;
+  selectedFT: FicheTechniques | null = null;
+
+  onSelectFT(ft: FicheTechniques | null) {
+    this.selectedFT = ft;
+  }
+
+  onAction(op?: string) {
+    this.action = op || operations.table;
+  }
+
+  resultatCalcul: any;
+
+
   constructor(
     private ficheTechniquesService: FicheTechniquesService,
     private categorieProduitService: CategorieProduitService,
@@ -76,6 +98,7 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
     private authService:AuthService,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
+    private fichesTechniquesFrequenceService: FichesTechniquesFrequenceService,
   ) {
     this.ficheTechniques = new MatTableDataSource<FicheTechniques>([]);
   }
@@ -189,10 +212,46 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
     this.ficheTechniques.filter = filterValue.trim().toLowerCase();
   }
 
-  crud(ficheTechnique: FicheTechniques, operation?: string) {
-    this.notifyFicheTechnique.emit(ficheTechnique);
-    this.notifyActionOperation.emit(operation);
+
+  /*    this.fichesTechniquesFrequenceService
+      .getFicheTechniqueFrequenceDetail(ficheTechniqueSelectionne.id)
+      .subscribe(detail => {
+        console.log("detail");
+        console.log(detail);
+        this.notifyFicheTechnique.emit(detail);
+        this.notifyActionOperation.emit(operation);
+      });*/
+
+
+  crud(ficheTechniqueSelectionne: FicheTechniques, operation?: string) {
+
+    const payload: CalculFraisFrequenceRequest = {
+      fiche_id: ficheTechniqueSelectionne.id,
+      enregistrer: false
+    };
+
+    this.fichesTechniquesFrequenceService
+      .calculerFraisFicheTechniqueFrequence(payload)
+      .subscribe({
+        next: (result) => {
+          console.log('Résultat calcul:', result);
+
+          // ✅ 1) L’afficher (exemple simple)
+       /*   this.msgMessageService.success('Calcul terminé');*/
+
+          // ✅ 2) Le stocker dans une variable pour l’afficher dans le HTML
+          this.resultatCalcul = result;
+
+          console.log(this.resultatCalcul);
+
+        },
+        error: (e) => {
+          console.error('Erreur calcul:', e);
+          /*this.msgMessageService.error('Erreur lors du calcul');*/
+        }
+      });
   }
+
 
   onDelete(ficheTechniques: FicheTechniques) {
     this.dialogService.yes_no({message: " Voulez-vous supprimer cet enregistrement"}).subscribe(yes_no => {

@@ -1,3 +1,5 @@
+<!-- src/app/facture/frequences/modals/station-frequences-dialog/station-frequences-dialog.component.html -->
+
 <div class="page-title">
   <h2>{{ title }}</h2>
 </div>
@@ -8,9 +10,7 @@
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="stationCfg.type_station?.visible">
     <mat-label>Type station</mat-label>
-    <mat-select
-      formControlName="type_station"
-      matTooltip="Type station">
+    <mat-select formControlName="type_station" matTooltip="Type station">
       <mat-option *ngFor="let item of typeStations" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
@@ -30,54 +30,36 @@
 
   <!-- Nombre de stations -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.nbre_station?.visible">
+                  *ngIf="stationCfg.nombre_station?.visible">
     <mat-label>Nombre de stations</mat-label>
-    <input matInput type="number" formControlName="nbre_station">
+    <input matInput type="number" formControlName="nombre_station" min="1">
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- Largeur de bande -->
+  <!-- Largeur de bande (MHz) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.largeur_bande?.visible">
-    <mat-label>Largeur de bande</mat-label>
-    <input matInput type="number" formControlName="largeur_bande">
+                  *ngIf="stationCfg.largeur_bande_mhz?.visible">
+    <mat-label>Largeur de bande (MHz)</mat-label>
+    <input matInput type="number" formControlName="largeur_bande_mhz">
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- Unité de largeur de bande (MHz/kHz/…) -->
+  <!-- Débit (kbps) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.largeur_bande_unite?.visible">
-    <mat-label>Unité</mat-label>
-    <mat-select
-      formControlName="largeur_bande_unite"
-      matTooltip="Unité de largeur de bande">
-      <mat-option *ngFor="let u of largeurBandeUnites" [value]="u.id">
-        {{ u.libelle }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <div class="blank-row"></div>
-
-  <!-- Débit -->
-  <!-- Débit -->
-  <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.debit?.visible">
-    <mat-label>Débit</mat-label>
-    <input matInput type="number" formControlName="debit">
+                  *ngIf="stationCfg.debit_kbps?.visible">
+    <mat-label>Débit (kbps)</mat-label>
+    <input matInput type="number" formControlName="debit_kbps">
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Bande de fréquence -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.bande_frequence?.visible">
+                  *ngIf="stationCfg.type_bande_frequence?.visible">
     <mat-label>Bande de fréquence</mat-label>
-    <mat-select
-      formControlName="bande_frequence"
-      matTooltip="Bande de fréquence">
+    <mat-select formControlName="type_bande_frequence" matTooltip="Bande de fréquence">
       <mat-option *ngFor="let item of typeBandeFrequences" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
@@ -86,23 +68,37 @@
 
   <div class="blank-row"></div>
 
-  <!-- Caractère commercial -->
+  <!-- Caractère radio -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.caractere_commercial?.visible">
-    <mat-label>Caractère commercial</mat-label>
-    <mat-select formControlName="caractere_commercial">
-      <mat-option value="COMMERCIALE">Commercial</mat-option>
-      <mat-option value="NON_COMMERCIALE">Non commercial</mat-option>
+                  *ngIf="stationCfg.caractere_radio?.visible">
+    <mat-label>Caractère radio</mat-label>
+    <mat-select formControlName="caractere_radio" matTooltip="Caractère radio">
+      <!-- à remplacer par une liste dynamique si tu as un référentiel -->
+      <mat-option [value]="1">Commercial</mat-option>
+      <mat-option [value]="2">Non commercial</mat-option>
     </mat-select>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- Nombre de tranches de facturation -->
+  <!-- Nombre de tranches -->
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="stationCfg.nbre_tranche?.visible">
-    <mat-label>Nombre de tranches de facturation</mat-label>
-    <input matInput type="number" formControlName="nbre_tranche">
+    <mat-label>Nombre de tranches</mat-label>
+    <input matInput type="number" formControlName="nbre_tranche" min="1">
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- Zone de couverture (si utilisée sur station dans certaines catégories) -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.zone_couverture?.visible">
+    <mat-label>Zone de couverture</mat-label>
+    <mat-select formControlName="zone_couverture" matTooltip="Zone de couverture">
+      <mat-option *ngFor="let item of zoneCouvertures" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
+    </mat-select>
   </mat-form-field>
 
   <div class="blank-row"></div>
