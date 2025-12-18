@@ -168,3 +168,43 @@ export class  CalculFraisFrequenceRequest
   fiche_id: number;
   enregistrer: Boolean;
 }
+
+
+export interface ProduitDetail {
+  id: number;
+  code: string;
+  libelle: string;
+}
+
+/*export type NatureFraisFrequence = 'DOSSIER' | 'UTILISATION' | string;*/
+
+export interface CalculFraisFrequenceDetail {
+  id: number | null;
+
+  fiche_technique: number;
+
+  // selon le type de ligne, l’un des 2 peut être présent
+  station_id?: number;
+  canal_id?: number;
+
+  nature_frais: string;
+
+  produit: ProduitDetail;
+
+  regle_tarif_frequence: number;
+
+  base_quantite: string;        // "5.0000"
+  montant_unitaire: string;     // "20000.00"
+  coefficient_global: string;   // "1.0000"
+  montant_calcule: string;      // "100000.00"
+
+  created_at: string;           // ISO datetime
+}
+
+export interface CalculFraisFrequenceResult {
+  fiche_id: number;
+  total: string;
+  nb_lignes: number;
+
+  details: CalculFraisFrequenceDetail[];
+}

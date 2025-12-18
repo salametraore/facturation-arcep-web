@@ -16,7 +16,7 @@ export class ClasseDebitService extends BaseClasseService<ClasseDebit> {
   }
 
   protected get baseUrl(): string {
-    return `${this.cfg.baseUrl.replace(/\/$/, '')}/classe-debit-frequences`;
+    return `${this.cfg.baseUrl.replace(/\/$/, '')}/classe-debit`;
   }
 
   getClasseIdByDebit(debitKbps: number | string | null | undefined): Observable<number | null> {

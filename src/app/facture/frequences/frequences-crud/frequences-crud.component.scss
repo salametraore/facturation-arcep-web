@@ -147,3 +147,21 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.recap-dl--inline {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;        // espace entre les 2 blocs
+  flex-wrap: wrap;  // si écran petit, ça repasse à la ligne
+
+  > div {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;       // espace entre dt et dd
+    margin: 0;      // au cas où
+  }
+
+  dt { margin: 0; }
+  dd { margin: 0; }
+}

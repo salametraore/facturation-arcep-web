@@ -291,6 +291,52 @@
               </dl>
             </section>
 
+            <!-- ── FRAIS CALCULÉS : affichage uniquement si fiche déjà créée ── -->
+            <section class="recap-card" *ngIf="!isNew && ficheTechnique?.id">
+              <h3>Frais calculés</h3>
+
+              <p *ngIf="loadingCalcul" class="recap-count">Calcul en cours…</p>
+              <p *ngIf="errorCalcul" class="recap-empty">{{ errorCalcul }}</p>
+
+              <ng-container *ngIf="!loadingCalcul && resultatCalcul">
+                <dl class="recap-dl recap-dl--inline">
+                  <div>
+                    <dt>Total</dt>
+                    <dd><strong>{{ resultatCalcul?.total }}</strong></dd>
+                  </div>
+
+                  <div>
+                    <dt>Nombre de lignes</dt>
+                    <dd>{{ resultatCalcul?.nb_lignes }}</dd>
+                  </div>
+                </dl>
+
+                <div class="recap-table-wrapper" *ngIf="resultatCalcul.details?.length">
+                  <table class="recap-table">
+                    <thead>
+                    <tr>
+                      <th>Nature</th>
+                      <th>Produit</th>
+                      <th>Base</th>
+                      <th>PU</th>
+                      <th>Coef</th>
+                      <th>Montant</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let d of resultatCalcul.details">
+                      <td>{{ d.nature_frais }}</td>
+                      <td>{{ d.produit?.libelle }}</td>
+                      <td>{{ d.base_quantite }}</td>
+                      <td>{{ d.montant_unitaire }}</td>
+                      <td>{{ d.coefficient_global }}</td>
+                      <td><strong>{{ d.montant_calcule }}</strong></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-container>
+            </section>
 
             <div class="recap-grid">
 

@@ -1,0 +1,462 @@
+{
+  "dashboard": {
+    "kpis": {
+      "clients_en_recouvrement": 38,
+      "montant_total_impayes": 38934750,
+      "actions_a_faire": 181,
+      "actions_en_retard": 77
+    }
+  },
+  "dossiersClients": [
+    {
+      "client_id": 1009,
+      "denomination": "Client 1009 - Iota",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 2095000,
+      "facture_plus_ancienne": "2025-10-11",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1039,
+      "denomination": "Client 1039 - Iota",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1835000,
+      "facture_plus_ancienne": "2025-10-12",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1013,
+      "denomination": "Client 1013 - Gamma",
+      "type_client": "GROS",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1815000,
+      "facture_plus_ancienne": "2025-10-13",
+      "statut_dossier": "BLOQUE"
+    },
+    {
+      "client_id": 1001,
+      "denomination": "Client 1001 - Alpha",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1645500,
+      "facture_plus_ancienne": "2025-10-06",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1022,
+      "denomination": "Client 1022 - Beta",
+      "type_client": "PME",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1625000,
+      "facture_plus_ancienne": "2025-10-05",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1006,
+      "denomination": "Client 1006 - Zeta",
+      "type_client": "PME",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1490000,
+      "facture_plus_ancienne": "2025-10-18",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1048,
+      "denomination": "Client 1048 - Theta",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 1322000,
+      "facture_plus_ancienne": "2025-09-07",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1037,
+      "denomination": "Client 1037 - Eta",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 1182500,
+      "facture_plus_ancienne": "2025-09-11",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1050,
+      "denomination": "Client 1050 - Kappa",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1100000,
+      "facture_plus_ancienne": "2025-09-18",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1046,
+      "denomination": "Client 1046 - Zeta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1060000,
+      "facture_plus_ancienne": "2025-09-16",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1029,
+      "denomination": "Client 1029 - Iota",
+      "type_client": "PME",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 1056000,
+      "facture_plus_ancienne": "2025-09-21",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1041,
+      "denomination": "Client 1041 - Alpha",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 1050000,
+      "facture_plus_ancienne": "2025-09-09",
+      "statut_dossier": "BLOQUE"
+    },
+    {
+      "client_id": 1038,
+      "denomination": "Client 1038 - Theta",
+      "type_client": "GROS",
+      "nb_factures_impayees": 3,
+      "montant_total_restant": 1045000,
+      "facture_plus_ancienne": "2025-11-25",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1034,
+      "denomination": "Client 1034 - Delta",
+      "type_client": "PME",
+      "nb_factures_impayees": 3,
+      "montant_total_restant": 1005000,
+      "facture_plus_ancienne": "2025-10-03",
+      "statut_dossier": "PROMESSE"
+    },
+    {
+      "client_id": 1021,
+      "denomination": "Client 1021 - Alpha",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 940000,
+      "facture_plus_ancienne": "2025-10-18",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1007,
+      "denomination": "Client 1007 - Eta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 901500,
+      "facture_plus_ancienne": "2025-12-09",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1028,
+      "denomination": "Client 1028 - Theta",
+      "type_client": "GROS",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 825000,
+      "facture_plus_ancienne": "2025-10-22",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1035,
+      "denomination": "Client 1035 - Epsilon",
+      "type_client": "PME",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 812500,
+      "facture_plus_ancienne": "2025-08-31",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1026,
+      "denomination": "Client 1026 - Zeta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 757500,
+      "facture_plus_ancienne": "2026-01-01",
+      "statut_dossier": "PROMESSE"
+    },
+    {
+      "client_id": 1010,
+      "denomination": "Client 1010 - Kappa",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 755000,
+      "facture_plus_ancienne": "2025-09-22",
+      "statut_dossier": "PROMESSE"
+    },
+    {
+      "client_id": 1027,
+      "denomination": "Client 1027 - Eta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 728500,
+      "facture_plus_ancienne": "2025-09-30",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1047,
+      "denomination": "Client 1047 - Eta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 710000,
+      "facture_plus_ancienne": "2025-09-19",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1015,
+      "denomination": "Client 1015 - Epsilon",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 707500,
+      "facture_plus_ancienne": "2025-09-19",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1043,
+      "denomination": "Client 1043 - Gamma",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 705000,
+      "facture_plus_ancienne": "2025-12-07",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1003,
+      "denomination": "Client 1003 - Gamma",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 692500,
+      "facture_plus_ancienne": "2025-10-06",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1020,
+      "denomination": "Client 1020 - Kappa",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 680000,
+      "facture_plus_ancienne": "2025-09-15",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1004,
+      "denomination": "Client 1004 - Delta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 656250,
+      "facture_plus_ancienne": "2025-10-13",
+      "statut_dossier": "PROMESSE"
+    },
+    {
+      "client_id": 1011,
+      "denomination": "Client 1011 - Alpha",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 640000,
+      "facture_plus_ancienne": "2025-09-07",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1018,
+      "denomination": "Client 1018 - Theta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 606250,
+      "facture_plus_ancienne": "2025-10-11",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1044,
+      "denomination": "Client 1044 - Delta",
+      "type_client": "GROS",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 585000,
+      "facture_plus_ancienne": "2025-09-10",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1005,
+      "denomination": "Client 1005 - Epsilon",
+      "type_client": "PME",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 566000,
+      "facture_plus_ancienne": "2025-09-16",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1002,
+      "denomination": "Client 1002 - Beta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 3,
+      "montant_total_restant": 558750,
+      "facture_plus_ancienne": "2025-11-02",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1017,
+      "denomination": "Client 1017 - Eta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 540000,
+      "facture_plus_ancienne": "2025-09-21",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1019,
+      "denomination": "Client 1019 - Iota",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 535000,
+      "facture_plus_ancienne": "2025-10-11",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1023,
+      "denomination": "Client 1023 - Gamma",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 2,
+      "montant_total_restant": 522000,
+      "facture_plus_ancienne": "2025-09-10",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1040,
+      "denomination": "Client 1040 - Kappa",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 515000,
+      "facture_plus_ancienne": "2025-10-02",
+      "statut_dossier": "PROMESSE"
+    },
+    {
+      "client_id": 1008,
+      "denomination": "Client 1008 - Theta",
+      "type_client": "GROS",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 480000,
+      "facture_plus_ancienne": "2025-09-21",
+      "statut_dossier": "BLOQUE"
+    },
+    {
+      "client_id": 1025,
+      "denomination": "Client 1025 - Epsilon",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 469000,
+      "facture_plus_ancienne": "2025-09-09",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1049,
+      "denomination": "Client 1049 - Iota",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 435000,
+      "facture_plus_ancienne": "2025-09-23",
+      "statut_dossier": "BLOQUE"
+    },
+    {
+      "client_id": 1032,
+      "denomination": "Client 1032 - Beta",
+      "type_client": "GROS",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 426000,
+      "facture_plus_ancienne": "2025-09-19",
+      "statut_dossier": "PROMESSE"
+    },
+    {
+      "client_id": 1016,
+      "denomination": "Client 1016 - Zeta",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 415000,
+      "facture_plus_ancienne": "2025-09-16",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1012,
+      "denomination": "Client 1012 - Beta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 410000,
+      "facture_plus_ancienne": "2025-09-03",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1045,
+      "denomination": "Client 1045 - Epsilon",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 362000,
+      "facture_plus_ancienne": "2025-10-26",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1014,
+      "denomination": "Client 1014 - Delta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 5,
+      "montant_total_restant": 347500,
+      "facture_plus_ancienne": "2025-10-13",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1042,
+      "denomination": "Client 1042 - Beta",
+      "type_client": "PME",
+      "nb_factures_impayees": 4,
+      "montant_total_restant": 290000,
+      "facture_plus_ancienne": "2025-09-05",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1024,
+      "denomination": "Client 1024 - Delta",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 3,
+      "montant_total_restant": 290000,
+      "facture_plus_ancienne": "2025-11-24",
+      "statut_dossier": "PROMESSE"
+    },
+    {
+      "client_id": 1031,
+      "denomination": "Client 1031 - Alpha",
+      "type_client": "PME",
+      "nb_factures_impayees": 2,
+      "montant_total_restant": 275000,
+      "facture_plus_ancienne": "2025-12-02",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1030,
+      "denomination": "Client 1030 - Kappa",
+      "type_client": "STANDARD",
+      "nb_factures_impayees": 2,
+      "montant_total_restant": 240000,
+      "facture_plus_ancienne": "2025-10-26",
+      "statut_dossier": "EN_RECOUVREMENT"
+    },
+    {
+      "client_id": 1033,
+      "denomination": "Client 1033 - Gamma",
+      "type_client": "GROS",
+      "nb_factures_impayees": 3,
+      "montant_total_restant": 142500,
+      "facture_plus_ancienne": "2025-09-13",
+      "statut_dossier": "BLOQUE"
+    },
+    {
+      "client_id": 1036,
+      "denomination": "Client 1036 - Zeta",
+      "type_client": "PME",
+      "nb_factures_impayees": 2,
+      "montant_total_restant": 87500,
+      "facture_plus_ancienne": "2025-10-31",
+      "statut_dossier": "EN_RECOUVREMENT"
+    }
+  ]
+}

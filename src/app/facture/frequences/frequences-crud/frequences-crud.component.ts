@@ -12,7 +12,10 @@ import { CategoryId } from '../../../shared/models/frequences-category.types';
 import {
   FicheTechniqueStationRequest,
   FicheTechniqueCanalRequest,
-  FicheTechniqueFrequenceCreateRequest, FicheTechniqueFrequenceDetail
+  FicheTechniqueFrequenceCreateRequest,
+  FicheTechniqueFrequenceDetail,
+  CalculFraisFrequenceRequest,
+  CalculFraisFrequenceResult
 } from '../../../shared/models/fiche-technique-frequence-create-request';
 
 import {
@@ -61,6 +64,8 @@ import { ZoneCouverture } from '../../../shared/models/zone-couverture';
 import { ZoneCouvertureService } from '../../../shared/services/zone-couverture.service';
 import {Utilisateur} from "../../../shared/models/utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
+import {FicheTechniqueCanal, FicheTechniqueStation} from "../../../shared/models/fiche-technique-frequence";
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'frequences-crud',
@@ -70,10 +75,10 @@ import {AuthService} from "../../../authentication/auth.service";
 export class FrequencesCrudComponent implements OnInit {
 
   @Input() operation: string;
-  @Input() ficheTechnique: FicheTechniqueFrequenceDetail;
+  @Input() ficheTechnique: FicheTechniques;
 
   @Output() notifyActionOperation = new EventEmitter<string>();
-  @Output() notifyFicheTechnique = new EventEmitter<FicheTechniqueFrequenceDetail>();
+  @Output() notifyFicheTechnique = new EventEmitter<FicheTechniques>();
 
   // 🔹 Colonnes alignées avec les nouveaux modèles / configs
   displayedColumnsStations: string[] = [
@@ -140,11 +145,16 @@ export class FrequencesCrudComponent implements OnInit {
 
   utilisateurConnecte:Utilisateur;
 
+  // Résultat calcul frais (affiché uniquement si fiche déjà créée)
+  resultatCalcul?: CalculFraisFrequenceResult;
+  loadingCalcul = false;
+  errorCalcul = '';
+
   protected readonly operations = operations;
 
   constructor(
     private fb: FormBuilder,
-    private api: FichesTechniquesFrequenceService,
+    private fichesTechniquesFrequenceService: FichesTechniquesFrequenceService,
     private msgService: MsgMessageServiceService,
     private dialogService: DialogService,
     private dialog: MatDialog,
@@ -338,16 +348,16 @@ export class FrequencesCrudComponent implements OnInit {
     this.loading = true;
     this.errorMsg = '';
 
-    this.api.getItem(this.ficheTechnique.id).subscribe({
-      next: (fiche: FicheTechniqueFrequenceCreateRequest) => {
+    this.fichesTechniquesFrequenceService.getDetailFicheTechniqueFrequence(this.ficheTechnique.id).subscribe({
+      next: (fiche: FicheTechniqueFrequenceDetail) => {
         this.cat = (fiche.categorie_produit as CategoryId);
         this.form = buildFicheTechniqueFrequenceForm(this.fb, fiche);
 
-        (fiche.stations || []).forEach((s: FicheTechniqueStationRequest) => {
+      (fiche.stations || []).forEach((s: FicheTechniqueStation) => {
           this.stationsFA.push(buildStationFG(this.fb, s, this.cat));
         });
 
-        (fiche.canaux || []).forEach((c: FicheTechniqueCanalRequest) => {
+        (fiche.canaux || []).forEach((c: FicheTechniqueCanal) => {
           this.canauxFA.push(buildCanalFG(this.fb, c, this.cat));
         });
 
@@ -366,6 +376,10 @@ export class FrequencesCrudComponent implements OnInit {
             this.updateDisplayedColumns();
           }
         });
+
+        // Calcul des lignes tarifées (uniquement si fiche existe)
+        this.loadTarifsIfPossible(this.ficheTechnique.id);
+
       },
       error: (e) => {
         console.error('GET fiche fréquence failed:', e);
@@ -373,7 +387,38 @@ export class FrequencesCrudComponent implements OnInit {
         this.loading = false;
       }
     });
+
+
   }
+
+
+  // ---------- CALCUL TARIFS (STEP 4) ----------
+  private loadTarifsIfPossible(ficheId?: number | null): void {
+    if (!ficheId) return;
+
+    this.loadingCalcul = true;
+    this.errorCalcul = '';
+    this.resultatCalcul = undefined;
+
+    const payloadCalcul: CalculFraisFrequenceRequest = {
+      fiche_id: ficheId,
+      enregistrer: false
+    };
+
+    this.fichesTechniquesFrequenceService
+      .calculerFraisFicheTechniqueFrequence(payloadCalcul)
+      .pipe(finalize(() => (this.loadingCalcul = false)))
+      .subscribe({
+        next: (result: CalculFraisFrequenceResult) => {
+          this.resultatCalcul = result;
+        },
+        error: (e) => {
+          console.error('Erreur calcul:', e);
+          this.errorCalcul = 'Erreur lors du calcul des frais';
+        }
+      });
+  }
+
 
   // ---------- STATIONS : TABLE + MODALE ----------
   onOpenStationDialog(index?: number): void {
@@ -493,11 +538,32 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   // ---------- SAUVEGARDE SIMPLE (pas de lignes tarifées) ----------
+
+  private logInvalidControls(fg: FormGroup, prefix = ''): void {
+    Object.keys(fg.controls).forEach(key => {
+      const c: any = fg.get(key);
+      const path = prefix ? `${prefix}.${key}` : key;
+
+      if (!c) return;
+
+      if (c.controls) {
+        // FormGroup / FormArray
+        this.logInvalidControls(c, path);
+      } else if (c.invalid) {
+        console.log('INVALID:', path, 'value=', c.value, 'errors=', c.errors);
+      }
+    });
+  }
+
+
   onSave(): void {
+    console.log("debut save ");
+    console.log(" this.form.invalid :  " +  this.form.invalid);
 
     if (!this.form || this.form.invalid) {
       this.form.markAllAsTouched();
-      this.errorMsg = 'Formulaire incomplet ou invalide';
+      console.log('FORM INVALID');
+      this.logInvalidControls(this.form);
       return;
     }
 
@@ -505,14 +571,33 @@ export class FrequencesCrudComponent implements OnInit {
     this.loading = true;
     this.errorMsg = '';
 
+    console.log("this.isNew : "+this.isNew);
+
     const obs = this.isNew
-      ? this.api.initierFicheTechniqueFrequence(payload)
-      : this.api.update(this.ficheTechnique.id, payload);
+      ? this.fichesTechniquesFrequenceService.initierFicheTechniqueFrequence(payload)
+      : this.fichesTechniquesFrequenceService.updateFicheTechniqueFrequence(this.ficheTechnique.id, payload);
 
     obs.subscribe({
-      next: () => {
+      next: (saved: any) => {
         this.loading = false;
         this.msgService.success('Fiche fréquences enregistrée');
+
+        // Si création: on a besoin de l'ID retourné par l'API pour afficher les frais
+        if (this.isNew) {
+          const newId = saved?.id;
+          if (newId) {
+            this.isNew = false;
+            // garder l'id côté composant
+            this.ficheTechnique = { ...(this.ficheTechnique ?? {}), id: newId } as any;
+            this.loadTarifsIfPossible(newId);
+          }
+        } else {
+          // en édition : recalcul après save (facultatif, mais utile)
+          this.loadTarifsIfPossible(this.ficheTechnique.id);
+        }
+
+
+
         this.notifyActionOperation.emit(operations.table);
       },
       error: (e) => {

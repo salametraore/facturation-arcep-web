@@ -16,7 +16,7 @@ export class ClassePuissanceService extends BaseClasseService<ClassePuissance> {
   }
 
   protected get baseUrl(): string {
-    return `${this.cfg.baseUrl.replace(/\/$/, '')}/classe-puissance-frequences`;
+    return `${this.cfg.baseUrl.replace(/\/$/, '')}/classe-puissance`;
   }
 
   getClasseIdByPuissance(puissanceW: number | string | null | undefined): Observable<number | null> {

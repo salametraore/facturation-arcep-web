@@ -47,7 +47,7 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
 
   @Input() frequencesCategories: number[] = [1,2,3,4,5,6,7];
 
-  @Output() notifyFicheTechnique: EventEmitter<FicheTechniqueFrequenceDetail> = new EventEmitter<FicheTechniqueFrequenceDetail>();
+  @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
   @Output() notifyActionOperation: EventEmitter<string> = new EventEmitter<string>();
 
   ficheTechniques?: MatTableDataSource<FicheTechniques>;
@@ -212,23 +212,25 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
     this.ficheTechniques.filter = filterValue.trim().toLowerCase();
   }
 
+  /*
 
-  /*    this.fichesTechniquesFrequenceService
+  crudzzzz(ficheTechniqueSelectionne: FicheTechniques, operation?: string) {
+
+
+    this.fichesTechniquesFrequenceService
       .getFicheTechniqueFrequenceDetail(ficheTechniqueSelectionne.id)
       .subscribe(detail => {
         console.log("detail");
         console.log(detail);
         this.notifyFicheTechnique.emit(detail);
         this.notifyActionOperation.emit(operation);
-      });*/
-
-
-  crud(ficheTechniqueSelectionne: FicheTechniques, operation?: string) {
+      });
 
     const payload: CalculFraisFrequenceRequest = {
       fiche_id: ficheTechniqueSelectionne.id,
       enregistrer: false
     };
+
 
     this.fichesTechniquesFrequenceService
       .calculerFraisFicheTechniqueFrequence(payload)
@@ -237,7 +239,7 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
           console.log('Résultat calcul:', result);
 
           // ✅ 1) L’afficher (exemple simple)
-       /*   this.msgMessageService.success('Calcul terminé');*/
+       /!*   this.msgMessageService.success('Calcul terminé');*!/
 
           // ✅ 2) Le stocker dans une variable pour l’afficher dans le HTML
           this.resultatCalcul = result;
@@ -247,11 +249,15 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
         },
         error: (e) => {
           console.error('Erreur calcul:', e);
-          /*this.msgMessageService.error('Erreur lors du calcul');*/
+          /!*this.msgMessageService.error('Erreur lors du calcul');*!/
         }
       });
-  }
+  }*/
 
+  crud(ficheTechnique: FicheTechniques, operation?: string) {
+    this.notifyFicheTechnique.emit(ficheTechnique);
+    this.notifyActionOperation.emit(operation);
+  }
 
   onDelete(ficheTechniques: FicheTechniques) {
     this.dialogService.yes_no({message: " Voulez-vous supprimer cet enregistrement"}).subscribe(yes_no => {
