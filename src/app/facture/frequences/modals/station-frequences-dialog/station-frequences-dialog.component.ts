@@ -74,6 +74,9 @@ export class StationFrequencesDialogComponent implements OnInit {
 
     this.loadData();
 
+    console.log("this.data.station");
+    console.log(this.data.station);
+
     // FormGroup construit dynamiquement selon la catégorie + modèle FicheTechniqueStationRequest
     this.form = buildStationFG(
       this.fb,

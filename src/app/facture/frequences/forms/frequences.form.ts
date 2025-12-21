@@ -52,7 +52,6 @@ export function buildFicheTechniqueFrequenceForm(
   });
 }
 
-
 // ===============================================================
 // 2. STATION (FicheTechniqueStationRequest)
 // - champs classe_* gardés dans le FormGroup (cachés dans l’UI)
@@ -148,6 +147,11 @@ export const getStationsFA = (form: FormGroup): FormArray =>
 export const getCanauxFA = (form: FormGroup): FormArray =>
   form.get('canaux') as FormArray;
 
+function toNumber(v: any): number | null {
+  if (v === null || v === undefined || v === '') return null;
+  const n = typeof v === 'number' ? v : Number(String(v).replace(',', '.'));
+  return Number.isFinite(n) ? n : null;
+}
 
 // ===============================================================
 // 5. MAPPING VERS L’API

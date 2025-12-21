@@ -130,6 +130,7 @@ export interface FicheTechniqueCanalDetail {
   nbre_tranche_facturation: number;
 
   largeur_bande_khz: string;
+  classe_largeur_bande?: number;
 
   type_bande_frequence: number;
 }
@@ -140,24 +141,27 @@ export interface FicheTechniqueStationDetail {
 
   categorie_produit: number;
 
-  type_station: number;
+  type_station?: number;
 
-  classe_puissance: number;
+  puissance?: number;
+  classe_puissance?: number;
 
-  nombre_station: number;
-  debit_kbps: number;
+  nombre_station?: number;
 
-  largeur_bande_mhz: string;
+  zone_couverture?: number;
+  localite?: string;
 
-  type_bande_frequence: number;
+  nbre_tranche?: number;
 
-  nbre_tranche: number;
+  largeur_bande_mhz?: string;
 
-  localite: string;
+  type_bande_frequence?: number;
+  classe_largeur_bande?: number;
 
-  zone_couverture: number;
+  debit_kbps?: number;
+  classe_debit?: number;
 
-  caractere_radio: number;
+  caractere_radio?: number;
 
   created_at: string; // ISO date-time
   updated_at: string; // ISO date-time

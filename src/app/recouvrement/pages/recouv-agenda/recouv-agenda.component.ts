@@ -1,14 +1,13 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { Observable, of } from 'rxjs';
+import {AfterViewInit, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
 
-import { LocalPageDataSource } from '../../../rcv/local-page-datasource';
-import { PageResult } from '../../../rcv/rcv-query';
-import { RcvAgendaApi } from '../../../rcv/endpoints/rcv-agenda.api';
+import {LocalPageDataSource} from '../../../rcv/local-page-datasource';
+import {PageResult} from '../../../rcv/rcv-query';
+import {RcvAgendaApi} from '../../../rcv/endpoints/rcv-agenda.api';
 
-import { RecouvAgendaDetailsDialogComponent } from './recouv-agenda-details-dialog.component';
+import {RecouvAgendaDetailsDialogComponent} from './recouv-agenda-details-dialog.component';
 
 type AgendaStatut = 'A_FAIRE' | 'EN_COURS' | 'FAIT' | 'ECHOUE' | 'REPORTE' | 'ANNULE';
 type ModeExecution = 'AUTO' | 'SEMI_AUTO' | 'MANU' | 'MANUEL';
@@ -20,18 +19,18 @@ type ModeExecution = 'AUTO' | 'SEMI_AUTO' | 'MANU' | 'MANUEL';
 })
 export class RecouvAgendaComponent implements AfterViewInit {
   // ✅ DOIT matcher les matColumnDef du HTML
-/*  displayedColumns = [
-    'client',
-    'type_action',
-    'date_planifiee',
-    'statut',
-    'mode_execution',
-    'portefeuille',
-    'nb_factures',
-    'preview',
-    'preview_toggle',
-    'actions'
-  ];*/
+  /*  displayedColumns = [
+      'client',
+      'type_action',
+      'date_planifiee',
+      'statut',
+      'mode_execution',
+      'portefeuille',
+      'nb_factures',
+      'preview',
+      'preview_toggle',
+      'actions'
+    ];*/
 
   displayedColumns = [
     'client',
@@ -45,9 +44,10 @@ export class RecouvAgendaComponent implements AfterViewInit {
     'actions'
   ];
 
+
   dataSource!: LocalPageDataSource<any>;
-  total$: Observable<number> = of(0);
-  loading$: Observable<boolean> = of(false);
+  total$ = this.dataSource?.totalCount$?.();
+  loading$ = this.dataSource?.loadingState$?.();
 
   search = '';
 
@@ -73,31 +73,35 @@ export class RecouvAgendaComponent implements AfterViewInit {
 
   constructor(
     private api: RcvAgendaApi,
-    private dialog: MatDialog
-  ) {}
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
+  ) {
+  }
 
   ngOnInit(): void {
-    this.typeActionsOptions = ['APPEL','COURRIER','EMAIL','SMS'];
+    this.typeActionsOptions = ['APPEL', 'COURRIER', 'EMAIL', 'SMS'];
   }
-  
+
   ngAfterViewInit(): void {
-    this.dataSource = new LocalPageDataSource<any>(
-      this.paginator,
-      this.sort,
-      (q) => this.api.list(q) as PageResult<any>
-    );
+    Promise.resolve().then(() => {
+      this.dataSource = new LocalPageDataSource<any>(
+        this.paginator,
+        this.sort,
+        (q) => this.api.list(q) as PageResult<any>
+      );
 
-    this.total$ = this.dataSource.totalCount$();
-    this.loading$ = this.dataSource.loadingState$();
+      this.total$ = this.dataSource.totalCount$();
+      this.loading$ = this.dataSource.loadingState$();
 
-    // tri par défaut
-    this.sort.active = 'date_planifiee';
-    this.sort.direction = 'asc';
+      // tri par défaut
+      this.sort.active = 'date_planifiee';
+      this.sort.direction = 'asc';
 
-   /* // ✅ options Type action
-    this.typeActionsOptions = this.api.listTypeActions?.() ?? [];*/
+      this.applyFilters();
 
-    this.applyFilters();
+      // ✅ stabilise la vue (évite NG0100)
+      this.cdr.detectChanges();
+    });
   }
 
   applySearch() {
@@ -174,7 +178,7 @@ export class RecouvAgendaComponent implements AfterViewInit {
     this.dialog.open(RecouvAgendaDetailsDialogComponent, {
       width: '980px',
       maxWidth: '98vw',
-      data: { agendaId: row.id }
+      data: {agendaId: row.id}
     });
   }
 
@@ -258,15 +262,6 @@ export class RecouvAgendaComponent implements AfterViewInit {
     return c;
   }
 
-  private canalFromTypeAction(typeAction: any): 'EMAIL' | 'SMS' | 'APPEL' | 'LETTRE' | null {
-    const t = String(typeAction || '').toUpperCase();
-    if (t.includes('EMAIL')) return 'EMAIL';
-    if (t.includes('SMS')) return 'SMS';
-    if (t.includes('APPEL')) return 'APPEL';
-    if (t.includes('COURRIER') || t.includes('LETTRE')) return 'LETTRE';
-    return null;
-  }
-
   previewShort(row: any, max = 140): string {
     const raw = this.extractSnapshotTextPublic(row).replace(/\s+/g, ' ').trim();
     if (!raw) return '';
@@ -285,5 +280,14 @@ export class RecouvAgendaComponent implements AfterViewInit {
     if (body) head.push(body);
 
     return head.join('\n');
+  }
+
+  private canalFromTypeAction(typeAction: any): 'EMAIL' | 'SMS' | 'APPEL' | 'LETTRE' | null {
+    const t = String(typeAction || '').toUpperCase();
+    if (t.includes('EMAIL')) return 'EMAIL';
+    if (t.includes('SMS')) return 'SMS';
+    if (t.includes('APPEL')) return 'APPEL';
+    if (t.includes('COURRIER') || t.includes('LETTRE')) return 'LETTRE';
+    return null;
   }
 }

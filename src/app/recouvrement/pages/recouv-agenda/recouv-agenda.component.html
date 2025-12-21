@@ -105,8 +105,7 @@
       <div class="loading" *ngIf="(loading$ | async)">Chargement…</div>
 
       <div class="mat-elevation-z10 compact-table agenda-table">
-        <table mat-table
-               [dataSource]="dataSource"
+        <table mat-table *ngIf="dataSource" [dataSource]="dataSource"
                matSort
                [trackBy]="trackById"
                multiTemplateDataRows

@@ -350,6 +350,9 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.fichesTechniquesFrequenceService.getDetailFicheTechniqueFrequence(this.ficheTechnique.id).subscribe({
       next: (fiche: FicheTechniqueFrequenceDetail) => {
+        console.log("fiche initUpdate");
+        console.log(fiche);
+
         this.cat = (fiche.categorie_produit as CategoryId);
         this.form = buildFicheTechniqueFrequenceForm(this.fb, fiche);
 

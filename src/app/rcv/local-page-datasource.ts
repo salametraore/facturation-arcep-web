@@ -1,5 +1,5 @@
 import { DataSource } from '@angular/cdk/collections';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -16,28 +16,37 @@ export class LocalPageDataSource<T> extends DataSource<T> {
   private filters$ = new BehaviorSubject<Record<string, any>>({});
 
   constructor(
-    private paginator: MatPaginator,
-    private sort: MatSort,
+    private paginator: MatPaginator | null | undefined,
+    private sort: MatSort | null | undefined,
     private loadPage: PageLoader<T>
   ) {
     super();
   }
 
   connect(): Observable<T[]> {
+    const page$ = this.paginator?.page ? this.paginator.page.pipe(startWith(null)) : of(null);
+    const sort$ = this.sort?.sortChange ? this.sort.sortChange.pipe(startWith(null)) : of(null);
+
     return combineLatest([
-      this.paginator.page.pipe(startWith(null)),
-      this.sort.sortChange.pipe(startWith(null)),
+      page$,
+      sort$,
       this.search$.pipe(startWith('')),
       this.filters$.pipe(startWith({}))
     ]).pipe(
       map(() => {
         this.loading$.next(true);
 
+        const pageIndex = this.paginator?.pageIndex ?? 0;
+        const pageSize = this.paginator?.pageSize ?? 25;
+
+        const active = this.sort?.active;
+        const direction = this.sort?.direction || 'asc';
+
         const q: PageQuery = {
-          page: (this.paginator.pageIndex ?? 0) + 1,
-          pageSize: this.paginator.pageSize ?? 25,
+          page: pageIndex + 1,
+          pageSize,
           search: (this.search$.value || '').trim() || undefined,
-          sort: this.sort.active ? `${this.sort.active},${this.sort.direction || 'asc'}` : undefined,
+          sort: active ? `${active},${direction}` : undefined,
           filters: this.filters$.value
         };
 
@@ -61,12 +70,12 @@ export class LocalPageDataSource<T> extends DataSource<T> {
 
   setSearch(value: string) {
     this.search$.next(value || '');
-    this.paginator.firstPage();
+    this.paginator?.firstPage?.();
   }
 
   setFilters(filters: Record<string, any>) {
     this.filters$.next(filters || {});
-    this.paginator.firstPage();
+    this.paginator?.firstPage?.();
   }
 
   totalCount$(): Observable<number> {
