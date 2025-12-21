@@ -49,7 +49,7 @@ export class FichesTechniquesFrequenceService {
   }
 
   updateFicheTechniqueFrequence(id: number, fiche: FicheTechniqueFrequenceCreateRequest): Observable<FicheTechniqueFrequenceDetail> {
-    return this.http.put<FicheTechniqueFrequenceDetail>(`${this.baseUrl}/${id}/`, fiche);
+    return this.http.put<FicheTechniqueFrequenceDetail>(`${this.cfg.baseUrl}/fiche-technique-frequence-update/${id}/`, fiche);
   }
 
   calculerFraisFicheTechniqueFrequence(fiche: CalculFraisFrequenceRequest): Observable<any> {

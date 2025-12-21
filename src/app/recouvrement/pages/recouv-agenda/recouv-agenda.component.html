@@ -1,0 +1,310 @@
+<!-- src/app/recouvrement/pages/recouv-agenda/recouv-agenda.component.html -->
+<mat-card class="page-card">
+
+  <!-- Barre rose -->
+  <div class="page-title">
+    <h2>Agenda</h2>
+  </div>
+
+ <!-- <div class="page-subtitle">
+    Actions planifiées au niveau client (portefeuille d’impayés)
+  </div>
+-->
+  <!-- Filtres Agenda : 3 lignes -->
+  <div class="filters">
+    <div class="filters-grid filters-grid--agenda">
+
+      <!-- ===== Ligne 1 : Recherche + boutons ===== -->
+      <mat-form-field appearance="outline" class="filter search">
+        <mat-label>Rechercher</mat-label>
+        <input matInput
+               [(ngModel)]="search"
+               (keyup.enter)="applySearch()"
+               placeholder="Client, référence…" />
+        <button *ngIf="search"
+                matSuffix
+                mat-icon-button
+                (click)="search=''; applySearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <button mat-mini-fab color="primary" class="action-btn btn-search"
+              (click)="applyFilters()" matTooltip="Rechercher">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <button mat-mini-fab color="primary" class="action-btn btn-reset"
+              (click)="clear()" matTooltip="Réinitialiser">
+        <mat-icon>cached</mat-icon>
+      </button>
+
+      <!-- ===== Ligne 2 : Client + Statut + Type action ===== -->
+      <mat-form-field appearance="outline" class="filter filter-client">
+        <mat-label>Client ID</mat-label>
+        <input matInput
+               type="number"
+               [(ngModel)]="clientId"
+               (keyup.enter)="applyFilters()"
+               placeholder="ex: 15" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-statut">
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="statut" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-type">
+        <mat-label>Type action</mat-label>
+        <mat-select [(ngModel)]="typeAction" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option *ngFor="let t of typeActionsOptions" [value]="t">{{ t }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- ===== Ligne 3 : Mode + Du + Au ===== -->
+      <mat-form-field appearance="outline" class="filter filter-mode">
+        <mat-label>Mode</mat-label>
+        <mat-select [(ngModel)]="modeExecution" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option *ngFor="let m of modes" [value]="m">{{ m }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-from">
+        <mat-label>Du</mat-label>
+        <input matInput type="date" [(ngModel)]="dateFrom" (change)="applyFilters()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-to">
+        <mat-label>Au</mat-label>
+        <input matInput type="date" [(ngModel)]="dateTo" (change)="applyFilters()" />
+      </mat-form-field>
+
+    </div>
+  </div>
+
+
+  <!-- Cadre standard -->
+  <section class="list-box">
+
+    <div class="list-header">
+      <h3 class="list-title">Actions planifiées</h3>
+
+      <!-- (Optionnel) tu peux mettre une action à droite si besoin -->
+      <div class="list-actions">
+        <!-- rien pour l’instant -->
+      </div>
+    </div>
+
+    <div class="list-body">
+
+      <div class="loading" *ngIf="(loading$ | async)">Chargement…</div>
+
+      <div class="mat-elevation-z10 compact-table agenda-table">
+        <table mat-table
+               [dataSource]="dataSource"
+               matSort
+               [trackBy]="trackById"
+               multiTemplateDataRows
+               style="width: 100%">
+
+          <!-- Date -->
+          <ng-container matColumnDef="date_planifiee">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ plannedDate(row) }}</div>
+              <div class="cell-muted" *ngIf="row?.agent_id">Agent #{{ row.agent_id }}</div>
+            </td>
+          </ng-container>
+
+          <!-- Client -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef>Client</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ clientLabel(row) }}</div>
+              <div class="cell-muted">Client #{{ row.client_id }}</div>
+              <div class="cell-muted" *ngIf="row.references_resume">Factures: {{ row.references_resume }}</div>
+            </td>
+          </ng-container>
+
+          <!-- Action -->
+          <ng-container matColumnDef="type_action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ row.type_action }}</div>
+              <div class="cell-muted">
+                Plan #{{ row.plan_action_id }} · Étape #{{ row.etape_id ?? row.plan_etape_id }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Statut -->
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip class="chip"
+                        [color]="(row.statut === 'A_FAIRE' || row.statut === 'EN_COURS') ? 'primary' : undefined"
+                        selected>
+                {{ row.statut }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Mode -->
+          <ng-container matColumnDef="mode_execution">
+            <th mat-header-cell *matHeaderCellDef>Mode</th>
+            <td mat-cell *matCellDef="let row" class="cell-muted">{{ row.mode_execution }}</td>
+          </ng-container>
+
+          <!-- Portefeuille -->
+          <ng-container matColumnDef="portefeuille">
+            <th mat-header-cell *matHeaderCellDef>Portefeuille</th>
+            <td mat-cell *matCellDef="let row"
+                class="portefeuille-cell"
+                [matTooltip]="portefeuilleTooltip(row)"
+                matTooltipPosition="above"
+                matTooltipShowDelay="150">
+              <div class="cell-title">{{ montantLabel(row) }}</div>
+              <div class="cell-muted">Groupe #{{ row.groupe_id }} · Décl. #{{ row.declencheur_id }}</div>
+            </td>
+          </ng-container>
+
+          <!-- Nb -->
+          <ng-container matColumnDef="nb_factures">
+            <th mat-header-cell *matHeaderCellDef>Nbre Fact.</th>
+            <td mat-cell *matCellDef="let row" class="cell-muted">{{ nbFactures(row) }}</td>
+          </ng-container>
+
+          <!-- Aperçu -->
+  <!--        <ng-container matColumnDef="preview">
+            <th mat-header-cell *matHeaderCellDef>Aperçu</th>
+
+            <td mat-cell *matCellDef="let row"
+                class="preview-cell"
+                (click)="$event.stopPropagation()"
+                [matTooltip]="previewTooltip(row)"
+                matTooltipPosition="above"
+                matTooltipShowDelay="200">
+
+              <div class="preview-top">
+                <mat-chip class="chip chip-canal" selected>{{ canalLabel(row) }}</mat-chip>
+
+                <span class="cell-muted preview-subject" *ngIf="previewSubject(row) as s">
+                  <strong>Sujet:</strong> {{ s }}
+                </span>
+              </div>
+
+              <div class="preview-body" *ngIf="hasPreview(row); else noPreviewCompact">
+                {{ previewShort(row) }}
+              </div>
+
+              <ng-template #noPreviewCompact>
+                <div class="cell-muted">(Aucun aperçu — ouvrir “Détails”)</div>
+              </ng-template>
+
+            </td>
+          </ng-container>-->
+
+          <!-- Toggle preview -->
+          <ng-container matColumnDef="preview_toggle">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row" class="actions-col">
+              <button mat-icon-button
+                      (click)="togglePreview(row); $event.stopPropagation()"
+                      [matTooltip]="isPreviewOpen(row) ? 'Masquer l’aperçu' : 'Afficher l’aperçu'">
+                <mat-icon>{{ isPreviewOpen(row) ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let row" class="actions-col">
+              <button mat-stroked-button (click)="openDetails(row); $event.stopPropagation()">
+                <mat-icon>open_in_new</mat-icon>
+                Détails
+              </button>
+            </td>
+          </ng-container>
+
+          <!-- Expanded row -->
+          <ng-container matColumnDef="expandedDetail">
+            <td mat-cell *matCellDef="let row"
+                [attr.colspan]="displayedColumns.length"
+                class="expanded-cell">
+
+              <div class="expanded-wrap"
+                   *ngIf="isPreviewOpen(row)"
+                   (click)="$event.stopPropagation()">
+
+                <div class="expanded-head">
+                  <mat-chip class="chip chip-canal" selected>{{ canalLabel(row) }}</mat-chip>
+
+                  <div class="expanded-meta">
+                    <div class="expanded-title">
+                      {{ row.type_action }} · {{ clientLabel(row) }}
+                    </div>
+                    <div class="cell-muted" *ngIf="row.references_resume">
+                      Factures: {{ row.references_resume }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="expanded-subject" *ngIf="previewSubject(row) as s">
+                  <strong>Sujet :</strong> {{ s }}
+                </div>
+
+                <pre class="expanded-body" *ngIf="hasPreview(row); else noPreviewExpanded">
+{{ extractSnapshotTextPublic(row) }}
+                </pre>
+
+                <ng-template #noPreviewExpanded>
+                  <div class="cell-muted">(Aucun aperçu disponible — ouvrir “Détails”)</div>
+                </ng-template>
+              </div>
+
+            </td>
+          </ng-container>
+
+          <!-- Header -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+          <!-- Row -->
+          <tr mat-row
+              *matRowDef="let row; columns: displayedColumns;"
+              class="data-row"
+              (click)="openDetails(row)">
+          </tr>
+
+          <!-- Detail row -->
+          <tr mat-row
+              *matRowDef="let row; columns: ['expandedDetail'];"
+              class="detail-row"
+              [class.detail-row--open]="isPreviewOpen(row)">
+          </tr>
+
+          <!-- No data -->
+          <tr mat-row *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns?.length ?? 9">
+              Aucune correspondance trouvée.
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator [length]="(total$ | async) ?? 0"
+                       [pageSize]="25"
+                       [pageSizeOptions]="[10,25,50]"
+                       showFirstLastButtons>
+        </mat-paginator>
+      </div>
+
+    </div>
+  </section>
+
+</mat-card>

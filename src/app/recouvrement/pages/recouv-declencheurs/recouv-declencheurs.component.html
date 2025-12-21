@@ -1,0 +1,190 @@
+<!-- src/app/recouvrement/pages/recouv-declencheurs/recouv-declencheurs.component.html -->
+<mat-card class="page-card">
+
+  <!-- Titre (barre rose) -->
+  <div class="page-title">
+    <h2>Déclencheurs</h2>
+  </div>
+<!--
+  <div class="page-subtitle">
+    Critères + délai + rattachement groupe
+  </div>-->
+
+  <!-- Filtres (1 ligne + wrap) -->
+  <div class="filters filters--one-line">
+    <div class="filters-grid">
+
+      <!-- Recherche -->
+      <mat-form-field appearance="outline" class="filter search">
+        <mat-label>Rechercher</mat-label>
+        <input matInput
+               [(ngModel)]="search"
+               (keyup.enter)="applySearch()"
+               placeholder="Code, nom…" />
+        <button *ngIf="search"
+                matSuffix
+                mat-icon-button
+                (click)="search=''; applySearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Actif -->
+      <mat-form-field appearance="outline" class="filter filter-actif">
+        <mat-label>Actif</mat-label>
+        <mat-select [(ngModel)]="actif" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option [value]="true">Actifs</mat-option>
+          <mat-option [value]="false">Inactifs</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Groupe -->
+      <mat-form-field appearance="outline" class="filter filter-groupe">
+        <mat-label>Groupe</mat-label>
+        <mat-select [(ngModel)]="groupeId" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option *ngFor="let g of [1,2,3,4,5]" [value]="g">Groupe #{{ g }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Délai -->
+      <mat-form-field appearance="outline" class="filter filter-delai">
+        <mat-label>Délai</mat-label>
+        <mat-select [(ngModel)]="typeDelai" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option value="AVANT">Avant échéance</mat-option>
+          <mat-option value="APRES">Après échéance</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Actions filtres -->
+      <button mat-mini-fab color="primary" class="action-btn"
+              (click)="applyFilters()" matTooltip="Rechercher">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <button mat-mini-fab color="primary" class="action-btn"
+              (click)="clear()" matTooltip="Réinitialiser">
+        <mat-icon>cached</mat-icon>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Cadre standard -->
+  <section class="list-box">
+
+    <!-- Header -->
+    <div class="list-header">
+      <h3 class="list-title">Liste des déclencheurs</h3>
+
+      <div class="list-actions">
+        <button mat-flat-button color="primary" (click)="onAdd()">
+          <mat-icon>add</mat-icon>
+          Ajouter
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="list-body">
+
+      <div class="loading" *ngIf="(loading$ | async)">Chargement…</div>
+
+      <div class="mat-elevation-z10 compact-table">
+        <table mat-table [dataSource]="dataSource" matSort [trackBy]="trackById" style="width: 100%">
+
+          <!-- Nom -->
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ row.nom }}</div>
+              <div class="cell-muted">{{ row.code }}</div>
+            </td>
+          </ng-container>
+
+          <!-- Groupe -->
+          <ng-container matColumnDef="groupe">
+            <th mat-header-cell *matHeaderCellDef>Groupe</th>
+            <td mat-cell *matCellDef="let row" class="cell-muted">
+              {{ groupeLabel(row.groupe_id) }}
+            </td>
+          </ng-container>
+
+          <!-- Description -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let row" class="cell-muted">
+              {{ row.description || '—' }}
+            </td>
+          </ng-container>
+
+          <!-- Critères -->
+          <ng-container matColumnDef="criteres">
+            <th mat-header-cell *matHeaderCellDef>Critères</th>
+
+            <td mat-cell *matCellDef="let row" class="criteres-cell"
+                [matTooltip]="criteresTooltip(row.criteres)"
+                matTooltipPosition="above"
+                matTooltipShowDelay="150">
+
+              <mat-chip-set *ngIf="row?.criteres as c">
+                <mat-chip *ngFor="let x of criteresChipsShort(c)" class="chip chip-criteres">
+                  {{ x }}
+                </mat-chip>
+
+                <mat-chip *ngIf="!criteresChipsShort(c).length" class="chip chip-criteres chip-empty">
+                  Aucun
+                </mat-chip>
+              </mat-chip-set>
+
+            </td>
+          </ng-container>
+
+          <!-- Actif -->
+          <ng-container matColumnDef="actif">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip class="chip" [color]="row.actif ? 'primary' : undefined" selected>
+                {{ row.actif ? 'Actif' : 'Inactif' }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let row" class="actions-col">
+              <button mat-icon-button (click)="onEdit(row)" matTooltip="Modifier">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="onDelete(row)" matTooltip="Supprimer">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <!-- Rows -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <tr mat-row *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns?.length ?? 6">
+              Aucune correspondance trouvée.
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator [length]="(total$ | async) ?? 0"
+                       [pageSize]="25"
+                       [pageSizeOptions]="[10,25,50]"
+                       showFirstLastButtons>
+        </mat-paginator>
+      </div>
+
+    </div>
+  </section>
+
+</mat-card>

@@ -1,0 +1,157 @@
+<h2 mat-dialog-title>Détails action (Agenda)</h2>
+
+<mat-dialog-content class="dialog-content">
+
+  <!-- ===== Bandeau haut ===== -->
+  <div class="top">
+    <div>
+      <div class="title">{{ clientLabel() }}</div>
+
+      <div class="muted">
+        Client #{{ agenda.client_id }}
+        • {{ agenda.type_action }}
+        • {{ agenda.mode_execution }}
+      </div>
+
+      <div class="muted">
+        Date: {{ plannedDate() }} • Statut: {{ agenda.statut }}
+      </div>
+
+      <!-- ✅ infos moteur (compact) -->
+      <div class="muted" style="margin-top:4px">
+        Groupe #{{ agenda.groupe_id ?? '—' }}
+        • Décl. #{{ agenda.declencheur_id ?? '—' }}
+        • Plan #{{ agenda.plan_action_id ?? '—' }}
+        • Étape #{{ agenda.etape_id ?? agenda.plan_etape_id ?? '—' }}
+        <span *ngIf="agenda.agent_id"> • Agent #{{ agenda.agent_id }}</span>
+        <span *ngIf="agenda.priorite != null"> • Priorité {{ agenda.priorite }}</span>
+      </div>
+    </div>
+
+    <div class="chips">
+      <mat-chip-set>
+        <mat-chip class="chip">{{ agenda.nb_factures ?? '—' }} factures</mat-chip>
+
+        <mat-chip class="chip" *ngIf="totalSeed != null">
+          Seed: {{ fmt(totalSeed) }} FCFA
+        </mat-chip>
+
+        <mat-chip class="chip">
+          Recalc: {{ fmt(totalRecalc) }} FCFA
+        </mat-chip>
+
+        <mat-chip class="chip warn" *ngIf="totalSeed != null && totalDelta !== 0">
+          Δ {{ fmt(totalDelta) }} FCFA
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <!-- ✅ Résumé refs en haut -->
+  <mat-card class="refs-card" *ngIf="refs.length">
+    <div class="refs-title">Factures du portefeuille</div>
+    <div class="refs-line">{{ refs.join(', ') }}</div>
+  </mat-card>
+
+  <!-- ===== ✅ Aperçu communication (EMAIL / SMS / COURRIER / APPEL) ===== -->
+  <mat-card class="card" *ngIf="agenda?.template_snapshot as snap">
+    <div class="card-title">Aperçu communication</div>
+
+    <!-- Cas 1 : snapshot structuré { canal, sujet, contenu } -->
+    <ng-container *ngIf="snap?.contenu || snap?.body || snap?.message; else snapshotRaw">
+      <div class="muted" style="margin-bottom:8px">
+        Canal :
+        <strong>{{ snap?.canal ?? agenda?.type_action ?? '—' }}</strong>
+        <span *ngIf="snap?.template_id"> • Template #{{ snap.template_id }}</span>
+      </div>
+
+      <div class="muted" *ngIf="snap?.sujet">
+        <strong>Sujet :</strong> {{ snap.sujet }}
+      </div>
+
+      <pre class="tpl-body" style="margin-top:8px; white-space: pre-wrap;">
+{{ snap?.contenu ?? snap?.body ?? snap?.message }}
+      </pre>
+    </ng-container>
+
+    <!-- Cas 2 : snapshot texte brut / json string -->
+    <ng-template #snapshotRaw>
+      <div class="muted" style="margin-bottom:8px">
+        Snapshot brut (non structuré)
+      </div>
+      <pre class="tpl-body" style="white-space: pre-wrap;">{{ snap }}</pre>
+    </ng-template>
+  </mat-card>
+
+  <!-- si pas de snapshot -->
+  <mat-card class="card" *ngIf="!agenda?.template_snapshot">
+    <div class="card-title">Aperçu communication</div>
+    <div class="muted">
+      Aucun aperçu disponible (template_snapshot absent).<br />
+      Astuce : l’aperçu apparaît quand le moteur prépare/génère la communication (snapshot), ou quand tu ajoutes un “aperçu virtuel”.
+    </div>
+  </mat-card>
+
+  <!-- ===== Détail des factures ===== -->
+  <mat-card class="card">
+    <div class="card-title">Détail des factures</div>
+
+    <table mat-table [dataSource]="facturesLinks" class="factures-table">
+
+      <ng-container matColumnDef="reference">
+        <th mat-header-cell *matHeaderCellDef>Référence</th>
+        <td mat-cell *matCellDef="let r">{{ r.facture?.reference }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="objet">
+        <th mat-header-cell *matHeaderCellDef>Objet</th>
+        <td mat-cell *matCellDef="let r">{{ r.facture?.objet }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="echeance">
+        <th mat-header-cell *matHeaderCellDef>Échéance</th>
+        <td mat-cell *matCellDef="let r">{{ r.facture?.date_echeance }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="montant_restant">
+        <th mat-header-cell *matHeaderCellDef>Restant</th>
+        <td mat-cell *matCellDef="let r">
+          {{ fmt(r.facture?.montant_restant ?? r.facture?.montant ?? 0) }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['reference','objet','echeance','montant_restant']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['reference','objet','echeance','montant_restant'];"></tr>
+    </table>
+  </mat-card>
+
+  <!-- ===== Historique ===== -->
+  <mat-card class="card" *ngIf="logs.length">
+    <div class="card-title">Historique d’exécution</div>
+
+    <table mat-table [dataSource]="logs" class="logs-table">
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let l">{{ l.date_execution }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="resultat">
+        <th mat-header-cell *matHeaderCellDef>Résultat</th>
+        <td mat-cell *matCellDef="let l">{{ l.resultat }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="details">
+        <th mat-header-cell *matHeaderCellDef>Détails</th>
+        <td mat-cell *matCellDef="let l">{{ l.details }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['date','resultat','details']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['date','resultat','details'];"></tr>
+    </table>
+  </mat-card>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Fermer</button>
+</mat-dialog-actions>

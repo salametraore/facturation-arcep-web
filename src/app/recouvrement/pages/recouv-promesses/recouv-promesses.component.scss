@@ -1,0 +1,270 @@
+.page { padding: 16px; }
+.page-header { display:flex; gap:16px; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; }
+.subtitle { opacity:.75; margin-top: 4px; }
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+@media (max-width: 1100px) {
+  .actions-grid { grid-template-columns: 1fr; }
+}
+
+.table-card { padding: 10px; }
+.loading { padding: 10px; opacity: .75; }
+
+.title { font-weight: 600; }
+.muted { opacity: .75; font-size: 12px; }
+.actions-col { width: 1%; white-space: nowrap; }
+.data-row { cursor: pointer; }
+
+
+
+/* src/app/recouvrement/pages/recouv-promesses/recouv-promesses.component.scss */
+
+:host {
+  --brand: #FF6B8E;
+  display: block;
+}
+
+.page-card {
+  padding: 0;
+}
+
+/* ===== Barre rose ===== */
+.page-title {
+  background: var(--brand);
+  color: #fff;
+  padding: 14px 18px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+}
+
+.page-subtitle {
+  padding: 10px 18px 0 18px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+}
+
+/* ===== Filtres Promesses (2 lignes) ===== */
+.filters {
+  padding: 10px 12px 8px 12px;
+}
+
+.filters--promesses .filters-grid {
+  display: grid;
+  gap: 10px;
+  align-items: center;
+
+  /* Ligne 1 */
+  grid-template-columns: 2.2fr 1.1fr 1.1fr 40px 40px;
+
+  .search {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .filter-client {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .filter-facture {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .btn-search {
+    grid-column: 4;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .btn-reset {
+    grid-column: 5;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  /* Ligne 2 */
+  .filter-statut {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .filter-from {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .filter-to {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .filters-actions {
+    grid-column: 4 / 6;
+    grid-row: 2;
+    justify-self: end;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 1fr;
+
+    .search { grid-column: 1 / -1; }
+    .filter-client { grid-column: 1; }
+    .filter-facture { grid-column: 2; }
+    .btn-search { grid-column: 1; justify-self: start; }
+    .btn-reset { grid-column: 2; justify-self: start; }
+
+    .filter-statut { grid-column: 1 / -1; }
+    .filter-from { grid-column: 1; }
+    .filter-to { grid-column: 2; }
+    .filters-actions { grid-column: 1 / -1; justify-self: start; }
+  }
+
+  @media (max-width: 680px) {
+    grid-template-columns: 1fr;
+
+    .search,
+    .filter-client,
+    .filter-facture,
+    .filter-statut,
+    .filter-from,
+    .filter-to,
+    .btn-search,
+    .btn-reset,
+    .filters-actions {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+  }
+}
+
+.filter {
+  width: 100%;
+  min-width: 0;
+}
+
+.search {
+  min-width: 240px;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+}
+
+.btn-add {
+  height: 40px;
+}
+
+/* ===== Cadre standard ===== */
+.list-box {
+  padding: 10px 12px 14px 12px;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 6px 12px 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.list-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.list-body {
+  padding-top: 12px;
+}
+
+/* ===== Table ===== */
+.compact-table {
+  border-radius: 10px;
+  overflow: hidden;
+
+  table {
+    width: 100%;
+  }
+
+  th.mat-header-cell {
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.75);
+  }
+
+  td.mat-cell {
+    vertical-align: top;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
+.cell-title {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.cell-muted {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 2px;
+}
+
+.actions-col {
+  width: 160px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.chip {
+  font-size: 12px;
+  height: 26px;
+}
+
+.data-row {
+  cursor: pointer;
+}
+.data-row:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Loader (si utilisé) */
+.loading {
+  margin: 0 0 10px 0;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+}
+
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 6px 12px 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.list-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}

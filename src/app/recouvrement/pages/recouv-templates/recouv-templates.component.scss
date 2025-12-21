@@ -1,0 +1,162 @@
+/* src/app/recouvrement/templates/rcv-templates-list.component.scss */
+
+:host {
+  --brand: #FF6B8E;
+  display: block;
+}
+
+.page-card {
+  padding: 0;
+}
+
+/* ===== Barre rose ===== */
+.page-title {
+  background: var(--brand);
+  color: #fff;
+  padding: 14px 18px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+}
+
+/* (Optionnel si tu gardes un sous-titre) */
+.page-subtitle {
+  padding: 10px 18px 0 18px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+}
+
+/* ===== Filtres (une ligne + wrap) ===== */
+.filters {
+  padding: 10px 12px 8px 12px;
+}
+
+.filters--one-line .filters-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1.2fr 1.1fr auto auto;
+  gap: 10px;
+  align-items: center;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 680px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter {
+  width: 100%;
+  min-width: 0;
+}
+
+.search {
+  min-width: 240px;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+}
+
+/* ===== Cadre standard ===== */
+.list-box {
+  padding: 10px 12px 14px 12px;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 6px 12px 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.list-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.list-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.list-body {
+  padding-top: 12px;
+}
+
+/* ===== Table ===== */
+.compact-table {
+  border-radius: 10px;
+  overflow: hidden;
+
+  table {
+    width: 100%;
+  }
+
+  th.mat-header-cell {
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.75);
+  }
+
+  td.mat-cell {
+    vertical-align: top;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
+.cell-title {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.cell-muted {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 2px;
+}
+
+.actions-col {
+  width: 140px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.chip {
+  font-size: 12px;
+  height: 26px;
+}
+
+/* ===== Aperçu inline ===== */
+.quick-preview {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--brand);
+  background: rgba(173, 20, 87, 0.06);
+  border-radius: 6px;
+}
+
+.qp-line {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.75);
+  margin: 3px 0;
+}
+
+/* ===== Loading ===== */
+.loading {
+  margin: 0 0 10px 0;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+}

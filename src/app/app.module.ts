@@ -15,6 +15,7 @@ import { AppConfigService } from './core/config/app-config.service';
 
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import {ScrollingModule} from "@angular/cdk/scrolling";
+import {RcvFakeApiModule} from "./rcv/rcv-fake-api.module";
 
 registerLocaleData(localeFR);
 
@@ -48,6 +49,7 @@ export const MY_FORMAT: MatDateFormats = {
     HttpClientModule,
     SharedModule,
     ScrollingModule,
+    RcvFakeApiModule,
   ],
 
   providers: [

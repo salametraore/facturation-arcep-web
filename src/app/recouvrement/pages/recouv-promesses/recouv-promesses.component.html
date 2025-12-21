@@ -1,0 +1,183 @@
+<!-- src/app/recouvrement/pages/recouv-promesses/recouv-promesses.component.html -->
+<mat-card class="page-card">
+
+  <!-- Barre rose -->
+  <div class="page-title">
+    <h2>Promesses</h2>
+  </div>
+
+  <div class="page-subtitle">
+    Promesses de paiement (globales ou liées à une facture)
+  </div>
+
+  <!-- Filtres (2 lignes) -->
+  <div class="filters filters--promesses">
+    <div class="filters-grid">
+
+      <!-- Ligne 1 : Recherche + Client + Facture + boutons -->
+      <mat-form-field appearance="outline" class="filter search">
+        <mat-label>Rechercher</mat-label>
+        <input matInput
+               [(ngModel)]="search"
+               (keyup.enter)="applySearch()"
+               placeholder="Client, facture, montant…" />
+        <button *ngIf="search"
+                matSuffix
+                mat-icon-button
+                (click)="search=''; applySearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-client">
+        <mat-label>Client ID</mat-label>
+        <input matInput
+               type="number"
+               [(ngModel)]="clientId"
+               (keyup.enter)="applyFilters()"
+               placeholder="ex: 1004" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-facture">
+        <mat-label>Facture ID</mat-label>
+        <input matInput
+               type="number"
+               [(ngModel)]="factureId"
+               (keyup.enter)="applyFilters()"
+               placeholder="ex: 50001" />
+      </mat-form-field>
+
+      <button mat-mini-fab color="primary" class="action-btn btn-search"
+              (click)="applyFilters()" matTooltip="Rechercher">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <button mat-mini-fab color="primary" class="action-btn btn-reset"
+              (click)="clear()" matTooltip="Réinitialiser">
+        <mat-icon>cached</mat-icon>
+      </button>
+
+      <!-- Ligne 2 : Statut + Du + Au + Ajouter -->
+      <mat-form-field appearance="outline" class="filter filter-statut">
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="statut" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-from">
+        <mat-label>Du</mat-label>
+        <input matInput type="date" [(ngModel)]="dateFrom" (change)="applyFilters()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter filter-to">
+        <mat-label>Au</mat-label>
+        <input matInput type="date" [(ngModel)]="dateTo" (change)="applyFilters()" />
+      </mat-form-field>
+
+
+
+    </div>
+  </div>
+
+  <!-- Cadre standard -->
+  <section class="list-box">
+
+    <div class="list-header">
+      <h3 class="list-title">Liste des promesses</h3>
+
+      <div class="list-actions">
+        <button mat-flat-button color="primary" class="btn-add" (click)="openCreate()">
+          <mat-icon>add</mat-icon>
+          Ajouter
+        </button>
+      </div>
+    </div>
+
+    <div class="list-body">
+
+      <!-- (Optionnel) loader si tu as loading$ -->
+      <!-- <div class="loading" *ngIf="(loading$ | async)">Chargement…</div> -->
+
+      <div class="mat-elevation-z10 compact-table">
+        <table mat-table [dataSource]="dataSource" matSort [trackBy]="trackById" style="width: 100%">
+
+          <ng-container matColumnDef="date_promesse">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="date_promesse">Date promesse</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ row.date_promesse }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="client.denomination">Client</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ clientLabel(row) }}</div>
+              <div class="cell-muted">Client #{{ row.client_id }} · {{ row.client?.code }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="facture">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="facture.reference">Facture</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ factureLabel(row) }}</div>
+              <div class="cell-muted" *ngIf="row.facture_id">Échéance : {{ row.facture?.date_echeance }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="montant">Montant</th>
+            <td mat-cell *matCellDef="let row">
+              <strong>{{ row.montant | number }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="statut">Statut</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip class="chip"
+                        [color]="row.statut === 'EN_COURS' ? 'primary' : undefined"
+                        selected>
+                {{ row.statut }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let row" class="actions-col">
+              <button mat-stroked-button (click)="openDetails(row); $event.stopPropagation()">
+                <mat-icon>open_in_new</mat-icon>
+                Détails
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+          <tr mat-row
+              *matRowDef="let row; columns: displayedColumns; trackBy: trackById"
+              class="data-row"
+              (click)="openDetails(row)">
+          </tr>
+
+          <tr mat-row *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns?.length ?? 6">
+              Aucune correspondance trouvée.
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator [length]="total"
+                       [pageSize]="25"
+                       [pageSizeOptions]="[10,25,50]"
+                       showFirstLastButtons>
+        </mat-paginator>
+      </div>
+
+    </div>
+  </section>
+
+</mat-card>

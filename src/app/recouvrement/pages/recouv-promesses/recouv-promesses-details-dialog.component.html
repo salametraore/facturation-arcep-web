@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>
+  {{ data.mode === 'create' ? 'Nouvelle promesse' : ('Détails promesse #' + promesse?.id) }}
+</h2>
+
+<mat-dialog-content class="content">
+  <div class="loading" *ngIf="loading">Chargement…</div>
+
+  <ng-container *ngIf="!loading">
+
+    <div class="info">
+      <div class="row">
+        <div class="k">Client</div>
+        <div class="v">
+          <div class="title">{{ clientLabel() }}</div>
+          <div class="muted" *ngIf="data.mode === 'edit' && promesse">
+            Client #{{ promesse.client_id }} · {{ promesse.client?.code }}
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="k">Facture</div>
+        <div class="v">
+          <div class="title">{{ factureLabel() }}</div>
+          <div class="muted" *ngIf="data.mode === 'edit' && promesse?.facture_id">
+            Échéance : {{ promesse.facture?.date_echeance }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Champs création -->
+    <div class="form" *ngIf="data.mode === 'create'">
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Client ID</mat-label>
+        <input matInput type="number" [(ngModel)]="edit.client_id" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Facture ID (optionnel)</mat-label>
+        <input matInput type="number" [(ngModel)]="edit.facture_id" />
+        <mat-hint>Laisser vide = promesse globale</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- Champs communs -->
+    <div class="form">
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Montant</mat-label>
+        <input matInput type="number" [(ngModel)]="edit.montant" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Date promesse</mat-label>
+        <input matInput type="date" [(ngModel)]="edit.date_promesse" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="edit.statut">
+          <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Fermer</button>
+
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="saving || loading">
+    <mat-icon>save</mat-icon>
+    {{ data.mode === 'create' ? 'Créer' : 'Enregistrer' }}
+  </button>
+</mat-dialog-actions>

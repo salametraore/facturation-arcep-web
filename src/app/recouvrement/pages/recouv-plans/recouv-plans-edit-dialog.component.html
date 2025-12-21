@@ -1,0 +1,189 @@
+<h2 mat-dialog-title>
+  {{ data.mode === 'create' ? 'Ajouter un plan d’action' : 'Modifier le plan d’action' }}
+</h2>
+
+<mat-dialog-content class="dialog-content" [formGroup]="form">
+
+  <mat-tab-group>
+
+    <mat-tab label="Général">
+
+      <div class="blank-row"></div>
+
+      <div class="grid">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Code</mat-label>
+          <input matInput formControlName="code" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="nom" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-2">
+          <mat-label>Description</mat-label>
+          <textarea matInput rows="3" formControlName="description"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="priority">
+          <mat-label>Priorité</mat-label>
+          <input matInput type="number" formControlName="priority" />
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="actif">Actif</mat-slide-toggle>
+
+        <div class="hint col-2" *ngIf="data.mode === 'create'">
+          Astuce : enregistrez d’abord le plan, puis ajoutez les étapes.
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Étapes">
+      <div class="steps-wrap">
+
+        <div class="steps-header">
+          <div class="steps-title">Séquence d’actions</div>
+          <button mat-stroked-button (click)="startAddEtape()">
+            <mat-icon>add</mat-icon>
+            Ajouter une étape
+          </button>
+        </div>
+
+        <table mat-table [dataSource]="etapes" class="steps-table">
+
+          <ng-container matColumnDef="ordre">
+            <th mat-header-cell *matHeaderCellDef>#</th>
+            <td mat-cell *matCellDef="let row">{{ row.ordre }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="type_action">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let row">{{ row.type_action }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="delai">
+            <th mat-header-cell *matHeaderCellDef>Délai</th>
+            <td mat-cell *matCellDef="let row">{{ row.delai_jours }} j</td>
+          </ng-container>
+
+          <ng-container matColumnDef="mode">
+            <th mat-header-cell *matHeaderCellDef>Mode</th>
+            <td mat-cell *matCellDef="let row">{{ row.mode_execution }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="template">
+            <th mat-header-cell *matHeaderCellDef>Modèle</th>
+            <td mat-cell *matCellDef="let row">{{ row.template_id ?? '—' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actif">
+            <th mat-header-cell *matHeaderCellDef>Actif</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip [color]="row.actif ? 'primary' : undefined" selected>
+                {{ row.actif ? 'Actif' : 'Inactif' }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row" class="actions-col">
+              <button mat-icon-button (click)="moveUp(row)" matTooltip="Monter">
+                <mat-icon>arrow_upward</mat-icon>
+              </button>
+              <button mat-icon-button (click)="moveDown(row)" matTooltip="Descendre">
+                <mat-icon>arrow_downward</mat-icon>
+              </button>
+              <button mat-icon-button (click)="startEditEtape(row)" matTooltip="Modifier">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteEtape(row)" matTooltip="Supprimer">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['ordre','type_action','delai','mode','template','actif','actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['ordre','type_action','delai','mode','template','actif','actions'];"></tr>
+        </table>
+
+        <!-- mini-form étape -->
+        <div class="step-form" [formGroup]="etapeForm">
+          <div class="step-form-title">
+            {{ editingEtapeId ? 'Modifier étape' : 'Nouvelle étape' }}
+          </div>
+
+          <div class="grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Type action</mat-label>
+              <mat-select formControlName="type_action">
+                <mat-option *ngFor="let t of typeActions" [value]="t">{{ t }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mode d’exécution</mat-label>
+              <mat-select formControlName="mode_execution">
+                <mat-option *ngFor="let m of modeExecutions" [value]="m">{{ m }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Délai (jours)</mat-label>
+              <input matInput type="number" formControlName="delai_jours" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Modèle (optionnel)</mat-label>
+              <mat-select formControlName="template_id">
+                <mat-option [value]="null">— Aucun —</mat-option>
+
+                <mat-option *ngFor="let t of templatesForSelect" [value]="t.id">
+                  {{ templateOptionLabel(t) }}
+                </mat-option>
+              </mat-select>
+
+              <mat-hint *ngIf="etapeForm.get('template_id')?.value as tplId">
+                {{ templateLabelById[tplId] || ('Template #' + tplId) }}
+              </mat-hint>
+            </mat-form-field>
+
+            <!-- ✅ Preview en dessous (pas dans mat-form-field) -->
+            <div class="tpl-preview col-2" *ngIf="templateById(etapeForm.get('template_id')?.value) as tpl">
+              <div class="tpl-title">
+                {{ tpl.nom }} — {{ tpl.canal === 'LETTRE' ? 'COURRIER' : tpl.canal }}
+              </div>
+
+              <div class="tpl-subject" *ngIf="tpl.sujet">
+                <strong>Sujet :</strong> {{ tpl.sujet }}
+              </div>
+
+              <pre class="tpl-body">{{ tpl.contenu }}</pre>
+            </div>
+
+            <mat-slide-toggle formControlName="actif">Actif</mat-slide-toggle>
+          </div>
+
+          <div class="step-form-actions">
+            <button mat-button (click)="cancelEtapeEdit()">Annuler</button>
+            <button mat-raised-button color="primary" (click)="saveEtape()">
+              {{ editingEtapeId ? 'Mettre à jour' : 'Ajouter' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Fermer</button>
+  <button mat-raised-button color="primary" (click)="savePlan()" [disabled]="saving">
+    Enregistrer
+  </button>
+</mat-dialog-actions>

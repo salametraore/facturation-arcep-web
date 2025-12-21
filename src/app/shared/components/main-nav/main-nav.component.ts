@@ -416,19 +416,74 @@ export class MainNavComponent implements OnInit {
       id: 40, direction: 0, titre: 'Recouvrement', description: 'Recouvrement',
       actif: 'OUI', module: 1, feuille: 0,
       sous_menus: [
-/*        {
+        {
           id: 4005,
           direction: 100,
-          titre: 'Tableau de bord',
-          description: 'Tableau de bord',
+          titre: 'Groupes recouvrement',
+          description: 'Groupes recouvrement',
           actif: 'OUI',
           module: 0,
           feuille: 1,
           sous_menus: null,
-          url: 'dashboard/recouvrement'
-        },*/
+          url: 'recouvrement/groupes'
+        },
+        {
+          id: 4010,
+          direction: 100,
+          titre: 'Les modèles de relance',
+          description: 'Les modèles de relance',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'recouvrement/templates'
+        },
         {
           id: 4015,
+          direction: 100,
+          titre: 'Plans de recouvrement',
+          description: 'Plans de recouvrement',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'recouvrement/plans'
+        },
+        {
+          id: 4020,
+          direction: 100,
+          titre: 'Declencheurs de recouvrement',
+          description: 'Declencheurs  de recouvrement',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'recouvrement/declencheurs'
+        },
+        {
+          id: 4025,
+          direction: 100,
+          titre: 'Agenda de recouvrement',
+          description: 'Agenda de recouvrement',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'recouvrement/agenda'
+        },
+        {
+          id: 4030,
+          direction: 100,
+          titre: 'Les promesses de paiement',
+          description: 'Les promesses de paiement',
+          actif: 'OUI',
+          module: 0,
+          feuille: 1,
+          sous_menus: null,
+          url: 'recouvrement/promesses'
+        },
+        {
+          id: 4075,
           direction: 0,
           titre: 'Clients',
           description: 'Clients',

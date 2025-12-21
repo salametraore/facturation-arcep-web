@@ -573,6 +573,9 @@ export class FrequencesCrudComponent implements OnInit {
 
     console.log("this.isNew : "+this.isNew);
 
+    console.log("payload");
+    console.log(payload);
+
     const obs = this.isNew
       ? this.fichesTechniquesFrequenceService.initierFicheTechniqueFrequence(payload)
       : this.fichesTechniquesFrequenceService.updateFicheTechniqueFrequence(this.ficheTechnique.id, payload);

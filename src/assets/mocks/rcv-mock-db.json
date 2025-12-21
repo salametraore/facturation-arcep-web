@@ -4093,6 +4093,102 @@
       "montant": 120000,
       "date_promesse": "2025-12-21",
       "statut": "EN_COURS"
+    },
+    {
+      "id": 9,
+      "client_id": 1001,
+      "facture_id": 50004,
+      "montant": 24000,
+      "date_promesse": "2025-12-23",
+      "statut": "EN_COURS"
+    },
+    {
+      "id": 10,
+      "client_id": 1001,
+      "facture_id": 50005,
+      "montant": 300000,
+      "date_promesse": "2026-01-10",
+      "statut": "EN_COURS"
+    },
+    {
+      "id": 11,
+      "client_id": 1002,
+      "facture_id": 50006,
+      "montant": 48750,
+      "date_promesse": "2025-12-05",
+      "statut": "RESPECTEE"
+    },
+    {
+      "id": 12,
+      "client_id": 1002,
+      "facture_id": 50008,
+      "montant": 150000,
+      "date_promesse": "2025-12-01",
+      "statut": "NON_RESPECTEE"
+    },
+    {
+      "id": 13,
+      "client_id": 1002,
+      "facture_id": 50010,
+      "montant": 100000,
+      "date_promesse": "2025-12-27",
+      "statut": "EN_COURS"
+    },
+    {
+      "id": 14,
+      "client_id": 1003,
+      "facture_id": 50012,
+      "montant": 67500,
+      "date_promesse": "2025-11-20",
+      "statut": "RESPECTEE"
+    },
+    {
+      "id": 15,
+      "client_id": 1003,
+      "facture_id": 50015,
+      "montant": 100000,
+      "date_promesse": "2025-12-15",
+      "statut": "NON_RESPECTEE"
+    },
+    {
+      "id": 16,
+      "client_id": 1004,
+      "facture_id": 50019,
+      "montant": 16250,
+      "date_promesse": "2025-12-20",
+      "statut": "EN_COURS"
+    },
+    {
+      "id": 17,
+      "client_id": 1005,
+      "facture_id": 50021,
+      "montant": 40000,
+      "date_promesse": "2025-12-24",
+      "statut": "EN_COURS"
+    },
+    {
+      "id": 18,
+      "client_id": 1006,
+      "facture_id": 50028,
+      "montant": 200000,
+      "date_promesse": "2026-01-05",
+      "statut": "EN_COURS"
+    },
+    {
+      "id": 19,
+      "client_id": 1007,
+      "facture_id": 50035,
+      "montant": 65000,
+      "date_promesse": "2025-10-01",
+      "statut": "NON_RESPECTEE"
+    },
+    {
+      "id": 20,
+      "client_id": 1008,
+      "facture_id": 50040,
+      "montant": 110000,
+      "date_promesse": "2025-12-18",
+      "statut": "RESPECTEE"
     }
   ],
   "agendaItems": [

@@ -1,0 +1,99 @@
+<h2 mat-dialog-title>
+  {{ data.mode === 'create' ? 'Ajouter un déclencheur' : 'Modifier le déclencheur' }}
+</h2>
+
+<mat-dialog-content [formGroup]="form" class="dialog-content">
+
+  <mat-tab-group>
+    <mat-tab label="Général">
+      <div class="grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Code</mat-label>
+          <input matInput formControlName="code"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="nom"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-2">
+          <mat-label>Description</mat-label>
+          <textarea matInput rows="3" formControlName="description"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Groupe associé</mat-label>
+          <mat-select formControlName="groupe_id">
+            <mat-option *ngFor="let g of groupes" [value]="g.id">{{ g.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Plan d’action (optionnel)</mat-label>
+          <input matInput type="number" formControlName="plan_action_id"/>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="actif">Actif</mat-slide-toggle>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Critères & délai">
+      <div class="grid">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Type(s) de client</mat-label>
+          <mat-select formControlName="type_client" multiple>
+            <mat-option *ngFor="let t of typeClients" [value]="t">{{ t }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Produit / service</mat-label>
+          <mat-select formControlName="produit_code" multiple>
+            <mat-option *ngFor="let p of produits" [value]="p">{{ p }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Montant min</mat-label>
+          <input matInput type="number" formControlName="montant_min"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Montant max</mat-label>
+          <input matInput type="number" formControlName="montant_max"/>
+          <mat-error *ngIf="form.hasError('minMax')">Montant min ne peut pas dépasser montant max.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nb factures impayées (min)</mat-label>
+          <input matInput type="number" formControlName="nb_factures_impayees_min"/>
+        </mat-form-field>
+
+        <div class="col-2 delay-box">
+          <div class="delay-title">Délai</div>
+
+          <mat-radio-group formControlName="type_delai" class="delay-radio">
+            <mat-radio-button value="AVANT">Avant échéance</mat-radio-button>
+            <mat-radio-button value="APRES">Après échéance</mat-radio-button>
+          </mat-radio-group>
+
+          <mat-form-field appearance="outline" class="delay-days">
+            <mat-label>N jours</mat-label>
+            <input matInput type="number" formControlName="nb_jours"/>
+          </mat-form-field>
+        </div>
+
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="saving">
+    Enregistrer
+  </button>
+</mat-dialog-actions>

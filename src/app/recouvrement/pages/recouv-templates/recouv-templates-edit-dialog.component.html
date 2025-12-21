@@ -1,0 +1,90 @@
+<h2 mat-dialog-title>
+  {{ data.mode === 'create' ? 'Ajouter un modèle' : 'Modifier le modèle' }}
+</h2>
+
+<mat-dialog-content class="dialog-content" [formGroup]="form">
+
+  <mat-tab-group>
+
+    <mat-tab label="Général">
+
+      <div class="blank-row"></div>
+
+      <div class="grid">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Code</mat-label>
+          <input matInput formControlName="code" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="nom" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Canal</mat-label>
+          <mat-select formControlName="canal">
+            <mat-option *ngFor="let c of canals" [value]="c.value">{{ c.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="actif">Actif</mat-slide-toggle>
+
+        <mat-form-field appearance="outline" class="col-2"
+                        *ngIf="['EMAIL','COURRIER','LETTRE'].includes(form.get('canal')?.value)">
+          <mat-label>Sujet (optionnel)</mat-label>
+          <input matInput formControlName="sujet" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-2">
+          <mat-label>Variables (JSON, optionnel)</mat-label>
+          <textarea matInput rows="4" formControlName="variables" placeholder='{"client":"...","refs":"..."}'></textarea>
+          <mat-error *ngIf="form.hasError('badJson')">JSON invalide.</mat-error>
+        </mat-form-field>
+
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Contenu">
+      <div class="content-grid">
+
+        <mat-form-field appearance="outline" class="col-2">
+          <mat-label>Contenu</mat-label>
+          <textarea matInput rows="14" formControlName="contenu"></textarea>
+        </mat-form-field>
+
+        <div class="vars-box">
+          <div class="box-title">Variables détectées</div>
+          <div class="chips">
+            <mat-chip *ngFor="let v of detectedVars()" selected>{{ '{' + v + '}' }}</mat-chip>
+            <span class="muted" *ngIf="!detectedVars().length">Aucune</span>
+          </div>
+
+          <div class="box-title" style="margin-top:10px;">Exemple de données</div>
+          <pre class="preview-json">{{ previewData | json }}</pre>
+        </div>
+
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Prévisualisation">
+      <div class="preview">
+        <div class="preview-title">Sujet</div>
+        <div class="preview-box">{{ renderPreview(form.get('sujet')?.value) || '—' }}</div>
+
+        <div class="preview-title" style="margin-top:12px;">Message</div>
+        <pre class="preview-box pre">{{ renderPreview(form.get('contenu')?.value) }}</pre>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Fermer</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="saving">
+    Enregistrer
+  </button>
+</mat-dialog-actions>

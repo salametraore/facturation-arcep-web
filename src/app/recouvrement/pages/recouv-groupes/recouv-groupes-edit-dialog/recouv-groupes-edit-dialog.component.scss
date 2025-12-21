@@ -1,0 +1,40 @@
+.content { padding-top: 6px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 160px 140px;
+  gap: 12px;
+  align-items: center;
+
+  .desc { grid-column: 1 / -1; }
+}
+
+.divider { margin: 12px 0; }
+
+.members-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 220px auto;
+  gap: 12px;
+  align-items: center;
+  margin: 10px 0 12px;
+}
+
+.add-member {
+  display: grid;
+  grid-template-columns: 1fr 380px auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.client-cell {
+  .title { font-weight: 600; }
+  .sub { opacity: .75; font-size: 12px; }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
