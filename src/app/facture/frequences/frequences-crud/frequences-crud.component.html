@@ -315,8 +315,14 @@
                   <table class="recap-table">
                     <thead>
                     <tr>
+
+                      <!-- ✅ nouveaux -->
+                      <th>Station ID</th>
+                      <th>Canal ID</th>
+
                       <th>Nature</th>
                       <th>Produit</th>
+
                       <th>Base</th>
                       <th>PU</th>
                       <th>Coef</th>
@@ -325,12 +331,18 @@
                     </thead>
                     <tbody>
                     <tr *ngFor="let d of resultatCalcul.details">
+
+                      <!-- ✅ nouveaux (affiche - si null) -->
+                      <td>{{ d.station_id ?? '-' }}</td>
+                      <td>{{ d.canal_id ?? '-' }}</td>
+
                       <td>{{ d.nature_frais }}</td>
                       <td>{{ d.produit?.libelle }}</td>
-                      <td>{{ d.base_quantite }}</td>
-                      <td>{{ d.montant_unitaire }}</td>
-                      <td>{{ d.coefficient_global }}</td>
-                      <td><strong>{{ d.montant_calcule }}</strong></td>
+
+                      <td>{{ d.base_quantite | number:'1.0-0':'fr-FR' }}</td>
+                      <td>{{ d.montant_unitaire | number:'1.0-0':'fr-FR' }}</td>
+                      <td>{{ d.coefficient_global | number:'1.2-2':'fr-FR' }}</td>
+                      <td><strong>{{ d.montant_calcule | number:'1.0-0':'fr-FR' }}</strong></td>
                     </tr>
                     </tbody>
                   </table>
@@ -368,6 +380,7 @@
                   <table class="recap-table">
                     <thead>
                     <tr>
+                      <!--<th>ID</th>-->
                       <th *ngIf="cfg[cat]?.stations?.type_station?.visible">Type</th>
                       <th *ngIf="cfg[cat]?.stations?.puissance?.visible">Puissance</th>
                       <th *ngIf="cfg[cat]?.stations?.nombre_station?.visible">Nb stations</th>
@@ -381,17 +394,20 @@
                     </thead>
                     <tbody>
                     <tr *ngFor="let row of stationsFA.controls">
+
+                      <!--<td>{{ row.value.id ?? '-' }}</td>-->
+
                       <td *ngIf="cfg[cat]?.stations?.type_station?.visible">
                         {{ getLibelleTypeStation(row.value.type_station) }}
                       </td>
                       <td *ngIf="cfg[cat]?.stations?.puissance?.visible">
-                        {{ row.value.puissance }}
+                        {{ row.value.puissance | number:'1.0-0':'fr-FR' }}
                       </td>
                       <td *ngIf="cfg[cat]?.stations?.nombre_station?.visible">
-                        {{ row.value.nombre_station }}
+                        {{ row.value.nombre_station | number:'1.0-0':'fr-FR' }}
                       </td>
                       <td *ngIf="cfg[cat]?.stations?.debit_kbps?.visible">
-                        {{ row.value.debit_kbps }}
+                        {{ row.value.debit_kbps | number:'1.0-0':'fr-FR' }}
                       </td>
                       <td *ngIf="cfg[cat]?.stations?.largeur_bande_mhz?.visible">
                         {{ row.value.largeur_bande_mhz }}
@@ -404,7 +420,7 @@
                         {{ row.value.caractere_radio }}
                       </td>
                       <td *ngIf="cfg[cat]?.stations?.nbre_tranche?.visible">
-                        {{ row.value.nbre_tranche }}
+                        {{ row.value.nbre_tranche | number:'1.0-0':'fr-FR'}}
                       </td>
                       <td *ngIf="cfg[cat]?.stations?.localite?.visible">
                         {{ row.value.localite }}
@@ -431,7 +447,7 @@
                 — {{ getLibelleZoneCouverture(row.value.zone_couverture) }}
               </span>
                     <span *ngIf="row.value.nbre_tranche_facturation">
-                      — {{ row.value.nbre_tranche_facturation }} tranche(s)
+                      — {{ row.value.nbre_tranche_facturation | number:'1.0-0':'fr-FR' }} tranche(s)
                     </span>
                   </li>
                 </ul>
@@ -445,6 +461,7 @@
                   <table class="recap-table">
                     <thead>
                     <tr>
+                    <!--  <th>ID</th>-->
                       <th *ngIf="cfg[cat]?.canaux?.type_station?.visible">Type station</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_canal?.visible">Type canal</th>
                       <th *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">Zone</th>
@@ -455,6 +472,9 @@
                     </thead>
                     <tbody>
                     <tr *ngFor="let row of canauxFA.controls">
+
+                    <!--  <td>{{ row.value.id ?? '-' }}</td>-->
+
                       <td *ngIf="cfg[cat]?.canaux?.type_station?.visible">
                         {{ getLibelleTypeStation(row.value.type_station) }}
                       </td>
@@ -465,10 +485,10 @@
                         {{ getLibelleZoneCouverture(row.value.zone_couverture) }}
                       </td>
                       <td *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">
-                        {{ row.value.nbre_tranche_facturation }}
+                        {{ row.value.nbre_tranche_facturation | number:'1.0-0':'fr-FR'}}
                       </td>
                       <td *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">
-                        {{ row.value.largeur_bande_khz }}
+                        {{ row.value.largeur_bande_khz | number:'1.0-0':'fr-FR' }}
                       </td>
                       <td *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">
                         {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
