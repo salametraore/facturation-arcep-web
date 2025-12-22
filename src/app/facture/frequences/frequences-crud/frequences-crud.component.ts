@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { MatTable } from '@angular/material/table';
 
-import { FicheTechniques } from '../../../shared/models/ficheTechniques';
+import {FicheTechniques, MiseAJourStatutFiche} from '../../../shared/models/ficheTechniques';
 
 import { CategoryId } from '../../../shared/models/frequences-category.types';
 import {
@@ -65,7 +65,7 @@ import { ZoneCouvertureService } from '../../../shared/services/zone-couverture.
 import {Utilisateur} from "../../../shared/models/utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
 import {FicheTechniqueCanal, FicheTechniqueStation} from "../../../shared/models/fiche-technique-frequence";
-import { finalize } from 'rxjs/operators';
+import { finalize, switchMap, tap, mapTo } from 'rxjs/operators';
 
 @Component({
   selector: 'frequences-crud',
@@ -167,6 +167,7 @@ export class FrequencesCrudComponent implements OnInit {
     private typeCanauxService: TypeCanauxService,
     private zoneCouvertureService: ZoneCouvertureService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
+    private msgMessageService: MsgMessageServiceService,
     private authService:AuthService,
   ) {
   }
@@ -204,6 +205,8 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.isNew = false;
     this.initUpdate();
+
+    console.log("operation : " +this.operation)
   }
 
   // ---------- Chargement des référentiels ----------
@@ -706,4 +709,54 @@ export class FrequencesCrudComponent implements OnInit {
 
     return keys.some(k => canalCfg[k]?.visible === true);
   }
+
+
+
+
+onTransmettre() {
+  const ficheId = this.ficheTechnique?.id;
+  if (!ficheId) {
+    this.dialogService.alert({ message: "Aucune fiche sélectionnée." });
+    return;
+  }
+
+  // 1) payload calcul
+  const payloadCalcul: CalculFraisFrequenceRequest = {
+    fiche_id: ficheId,
+    enregistrer: true
+  };
+
+  // 2) payload transmission (statut = 2)
+  const miseAJourStatutFiche: MiseAJourStatutFiche = new MiseAJourStatutFiche();
+  miseAJourStatutFiche.fiche_technique = ficheId;
+  miseAJourStatutFiche.statut = 2;
+
+  this.loadingCalcul = true;
+
+  // ✅ calcul d'abord, puis transmission uniquement si succès
+  this.fichesTechniquesFrequenceService.calculerFraisFicheTechniqueFrequence(payloadCalcul).pipe(
+    // on ignore le résultat du calcul (mais l’appel est exécuté)
+    mapTo(void 0),
+
+    // si calcul OK => transmission
+    switchMap(() => this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)),
+
+    tap(() => this.msgMessageService.success("Fiche transmise avec succès !")),
+
+    finalize(() => (this.loadingCalcul = false))
+  ).subscribe({
+    next: () => {
+      // rien d'autre
+    },
+    error: (e) => {
+      // ❌ si calcul échoue, switchMap ne s'exécute jamais => pas de transmission
+      console.error('Erreur (calcul ou transmission):', e);
+      this.dialogService.alert({
+        message: e?.message ?? "Le calcul a échoué : la fiche n'a pas été transmise."
+      });
+    }
+  });
+}
+
+
 }

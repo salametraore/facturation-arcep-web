@@ -483,12 +483,24 @@
 
             <!-- Boutons bas de page -->
             <div class="actions-right recap-actions">
+
+
               <button
                 mat-flat-button
                 color="primary"
+                *ngIf="operation===operations.create || operation===operations.update"
                 (click)="onSave()">
                 <mat-icon>save</mat-icon>
                 Enregistrer
+              </button>
+
+              <button
+                mat-flat-button
+                color="warn"
+                *ngIf="operation===operations.transmettre"
+                (click)="onTransmettre()">
+                <mat-icon>send</mat-icon>
+                Transmettre
               </button>
 
               <button
@@ -496,6 +508,8 @@
                 (click)="onRetourListe()">
                 ← Retour à la liste
               </button>
+
+
             </div>
 
           </div>
