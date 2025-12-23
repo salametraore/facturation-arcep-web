@@ -165,3 +165,81 @@
   dt { margin: 0; }
   dd { margin: 0; }
 }
+
+
+/* Badge numéro (N°1, N°2...) */
+.badge-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  border: 1px solid rgba(0, 0, 0, .18);
+  background: rgba(0, 0, 0, .05);
+}
+
+/* Variante compacte pour cellule tableau */
+.badge-no--table {
+  min-width: 28px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+
+/* Petit alignement dans les listes récap */
+.recap-list .badge-no {
+  margin-right: 8px;
+}
+
+
+.recap-card__header{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap; // si écran petit, ça passe à la ligne
+}
+
+.recap-card__title{
+  margin: 0;
+}
+
+.recap-card__meta{
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.meta-sep{
+  opacity: .6;
+}
+
+
+.recap-dl--one-line{
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: nowrap;      // ✅ tout sur une seule ligne
+  white-space: nowrap;    // ✅ empêche les retours à la ligne
+  margin: 0;
+}
+
+.recap-dl--one-line > div{
+  display: inline-flex;   // dt + dd sur la même ligne
+  align-items: baseline;
+  gap: 8px;
+}
+
+.recap-dl--one-line dt{
+  margin: 0;
+}
+
+.recap-dl--one-line dd{
+  margin: 0;
+}

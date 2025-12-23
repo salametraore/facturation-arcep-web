@@ -54,7 +54,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
   nomClient: string | null = null;
 
   // === IDs produits (adapte si nécessaire) ===
-  private readonly PRODUCT_BASE_ID = 72;
+/*  private readonly PRODUCT_BASE_ID = 72;*/
   private readonly PRODUCT_RADIO_ID = 73;
   private readonly PRODUCT_TERMINAL_ID = 74;
 
@@ -63,7 +63,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
   private readonly PRICE_RADIO = 50000;
   private readonly PRICE_TERMINAL = 30000;
 
-  private isBase = (id: number) => id === this.PRODUCT_BASE_ID;
+  /*private isBase = (id: number) => id === this.PRODUCT_BASE_ID;*/
   private isRadio = (id: number) => id === this.PRODUCT_RADIO_ID;
   private isTerminal = (id: number) => id === this.PRODUCT_TERMINAL_ID;
 
@@ -192,7 +192,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
     this.produitsFiltered = (this.produitsAll || []).filter(p => {
       if (cat === 12) {
         // Agrément d’équipement : restreindre aux 3 lignes
-        return [this.PRODUCT_BASE_ID, this.PRODUCT_RADIO_ID, this.PRODUCT_TERMINAL_ID].includes(p.id);
+        /*return [this.PRODUCT_BASE_ID, this.PRODUCT_RADIO_ID, this.PRODUCT_TERMINAL_ID].includes(p.id);*/
       }
       if (cat === 13) {
         return p.id === 81; // ton cas existant
@@ -224,8 +224,9 @@ export class EncaissementDirectCrudComponent implements OnInit {
     });
 
     // si cat=12, s'assurer que la ligne "Base" existe (ton ajout auto)
-    if (cat === 12 && !this.hasProduct(this.PRODUCT_BASE_ID)) {
-      this.produitsFormArray.push(this.createProduitFG(this.PRODUCT_BASE_ID, this.PRICE_BASE));
+    //if (cat === 12 && !this.hasProduct(this.PRODUCT_BASE_ID)) {
+    if (cat === 12 ) {
+      //this.produitsFormArray.push(this.createProduitFG(this.PRODUCT_BASE_ID, this.PRICE_BASE));
       this.refreshDS();
     }
 
@@ -273,8 +274,9 @@ export class EncaissementDirectCrudComponent implements OnInit {
       fg.get('total')!.setValue(q * pu, { emitEvent: false });
 
       const currentCat = this.ficheForm.get('categorie_produit')!.value;
-      if (currentCat === 12 && (this.isRadio(id) || this.isTerminal(id)) && !this.hasProduct(this.PRODUCT_BASE_ID)) {
-        this.produitsFormArray.insert(0, this.createProduitFG(this.PRODUCT_BASE_ID, undefined));
+      //if (currentCat === 12 && (this.isRadio(id) || this.isTerminal(id)) && !this.hasProduct(this.PRODUCT_BASE_ID)) {
+      if (currentCat === 12 && (this.isRadio(id) || this.isTerminal(id))) {
+        //this.produitsFormArray.insert(0, this.createProduitFG(this.PRODUCT_BASE_ID, undefined));
         this.refreshDS();
         this.recomputeAllUnitPrices();
       }
@@ -303,18 +305,18 @@ export class EncaissementDirectCrudComponent implements OnInit {
 
   addProduitLine(): void {
     const cat = this.ficheForm.get('categorie_produit')!.value;
-    const defId = (cat === 12) ? this.PRODUCT_BASE_ID : null;
+    //const defId = (cat === 12) ? this.PRODUCT_BASE_ID : null;
 
-    this.produitsFormArray.push(this.createProduitFG(defId!, undefined));
+    //this.produitsFormArray.push(this.createProduitFG(defId!, undefined));
     this.refreshDS();
 
-    if (defId) {
+/*    if (defId) {
       const fg = this.produitsFormArray.at(this.produitsFormArray.length - 1) as FormGroup;
       const pu = this.getUnitPriceFor(defId);
       fg.get('prix_unitaire')!.setValue(pu, { emitEvent: false });
       const q = +fg.get('quantite')!.value || 0;
       fg.get('total')!.setValue(q * pu, { emitEvent: false });
-    }
+    }*/
 
     this.updateMontants();
   }

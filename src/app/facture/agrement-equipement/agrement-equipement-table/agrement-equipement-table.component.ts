@@ -58,7 +58,7 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
   clients: Client[];
   client: Client;
 
-  productAllowedIds = [72, 73, 74];
+  productAllowedIds = [ 73, 74];
   utilisateurConnecte:Utilisateur;
   roleUtilisateurConnecte:UtilisateurRole;
 
@@ -161,7 +161,7 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
 
     this.ficheTechniquesService.getFicheTechniques()
       .subscribe((lignes: FicheTechniques[]) => {
-        const allowed = new Set<number>([72, 73, 74]); // productAllowedIds
+        const allowed = new Set<number>([ 73, 74]); // productAllowedIds
         this.ficheTechniques.data = lignes
           .filter(f =>
             f.categorie_produit === this.fixeCategorie &&
