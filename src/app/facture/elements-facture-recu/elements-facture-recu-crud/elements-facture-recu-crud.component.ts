@@ -20,6 +20,10 @@ import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traite
 import { finalize } from 'rxjs/operators';
 import {MatSnackBar} from "@angular/material/snack-bar";
 
+import { ViewChild, AfterViewInit } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+
+
 @Component({
   selector: 'app-elements-facture-recu-crud',
   templateUrl: './elements-facture-recu-crud.component.html'
@@ -50,6 +54,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   nomClient: any;
   historiqueFicheTechniques: HistoriqueFicheTechnique[];
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
 
   constructor(
@@ -97,6 +102,12 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
     this.title = this.title + ' - ' + this.window_name;
   }
 
+  ngAfterViewInit(): void {
+    if (this.t_ProduitFiche) {
+      this.t_ProduitFiche.paginator = this.paginator;
+    }
+  }
+
   reloadData() {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients;
@@ -109,6 +120,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       }
       if (this.ficheTechniqueAFacturer?.liste_produits?.length > 0) {
         this.t_ProduitFiche!.data = [...this.ficheTechniqueAFacturer?.liste_produits];
+        this.t_ProduitFiche!.paginator = this.paginator;
       }
     });
 
