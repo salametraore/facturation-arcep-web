@@ -27,7 +27,7 @@ export function buildFicheTechniqueFrequenceForm(
       client:            new FormControl(fiche?.client ?? null, [Validators.required]),
       categorie_produit: new FormControl(fiche?.categorie_produit ?? category, [Validators.required]),
 
-      objet:             new FormControl(fiche?.objet ?? null, [Validators.required]),
+      objet:             new FormControl(fiche?.commentaire ?? null),
       commentaire:       new FormControl(fiche?.commentaire ?? null),
 
       direction:         new FormControl(fiche?.direction ?? null),

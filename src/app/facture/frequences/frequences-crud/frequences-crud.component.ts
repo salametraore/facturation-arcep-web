@@ -561,6 +561,9 @@ export class FrequencesCrudComponent implements OnInit {
     });
   }
 
+  getCategorieProduit(id: number) {
+    return this.categories.find(p => p.id === id)?.libelle;
+  }
 
   onSave(): void {
     console.log("debut save ");

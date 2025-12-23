@@ -42,7 +42,7 @@ export class FicheTechniquesService {
 
   // --- CRUD Fiches techniques ---
   getItem(id: number): Observable<FicheTechniques> {
-    return this.http.get<FicheTechniques>(`${this.urlFiches}/${id}`);
+    return this.http.get<FicheTechniques>(`${this.urlFiches}/${id}/`);
   }
 
   create(ficheTechniqueData: FormData): Observable<FicheTechniques> {
@@ -104,7 +104,7 @@ export class FicheTechniquesService {
     if (chercheFiche?.date_fin)
       params = params.set('date_fin', chercheFiche.date_fin);
 
-    return this.http.get<FicheTechniques[]>(this.urlFiches, { params });
+    return this.http.get<FicheTechniques[]>(`${this.urlFiches}/`, { params });
   }
 
   // --- Historique & workflow ---
