@@ -188,15 +188,15 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     },
     canaux: {
       type_station:             H(),
-      type_canal:              H(),
-      zone_couverture:         H(),
+      type_canal:               V(true),
+      zone_couverture:          V(true),
 
-      nbre_tranche_facturation: H(),
+      nbre_tranche_facturation: V(true),
 
-      largeur_bande_khz:       H(),
-      classe_largeur_bande:    H(),
+      largeur_bande_khz:        V(true),
+      classe_largeur_bande:     H(),
 
-      type_bande_frequence:     H(),
+      type_bande_frequence:     V(true),
     }
   },
 

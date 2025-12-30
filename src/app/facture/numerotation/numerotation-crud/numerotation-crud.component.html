@@ -87,7 +87,7 @@
 
               <!-- Catégorie de numéro -->
               <mat-form-field appearance="outline" class="product-field">
-                <mat-label>Catégorie de numéro</mat-label>
+                <mat-label>Type de ressource</mat-label>
                 <mat-select formControlName="produit" matTooltip="Catégorie de numéro">
                   <mat-option *ngFor="let item of produits" [value]="item.id">
                     {{ item.libelle }}
@@ -106,7 +106,11 @@
               <mat-form-field appearance="outline" class="product-field designation">
                 <mat-label>Plages de numéros</mat-label>
                 <input type="text" matInput formControlName="plage_numero"
-                       matTooltip="Ex. 70 00 00 00–70 00 99 99; 71 10 00 00–71 10 49 99" required>
+                       matTooltip="Ex. 70 00 00 00–70 00 99 99; 71 10 00 00–71 10 49 99">
+
+                <mat-error *ngIf="form_ficheTechniquesProduit.get('plage_numero')?.hasError('required')">
+                  La plage de numéros est obligatoire pour ce type de ressource.
+                </mat-error>
               </mat-form-field>
 
               <!-- Bouton sur la même ligne -->
@@ -131,7 +135,7 @@
 
             <!-- Catégorie -->
             <ng-container matColumnDef="produit">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie de numéro</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Type de ressource</th>
               <td mat-cell *matCellDef="let element">{{ getProduit(element.produit) }}</td>
             </ng-container>
 

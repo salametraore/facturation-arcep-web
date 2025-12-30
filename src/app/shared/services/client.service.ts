@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import {Client, ClientAutorisePostal} from '../models/client';
-import { DetailFicheClient } from '../models/detail-fiche-client';
-import { LigneReleveCompteClient, ReleveCompteClient } from '../models/ligne-releve-compte-client';
+import { Client, ClientAutorisePostal, ClientRequest, toClientRequest } from '../models/client';
+import { ReleveCompteClient } from '../models/ligne-releve-compte-client';
 import { RecouvDashboardClient } from '../models/recouv-dashboard-client';
-import { RecouvListeEncaissement } from '../models/recouv-liste-encaissement';
 
 import { AppConfigService } from '../../core/config/app-config.service';
-import {map} from "rxjs/operators";
 
 @Injectable({ providedIn: 'root' })
 export class ClientService {
@@ -28,10 +26,10 @@ export class ClientService {
   }
 
   // --- URLs centralisées ---
-  private get urlClients()        { return this.joinUrl(this.cfg.baseUrl, 'clients'); }
-  private get urlRecouv()         { return this.joinUrl(this.cfg.baseUrl, 'recouv'); }
-  private get urlReleveClient()   { return this.joinUrl(this.cfg.baseUrl, 'releve-client'); }
-  private get urlReleveGenerate() { return this.joinUrl(this.cfg.baseUrl, 'releve/generate-pdf'); }
+  private get urlClients()              { return this.joinUrl(this.cfg.baseUrl, 'clients'); }
+  private get urlRecouv()               { return this.joinUrl(this.cfg.baseUrl, 'recouv'); }
+  private get urlReleveClient()         { return this.joinUrl(this.cfg.baseUrl, 'releve-client'); }
+  private get urlReleveGenerate()       { return this.joinUrl(this.cfg.baseUrl, 'releve/generate-pdf'); }
   private get urlClientAutorisePostal() { return this.joinUrl(this.cfg.baseUrl, 'clients/autorise-postal'); }
 
   // --- CRUD Clients ---
@@ -39,20 +37,29 @@ export class ClientService {
     return this.httpClient.get<Client[]>(`${this.urlClients}/`);
   }
 
-  getItem(id: any): Observable<Client> {
+  getItem(id: number): Observable<Client> {
     return this.httpClient.get<Client>(`${this.urlClients}/${id}/`);
   }
 
-  create(client: Client): Observable<any> {
-    return this.httpClient.post<any>(this.urlClients, client);
+  /** CREATE: body = ClientRequest (pas de id) */
+  create(client: ClientRequest | Client): Observable<Client> {
+    const payload: ClientRequest = 'id' in (client as any) ? toClientRequest(client as Client) : (client as ClientRequest);
+    return this.httpClient.post<Client>(`${this.urlClients}/`, payload);
   }
 
-  update(id: number, client: Client): Observable<any> {
-    return this.httpClient.put<any>(`${this.urlClients}/${id}`, client);
+  /** UPDATE complet: id dans l'URL, body = ClientRequest (pas de id) */
+  update(id: number, client: ClientRequest | Client): Observable<Client> {
+    const payload: ClientRequest = 'id' in (client as any) ? toClientRequest(client as Client) : (client as ClientRequest);
+    return this.httpClient.put<Client>(`${this.urlClients}/${id}/`, payload);
   }
 
-  delete(id: any): Observable<any> {
-    return this.httpClient.delete(`${this.urlClients}/${id}`);
+  /** PATCH partiel: body = Partial<ClientRequest> */
+  patch(id: number, changes: Partial<ClientRequest>): Observable<Client> {
+    return this.httpClient.patch<Client>(`${this.urlClients}/${id}/`, changes);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.httpClient.delete<void>(`${this.urlClients}/${id}/`);
   }
 
   // --- Recouv / tableaux de bord / relevés ---
@@ -73,18 +80,13 @@ export class ClientService {
     return this.httpClient.get(url, {
       observe: 'response',
       responseType: 'arraybuffer' as 'json'
-    }); // -> Observable<HttpResponse<Blob>>
+    });
   }
 
-  /*  getListeClientsAutorisesPostal(): Observable<any> {
-      return this.httpClient.get<any>(`${this.urlClientAutorisePostal}/`);
-    }*/
 
   getListeClientsAutorisesPostal(): Observable<ClientAutorisePostal[]> {
     return this.httpClient
       .get<{ results: ClientAutorisePostal[] }>(`${this.urlClientAutorisePostal}/`)
-      .pipe(
-        map(resp => resp.results)   // 👈 on ne renvoie QUE le tableau
-      );
+      .pipe(map(resp => resp.results));
   }
 }

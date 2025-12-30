@@ -1,69 +1,140 @@
+<!-- src/app/features/parametrage/categorie-produit/categorie-produit-list-page.component.html -->
+
 <mat-card>
-  <mat-toolbar color="primary">
-    <span class="title-center mat-h1">Liste des catégories de produit</span>
-  </mat-toolbar>
-</mat-card>
-<div class="search-div">
 
-  <mat-form-field class="search-form-field">
-    <mat-label>Recherche</mat-label>
-    <input appUppercase #input (keyup)="applyFilter($event)" matInput>
-  </mat-form-field>
+  <!-- Titre de page (barre rose / primaire) -->
+  <div class="page-title">
+    <h2>Paramétrage : catégories de produit</h2>
+  </div>
 
-  <button (click)="crud(null,this.operations.create)" color="primary" mat-button>
-    <mat-icon>add</mat-icon>
-    {{bouton_names.add}}
-  </button>
-</div>
+  <!-- Filtres compacts et centrés -->
+  <div class="filters filters--one-line">
+    <div class="filters-grid">
 
-<div class="mat-elevation-z2">
-  <table [dataSource]="t_CategorieProduit" mat-table matSort style="width: 100%">
-    <ng-container matColumnDef="code">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header> Code</th>
-      <td *matCellDef="let element" mat-cell> {{element.code}} </td>
-    </ng-container>
+      <!-- Recherche -->
+      <mat-form-field class="search-field" appearance="outline">
+        <mat-label>Recherche</mat-label>
+        <input
+          appUppercase
+          #input
+          matInput
+          placeholder="Code, libellé, description…"
+          (keyup)="applyFilter($event)">
 
-    <ng-container matColumnDef="libelle">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header> Libelle</th>
-      <td *matCellDef="let element" mat-cell> {{element.libelle}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="description">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header> Description</th>
-      <td *matCellDef="let element" mat-cell> {{element.description}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef mat-header-cell>Actions
-      </th>
-      <td *matCellDef="let element" mat-cell>
-        <button [matMenuTriggerFor]="menu" color="primary" mat-icon-button>
-          <mat-icon>settings</mat-icon>
+        <!-- suffix close -->
+        <button mat-icon-button matSuffix type="button"
+                (click)="resetFilter(input)">
+          <mat-icon>close</mat-icon>
         </button>
-        <mat-menu #menu="matMenu">
-          <button color="primary" (click)="crud(element,this.operations.details)" mat-menu-item>
-            <mat-icon>visibility</mat-icon>
-            Détails
-          </button>
-          <button (click)="crud(element,this.operations.update)" color="primary" mat-menu-item>
-            <mat-icon color="accent">edit</mat-icon>
-            Modifier
-          </button>
-          <button (click)="onDelete(element)" class="btn_delete" mat-menu-item>
-            <mat-icon color="warn">delete</mat-icon>
-            Supprimer
-          </button>
-        </mat-menu>
-      </td>
-    </ng-container>
-    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr (click)="onRowClicked(element)" *matRowDef="let element; columns: displayedColumns;"
-        [ngClass]="{ 'selected': element === selectedRow }" mat-row></tr>
 
-    <!-- Row shown when there is no matching data. -->
-    <tr *matNoDataRow class="mat-row">
-      <td class="mat-cell" colspan="4">Aucune information trouvée : &nbsp; &nbsp; &nbsp;{{input.value}}</td>
-    </tr>
-  </table>
-  <mat-paginator [pageSizeOptions]="[3,5, 10, 15]" [pageSize]="5" showFirstLastButtons></mat-paginator>
-</div>
+      </mat-form-field>
+
+      <!-- bouton search -->
+      <button mat-mini-fab color="primary" class="action-btn"
+              (click)="setFilter(input.value)">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <!-- bouton reset -->
+      <button mat-mini-fab color="primary" class="action-btn"
+              (click)="resetFilter(input)">
+        <mat-icon>cached</mat-icon>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Cadre standard -->
+  <section class="list-box">
+
+    <!-- En-tête : titre + actions à droite -->
+    <div class="list-header">
+      <h3 class="list-title">Liste des catégories de produit</h3>
+
+      <div class="list-actions">
+        <button mat-flat-button color="primary" (click)="crud(null, this.operations.create)">
+          <mat-icon>add</mat-icon>
+          {{ bouton_names.add }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Corps : table + pagination -->
+    <div class="list-body">
+
+      <div class="mat-elevation-z10 compact-table">
+        <table mat-table [dataSource]="t_CategorieProduit" matSort style="width: 100%">
+
+          <!-- Code -->
+          <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Code</th>
+            <td mat-cell *matCellDef="let element">{{ element.code }}</td>
+          </ng-container>
+
+          <!-- Libellé -->
+          <ng-container matColumnDef="libelle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Libellé</th>
+            <td mat-cell *matCellDef="let element">{{ element.libelle }}</td>
+          </ng-container>
+
+          <!-- Description -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+            <td mat-cell *matCellDef="let element">{{ element.description }}</td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
+                <mat-icon>settings</mat-icon>
+              </button>
+
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item color="primary" (click)="crud(element, this.operations.details)">
+                  <mat-icon>visibility</mat-icon>
+                  Détails
+                </button>
+
+                <button mat-menu-item color="primary" (click)="crud(element, this.operations.update)">
+                  <mat-icon color="accent">edit</mat-icon>
+                  Modifier
+                </button>
+
+                <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
+                  <mat-icon color="warn">delete</mat-icon>
+                  Supprimer
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <!-- Lignes -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row
+              *matRowDef="let element; columns: displayedColumns"
+              (click)="onRowClicked(element)"
+              [ngClass]="{ 'selected': element === selectedRow }">
+          </tr>
+
+          <!-- Row vide -->
+          <tr mat-row *matNoDataRow>
+            <td class="mat-cell" colspan="4">
+              Aucune information trouvée : <strong>{{ input.value }}</strong>
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[3, 5, 10, 15]"
+          [pageSize]="5"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+
+    </div>
+  </section>
+
+</mat-card>

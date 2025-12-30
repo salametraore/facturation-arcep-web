@@ -3,7 +3,7 @@ import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/fich
 import {Client} from "../../../shared/models/client";
 import {CategorieProduit} from "../../../shared/models/categorie-produit";
 import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatTableDataSource} from "@angular/material/table";
 import {FicheTechniqueProduit} from "../../../shared/models/ficheTechniquesProduits";
 import {MatPaginator} from "@angular/material/paginator";
@@ -18,6 +18,7 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 import {DialogService} from "../../../shared/services/dialog.service";
 import {operations,bouton_names} from "../../../constantes";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
   selector: 'numerotation-crud',
@@ -52,6 +53,9 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   produits: Produit[]= [];
 
   saveLocked = false;
+
+  private destroy$ = new Subject<void>();
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -147,14 +151,14 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   }
 
 
-  initFormFicheTechniquesProduit_create() {
+  /*initFormFicheTechniquesProduit_create() {
     this.form_ficheTechniquesProduit = this.formBuilder.group({
       id: [''],
       plage_numero: [''],
       quantite: ['1'],
       produit: [''],
     });
-  }
+  }*/
 
   onGetTotalLigne() {
     const formValue = this.form_ficheTechniquesProduit.value;
@@ -306,5 +310,50 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
 
   getProduit(id: number) {
     return this.produits.find(p => p.id === id)?.libelle;
+  }
+
+  initFormFicheTechniquesProduit_create() {
+    this.form_ficheTechniquesProduit = this.formBuilder.group({
+      id: [''],
+      plage_numero: [''],         // => devient required dynamiquement
+      quantite: ['1'],
+      produit: [''],
+    });
+
+    this.setupPlageNumeroConditionalValidator();
+  }
+
+  private setupPlageNumeroConditionalValidator() {
+    const produitCtrl = this.form_ficheTechniquesProduit.get('produit');
+    const plageCtrl = this.form_ficheTechniquesProduit.get('plage_numero');
+
+    if (!produitCtrl || !plageCtrl) return;
+
+    const apply = (produitId: any) => {
+      const id = Number(produitId);
+      const isRequired = id === 42 || id === 43;
+
+      if (isRequired) {
+        plageCtrl.setValidators([Validators.required]);
+      } else {
+        plageCtrl.clearValidators();
+        // optionnel : si tu veux vider automatiquement quand ce n'est pas obligatoire
+        // plageCtrl.setValue('');
+      }
+      plageCtrl.updateValueAndValidity({ emitEvent: false });
+    };
+
+    // appliquer au chargement (si produit déjà sélectionné)
+    apply(produitCtrl.value);
+
+    // appliquer à chaque changement
+    produitCtrl.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(v => apply(v));
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

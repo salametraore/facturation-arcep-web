@@ -2019,3 +2019,78 @@ dashboard resumé client
     justify-content: space-between;
   }
 }
+
+
+
+/* Cohérence avec tes pages existantes */
+.blank-row {
+  height: 12px;
+}
+
+/* Conteneur global */
+.form-wrap {
+  width: 100%;
+}
+
+/* Optionnel : lisibilité des onglets */
+.crud-tabs {
+  width: 100%;
+}
+
+/* ✅ Zone compacte (720px) mais alignée à gauche */
+.tab-pane {
+  width: 100%;
+  max-width: 720px;   /* ✅ COMPACT */
+  margin: 0;          /* ✅ plus centré */
+  padding-left: 8px;  /* ✅ léger décalage à gauche */
+  padding-right: 8px;
+}
+
+/* ✅ 1 champ par ligne */
+.fields--one {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch; /* ✅ occupe toute la largeur */
+}
+
+/* Champ pleine largeur */
+.w-full {
+  width: 100%;
+}
+
+/* Checkboxes en colonne (alignées à gauche) */
+.checks--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+  align-items: flex-start;
+}
+
+/* Actions alignées à droite (haut & bas) */
+.actions-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+.cell-title { font-weight: 600; }
+.cell-muted { opacity: .7; font-size: 12px; }
+
+
+.crud-form {
+  width: 100%;
+}
+
+
+
+.meta {
+  margin-top: 6px;
+  opacity: .75;
+  font-size: 12px;
+  display: grid;
+  gap: 4px;
+}

@@ -11,8 +11,7 @@ import {CategorieProduitService} from "../../../shared/services/categorie-produi
 
 @Component({
   selector: 'app-produit-crud',
-  templateUrl: './produit-crud.component.html',
-  styleUrl: './produit-crud.component.scss'
+  templateUrl: './produit-crud.component.html'
 })
 export class ProduitCrudComponent implements OnInit {
 

@@ -9,6 +9,7 @@ import { RecouvAgendaComponent } from './pages/recouv-agenda/recouv-agenda.compo
 import {RecouvDashboardComponent} from "./pages/recouv-dashboard/recouv-dashboard.component";
 import {RecouvPromessesComponent} from "./pages/recouv-promesses/recouv-promesses.component";
 import {DefaultComponent} from "../shared/components/default/default.component";
+import {RecouvClientComponent} from "./pages/recouv_client/recouv-client.component";
 
 
 const routes: Routes = [
@@ -25,6 +26,7 @@ const routes: Routes = [
       { path: 'templates', component: RecouvTemplatesComponent },
       { path: 'promesses', component: RecouvPromessesComponent },
       { path: 'agenda', component: RecouvAgendaComponent },
+      { path: 'clients', component: RecouvClientComponent},
     ]
   }
 ];

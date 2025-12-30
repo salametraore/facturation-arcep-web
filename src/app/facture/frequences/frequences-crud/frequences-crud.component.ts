@@ -716,6 +716,7 @@ export class FrequencesCrudComponent implements OnInit {
     return found?.libelle || '';
   }
 
+
   getRecapObjet(): string {
     return this.ficheFG?.get('objet')?.value || '';
   }
@@ -853,7 +854,7 @@ export class FrequencesCrudComponent implements OnInit {
     }
 
     if (this.isVisibleStation('caractere_radio') && this.hasValue(s?.caractere_radio)) {
-      details.push(`Caractère : ${s.caractere_radio}`);
+      details.push(`Caractère : ${this.getLibelleCaractereRadio(s.caractere_radio)}`);
     }
 
     if (this.isVisibleStation('localite') && this.hasValue(s?.localite)) {
@@ -929,4 +930,14 @@ export class FrequencesCrudComponent implements OnInit {
     return d?.canal_id ? this.canalNoFromId(d.canal_id) : '-';
   }
 
+  getLibelleCaractereRadio(id: number | null | undefined): string {
+    switch (id) {
+      case 1:
+        return 'Commercial';
+      case 2:
+        return 'Non commercial';
+      default:
+        return '';
+    }
+  }
 }

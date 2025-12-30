@@ -5,21 +5,7 @@ import {SharedModule} from '../shared/shared.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PdfViewerModule} from 'ng2-pdf-viewer';
 import { MatPaginatorModule } from '@angular/material/paginator';
-// import {DomaineComponent} from "./domaine/domaine.component";
-// import {FichesTechniquesDapCrudComponent} from "./domaine/domaine-crud/domaine-crud.component";
-// import {ServiceConfianceComponent} from "./service-confiance/service-confiance.component";
-// import {
-//   ServiceConfianceCrudComponent
-// } from "./service-confiance/service-confiance-crud/service-confiance-crud.component";
-import {ClientComponent} from "./client/client.component";
-import {ClientCrudComponent} from "./client/client-crud/client-crud.component";
-import {ClientTablesComponent} from "./client/client-tables/client-tables.component";
-import {ClientRelancesComponent} from "./client/client-tables/client-relances/client-relances.component";
-import {ClientReleveCompteComponent} from "./client/client-tables/client-releve-compte/client-releve-compte.component";
-import {ClientPromessesComponent} from "./client/client-tables/client-promesses/client-promesses.component";
-import {ClientFacturesComponent} from "./client/client-tables/client-factures/client-factures.component";
-import {ClientEncaissementsComponent} from "./client/client-tables/client-encaissements/client-encaissements.component";
-import {ClientFichesTechniques} from "./client/client-tables/client-fiches-techniques/client-fiches-techniques";
+
 import {CategorieProduitComponent} from "./categorie-produit/categorie-produit.component";
 import {
   CategorieProduitCrudComponent
@@ -48,6 +34,14 @@ import {ZoneCouvertureComponent} from "./zone-couverture/zone-couverture.compone
 import {CategorieStationComponent} from "./categorie-station/categorie-station.component";
 import {RoleCrudComponent} from "./roles/role-crud/role-crud.component";
 import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
+import {ClientsComponent} from "./clients/clients.component";
+import {ClientsCrudComponent} from "./clients/clients-crud/clients-crud.component";
+import {ParametresApplicatifsComponent} from "./parametres-applicatifs/parametres-applicatifs.component";
+import {ParametresApplicatifsCrudComponent} from "./parametres-applicatifs/parametres-applicatifs-crud/parametres-applicatifs-crud.component";
+import {TypeDirectionCrudComponent} from "./type-direction/type-direction-crud/type-direction-crud.component";
+import {TypeDirectionComponent} from "./type-direction/type-direction.component";
+import {DirectionComponent} from "./direction/direction.component";
+import {DirectionCrudComponent} from "./direction/direction-crud/direction-crud.component";
 
 @NgModule({
   declarations: [
@@ -55,15 +49,8 @@ import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
     // FichesTechniquesDapCrudComponent,
     // ServiceConfianceComponent,
     // ServiceConfianceCrudComponent,
-    ClientComponent,
-    ClientCrudComponent,
-    ClientTablesComponent,
-    ClientRelancesComponent,
-    ClientReleveCompteComponent,
-    ClientPromessesComponent,
-    ClientFacturesComponent,
-    ClientEncaissementsComponent,
-    ClientFichesTechniques,
+    ClientsComponent,
+    ClientsCrudComponent,
     CategorieProduitComponent,
     CategorieProduitCrudComponent,
     CategorieStationCrudComponent,
@@ -83,7 +70,13 @@ import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
     ZoneCouvertureComponent,
     CategorieStationComponent,
     RolesPageComponent,
-    RoleCrudComponent
+    RoleCrudComponent,
+    ParametresApplicatifsComponent,
+    ParametresApplicatifsCrudComponent,
+    TypeDirectionComponent,
+    TypeDirectionCrudComponent,
+    DirectionComponent,
+    DirectionCrudComponent,
   ],
   imports: [
     CommonModule,

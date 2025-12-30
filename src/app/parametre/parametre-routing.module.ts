@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {DefaultComponent} from '../shared/components/default/default.component';
-import {ClientComponent} from "./client/client.component";
+
 import {CategorieProduitComponent} from "./categorie-produit/categorie-produit.component";
 import {CategorieStationComponent} from "./categorie-station/categorie-station.component";
 import {GarantieComponent} from "./garantie/garantie.component";
@@ -12,12 +12,18 @@ import {TarifFrequenceComponent} from "./tarif-frequence/tarif-frequence.compone
 import {ZoneCouvertureComponent} from "./zone-couverture/zone-couverture.component";
 import {ZonePostaleComponent} from "./zone-postale/zone-postale.component";
 import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
+import {ClientsComponent} from "./clients/clients.component";
+import {ClientsCrudComponent} from "./clients/clients-crud/clients-crud.component";
+import {ParametresApplicatifsComponent} from "./parametres-applicatifs/parametres-applicatifs.component";
+import {TypeDirection} from "../shared/models/typeDirection";
+import {TypeDirectionComponent} from "./type-direction/type-direction.component";
+import {DirectionComponent} from "./direction/direction.component";
 
 const routes: Routes = [
   {
     path: '', component: DefaultComponent,
     children: [
-      {path: 'clients', component: ClientComponent},
+
       {path: 'categorie-produits', component: CategorieProduitComponent},
       {path: 'categorie-stations', component: CategorieStationComponent},
       {path: 'garanties', component: GarantieComponent},
@@ -28,6 +34,13 @@ const routes: Routes = [
       {path: 'zone-couvertures', component: ZoneCouvertureComponent},
       {path: 'zone-postales', component: ZonePostaleComponent},
       {path: 'roles-page', component: RolesPageComponent},
+      // ✅ Clients
+      { path: 'clients', component: ClientsComponent },
+      { path: 'clients/new', component: ClientsCrudComponent },
+      { path: 'clients/:id', component: ClientsCrudComponent },
+      {path: 'parametres-applicatifs', component: ParametresApplicatifsComponent},
+      {path: 'type-directions', component:TypeDirectionComponent },
+      {path: 'directions', component: DirectionComponent},
     ]
   }
 ];

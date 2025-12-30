@@ -392,7 +392,7 @@ export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
     const ficheId = ficheTechnique?.id; // si tu appelles en mode update
 
     this.router.navigate(
-      ['/facture/client-crud-prestations-diverses', this.clientId],
+      ['/facture/recouv-client-crud-prestations-diverses', this.clientId],
       {
         queryParams: {
           op: operation,   // create / update / transmettre ...
@@ -409,7 +409,7 @@ export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
     const ficheId = ficheTechnique?.id; // si tu appelles en mode update
 
     this.router.navigate(
-      ['/facture/client-crud-service-a-valeur-ajoute', this.clientId],
+      ['/facture/recouv-client-crud-service-a-valeur-ajoute', this.clientId],
       {
         queryParams: {
           op: operation,   // create / update / transmettre ...
@@ -427,7 +427,7 @@ export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
     const ficheId = ficheTechnique?.id; // si tu appelles en mode update
 
     this.router.navigate(
-      ['/facture/client-crud-numerotation', this.clientId],
+      ['/facture/recouv-client-crud-numerotation', this.clientId],
       {
         queryParams: {
           op: operation,   // create / update / transmettre ...
@@ -445,7 +445,7 @@ export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
     const ficheId = ficheTechnique?.id; // si tu appelles en mode update
 
     this.router.navigate(
-      ['/facture/client-crud-autorisation-generale', this.clientId],
+      ['/facture/recouv-client-crud-autorisation-generale', this.clientId],
       {
         queryParams: {
           op: operation,   // create / update / transmettre ...
@@ -462,7 +462,7 @@ export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
     const ficheId = ficheTechnique?.id; // si tu appelles en mode update
 
     this.router.navigate(
-      ['/facture/client-crud-agrement-equipement', this.clientId],
+      ['/facture/recouv-client-crud-agrement-equipement', this.clientId],
       {
         queryParams: {
           op: operation,   // create / update / transmettre ...
@@ -479,7 +479,7 @@ export class ClientDetailsFichesTechniques implements OnInit, AfterViewInit {
     const ficheId = ficheTechnique?.id; // si tu appelles en mode update
 
     this.router.navigate(
-      ['/facture/client-crud-agrement-installeur', this.clientId],
+      ['/facture/recouv-client-crud-agrement-installeur', this.clientId],
       {
         queryParams: {
           op: operation,   // create / update / transmettre ...

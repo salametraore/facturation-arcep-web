@@ -16,40 +16,51 @@
 
     <div class="menu-scroll">
       <ng-container *ngFor="let item of menuItems">
-        <!-- 1) Items SANS sous-menus : ils doivent être dans un mat-nav-list -->
-        <mat-nav-list *ngIf="!item.sous_menus || item.sous_menus.length === 0">
-          <a mat-list-item (click)="onNavigate(item.url || '')">
-            <mat-icon matListIcon fontSet="material-symbols-outlined">
-              {{ item.icone || 'folder' }}
-            </mat-icon>
-            <span matLine>{{ item.titre }}</span>
-          </a>
-        </mat-nav-list>
-
-        <!-- 2) Items AVEC sous-menus : utiliser un panneau séparé (pas dans un mat-nav-list parent) -->
-        <mat-expansion-panel *ngIf="item.sous_menus?.length" class="menu-panel">
-          <mat-expansion-panel-header>
-            <mat-panel-title class="menu-header">
-              <mat-icon fontSet="material-symbols-outlined" class="mr-2">
-                {{ item.icone || 'folder' }}
-              </mat-icon>
-              <span>{{ item.titre }}</span>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-
-          <mat-nav-list>
-            <ng-container *ngFor="let sm of visibleSousMenus(item)">
-              <a mat-list-item (click)="onNavigate(sm.url || '')">
-                <mat-icon matListIcon fontSet="material-symbols-outlined">
-                  {{ sm.icone || 'description' }}
-                </mat-icon>
-                <span matLine>{{ sm.titre }}</span>
-              </a>
-            </ng-container>
-          </mat-nav-list>
-        </mat-expansion-panel>
+        <ng-container
+          [ngTemplateOutlet]="menuNodeTpl"
+          [ngTemplateOutletContext]="{ node: item, level: 0 }">
+        </ng-container>
       </ng-container>
     </div>
+
+    <!-- ===================== TEMPLATE RECURSIF ===================== -->
+    <ng-template #menuNodeTpl let-node="node" let-level="level">
+
+      <!-- FEUILLE : lien cliquable -->
+      <mat-nav-list *ngIf="!node.sous_menus || node.sous_menus.length === 0">
+        <a mat-list-item
+           class="menu-leaf"
+           [style.paddingLeft.px]="12 + level * 12"
+           (click)="onNavigate(menuRoute(node))">
+
+          <mat-icon matListIcon fontSet="material-symbols-outlined">
+            {{ node.icone || (level === 0 ? 'folder' : 'description') }}
+          </mat-icon>
+
+          <span matLine>{{ node.titre }}</span>
+        </a>
+      </mat-nav-list>
+
+      <!-- GROUPE : expansion panel -->
+      <mat-expansion-panel *ngIf="node.sous_menus?.length" class="menu-panel" [class.lvl-0]="level===0">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="menu-header" [style.paddingLeft.px]="8 + level * 12">
+            <mat-icon fontSet="material-symbols-outlined" class="mr-2">
+              {{ node.icone || 'folder' }}
+            </mat-icon>
+            <span>{{ node.titre }}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <ng-container *ngFor="let child of visibleChildren(node)">
+          <ng-container
+            [ngTemplateOutlet]="menuNodeTpl"
+            [ngTemplateOutletContext]="{ node: child, level: level + 1 }">
+          </ng-container>
+        </ng-container>
+      </mat-expansion-panel>
+
+    </ng-template>
   </mat-sidenav>
 
   <mat-sidenav-content class="app-content"  [style.--bg-image]="'url(' + shellBgUrl + ')'">

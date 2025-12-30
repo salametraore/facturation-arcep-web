@@ -24,6 +24,15 @@ import {RecouvTemplatesEditDialogComponent} from "./pages/recouv-templates/recou
 import {RecouvAgendaDetailsDialogComponent} from "./pages/recouv-agenda/recouv-agenda-details-dialog.component";
 import { RecouvPromessesComponent } from './pages/recouv-promesses/recouv-promesses.component';
 import {RecouvPromessesDetailsDialogComponent} from "./pages/recouv-promesses/recouv-promesses-details-dialog.component";
+import {RecouvClientComponent} from "./pages/recouv_client/recouv-client.component";
+import {RecouvClientTablesComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-tables.component";
+import {RecouvClientCrudComponent} from "./pages/recouv_client/recouv-client-crud/recouv-client-crud.component";
+import {RecouvClientEncaissementsComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-encaissements/recouv-client-encaissements.component";
+import {RecouvClientFacturesComponent} from "./pages/recouv_client/recouv-client-tables/recouv_client-factures/recouv-client-factures.component";
+import {RecouvClientFichesTechniques} from "./pages/recouv_client/recouv-client-tables/recouv-client-fiches-techniques/recouv-client-fiches-techniques";
+import {RecouvClientReleveCompteComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-releve-compte/recouv-client-releve-compte.component";
+import {RecouvClientRelancesComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-relances/recouv-client-relances.component";
+import {RecouvClientPromessesComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-promesses/recouv-client-promesses.component";
 
 @NgModule({
   declarations: [
@@ -41,6 +50,15 @@ import {RecouvPromessesDetailsDialogComponent} from "./pages/recouv-promesses/re
     RecouvDeclencheurEditDialogComponent,
     RecouvPromessesComponent,
     RecouvPromessesDetailsDialogComponent,
+    RecouvClientComponent,
+    RecouvClientTablesComponent,
+    RecouvClientCrudComponent,
+    RecouvClientEncaissementsComponent,
+    RecouvClientFacturesComponent,
+    RecouvClientFichesTechniques,
+    RecouvClientReleveCompteComponent,
+    RecouvClientRelancesComponent,
+    RecouvClientPromessesComponent,
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,58 @@
+<mat-card>
+  <mat-card-header class="client-header">
+    <mat-card-title>
+      <div class="title-row">
+        <span class="label">Fiche Client :</span>
+        <span class="value">{{ client?.denomination_sociale }}</span>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content >
+    <!-- Onglets principaux -->
+    <mat-tab-group>
+
+      &lt;!&ndash; Fiches Techniques &ndash;&gt;
+      <mat-tab label="Fiches Techniques">
+        <recouv-client-fiches-techniques></recouv-client-fiches-techniques>
+      </mat-tab>
+
+      <!-- Onglet Factures -->
+      <mat-tab label="Factures">
+        <recouv-client-factures></recouv-client-factures>
+      </mat-tab>
+
+      &lt;!&ndash; Onglet Encaissements &ndash;&gt;
+      <mat-tab label="Encaissements">
+        <recouv-client-encaissements></recouv-client-encaissements>
+      </mat-tab>
+
+      <!--
+            &lt;!&ndash; Onglet Avances &ndash;&gt;
+            <mat-tab label="Avances">
+              <client-details-fiches-techniques></client-details-fiches-techniques>
+            </mat-tab>
+
+            &lt;!&ndash; Onglet Relances &ndash;&gt;
+            <mat-tab label="Relances">
+              <recouv-client-relances></recouv-client-relances>
+            </mat-tab>
+
+            &lt;!&ndash; Onglet Promesses &ndash;&gt;
+            <mat-tab label="Promesses">
+              <recouv-client-promesses></recouv-client-promesses>
+            </mat-tab>
+            -->
+            &lt;!&ndash; Onglet Relevé de compte &ndash;&gt;
+            <mat-tab label="Relevé de compte">
+              <recouv-client-releve-compte></recouv-client-releve-compte>
+            </mat-tab>
+
+    </mat-tab-group>
+    <br>
+    <div align="end">
+      <button mat-raised-button color="warn" (click)="onFermer()">Fermer</button>
+    </div>
+    <br>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,124 @@
+<!-- src/app/parametres/pages/parametres/parametres.component.html -->
+
+<mat-card>
+
+  <div class="page-title">
+    <h2>Paramétrage : paramètres</h2>
+  </div>
+
+  <div class="filters filters--one-line">
+    <div class="filters-grid">
+
+      <mat-form-field class="search-field" appearance="outline">
+        <mat-label>Recherche</mat-label>
+        <input #input matInput placeholder="Clé, valeur, description…" (keyup)="applyFilter($any($event.target).value)">
+
+        <button mat-icon-button matSuffix type="button" (click)="resetFilter(input)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <button mat-mini-fab color="primary" class="action-btn" (click)="applyFilter(input.value)">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <button mat-mini-fab color="primary" class="action-btn" (click)="resetFilter(input)">
+        <mat-icon>cached</mat-icon>
+      </button>
+
+    </div>
+  </div>
+
+  <section class="list-box">
+
+    <div class="list-header">
+      <h3 class="list-title">Liste des paramètres</h3>
+      <div class="list-actions">
+
+        <button mat-flat-button color="primary" (click)="create()">
+          <mat-icon>add</mat-icon>
+          Nouveau
+        </button>
+
+        <button mat-stroked-button color="primary" (click)="load()">
+          <mat-icon>refresh</mat-icon>
+          Actualiser
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="list-body">
+
+      <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+      <div class="mat-elevation-z10 compact-table">
+        <table mat-table [dataSource]="dataSource" matSort style="width: 100%">
+
+          <!-- ID -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+            <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+          </ng-container>
+
+          <!-- KEY -->
+          <ng-container matColumnDef="key">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Clé</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="cell-title">{{ row.key }}</div>
+              <div class="cell-muted" *ngIf="row.description">{{ row.description }}</div>
+            </td>
+          </ng-container>
+
+          <!-- VALUE -->
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Valeur</th>
+            <td mat-cell *matCellDef="let row">{{ row.value || '—' }}</td>
+          </ng-container>
+
+          <!-- ACTIVE -->
+          <ng-container matColumnDef="is_active">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Actif</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-slide-toggle [checked]="row.is_active" (change)="toggleActive(row)"></mat-slide-toggle>
+            </td>
+          </ng-container>
+
+          <!-- UPDATED -->
+          <ng-container matColumnDef="updated_at">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>MAJ</th>
+            <td mat-cell *matCellDef="let row">{{ row.updated_at | date:'dd/MM/yyyy HH:mm':'fr-FR' }}</td>
+          </ng-container>
+
+          <!-- ACTIONS -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-icon-button color="primary" (click)="open(row)">
+                <mat-icon>settings</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <tr mat-row *matNoDataRow>
+            <td class="mat-cell" colspan="6">
+              Aucune information trouvée : <strong>{{ input.value }}</strong>
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[5, 10, 20, 50]"
+          [pageSize]="10"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+
+    </div>
+  </section>
+</mat-card>

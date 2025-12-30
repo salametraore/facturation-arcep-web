@@ -1,0 +1,214 @@
+<!-- src/app/clients/pages/clients-crud/clients-crud.component.html -->
+
+<div class="page-title">
+  <h2>{{ isNew ? 'Paramétrage : nouveau client' : 'Paramétrage : modifier client' }}</h2>
+</div>
+
+<div class="blank-row"></div>
+
+<section class="list-box">
+  <div class="list-body">
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+    <form *ngIf="form" [formGroup]="form" class="form-wrap">
+
+      <!-- ✅ ACTIONS HAUT -->
+      <div class="actions-right">
+        <button mat-flat-button color="warn" type="button" (click)="cancel()">
+          Annuler
+        </button>
+
+        <button mat-flat-button color="primary" type="button"
+                (click)="save()" [disabled]="saving || loading">
+          <mat-icon>save</mat-icon>
+          Enregistrer
+        </button>
+      </div>
+
+      <div class="blank-row"></div>
+
+      <!-- ✅ ONGLETs -->
+      <mat-tab-group class="crud-tabs compact-tabs" animationDuration="0ms" dynamicHeight>
+
+        <!-- Identité -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair"><mat-icon>badge</mat-icon><span>Identité</span></span>
+          </ng-template>
+
+          <div class="blank-row"></div>
+
+          <div class="tab-pane compact-pane">
+            <div class="fields fields--one">
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Dénomination sociale</mat-label>
+                <input matInput formControlName="denomination_sociale"/>
+                <mat-error *ngIf="f['denomination_sociale']?.hasError('required')">Obligatoire</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Type</mat-label>
+                <input matInput formControlName="type"/>
+                <mat-error *ngIf="f['type']?.hasError('required')">Obligatoire</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>IFU</mat-label>
+                <input matInput formControlName="ifu"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>RCCM</mat-label>
+                <input matInput formControlName="rccm"/>
+                <mat-error *ngIf="f['rccm']?.hasError('required')">Obligatoire</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Prénom (rep. légal)</mat-label>
+                <input matInput formControlName="first_name"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Nom (rep. légal)</mat-label>
+                <input matInput formControlName="last_name"/>
+              </mat-form-field>
+
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Contact -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair"><mat-icon>call</mat-icon><span>Contact</span></span>
+          </ng-template>
+
+          <div class="blank-row"></div>
+
+          <div class="tab-pane compact-pane">
+            <div class="fields fields--one">
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Téléphone</mat-label>
+                <input matInput formControlName="telephone"/>
+                <mat-error *ngIf="f['telephone']?.hasError('required')">Obligatoire</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Adresse</mat-label>
+                <input matInput formControlName="adresse"/>
+                <mat-error *ngIf="f['adresse']?.hasError('required')">Obligatoire</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Qualité</mat-label>
+                <input matInput formControlName="qualite"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Tél. rep. légal</mat-label>
+                <input matInput formControlName="telephone_rep_legal"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Email rep. légal</mat-label>
+                <input matInput type="email" formControlName="email_rep_legal"/>
+              </mat-form-field>
+
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Comptabilité -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair"><mat-icon>account_balance</mat-icon><span>Comptabilité</span></span>
+          </ng-template>
+
+          <div class="blank-row"></div>
+
+          <div class="tab-pane compact-pane">
+            <div class="fields fields--one">
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Compte comptable</mat-label>
+                <input matInput formControlName="compte_comptable"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Compte banque</mat-label>
+                <input matInput formControlName="compte_banque"/>
+              </mat-form-field>
+
+              <div class="checks checks--stack">
+                <mat-checkbox formControlName="strategique">Client stratégique</mat-checkbox>
+                <mat-checkbox formControlName="mauvais_payeur">Mauvais payeur</mat-checkbox>
+                <mat-checkbox formControlName="litige">Litige</mat-checkbox>
+              </div>
+
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Web & géolocalisation -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="pair"><mat-icon>public</mat-icon><span>Web & géolocalisation</span></span>
+          </ng-template>
+
+          <div class="blank-row"></div>
+
+          <div class="tab-pane compact-pane">
+            <div class="fields fields--one">
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Site web</mat-label>
+                <input matInput formControlName="site_web"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Google Maps</mat-label>
+                <input matInput formControlName="google_maps"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Longitude</mat-label>
+                <input matInput type="number" formControlName="longitude"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Latitude</mat-label>
+                <input matInput type="number" formControlName="latitude"/>
+              </mat-form-field>
+
+            </div>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+
+      <!-- ✅ ACTIONS BAS -->
+      <div class="blank-row"></div>
+
+      <div class="actions-right">
+        <button mat-flat-button color="primary" type="button"
+                (click)="save()" [disabled]="saving || loading">
+          <mat-icon>save</mat-icon>
+          Enregistrer
+        </button>
+
+        <button mat-flat-button color="warn" type="button" (click)="cancel()">
+          ← Retour à la liste
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>

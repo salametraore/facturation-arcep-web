@@ -1,0 +1,48 @@
+<!-- src/app/directions/pages/direction-crud/direction-crud.component.html -->
+
+<h2 mat-dialog-title>
+  {{ isNew ? 'Nouvelle direction' : 'Modifier direction' }}
+</h2>
+
+<mat-dialog-content>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+  <form *ngIf="form" [formGroup]="form" class="crud-form">
+    <div class="fields fields--one">
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Libellé</mat-label>
+        <input matInput formControlName="libelle" />
+        <mat-error *ngIf="f['libelle']?.hasError('required')">Obligatoire</mat-error>
+        <mat-error *ngIf="f['libelle']?.hasError('maxlength')">Max 200 caractères</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Type de direction</mat-label>
+        <mat-select formControlName="type_direction">
+          <mat-option *ngFor="let t of typeDirections" [value]="t.id">
+            {{ t.code }} — {{ t.libelle || '—' }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="f['type_direction']?.hasError('required')">Obligatoire</mat-error>
+      </mat-form-field>
+
+      <div class="meta" *ngIf="!isNew && current">
+        <div>ID : <strong>{{ current.id }}</strong></div>
+      </div>
+
+    </div>
+  </form>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" (click)="close(false)">Fermer</button>
+
+  <button mat-flat-button color="primary" type="button"
+          (click)="save()" [disabled]="saving || loading || form.invalid">
+    <mat-icon>save</mat-icon>
+    Enregistrer
+  </button>
+</mat-dialog-actions>

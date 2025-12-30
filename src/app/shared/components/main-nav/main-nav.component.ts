@@ -7,20 +7,41 @@ import {AuthService} from "../../../authentication/auth.service";
 import {User} from "../../../authentication/auth.models";
 import {Utilisateur} from "../../models/utilisateur";
 import {UtilisateurRole} from "../../models/droits-utilisateur";
-
-interface MenuItem {
+export interface MenuItem {
   id: number;
   direction: number;
+
   titre: string;
-  description: string;
+  description?: string;
+
   icone?: string;
-  lien?: string;
+
+  /** Route interne (Angular routerLink) */
   url?: string;
-  actif: string;
+
+  /**
+   * Alias legacy: certaines parties de ton code utilisent "lien".
+   * On le garde pour compatibilité, mais idéalement on standardise sur "url".
+   */
+  lien?: string;
+
+  /**
+   * Pour liens externes (optionnel).
+   * Ex: https://..., mailto:, etc.
+   */
+  externalUrl?: string;
+
+  /** Idéalement boolean, mais on garde ton existant */
+  actif: 'OUI' | 'NON' | string;
+
   module: number;
-  feuille: number;
+
+  /** 1 = feuille (page), 0 = groupe (catégorie) */
+  feuille: 0 | 1;
+
   sous_menus?: MenuItem[] | null;
 }
+
 
 /* ====== MAPPINGS ICÔNES ====== */
 // icône "groupe" par module (id)
@@ -64,122 +85,242 @@ export class MainNavComponent implements OnInit {
 
   /* ---------------- MENU DATA ---------------- */
   menuItems: MenuItem[] = [
-/*    {
-      id: 10, direction: 100, titre: 'Paramétrage', description: 'Paramétrage',
-      actif: 'OUI', module: 1, feuille: 0,
+    {
+      id: 10,
+      direction: 100,
+      titre: 'Paramétrage',
+      description: 'Paramétrage',
+      actif: 'OUI',
+      module: 1,
+      feuille: 0,
       sous_menus: [
+
+         // ===================== Référentiels généraux =====================
         {
-          id: 1005,
+          id: 1200,
           direction: 5555,
-          titre: 'Les catégories de station',
-          description: 'Les catégories de station',
+          titre: 'Référentiels généraux',
+          description: 'Référentiels généraux',
           actif: 'OUI',
           module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/categorie-stations'
+          feuille: 0,
+          url: null,
+          sous_menus: [
+            {
+              id: 1020,
+              direction: 5555,
+              titre: 'Les clients',
+              description: 'Les clients',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/clients'
+            },
+            {
+              id: 1020,
+              direction: 5555,
+              titre: 'Les paramètres applicatifs',
+              description: 'Les paramètres applicatifs',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/parametres-applicatifs'
+            },
+            {
+              id: 1020,
+              direction: 5555,
+              titre: 'Les types de directions',
+              description: 'Les types de directions',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/type-directions'
+            },
+            {
+              id: 1020,
+              direction: 5555,
+              titre: 'Les directions',
+              description: 'Les directions',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/directions'
+            },
+            {
+              id: 1020,
+              direction: 5555,
+              titre: 'Les catégories de produits',
+              description: 'Les catégories de produits',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/categorie-produits'
+            },
+            {
+              id: 1025,
+              direction: 5555,
+              titre: 'Les produits',
+              description: 'Les produits',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/produits'
+            }
+          ]
         },
+
+        // ===================== FREQUENCES =====================
         {
-          id: 1010,
+          id: 1100,
           direction: 5555,
-          titre: 'Les zones de couverture des radio',
-          description: 'Les zones de couverture des radio',
+          titre: 'Elements liés aux Fréquences',
+          description: 'Elements liés aux Fréquences',
           actif: 'OUI',
           module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/zone-couvertures'
+          feuille: 0,
+          url: null,
+          sous_menus: [
+            /*{
+              id: 1005,
+              direction: 5555,
+              titre: 'Les catégories de station',
+              description: 'Les catégories de station',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/categorie-stations'
+            },
+            {
+              id: 1010,
+              direction: 5555,
+              titre: 'Les zones de couverture des radio',
+              description: 'Les zones de couverture des radio',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/zone-couvertures'
+            }*/
+          ]
         },
+
+        // ===================== TARIFS =====================
         {
-          id: 1015,
+          id: 1300,
           direction: 5555,
-          titre: 'Les zones postales',
-          description: 'Les zones postales',
+          titre: 'Tarifs',
+          description: 'Paramètres liés aux tarifs',
           actif: 'OUI',
           module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/zone-postales'
+          feuille: 0,
+          url: null,
+          sous_menus: [
+           /* {
+              id: 1030,
+              direction: 5555,
+              titre: 'Les tarifs frais de dossier',
+              description: 'Les tarifs frais de dossier',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/tarif-frais-dossiers'
+            },
+            {
+              id: 1035,
+              direction: 5555,
+              titre: 'Les tarifs des redevances annuelles de gestion',
+              description: 'Les tarifs des redevances annuelles de gestion',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/tarif-frais-redevances'
+            },
+            {
+              id: 1040,
+              direction: 5555,
+              titre: 'Les garanties',
+              description: 'Les garanties',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/garanties'
+            },
+            {
+              id: 1045,
+              direction: 5555,
+              titre: 'Les tarifs des fréquences',
+              description: 'Les tarifs des fréquences',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/tarif-frequences'
+            }*/
+          ]
         },
-        {
-          id: 1020,
+
+        // ===================== ZONES / POSTAL =====================
+    /*    {
+          id: 1400,
           direction: 5555,
-          titre: 'Les catégories de produits',
-          description: 'Les catégories de produits',
+          titre: 'Zonage',
+          description: 'Paramètres de zones et découpage',
           actif: 'OUI',
           module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/categorie-produits'
-        },
+          feuille: 0,
+          url: null,
+          sous_menus: [
+            {
+              id: 1015,
+              direction: 5555,
+              titre: 'Les zones postales',
+              description: 'Les zones postales',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/zone-postales'
+            }
+          ]
+        },*/
+
+        // ===================== SECURITE / UTILISATEURS =====================
         {
-          id: 1025,
+          id: 1500,
           direction: 5555,
-          titre: 'Les produits',
-          description: 'Les produits',
+          titre: 'Sécurité / Utilisateurs',
+          description: 'Rôles et droits',
           actif: 'OUI',
           module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/produits'
-        },
-        {
-          id: 1030,
-          direction: 5555,
-          titre: 'Les tarifs frais de dossier',
-          description: 'Les tarifs frais de dossier',
-          actif: 'OUI',
-          module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/tarif-frais-dossiers'
-        },
-        {
-          id: 1035,
-          direction: 5555,
-          titre: 'Les tarifs des redevances annuelles de gestion',
-          description: 'Les tarifs des redevances annuelles de gestion',
-          actif: 'OUI',
-          module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/tarif-frais-redevances'
-        },
-        {
-          id: 1040,
-          direction: 5555,
-          titre: 'Les garanties',
-          description: 'Les garanties',
-          actif: 'OUI',
-          module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/garanties'
-        },
-        {
-          id: 1045,
-          direction: 5555,
-          titre: 'Les tarifs des fréquences',
-          description: 'Les tarifs des fréquences',
-          actif: 'OUI',
-          module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/tarif-frequences'
-        },
-        {
-          id: 1050,
-          direction: 5555,
-          titre: 'Les rôles',
-          description: 'Les rôles',
-          actif: 'OUI',
-          module: 0,
-          feuille: 1,
-          sous_menus: null,
-          url: 'parametre/roles-page'
-        },
+          feuille: 0,
+          url: null,
+          sous_menus: [
+            {
+              id: 1050,
+              direction: 5555,
+              titre: 'Les rôles',
+              description: 'Les rôles',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/roles-page'
+            }
+          ]
+        }
+
       ]
-    },*/
+    },
     {
       id: 20, direction: 0, titre: 'Fiches Techniques', description: 'Fiches Techniques',
       actif: 'OUI', module: 1, feuille: 0,
@@ -491,7 +632,7 @@ export class MainNavComponent implements OnInit {
           module: 0,
           feuille: 1,
           sous_menus: null,
-          url: 'parametre/clients'
+          url: 'recouvrement/clients'
         },
       ]
     }
@@ -570,6 +711,7 @@ export class MainNavComponent implements OnInit {
   }
 
   onNavigate(url: string) {
+    if (!url) return;
     if (url) this.router.navigate([url]);
   }
 
@@ -580,5 +722,16 @@ export class MainNavComponent implements OnInit {
     );
   }
 
+  menuRoute(item: MenuItem): string {
+    // feuille uniquement
+    const route = (item.url ?? item.lien ?? '').trim();
+    return route;
+  }
+
+  visibleChildren(item: MenuItem): MenuItem[] {
+    // filtre "actif" + tri si tu veux
+    const children = item.sous_menus ?? [];
+    return children.filter(x => x.actif !== 'NON'); // adapte si tu as autre logique
+  }
 
 }

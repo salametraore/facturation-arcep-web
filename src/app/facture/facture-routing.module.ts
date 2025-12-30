@@ -81,12 +81,12 @@ const routes: Routes = [
       {path: 'client-dt-detail/:id', component:ClientDetailPage, resolve: { client: ClientResolver }},
       {path: 'client-direction-technique', component:ClientDirectionTechniqueComponent},
       {path: 'client-direction-technique-detail/:id', component:ClientDetailsComponent, resolve: { client: ClientResolver }},
-      {path: 'client-crud-prestations-diverses/:clientId', component: ClientCrudPrestationsDiversesComponent },
-      {path: 'client-crud-service-a-valeur-ajoute/:clientId', component: ClientCrudServiceAValeurAjouteComponent },
-      {path: 'client-crud-numerotation/:clientId', component: ClientCrudNumerotationComponent },
-      {path: 'client-crud-autorisation-generale/:clientId', component: ClientCrudAutorisationGeneraleComponent },
-      {path: 'client-crud-agrement-installeur/:clientId', component: ClientCrudAgrementInstalleurComponent },
-      {path: 'client-crud-agrement-equipement/:clientId', component: ClientCrudAgrementEquipementComponent },
+      {path: 'recouv-client-crud-prestations-diverses/:clientId', component: ClientCrudPrestationsDiversesComponent },
+      {path: 'recouv-client-crud-service-a-valeur-ajoute/:clientId', component: ClientCrudServiceAValeurAjouteComponent },
+      {path: 'recouv-client-crud-numerotation/:clientId', component: ClientCrudNumerotationComponent },
+      {path: 'recouv-client-crud-autorisation-generale/:clientId', component: ClientCrudAutorisationGeneraleComponent },
+      {path: 'recouv-client-crud-agrement-installeur/:clientId', component: ClientCrudAgrementInstalleurComponent },
+      {path: 'recouv-client-crud-agrement-equipement/:clientId', component: ClientCrudAgrementEquipementComponent },
       {
         path: 'activites-postales',
         children: [

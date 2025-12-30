@@ -1,0 +1,22 @@
+/* src/app/clients/pages/clients/clients.component.scss */
+.page-card { padding: 12px; }
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.search { width: 320px; }
+.table-wrap { overflow: auto; }
+
+.cell-title { font-weight: 600; }
+.muted { opacity: .75; font-size: 12px; }
+
+.col-actions { width: 110px; text-align: right; }
+.w-full { width: 100%; }

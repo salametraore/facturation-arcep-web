@@ -99,7 +99,7 @@ export class CanalFrequencesDialogComponent implements OnInit {
 
     this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanalList[]) => {
       this.typeCanaux = listeCanaux;
-      //this.typeCanaux = listeCanaux.filter(ts => ts.categorie_produit === cat);
+      this.typeCanaux = listeCanaux.filter(ts => ts.categorie_produit === cat);
     });
 
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {

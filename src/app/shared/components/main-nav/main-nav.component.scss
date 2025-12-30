@@ -273,3 +273,16 @@ mat-expansion-panel {
     width: 220px;      // un peu plus étroit sur petits écrans
   }
 }
+
+.menu-leaf {
+  border-radius: 10px;
+}
+
+.menu-panel {
+  margin: 4px 0;
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+}

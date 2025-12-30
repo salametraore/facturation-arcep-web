@@ -9,8 +9,7 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 
 @Component({
   selector: 'app-categorie-produit-crud',
-  templateUrl: './categorie-produit-crud.component.html',
-  styleUrl: './categorie-produit-crud.component.scss'
+  templateUrl: './categorie-produit-crud.component.html'
 })
 export class CategorieProduitCrudComponent implements OnInit {
 

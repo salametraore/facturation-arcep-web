@@ -1,5 +1,5 @@
 export class Client {
-  readonly id: number;
+  id?: number;
   created_at?: string;
   updated_at?: string;
   adresse: string;
@@ -28,6 +28,15 @@ export class Client {
   compte_banque?: string | null;
 
 }
+
+export type ClientRequest = Omit<Client, 'id'>;
+
+
+export function toClientRequest(client: Client): ClientRequest {
+  const { id, ...payload } = client;
+  return payload;
+}
+
 
 export class ClientAutorisePostal {
   client_id?: number | null;
