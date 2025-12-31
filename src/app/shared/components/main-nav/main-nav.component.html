@@ -52,7 +52,7 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
 
-        <ng-container *ngFor="let child of visibleChildren(node)">
+        <ng-container *ngFor="let child of visibleSousMenus(node)">
           <ng-container
             [ngTemplateOutlet]="menuNodeTpl"
             [ngTemplateOutletContext]="{ node: child, level: level + 1 }">

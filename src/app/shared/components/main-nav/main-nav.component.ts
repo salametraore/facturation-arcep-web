@@ -85,7 +85,7 @@ export class MainNavComponent implements OnInit {
 
   /* ---------------- MENU DATA ---------------- */
   menuItems: MenuItem[] = [
-    {
+/*    {
       id: 10,
       direction: 100,
       titre: 'Paramétrage',
@@ -186,7 +186,7 @@ export class MainNavComponent implements OnInit {
           feuille: 0,
           url: null,
           sous_menus: [
-            /*{
+            /!*{
               id: 1005,
               direction: 5555,
               titre: 'Les catégories de station',
@@ -207,7 +207,7 @@ export class MainNavComponent implements OnInit {
               feuille: 1,
               sous_menus: null,
               url: 'parametre/zone-couvertures'
-            }*/
+            }*!/
           ]
         },
 
@@ -222,7 +222,7 @@ export class MainNavComponent implements OnInit {
           feuille: 0,
           url: null,
           sous_menus: [
-           /* {
+           /!* {
               id: 1030,
               direction: 5555,
               titre: 'Les tarifs frais de dossier',
@@ -265,12 +265,12 @@ export class MainNavComponent implements OnInit {
               feuille: 1,
               sous_menus: null,
               url: 'parametre/tarif-frequences'
-            }*/
+            }*!/
           ]
         },
 
         // ===================== ZONES / POSTAL =====================
-    /*    {
+    /!*    {
           id: 1400,
           direction: 5555,
           titre: 'Zonage',
@@ -292,7 +292,7 @@ export class MainNavComponent implements OnInit {
               url: 'parametre/zone-postales'
             }
           ]
-        },*/
+        },*!/
 
         // ===================== SECURITE / UTILISATEURS =====================
         {
@@ -320,7 +320,7 @@ export class MainNavComponent implements OnInit {
         }
 
       ]
-    },
+    },*/
     {
       id: 20, direction: 0, titre: 'Fiches Techniques', description: 'Fiches Techniques',
       actif: 'OUI', module: 1, feuille: 0,

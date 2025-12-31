@@ -11,17 +11,24 @@ export class AppConfigService {
   /** Chargé au bootstrap via APP_INITIALIZER */
   load(): Promise<void> {
     const url = `assets/app-config.json?ts=${Date.now()}`; // anti-cache léger
-    return this.http.get<AppConfig>(url).toPromise()
-      .then(cfg => { this.config = cfg; })
-      .catch(() => {
-        // Fallback si le fichier n'est pas trouvé (utile en dev)
-        this.config = { baseUrl: 'http://localhost:8000/facturation_api' };
+
+    return this.http
+      .get<AppConfig>(url)
+      .toPromise()
+      .then(cfg => {
+        this.config = cfg;
       })
-      .then(() => void 0);
+      .catch(err => {
+        console.error('❌ Impossible de charger app-config.json', err);
+        return Promise.reject(err); // ⛔ bloque le bootstrap
+      });
   }
 
   /** Renvoie l'URL sans slash final */
   get baseUrl(): string {
+    if (!this.config?.baseUrl) {
+      throw new Error('AppConfig non chargé ou baseUrl manquante');
+    }
     return this.config.baseUrl.replace(/\/$/, '');
   }
 }
