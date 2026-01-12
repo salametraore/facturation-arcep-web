@@ -59,6 +59,11 @@ export interface FicheTechniqueCanalRuleSet {
   // bande fréquence
   type_bande_frequence: FieldRule;
 
+  // mode duplexage TDD ou FDD
+  mode_duplexage: FieldRule;
+
+  puissance_sortie : FieldRule;
+
 }
 
 /** Config complète pour une catégorie */

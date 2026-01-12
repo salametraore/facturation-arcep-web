@@ -20,37 +20,38 @@ export function buildFicheTechniqueFrequenceForm(
   fiche?: Partial<FicheTechniqueFrequenceCreateRequest>
 ): FormGroup {
 
-  const category: CategoryId = (fiche?.categorie_produit as CategoryId) ;
+  const category: CategoryId = (fiche?.categorie_produit as CategoryId);
 
   return fb.group({
     fiche: fb.group({
       client:            new FormControl(fiche?.client ?? null, [Validators.required]),
       categorie_produit: new FormControl(fiche?.categorie_produit ?? category, [Validators.required]),
 
-      objet:             new FormControl(fiche?.commentaire ?? null),
+      objet:             new FormControl((fiche as any)?.objet ?? null),
       commentaire:       new FormControl(fiche?.commentaire ?? null),
 
-      direction:         new FormControl(fiche?.direction ?? null),
-      utilisateur:       new FormControl(fiche?.utilisateur ?? null),
-      date_creation:     new FormControl(fiche?.date_creation ?? null),
+      direction:          new FormControl(fiche?.direction ?? null),
+      utilisateur:        new FormControl(fiche?.utilisateur ?? null),
+      date_creation:      new FormControl(fiche?.date_creation ?? null),
 
-      position:          new FormControl(fiche?.position ?? null),
-      position_direction:new FormControl(fiche?.position_direction ?? null),
+      position:           new FormControl(fiche?.position ?? null),
+      position_direction: new FormControl(fiche?.position_direction ?? null),
 
-      avis:              new FormControl(fiche?.avis ?? null),
-      date_avis:         new FormControl(fiche?.date_avis ?? null),
+      avis:               new FormControl(fiche?.avis ?? null),
+      date_avis:          new FormControl(fiche?.date_avis ?? null),
 
-      duree:             new FormControl(fiche?.duree ?? null),
-      date_debut:        new FormControl(fiche?.date_debut ?? null),
-      date_fin:          new FormControl(fiche?.date_fin ?? null),
+      duree:              new FormControl(fiche?.duree ?? null),
+      date_debut:         new FormControl(fiche?.date_debut ?? null),
+      date_fin:           new FormControl(fiche?.date_fin ?? null),
 
-      periode:           new FormControl(fiche?.periode ?? null),
+      periode:            new FormControl(fiche?.periode ?? null),
     }),
 
     stations: fb.array([]),
     canaux:   fb.array([]),
   });
 }
+
 
 // ===============================================================
 // 2. STATION (FicheTechniqueStationRequest)
@@ -80,9 +81,10 @@ export function buildStationFG(
     debit_kbps:   new FormControl(s.debit_kbps ?? null, requiredIf(cfg.debit_kbps)),
     classe_debit: new FormControl(s.classe_debit ?? null), // caché
 
-    largeur_bande_mhz:    new FormControl(s.largeur_bande_mhz ?? null, requiredIf(cfg.largeur_bande_mhz)),
+    largeur_bande_mhz: new FormControl(s.largeur_bande_mhz ?? null, requiredIf(cfg.largeur_bande_mhz)),
     classe_largeur_bande: new FormControl(s.classe_largeur_bande ?? null), // caché
 
+    // min(1) seulement si le champ est visible
     nbre_tranche: new FormControl(
       s.nbre_tranche ?? null,
       [
@@ -113,6 +115,9 @@ export function buildCanalFG(
 
   const cfg = CATEGORY_CONFIG[cat].canaux;
 
+  const trancheDefault =
+    cfg.nbre_tranche_facturation?.visible ? (c.nbre_tranche_facturation ?? 1) : (c.nbre_tranche_facturation ?? null);
+
   return fb.group({
     categorie_produit: new FormControl(c.categorie_produit ?? cat),
 
@@ -121,11 +126,12 @@ export function buildCanalFG(
 
     zone_couverture: new FormControl(c.zone_couverture ?? null, requiredIf(cfg.zone_couverture)),
 
+    // min(1) seulement si visible (sinon ça peut bloquer la soumission alors que le champ est masqué)
     nbre_tranche_facturation: new FormControl(
-      c.nbre_tranche_facturation ?? 1,
+      trancheDefault,
       [
         ...(cfg.nbre_tranche_facturation?.required ? [Validators.required] : []),
-        Validators.min(1),
+        ...(cfg.nbre_tranche_facturation?.visible ? [Validators.min(1)] : []),
       ]
     ),
 
@@ -134,7 +140,11 @@ export function buildCanalFG(
 
     type_bande_frequence: new FormControl(c.type_bande_frequence ?? null, requiredIf(cfg.type_bande_frequence)),
 
-});
+    mode_duplexage: new FormControl(c.mode_duplexage ?? null, requiredIf(cfg.mode_duplexage)),
+
+    // ✅ AJOUT selon la config (cat 4 & 5 visible/required)
+    puissance_sortie: new FormControl(c.puissance_sortie ?? null, requiredIf(cfg.puissance_sortie)),
+  });
 }
 
 
@@ -153,10 +163,9 @@ function toNumber(v: any): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+
 // ===============================================================
 // 5. MAPPING VERS L’API
-// - ici on ajoute created_at / updated_at / updated_by
-//   juste avant l’envoi au backend
 // ---------------------------------------------------------------
 export function formToFicheTechniqueFrequenceCreateRequest(
   form: FormGroup,

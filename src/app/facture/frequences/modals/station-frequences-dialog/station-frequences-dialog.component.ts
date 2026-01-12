@@ -1,8 +1,10 @@
 // src/app/facture/frequences/modals/station-frequences-dialog/station-frequences-dialog.component.ts
 
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { CategoryId } from '../../../../shared/models/frequences-category.types';
 import { FicheTechniqueStationRequest } from '../../../../shared/models/fiche-technique-frequence-create-request';
@@ -17,37 +19,42 @@ import { TypeStationService } from '../../../../shared/services/type-station.ser
 
 import { ZoneCouverture } from '../../../../shared/models/zone-couverture';
 import { ZoneCouvertureService } from '../../../../shared/services/zone-couverture.service';
-import {ClasseLargeurBandeService} from "../../../../shared/services/classe-largeur-bande.service";
-import {ClasseDebitService} from "../../../../shared/services/classe-debit.service";
-import {ClassePuissanceService} from "../../../../shared/services/classe-puissance.service";
-import {bindStationClasses} from "../../forms/station-classes-binder";
-import { Subject } from 'rxjs';
 
-
-
+import { ClasseLargeurBandeService } from "../../../../shared/services/classe-largeur-bande.service";
+import { ClasseDebitService } from "../../../../shared/services/classe-debit.service";
+import { ClassePuissanceService } from "../../../../shared/services/classe-puissance.service";
+import { bindStationClasses } from "../../forms/station-classes-binder";
 
 export interface StationDialogData {
   station?: FicheTechniqueStationRequest;
-  cat: CategoryId;   // catégorie de la fiche
+  cat: CategoryId;
 }
 
 @Component({
   selector: 'app-station-frequences-dialog',
   templateUrl: './station-frequences-dialog.component.html'
 })
-export class StationFrequencesDialogComponent implements OnInit {
+export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
 
   form!: FormGroup;
   title = 'Ajouter une station';
 
   typeBandeFrequences: TypeBandeFrequenceList[] = [];
   typeStations: TypeStation[] = [];
+  typeStationSeelectione: TypeStation;
   zoneCouvertures: ZoneCouverture[] = [];
 
-  // config de la catégorie courante (surchargée au ngOnInit)
   cfg = CATEGORY_CONFIG[1 as CategoryId];
 
   private destroy$ = new Subject<void>();
+
+  // ✅ flags d’affichage conditionnel (règles cat 1 / cat 6)
+  showPuissance = true;
+  showDebitKbps = true;
+  showLargeurBandeMhz = true;
+
+  // ✅ cache du code résolu via getItem(id)
+  private selectedTypeStationCode: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -61,7 +68,6 @@ export class StationFrequencesDialogComponent implements OnInit {
     private classeLargeurBande: ClasseLargeurBandeService,
   ) {}
 
-  // alias pratique pour le template
   get stationCfg() {
     return this.cfg.stations;
   }
@@ -69,34 +75,34 @@ export class StationFrequencesDialogComponent implements OnInit {
   ngOnInit(): void {
     this.title = this.data.station ? 'Modifier la station' : 'Ajouter une station';
 
-    // utiliser la bonne config de catégorie
     this.cfg = CATEGORY_CONFIG[this.data.cat];
 
     this.loadData();
 
-    console.log("this.data.station");
-    console.log(this.data.station);
+    this.form = buildStationFG(this.fb, this.data.station ?? {}, this.data.cat);
 
-    // FormGroup construit dynamiquement selon la catégorie + modèle FicheTechniqueStationRequest
-    this.form = buildStationFG(
-      this.fb,
-      this.data.station ?? {},
-      this.data.cat
-    );
-
+    // binder existant (classe_puissance / classe_debit / classe_largeur_bande)
     bindStationClasses(this.form, {
       classePuissance: this.classePuissance,
       classeDebit: this.classeDebit,
       classeLargeurBande: this.classeLargeurBande
     }, this.destroy$);
 
+    // ✅ écoute changement type_station => va chercher le code via API => applique règles
+    const typeCtrl = this.form.get('type_station');
+    typeCtrl?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((id: number | null) => this.resolveTypeStationCodeAndApply(id));
+
+    // ✅ 1ère application (édition) : résoudre le code si déjà un id
+    const initialId = typeCtrl?.value as number | null;
+    this.resolveTypeStationCodeAndApply(initialId);
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
 
   onCancel(): void {
     this.dialogRef.close();
@@ -106,16 +112,16 @@ export class StationFrequencesDialogComponent implements OnInit {
     const cat = this.data.cat;
 
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
-      this.typeStations = listeTypeStations.filter(ts => ts.categorie_produit === cat);
+      this.typeStations = (listeTypeStations ?? []).filter(ts => ts.categorie_produit === cat);
+      // NB: on ne dépend plus de cette liste pour le code (on passe par getItem)
     });
 
     this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
-      this.typeBandeFrequences = listeTypeBandesFreq.filter(bf => bf.categorie_produit === cat);
+      this.typeBandeFrequences = (listeTypeBandesFreq ?? []).filter(bf => bf.categorie_produit === cat);
     });
 
-    // utile uniquement si stationCfg.zone_couverture est visible
     this.zoneCouvertureService.getListItems().subscribe((listeZones: ZoneCouverture[]) => {
-      this.zoneCouvertures = listeZones.filter(z => z.categorie_produit === 2);
+      this.zoneCouvertures = (listeZones ?? []).filter(z => z.categorie_produit === 2);
     });
   }
 
@@ -126,8 +132,126 @@ export class StationFrequencesDialogComponent implements OnInit {
     }
 
     const value = this.form.getRawValue() as FicheTechniqueStationRequest;
-
-    console.log('STATION renvoyée par la modale :', value);
     this.dialogRef.close(value);
+  }
+
+  // ---------- visibilité côté template ----------
+  isPuissanceVisible(): boolean {
+    const baseVisible = this.stationCfg?.puissance?.visible !== false;
+    return baseVisible && this.showPuissance;
+  }
+
+  isDebitVisible(): boolean {
+    const baseVisible = this.stationCfg?.debit_kbps?.visible !== false;
+    return baseVisible && this.showDebitKbps;
+  }
+
+  isLargeurBandeMhzVisible(): boolean {
+    const baseVisible = this.stationCfg?.largeur_bande_mhz?.visible !== false;
+    return baseVisible && this.showLargeurBandeMhz;
+  }
+
+  // ---------- résolution code via API ----------
+  private getSelectedTypeStationCode(): string | null {
+    return this.selectedTypeStationCode;
+  }
+
+  private resolveTypeStationCodeAndApply(id: number | null): void {
+    if (!id) {
+      this.selectedTypeStationCode = null;
+      this.applyConditionalVisibilityAndValidators();
+      return;
+    }
+
+    this.typeStationService.getItem(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (ts: TypeStation) => {
+          this.selectedTypeStationCode = ts?.code ?? null;
+          console.log('type_station id=', id, 'code=', this.selectedTypeStationCode, 'cat=', this.data.cat);
+          this.applyConditionalVisibilityAndValidators();
+        },
+        error: (e) => {
+          console.error('Erreur getItem(type_station):', e);
+          this.selectedTypeStationCode = null;
+          this.applyConditionalVisibilityAndValidators();
+        }
+      });
+  }
+
+  // ---------- règles cat 1 / cat 6 ----------
+  private applyConditionalVisibilityAndValidators(): void {
+    const cat = this.data.cat;
+    const code = this.getSelectedTypeStationCode();
+
+    const puissanceCtrl = this.form.get('puissance');
+    const debitCtrl = this.form.get('debit_kbps');
+    const lbCtrl = this.form.get('largeur_bande_mhz');
+
+    const clearAndNull = (ctrl: any) => {
+      if (!ctrl) return;
+      ctrl.clearValidators();
+      ctrl.setValue(null, { emitEvent: false });
+      ctrl.updateValueAndValidity({ emitEvent: false });
+    };
+
+    const require = (ctrl: any) => {
+      if (!ctrl) return;
+      ctrl.setValidators([Validators.required]);
+      ctrl.updateValueAndValidity({ emitEvent: false });
+    };
+
+    // =========================
+    // CAT = 1 : PUISSANCE
+    // affichée + required si code in ('TS_PMR_MOBILE','TS_PMR_PORTABLE')
+    // =========================
+    if (cat === 1) {
+      this.showPuissance = false;
+
+      const mustShow = code === 'TS_PMR_MOBILE' || code === 'TS_PMR_PORTABLE';
+
+      if (mustShow) {
+        this.showPuissance = true;
+        require(puissanceCtrl);
+      } else {
+        clearAndNull(puissanceCtrl);
+      }
+
+      return;
+    }
+
+    // =========================
+    // CAT = 6 : DEBIT + LARGEUR_BANDE_MHZ
+    // debit_kbps => TS_VSAT
+    // largeur_bande_mhz => TS_TERR_PUB
+    // =========================
+    if (cat === 6) {
+      this.showDebitKbps = false;
+      this.showLargeurBandeMhz = false;
+
+      const mustShowDebit = code === 'TS_VSAT';
+      const mustShowLB = code === 'TS_TERR_PUB';
+
+      if (mustShowDebit) {
+        this.showDebitKbps = true;
+        require(debitCtrl);
+      } else {
+        clearAndNull(debitCtrl);
+      }
+
+      if (mustShowLB) {
+        this.showLargeurBandeMhz = true;
+        require(lbCtrl);
+      } else {
+        clearAndNull(lbCtrl);
+      }
+
+      return;
+    }
+
+    // autres catégories : on laisse la config standard décider
+    this.showPuissance = true;
+    this.showDebitKbps = true;
+    this.showLargeurBandeMhz = true;
   }
 }

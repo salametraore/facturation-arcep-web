@@ -1,6 +1,6 @@
 // src/app/features/facture/frequences/frequences-category.config.ts
-import { Validators } from '@angular/forms';
-import { CategoryId, CategoryRuleSet, FieldRule, V, H } from '../../../shared/models/frequences-category.types';
+import {Validators} from '@angular/forms';
+import {CategoryId, CategoryRuleSet, FieldRule, H, V} from '../../../shared/models/frequences-category.types';
 
 /**
  * Configuration par catégorie fonctionnelle
@@ -13,216 +13,68 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
   /** 1) PMR (privé) */
   1: {
     stations: {
-      type_station:        V(true),
+      type_station: V(true),
 
-      puissance:           V(true),
-      classe_puissance:    H(),
+      puissance: V(false),
+      classe_puissance: H(),
 
-      nombre_station:      V(true),
+      nombre_station: V(true),
 
-      debit_kbps:          H(),
-      classe_debit:        H(),
+      debit_kbps: H(),
+      classe_debit: H(),
 
-      largeur_bande_mhz:   H(),
-      classe_largeur_bande:H(),
+      largeur_bande_mhz: H(),
+      classe_largeur_bande: H(),
 
-      nbre_tranche:        H(),
+      nbre_tranche: H(),
 
       type_bande_frequence: H(),
 
-      zone_couverture:     H(),
-      localite:            H(),
-      caractere_radio:     H(),
+      zone_couverture: H(),
+      localite: H(),
+      caractere_radio: H(),
     },
     canaux: {
-      type_station:             H(),
-      type_canal:               V(true),
-      zone_couverture:          V(true),
+      type_station: H(),
+      type_canal: V(true),
+      zone_couverture: V(true),
 
       nbre_tranche_facturation: V(true),
 
-      largeur_bande_khz:        V(true),
-      classe_largeur_bande:     H(),
+      largeur_bande_khz: V(true),
+      classe_largeur_bande: H(),
 
-      type_bande_frequence:     V(true),
+      type_bande_frequence: V(true),
+
+      mode_duplexage: H(),
+
+      puissance_sortie: H(),
     }
   },
 
   /** 2) Aéronautique */
   2: {
     stations: {
-      type_station:        V(true),
+      type_station: V(true),
 
-      puissance:           H(),
-      classe_puissance:    H(),
+      puissance: H(),
+      classe_puissance: H(),
 
-      nombre_station:      V(true),
+      nombre_station: V(true),
 
-      debit_kbps:          H(),
-      classe_debit:        H(),
+      debit_kbps: H(),
+      classe_debit: H(),
 
-      largeur_bande_mhz:   H(),
-      classe_largeur_bande:H(),
-
-      nbre_tranche:        H(),
-
-      type_bande_frequence:H(),
-
-      zone_couverture:     H(),
-      localite:            H(),
-      caractere_radio:     H(),
-    },
-    canaux: {
-      type_station:             H(),
-      type_canal:               H(),
-      zone_couverture:          H(),
-
-      nbre_tranche_facturation: H(),
-
-      largeur_bande_khz:        H(),
-      classe_largeur_bande:     H(),
-
-      type_bande_frequence:     H(),
-    }
-  },
-
-  /** 3) Mobiles ouverts au public */
-  3: {
-    stations: {
-      type_station:        V(true),
-
-      puissance:           H(),
-      classe_puissance:    H(),
-
-      nombre_station:      V(true),
-
-      debit_kbps:          H(),
-      classe_debit:        H(),
-
-      largeur_bande_mhz:   H(),
-      classe_largeur_bande:H(),
-
-      nbre_tranche:        H(),
-
-      type_bande_frequence:H(),
-
-      zone_couverture:     H(),
-      localite:            H(),
-      caractere_radio:     H(),
-    },
-    canaux: {
-      type_station:             H(),
-      type_canal:               V(true),
-      zone_couverture:          V(true),
-
-      nbre_tranche_facturation: V(true),
-
-      largeur_bande_khz:        V(true),
-      classe_largeur_bande:     V(true),
-
-      type_bande_frequence:     V(true),
-    }
-  },
-
-  /** 4) Fixes */
-  4: {
-    stations: {
-      type_station:        V(true),
-
-      puissance:          V(true),
-      classe_puissance:    H(),
-
-      nombre_station:      V(true),
-
-      debit_kbps:          H(),
-      classe_debit:        H(),
-
-      largeur_bande_mhz:   H(),
-      classe_largeur_bande:H(),
-
-      nbre_tranche:        H(),
-
-      type_bande_frequence:H(),
-
-      zone_couverture:     H(),
-      localite:            H(),
-      caractere_radio:     H(),
-    },
-    canaux: {
-      type_station:             V(true),
-      type_canal:               V(true),
-      zone_couverture:          V(true),
-
-      nbre_tranche_facturation: V(true),
-
-      largeur_bande_khz:        V(true),
-      classe_largeur_bande:     H(),
-
-      type_bande_frequence:     V(true),
-    }
-  },
-
-  /** 5) Radio/TV/MMDS */
-  5: {
-    stations: {
-      type_station:        V(true),
-
-      puissance:          V(true),
-      classe_puissance:    H(),
-
-      nombre_station:      V(true),
-
-      debit_kbps:          H(),
-      classe_debit:        H(),
-
-      largeur_bande_mhz:   V(true),
+      largeur_bande_mhz: H(),
       classe_largeur_bande: H(),
 
-      nbre_tranche:        V(true),
+      nbre_tranche: H(),
 
-      type_bande_frequence:V(true),
+      type_bande_frequence: H(),
 
-      zone_couverture:     H(),
-      localite:            V(true),
-      caractere_radio:     V(true),
-    },
-    canaux: {
-      type_station:             H(),
-      type_canal:               V(true),
-      zone_couverture:          V(true),
-
-      nbre_tranche_facturation: V(true),
-
-      largeur_bande_khz:        V(true),
-      classe_largeur_bande:     H(),
-
-      type_bande_frequence:     V(true),
-    }
-  },
-
-  /** 6) Satellite */
-  6: {
-    stations: {
-      type_station:        V(true),
-
-      puissance:           H(),
-      classe_puissance:    H(),
-
-      nombre_station:      V(false),
-
-      debit_kbps:          V(false),
-      classe_debit:        H(),
-
-      largeur_bande_mhz:   V(false),
-      classe_largeur_bande: H(),
-
-      nbre_tranche:        H(),
-
-      type_bande_frequence:H(),
-
-      zone_couverture:     H(),
-      localite:            H(),
-      caractere_radio:     H(),
+      zone_couverture: H(),
+      localite: H(),
+      caractere_radio: H(),
     },
     canaux: {
       type_station: H(),
@@ -235,44 +87,228 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       classe_largeur_bande: H(),
 
       type_bande_frequence: H(),
+
+      mode_duplexage: H(),
+
+      puissance_sortie: H(),
+    }
+  },
+
+  /** 3) Mobiles ouverts au public */
+  3: {
+    stations: {
+      type_station: V(true),
+
+      puissance: H(),
+      classe_puissance: H(),
+
+      nombre_station: V(true),
+
+      debit_kbps: H(),
+      classe_debit: H(),
+
+      largeur_bande_mhz: H(),
+      classe_largeur_bande: H(),
+
+      nbre_tranche: H(),
+
+      type_bande_frequence: H(),
+
+      zone_couverture: H(),
+      localite: H(),
+      caractere_radio: H(),
+    },
+
+    canaux: {
+      type_station: V(true),
+      type_canal: V(true),
+      zone_couverture: V(false),
+
+      nbre_tranche_facturation: V(true),
+
+      largeur_bande_khz: V(true),
+      classe_largeur_bande: H(),
+
+      type_bande_frequence: V(false),
+
+      mode_duplexage: V(false),
+
+      puissance_sortie: H(),
+    }
+  },
+
+  /** 4) Fixes */
+  4: {
+    stations: {
+      type_station: V(true),
+
+      puissance:  H(),
+      classe_puissance: H(),
+
+      nombre_station: V(true),
+
+      debit_kbps: H(),
+      classe_debit: H(),
+
+      largeur_bande_mhz: H(),
+      classe_largeur_bande: H(),
+
+      nbre_tranche: H(),
+
+      type_bande_frequence: H(),
+
+      zone_couverture: H(),
+      localite: H(),
+      caractere_radio: H(),
+
+
+    },
+    canaux: {
+      type_station: V(true),
+      type_canal: V(true),
+      zone_couverture: V(false),
+
+      puissance_sortie:  V(false),
+
+      nbre_tranche_facturation: V(true),
+
+      largeur_bande_khz: V(true),
+      classe_largeur_bande: H(),
+
+      type_bande_frequence: V(false),
+
+      mode_duplexage: V(false),
+
+    }
+  },
+
+  /** 5) Radio/TV/MMDS */
+  5: {
+    stations: {
+      type_station: V(true),
+
+      nombre_station: V(true),
+
+      caractere_radio: V(true),
+
+      localite: V(true),
+
+      puissance:H(),
+      classe_puissance: H(),
+
+      debit_kbps: H(),
+      classe_debit: H(),
+
+      largeur_bande_mhz: H(),
+      classe_largeur_bande: H(),
+
+      nbre_tranche:H(),
+
+      type_bande_frequence: H(),
+
+      zone_couverture: H(),
+
+    },
+    canaux: {
+      type_station: V(true),
+      type_canal: V(true),
+      zone_couverture: V(false),
+
+      puissance_sortie:  V(false),
+
+      nbre_tranche_facturation: V(true),
+
+      largeur_bande_khz: V(true),
+      classe_largeur_bande: H(),
+
+      type_bande_frequence: V(false),
+      mode_duplexage: H(),
+    }
+  },
+
+  /** 6) Satellite */
+  6: {
+    stations: {
+      type_station: V(true),
+
+      puissance: H(),
+      classe_puissance: H(),
+
+      nombre_station: V(true),
+
+      debit_kbps: V(false),
+      classe_debit: H(),
+
+      largeur_bande_mhz: V(false),
+      classe_largeur_bande: H(),
+
+      nbre_tranche: H(),
+
+      type_bande_frequence: H(),
+
+      zone_couverture: H(),
+      localite: H(),
+      caractere_radio: H(),
+    },
+    canaux: {
+      type_station: H(),
+      type_canal: H(),
+      zone_couverture: H(),
+
+      nbre_tranche_facturation: H(),
+
+      largeur_bande_khz: H(),
+      classe_largeur_bande: H(),
+
+      type_bande_frequence: H(),
+
+      mode_duplexage: H(),
+
+      puissance_sortie: H(),
     }
   },
 
   /** 7) Amateur/Expérimental */
   7: {
     stations: {
-      type_station:        V(true),
+      type_station: V(true),
 
-      puissance:           H(),
-      classe_puissance:    H(),
+      puissance: H(),
+      classe_puissance: H(),
 
-      nombre_station:      V(true),
+      nombre_station: V(true),
 
-      debit_kbps:          H(),
-      classe_debit:        H(),
+      debit_kbps: H(),
+      classe_debit: H(),
 
-      largeur_bande_mhz:   H(),
-      classe_largeur_bande:H(),
+      largeur_bande_mhz: H(),
+      classe_largeur_bande: H(),
 
-      nbre_tranche:        H(),
+      nbre_tranche: H(),
 
-      type_bande_frequence:H(),
+      type_bande_frequence: H(),
 
-      zone_couverture:     H(),
-      localite:            H(),
-      caractere_radio:     H(),
+      zone_couverture: H(),
+      localite: H(),
+      caractere_radio: H(),
     },
     canaux: {
-      type_station:             H(),
-      type_canal:               H(),
-      zone_couverture:          H(),
+      type_station: H(),
+      type_canal: H(),
+      zone_couverture: H(),
+
+      puissance_sortie: H(),
 
       nbre_tranche_facturation: H(),
 
-      largeur_bande_khz:        H(),
-      classe_largeur_bande:     H(),
+      largeur_bande_khz: H(),
+      classe_largeur_bande: H(),
 
-      type_bande_frequence:     H(),
+      type_bande_frequence: H(),
+
+      mode_duplexage: H(),
+
+
     }
   },
 };

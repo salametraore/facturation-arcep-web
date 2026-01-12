@@ -21,8 +21,8 @@
 
   <!-- Puissance -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.puissance?.visible">
-    <mat-label>Puissance</mat-label>
+                  *ngIf="isPuissanceVisible()">
+    <mat-label>Puissance(W)</mat-label>
     <input matInput type="number" formControlName="puissance">
   </mat-form-field>
 
@@ -39,7 +39,7 @@
 
   <!-- Largeur de bande (MHz) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.largeur_bande_mhz?.visible">
+                  *ngIf="isLargeurBandeMhzVisible()">
     <mat-label>Largeur de bande (MHz)</mat-label>
     <input matInput type="number" formControlName="largeur_bande_mhz">
   </mat-form-field>
@@ -48,7 +48,7 @@
 
   <!-- Débit (kbps) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.debit_kbps?.visible">
+                  *ngIf="isDebitVisible()">
     <mat-label>Débit (kbps)</mat-label>
     <input matInput type="number" formControlName="debit_kbps">
   </mat-form-field>
@@ -84,7 +84,7 @@
   <!-- Nombre de tranches -->
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="stationCfg.nbre_tranche?.visible">
-    <mat-label>Nombre de tranches</mat-label>
+    <mat-label>Nombre de tranches de facturation</mat-label>
     <input matInput type="number" formControlName="nbre_tranche" min="1">
   </mat-form-field>
 

@@ -17,7 +17,11 @@ export interface FicheTechniqueCanalRequest {
 
   type_bande_frequence?: number;
 
+  mode_duplexage?: string;
 
+  puissance_sortie : number;
+
+  designation?: string;
 }
 
 
@@ -47,7 +51,7 @@ export interface FicheTechniqueStationRequest {
 
   caractere_radio?: number;
 
-
+  designation?: string;
 }
 
 export interface FicheTechniqueFrequenceCreateRequest {
@@ -133,6 +137,12 @@ export interface FicheTechniqueCanalDetail {
   classe_largeur_bande?: number;
 
   type_bande_frequence: number;
+
+  mode_duplexage?: string;
+
+  puissance_sortie : number;
+
+  designation?: string;
 }
 
 
@@ -162,6 +172,8 @@ export interface FicheTechniqueStationDetail {
   classe_debit?: number;
 
   caractere_radio?: number;
+
+  designation?: string;
 
   created_at: string; // ISO date-time
   updated_at: string; // ISO date-time

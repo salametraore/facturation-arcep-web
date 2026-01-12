@@ -6,7 +6,7 @@
 
 <mat-dialog-content [formGroup]="form" class="grid grid-cols-2 gap-4">
 
-  <!-- Type station -->
+  <!-- 1) Type station -->
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="canalCfg.type_station?.visible">
     <mat-label>Type station</mat-label>
@@ -15,71 +15,116 @@
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+    <mat-error *ngIf="form.get('type_station')?.hasError('required')">
+      Type station obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- Type canal -->
+  <!-- 2) Type canal -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.type_canal?.visible">
+                  *ngIf="isTypeCanalVisible()">
     <mat-label>Type canal</mat-label>
     <mat-select formControlName="type_canal" matTooltip="Type canal">
       <mat-option *ngFor="let item of typeCanaux" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+    <mat-error *ngIf="form.get('type_canal')?.hasError('required')">
+      Type canal obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- Largeur de bande (kHz) -->
+  <!-- 3) Mode duplexage -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.largeur_bande_khz?.visible">
+                  *ngIf="isModeDuplexageVisible()">
+    <mat-label>Mode duplexage</mat-label>
+    <mat-select formControlName="mode_duplexage" matTooltip="Mode duplexage">
+      <mat-option *ngFor="let m of duplexModes" [value]="m.value">
+        {{ m.label }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('mode_duplexage')?.hasError('required')">
+      Mode duplexage obligatoire
+    </mat-error>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- 4) Largeur de bande d'une tranche (kHz) -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="isLargeurBandeKhzVisible()">
     <mat-label>Largeur de bande (kHz)</mat-label>
     <input matInput type="number" formControlName="largeur_bande_khz">
+    <mat-error *ngIf="form.get('largeur_bande_khz')?.hasError('required')">
+      Largeur de bande obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- Bande de fréquence -->
+  <!-- 5) Nombre de tranches (facturation) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.type_bande_frequence?.visible">
-    <mat-label>Bande de fréquence</mat-label>
-    <mat-select formControlName="type_bande_frequence" matTooltip="Bande de fréquence">
-      <mat-option *ngFor="let item of typeBandeFrequences" [value]="item.id">
-        {{ item.libelle }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <div class="blank-row"></div>
-
-  <!-- Zone de couverture -->
-  <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.zone_couverture?.visible">
-    <mat-label>Zone de couverture</mat-label>
-    <mat-select formControlName="zone_couverture" matTooltip="Zone de couverture">
-      <mat-option *ngFor="let item of zoneCouvertures" [value]="item.id">
-        {{ item.libelle }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <div class="blank-row"></div>
-
-  <!-- Nombre de tranches (facturation) -->
-  <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.nbre_tranche_facturation?.visible">
+                  *ngIf="isNbreTrancheVisible()">
     <mat-label>Nombre de tranches</mat-label>
     <input
       matInput
       type="number"
       formControlName="nbre_tranche_facturation"
       min="1">
+    <mat-error *ngIf="form.get('nbre_tranche_facturation')?.hasError('required')">
+      Nombre de tranches obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
+  <!-- 6) Zone de couverture -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="isZoneCouvertureVisible()">
+    <mat-label>Zone de couverture</mat-label>
+    <mat-select formControlName="zone_couverture" matTooltip="Zone de couverture">
+      <mat-option *ngFor="let item of zoneCouvertures" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('zone_couverture')?.hasError('required')">
+      Zone de couverture obligatoire
+    </mat-error>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- 7) Puissance sortie (W) -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="isPuissanceSortieVisible()">
+    <mat-label>Puissance sortie (W)</mat-label>
+    <input matInput type="number" formControlName="puissance_sortie">
+    <mat-error *ngIf="form.get('puissance_sortie')?.hasError('required')">
+      Puissance sortie obligatoire
+    </mat-error>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
+  <!-- 8) Bande de fréquence -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="isTypeBandeFrequenceVisible()">
+    <mat-label>Bande de fréquence</mat-label>
+    <mat-select formControlName="type_bande_frequence" matTooltip="Bande de fréquence">
+      <mat-option *ngFor="let item of typeBandeFrequences" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('type_bande_frequence')?.hasError('required')">
+      Bande de fréquence obligatoire
+    </mat-error>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
 
 </mat-dialog-content>
 
