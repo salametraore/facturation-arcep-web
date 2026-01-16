@@ -1,5 +1,11 @@
 export class StatutFicheTechnique {
-  id?: number;            // facultatif car souvent généré par la base
+  id?: number;
   code?: string;
   libelle?: string;
 }
+
+export class StatutFicheTechniqueRequest {
+  code?: string;
+  libelle?: string;
+}
+

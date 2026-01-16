@@ -1,1 +1,145 @@
-<p>tarif-frais-dossier-crud works!</p>
+<!-- src/app/features/parametrage/tarif-frais-dossier/tarif-frais-dossier-crud/tarif-frais-dossier-crud.component.html -->
+
+<mat-card>
+
+  <!-- Titre de page -->
+  <div class="page-title">
+    <h2>{{ title }}</h2>
+  </div>
+
+  <!-- Messages d'erreur -->
+  <div *ngIf="errorMessage?.length > 0" class="alert-box">
+    <div *ngFor="let msg of errorMessage" class="alert-line">
+      <mat-icon class="alert-icon">error</mat-icon>
+      <span>{{ msg }}</span>
+    </div>
+  </div>
+
+  <!-- Bloc formulaire -->
+  <section class="list-box">
+    <div class="list-header">
+      <h3 class="list-title">
+        <ng-container *ngIf="data_operation===operations.create">Nouvel enregistrement</ng-container>
+        <ng-container *ngIf="data_operation===operations.update">Mise à jour</ng-container>
+        <ng-container *ngIf="data_operation===operations.details">Détails</ng-container>
+      </h3>
+    </div>
+
+    <div class="list-body">
+      <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+        <!-- Produit -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Produit</mat-label>
+          <mat-select
+            formControlName="produit"
+            matTooltip="Produit"
+            [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let p of produits" [value]="p.id">
+              {{ p.libelle }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Quantité min -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Quantité minimale</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="quantite_min"
+            placeholder="Quantité min"
+            matTooltip="Quantité minimale"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Quantité max -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Quantité maximale</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="quantite_max"
+            placeholder="Quantité max"
+            matTooltip="Quantité maximale"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Prix unitaire -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Prix unitaire</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="prix_unitaire"
+            placeholder="Prix unitaire"
+            matTooltip="Prix unitaire"
+            [readonly]="data_operation===operations.details"
+            required>
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Montant max par dossier -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Montant max par dossier</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="montant_max_par_dossier"
+            placeholder="Montant max par dossier"
+            matTooltip="Montant max par dossier"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Zone -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Zone</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="zone"
+            placeholder="Zone"
+            matTooltip="Zone"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <!-- Actions -->
+        <div class="form-actions">
+
+          <!-- Enregistrer (create/update seulement) -->
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid"
+            *ngIf="data_operation===operations.create || data_operation===operations.update">
+            <mat-icon>save</mat-icon>
+            {{ bouton_names.save }}
+          </button>
+
+          <!-- Fermer / Annuler -->
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            mat-dialog-close>
+            <mat-icon>close</mat-icon>
+            {{ bouton_names.cancel }}
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+</mat-card>

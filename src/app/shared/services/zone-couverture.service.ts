@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ZoneCouverture } from '../models/zone-couverture';
+import {ZoneCouverture, ZoneCouvertureDetailRequest} from '../models/zone-couverture';
 import { AppConfigService } from '../../core/config/app-config.service';
 
 @Injectable({ providedIn: 'root' })
@@ -17,8 +17,8 @@ export class ZoneCouvertureService {
     return `${this.cfg.baseUrl.replace(/\/$/, '')}/zone-couverture`;
   }
 
-  create(zoneCouverture: ZoneCouverture): Observable<ZoneCouverture> {
-    return this.http.post<ZoneCouverture>(`${this.baseUrl}/`, zoneCouverture);
+  create(zoneCouvertureRequest: ZoneCouvertureDetailRequest): Observable<ZoneCouverture> {
+    return this.http.post<ZoneCouverture>(`${this.baseUrl}/`, zoneCouvertureRequest);
   }
 
   getListItems(): Observable<ZoneCouverture[]> {
@@ -29,8 +29,8 @@ export class ZoneCouvertureService {
     return this.http.get<ZoneCouverture>(`${this.baseUrl}/${id}/`);
   }
 
-  update(id: number, zoneCouverture: ZoneCouverture): Observable<ZoneCouverture> {
-    return this.http.put<ZoneCouverture>(`${this.baseUrl}/${id}/`, zoneCouverture);
+  update(id: number, zoneCouvertureRequest: ZoneCouvertureDetailRequest): Observable<ZoneCouverture> {
+    return this.http.put<ZoneCouverture>(`${this.baseUrl}/${id}/`, zoneCouvertureRequest);
   }
 
   delete(id: number): Observable<void> {

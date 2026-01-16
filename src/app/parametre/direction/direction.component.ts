@@ -8,6 +8,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Direction } from '../../shared/models/direction';
 import { DirectionsService } from '../../shared/services/directions.services';
 import { DirectionCrudComponent } from './direction-crud/direction-crud.component';
+import {TypeDirection} from "../../shared/models/typeDirection";
+import {TypeDirectionsService} from "../../shared/services/type-directions.services";
 
 @Component({
   selector: 'app-direction',           // ✅ important : selector correct
@@ -18,12 +20,14 @@ export class DirectionComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['id', 'libelle', 'type_direction', 'actions'];
   dataSource = new MatTableDataSource<Direction>([]);
   loading = false;
+  typeDirections: TypeDirection[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private api: DirectionsService,
+    private typeApi: TypeDirectionsService,
     private dialog: MatDialog
   ) {
     // ✅ filtre : sur toutes les colonnes (défini tôt)
@@ -57,6 +61,13 @@ export class DirectionComponent implements OnInit, AfterViewInit {
       },
       error: () => (this.loading = false)
     });
+
+    this.typeApi.getItems().subscribe({
+      next: (rows) => (this.typeDirections = rows ?? []),
+      error: () => (this.typeDirections = [])
+    });
+
+
   }
 
   applyFilter(value: string): void {
@@ -100,5 +111,9 @@ export class DirectionComponent implements OnInit, AfterViewInit {
     this.api.delete(row.id).subscribe({
       next: () => this.load()
     });
+  }
+
+  getLibelleTypeDirection(id: number) {
+    return this.typeDirections?.find(types => types.id === id).libelle;
   }
 }

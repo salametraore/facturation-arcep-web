@@ -85,7 +85,7 @@ export class MainNavComponent implements OnInit {
 
   /* ---------------- MENU DATA ---------------- */
   menuItems: MenuItem[] = [
-/*    {
+    {
       id: 10,
       direction: 100,
       titre: 'Paramétrage',
@@ -171,7 +171,30 @@ export class MainNavComponent implements OnInit {
               feuille: 1,
               sous_menus: null,
               url: 'parametre/produits'
+            },
+            {
+              id: 1025,
+              direction: 5555,
+              titre: 'Les zones de couverture',
+              description: 'Les zones de couverture',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/zone-couverture'
+            },
+            {
+              id: 1025,
+              direction: 5555,
+              titre: 'Les statuts des fiches techniques',
+              description: 'Les statuts des fiches techniques',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/statut-fiche-technique'
             }
+
           ]
         },
 
@@ -186,28 +209,73 @@ export class MainNavComponent implements OnInit {
           feuille: 0,
           url: null,
           sous_menus: [
-            /!*{
+            {
               id: 1005,
               direction: 5555,
-              titre: 'Les catégories de station',
-              description: 'Les catégories de station',
+              titre: 'Les types de station',
+              description: 'Les types de station',
               actif: 'OUI',
               module: 0,
               feuille: 1,
               sous_menus: null,
-              url: 'parametre/categorie-stations'
+              url: 'parametre/type-stations'
             },
             {
               id: 1010,
               direction: 5555,
-              titre: 'Les zones de couverture des radio',
-              description: 'Les zones de couverture des radio',
+              titre: 'Les types de canaux',
+              description: 'Les types de canaux',
               actif: 'OUI',
               module: 0,
               feuille: 1,
               sous_menus: null,
-              url: 'parametre/zone-couvertures'
-            }*!/
+              url: 'parametre/type-canaux'
+            },
+            {
+              id: 1010,
+              direction: 5555,
+              titre: 'Les types de bande de fréquence',
+              description: 'Les types de bande de fréquence',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/type-bandes-frequence'
+            },
+            {
+              id: 1010,
+              direction: 5555,
+              titre: 'Les classes de débits',
+              description: 'Les classes de débits',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/classe-debit'
+            },
+            {
+              id: 1010,
+              direction: 5555,
+              titre: 'Les classes de largeur de bande',
+              description: 'Les classes de largeur de bande',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/classe-largeur-bande'
+            },
+            {
+              id: 1010,
+              direction: 5555,
+              titre: 'Les classes de puissance',
+              description: 'Les classes de puissance',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/classe-puissance'
+            }
+
           ]
         },
 
@@ -222,7 +290,7 @@ export class MainNavComponent implements OnInit {
           feuille: 0,
           url: null,
           sous_menus: [
-           /!* {
+            {
               id: 1030,
               direction: 5555,
               titre: 'Les tarifs frais de dossier',
@@ -242,9 +310,9 @@ export class MainNavComponent implements OnInit {
               module: 0,
               feuille: 1,
               sous_menus: null,
-              url: 'parametre/tarif-frais-redevances'
+              url: 'parametre/tarif-redevances-gestion'
             },
-            {
+/*            {
               id: 1040,
               direction: 5555,
               titre: 'Les garanties',
@@ -254,45 +322,22 @@ export class MainNavComponent implements OnInit {
               feuille: 1,
               sous_menus: null,
               url: 'parametre/garanties'
-            },
+            },*/
             {
               id: 1045,
               direction: 5555,
-              titre: 'Les tarifs des fréquences',
-              description: 'Les tarifs des fréquences',
+              titre: 'Les tarifs liés aux fréquences',
+              description: 'Les tarifss liés aux fréquences',
               actif: 'OUI',
               module: 0,
               feuille: 1,
               sous_menus: null,
-              url: 'parametre/tarif-frequences'
-            }*!/
+              url: 'parametre/regles-tarif-frequences'
+            }
           ]
         },
 
-        // ===================== ZONES / POSTAL =====================
-    /!*    {
-          id: 1400,
-          direction: 5555,
-          titre: 'Zonage',
-          description: 'Paramètres de zones et découpage',
-          actif: 'OUI',
-          module: 0,
-          feuille: 0,
-          url: null,
-          sous_menus: [
-            {
-              id: 1015,
-              direction: 5555,
-              titre: 'Les zones postales',
-              description: 'Les zones postales',
-              actif: 'OUI',
-              module: 0,
-              feuille: 1,
-              sous_menus: null,
-              url: 'parametre/zone-postales'
-            }
-          ]
-        },*!/
+
 
         // ===================== SECURITE / UTILISATEURS =====================
         {
@@ -315,12 +360,23 @@ export class MainNavComponent implements OnInit {
               feuille: 1,
               sous_menus: null,
               url: 'parametre/roles-page'
+            },
+            {
+              id: 1050,
+              direction: 5555,
+              titre: 'Les utilisateurs',
+              description: 'Les utilisateurs',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/utilisateurs'
             }
           ]
         }
 
       ]
-    },*/
+    },
     {
       id: 20, direction: 0, titre: 'Fiches Techniques', description: 'Fiches Techniques',
       actif: 'OUI', module: 1, feuille: 0,
@@ -645,6 +701,9 @@ export class MainNavComponent implements OnInit {
     this.roleUtilisateurConnecte = this.authService.getConnectedUtilisateurRole();
     console.log(" main nav : utilisateurConnecte");
     console.log(this.utilisateurConnecte);
+
+    console.log(" main nav : roleUtilisateurConnecte");
+    console.log(this.roleUtilisateurConnecte);
   }
 
   /* ------- mapping d'icônes (méthode de classe, PAS de "function") ------- */

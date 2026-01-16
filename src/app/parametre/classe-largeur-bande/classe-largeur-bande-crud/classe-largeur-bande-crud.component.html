@@ -1,0 +1,141 @@
+<!-- src/app/features/parametrage/classe-largeur-bande/classe-largeur-bande-crud/classe-largeur-bande-crud.component.html -->
+
+<mat-card>
+
+  <!-- Titre -->
+  <div class="page-title">
+    <h2>{{ title }}</h2>
+  </div>
+
+  <!-- Messages d'erreur -->
+  <div *ngIf="errorMessage?.length > 0" class="alert-box">
+    <div *ngFor="let msg of errorMessage" class="alert-line">
+      <mat-icon class="alert-icon">error</mat-icon>
+      <span>{{ msg }}</span>
+    </div>
+  </div>
+
+  <!-- Bloc formulaire -->
+  <section class="list-box">
+
+    <div class="list-header">
+      <h3 class="list-title">
+        <ng-container *ngIf="data_operation===operations.create">Nouvel enregistrement</ng-container>
+        <ng-container *ngIf="data_operation===operations.update">Mise à jour</ng-container>
+        <ng-container *ngIf="data_operation===operations.details">Détails</ng-container>
+      </h3>
+    </div>
+
+    <div class="list-body">
+
+      <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+        <!-- Code -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Code</mat-label>
+          <input
+            matInput
+            appUppercase
+            formControlName="code"
+            placeholder="Code"
+            matTooltip="Code"
+            [readonly]="data_operation===operations.details"
+            required>
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Libellé -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Libellé</mat-label>
+          <input
+            matInput
+            appUppercase
+            formControlName="libelle"
+            placeholder="Libellé"
+            matTooltip="Libellé"
+            [readonly]="data_operation===operations.details"
+            required>
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Catégorie produit -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Catégorie produit</mat-label>
+          <mat-select
+            formControlName="categorie_produit"
+            matTooltip="Catégorie produit"
+            [disabled]="data_operation===operations.details">
+
+            <mat-option [value]="null">-- Aucune --</mat-option>
+
+            <mat-option *ngFor="let item of categorieProduits" [value]="item.id">
+              {{ item.libelle }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- LB min -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>LB min (MHz)</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="lb_min_mhz"
+            placeholder="LB min (MHz)"
+            matTooltip="LB min (MHz)"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- LB max -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>LB max (MHz)</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="lb_max_mhz"
+            placeholder="LB max (MHz)"
+            matTooltip="LB max (MHz)"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Actif -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Actif</mat-label>
+          <mat-select formControlName="actif" [disabled]="data_operation===operations.details">
+            <mat-option [value]="true">Oui</mat-option>
+            <mat-option [value]="false">Non</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid"
+            *ngIf="data_operation===operations.create || data_operation===operations.update">
+            <mat-icon>save</mat-icon>
+            {{ bouton_names.save }}
+          </button>
+
+          <button mat-stroked-button color="warn" type="button" mat-dialog-close>
+            <mat-icon>close</mat-icon>
+            {{ bouton_names.cancel }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </section>
+
+</mat-card>

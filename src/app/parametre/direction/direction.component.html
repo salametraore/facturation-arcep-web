@@ -72,7 +72,7 @@
           <!-- Type direction (ID) -->
           <ng-container matColumnDef="type_direction">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Type direction</th>
-            <td mat-cell *matCellDef="let row">{{ row.type_direction }}</td>
+            <td mat-cell *matCellDef="let row">{{ getLibelleTypeDirection(row.type_direction) }}</td>
           </ng-container>
 
           <!-- Actions -->

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TypeBandeFrequenceList } from '../models/typeBandeFrequenceList';
 import { AppConfigService } from '../../core/config/app-config.service';
-import {TypeBandeFrequenceDetail} from "../models/typeBandeFrequenceDetail";
+import {TypeBandeFrequence,TypeBandeFrequenceRequest} from "../models/typeBandeFrequenceDetail";
 
 @Injectable({ providedIn: 'root' })
 export class TypeBandesFrequenceService {
@@ -18,20 +17,20 @@ export class TypeBandesFrequenceService {
     return `${this.cfg.baseUrl.replace(/\/$/, '')}/type-bandes-frequence`;
   }
 
-  create(typeBandeFrequenceList: TypeBandeFrequenceDetail): Observable<TypeBandeFrequenceDetail> {
-    return this.http.post<TypeBandeFrequenceDetail>(`${this.baseUrl}/`, typeBandeFrequenceList);
+  create(typeBandeFrequenceRequest: TypeBandeFrequenceRequest): Observable<TypeBandeFrequence> {
+    return this.http.post<TypeBandeFrequence>(`${this.baseUrl}/`, typeBandeFrequenceRequest);
   }
 
-  getListItems(): Observable<TypeBandeFrequenceList[]> {
-    return this.http.get<TypeBandeFrequenceList[]>(`${this.baseUrl}/`);
+  getListItems(): Observable<TypeBandeFrequence[]> {
+    return this.http.get<TypeBandeFrequence[]>(`${this.baseUrl}/`);
   }
 
-  getItem(id: number): Observable<TypeBandeFrequenceDetail> {
-    return this.http.get<TypeBandeFrequenceDetail>(`${this.baseUrl}/${id}/`);
+  getItem(id: number): Observable<TypeBandeFrequence> {
+    return this.http.get<TypeBandeFrequence>(`${this.baseUrl}/${id}/`);
   }
 
-  update(id: number, typeBandeFrequenceList: TypeBandeFrequenceDetail): Observable<TypeBandeFrequenceDetail> {
-    return this.http.put<TypeBandeFrequenceDetail>(`${this.baseUrl}/${id}/`, typeBandeFrequenceList);
+  update(id: number, typeBandeFrequenceRequest: TypeBandeFrequenceRequest): Observable<TypeBandeFrequence> {
+    return this.http.put<TypeBandeFrequence>(`${this.baseUrl}/${id}/`, typeBandeFrequenceRequest);
   }
 
   delete(id: number): Observable<void> {

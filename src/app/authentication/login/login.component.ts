@@ -121,7 +121,7 @@ export class LoginComponent implements OnInit {
         // Optionnel : this.authService.setToken(response.token);
 
         const user$ = this.utilisateurService
-          .getUtisateurByUsername(email)
+          .getUtilisateurByUsername(email)
           .pipe(take(1));
 
         const role$ = this.utilisateurRoleRoleService

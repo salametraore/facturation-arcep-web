@@ -22,14 +22,14 @@ import {
 } from "./tarif-frais-dossier/tarif-frais-dossier-crud/tarif-frais-dossier-crud.component";
 import {TarifFraisDossierComponent} from "./tarif-frais-dossier/tarif-frais-dossier.component";
 import {
-  TarifFraisRedevanceCrudComponent
-} from "./tarif-frais-redevance/tarif-frais-redevance-crud/tarif-frais-redevance-crud.component";
-import {TarifFraisRedevanceComponent} from "./tarif-frais-redevance/tarif-frais-redevance.component";
-import {TarifFrequenceCrudComponent} from "./tarif-frequence/tarif-frequence-crud/tarif-frequence-crud.component";
-import {TarifFrequenceComponent} from "./tarif-frequence/tarif-frequence.component";
+  TarifRedevanceGestionCrudComponent
+} from "./tarif-redevance-gestion/tarif-redevance-gestion-crud/tarif-redevance-gestion-crud.component";
+import {TarifRedevanceGestionComponent} from "./tarif-redevance-gestion/tarif-redevance-gestion.component";
+import {ReglesTarifFrequenceCrudComponent} from "./regles-tarif-frequence/regles-tarif-frequence-crud/regles-tarif-frequence-crud.component";
+import {ReglesTarifFrequenceComponent} from "./regles-tarif-frequence/regles-tarif-frequence.component";
 import {ZoneCouvertureCrudComponent} from "./zone-couverture/zone-couverture-crud/zone-couverture-crud.component";
-import {ZonePostaleCrudComponent} from "./zone-postale/zone-postale-crud/zone-postale-crud.component";
-import {ZonePostaleComponent} from "./zone-postale/zone-postale.component";
+import {StatutFicheTechniqueCrudComponent} from "./statut-fiche-technique/statut-fiche-technique-crud/statut-fiche-technique-crud.component";
+import {StatutFicheTechniqueComponent} from "./statut-fiche-technique/statut-fiche-technique.component";
 import {ZoneCouvertureComponent} from "./zone-couverture/zone-couverture.component";
 import {CategorieStationComponent} from "./categorie-station/categorie-station.component";
 import {RoleCrudComponent} from "./roles/role-crud/role-crud.component";
@@ -42,6 +42,20 @@ import {TypeDirectionCrudComponent} from "./type-direction/type-direction-crud/t
 import {TypeDirectionComponent} from "./type-direction/type-direction.component";
 import {DirectionComponent} from "./direction/direction.component";
 import {DirectionCrudComponent} from "./direction/direction-crud/direction-crud.component";
+import {TypeStationsCrudComponent} from "./type-stations/type-stations-crud/type-stations-crud.component";
+import {TypeStationsComponent} from "./type-stations/type-stations.component";
+import {TypeCanauxCrudComponent} from "./type-canaux/type-canaux-crud/type-canaux-crud.component";
+import {TypeCanauxComponent} from "./type-canaux/type-canaux.component";
+import {TypeBandesFrequenceComponent} from "./type-bandes-frequence/type-bandes-frequence.component";
+import {TypeBandesFrequenceCrudComponent} from "./type-bandes-frequence/type-bandes-frequence-crud/type-bandes-frequence-crud.component";
+import {ClasseDebitComponent} from "./classe-debit/classe-debit.component";
+import {ClasseDebitCrudComponent} from "./classe-debit/classe-debit-crud/classe-debit-crud.component";
+import {ClassePuissanceComponent} from "./classe-puissance/classe-puissance.component";
+import {ClassePuissanceCrudComponent} from "./classe-puissance/classe-puissance-crud/classe-puissance-crud.component";
+import {ClasseLargeurBandeComponent} from "./classe-largeur-bande/classe-largeur-bande.component";
+import {ClasseLargeurBandeCrudComponent} from "./classe-largeur-bande/classe-largeur-bande-crud/classe-largeur-bande-crud.component";
+import {UtilisateursComponent} from "./utilisateurs/utilisateurs.component";
+import {UtilisateursCrudComponent} from "./utilisateurs/utilisateurs-crud/utilisateurs-crud.component";
 
 @NgModule({
   declarations: [
@@ -60,13 +74,13 @@ import {DirectionCrudComponent} from "./direction/direction-crud/direction-crud.
     ProduitComponent,
     TarifFraisDossierCrudComponent,
     TarifFraisDossierComponent,
-    TarifFraisRedevanceCrudComponent,
-    TarifFraisRedevanceComponent,
-    TarifFrequenceCrudComponent,
-    TarifFrequenceComponent,
+    TarifRedevanceGestionCrudComponent,
+    TarifRedevanceGestionComponent,
+    ReglesTarifFrequenceCrudComponent,
+    ReglesTarifFrequenceComponent,
     ZoneCouvertureCrudComponent,
-    ZonePostaleCrudComponent,
-    ZonePostaleComponent,
+    StatutFicheTechniqueCrudComponent,
+    StatutFicheTechniqueComponent,
     ZoneCouvertureComponent,
     CategorieStationComponent,
     RolesPageComponent,
@@ -77,6 +91,20 @@ import {DirectionCrudComponent} from "./direction/direction-crud/direction-crud.
     TypeDirectionCrudComponent,
     DirectionComponent,
     DirectionCrudComponent,
+    TypeStationsCrudComponent,
+    TypeCanauxCrudComponent,
+    TypeStationsComponent,
+    TypeCanauxComponent,
+    TypeBandesFrequenceComponent,
+    TypeBandesFrequenceCrudComponent,
+    ClasseDebitComponent,
+    ClasseDebitCrudComponent,
+    ClassePuissanceComponent,
+    ClassePuissanceCrudComponent,
+    ClasseLargeurBandeComponent,
+    ClasseLargeurBandeCrudComponent,
+    UtilisateursComponent,
+    UtilisateursCrudComponent,
   ],
   imports: [
     CommonModule,

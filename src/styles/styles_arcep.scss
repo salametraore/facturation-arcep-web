@@ -2094,3 +2094,12 @@ dashboard resumé client
   display: grid;
   gap: 4px;
 }
+
+
+.role-crud-scroll {
+  max-height: 70vh;   // ajuste : 60vh / 75vh selon ton écran
+  overflow: auto;
+  padding-right: 8px; // évite que la scrollbar masque le contenu
+}
+
+

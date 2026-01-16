@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TypeStation } from '../models/type-station';
+import {TypeStation, TypeStationRequest} from '../models/type-station';
 import { AppConfigService } from '../../core/config/app-config.service';
 
 @Injectable({ providedIn: 'root' })
@@ -21,11 +21,11 @@ export class TypeStationService {
     return this.http.get<TypeStation>(`${this.baseUrl}/${id}/`);
   }
 
-  create(data: TypeStation): Observable<TypeStation> {
+  create(data: TypeStationRequest): Observable<TypeStation> {
     return this.http.post<TypeStation>(`${this.baseUrl}/`, data);
   }
 
-  update(id: number, value: TypeStation): Observable<TypeStation> {
+  update(id: number, value: TypeStationRequest): Observable<TypeStation> {
     return this.http.put<TypeStation>(`${this.baseUrl}/${id}/`, value);
   }
 

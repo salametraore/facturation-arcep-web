@@ -1,8 +1,10 @@
+// src/app/shared/services/role.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Operation, RequestPostRole, Role } from '../models/droits-utilisateur';
+import { Operation } from '../models/operation.model';
+import { Role, RoleRequest } from '../models/role.model';
 import { AppConfigService } from '../../core/config/app-config.service';
 
 @Injectable({ providedIn: 'root' })
@@ -13,16 +15,20 @@ export class RoleService {
     private cfg: AppConfigService
   ) {}
 
-  /** Base URLs normalisées */
-  private get urlRoles(): string {
-    return `${this.cfg.baseUrl.replace(/\/$/, '')}/roles`;
-  }
-  private get urlOperations(): string {
-    return `${this.cfg.baseUrl.replace(/\/$/, '')}/operations`;
+  private get base(): string {
+    return this.cfg.baseUrl.replace(/\/$/, '');
   }
 
-  create(role: Role): Observable<Role> {
-    return this.http.post<Role>(`${this.urlRoles}/`, role);
+  private get urlRoles(): string {
+    return `${this.base}/roles`;
+  }
+  private get urlOperations(): string {
+    return `${this.base}/operations`;
+  }
+
+  /** CREATE : backend attend RoleRequest */
+  create(payload: RoleRequest): Observable<Role> {
+    return this.http.post<Role>(`${this.urlRoles}/`, payload);
   }
 
   getListItems(): Observable<Role[]> {
@@ -33,18 +39,16 @@ export class RoleService {
     return this.http.get<Role>(`${this.urlRoles}/${id}/`);
   }
 
-  update(id: number, role: Role): Observable<Role> {
-    return this.http.put<Role>(`${this.urlRoles}/${id}/`, role);
+  /** UPDATE : backend attend RoleRequest */
+  update(id: number, payload: RoleRequest): Observable<Role> {
+    return this.http.put<Role>(`${this.urlRoles}/${id}/`, payload);
   }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.urlRoles}/${id}/`);
   }
 
-  creerRoleAvecOperations(requestPostRole: RequestPostRole): Observable<RequestPostRole> {
-    return this.http.post<RequestPostRole>(`${this.urlRoles}/`, requestPostRole);
-  }
-
+  /** LIST opérations */
   getListeOperations(): Observable<Operation[]> {
     return this.http.get<Operation[]>(`${this.urlOperations}/`);
   }

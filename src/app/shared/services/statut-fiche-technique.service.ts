@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { StatutFicheTechnique } from '../models/statut-fiche-technique';
+import {StatutFicheTechnique, StatutFicheTechniqueRequest} from '../models/statut-fiche-technique';
 import { AppConfigService } from '../../core/config/app-config.service';
 
 @Injectable({ providedIn: 'root' })
@@ -28,12 +28,12 @@ export class StatutFicheTechniqueService {
   }
 
   // CREATE
-  create(data: StatutFicheTechnique): Observable<StatutFicheTechnique> {
+  create(data: StatutFicheTechniqueRequest): Observable<StatutFicheTechnique> {
     return this.http.post<StatutFicheTechnique>(`${this.baseUrl}/`, data);
   }
 
   // UPDATE
-  update(id: number, data: StatutFicheTechnique): Observable<StatutFicheTechnique> {
+  update(id: number, data: StatutFicheTechniqueRequest): Observable<StatutFicheTechnique> {
     return this.http.put<StatutFicheTechnique>(`${this.baseUrl}/${id}/`, data);
   }
 

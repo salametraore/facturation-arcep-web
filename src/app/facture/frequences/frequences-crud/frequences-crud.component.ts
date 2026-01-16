@@ -57,8 +57,8 @@ import {CategorieProduitService} from '../../../shared/services/categorie-produi
 import {ProduitService} from '../../../shared/services/produits.service';
 import {ClientService} from '../../../shared/services/client.service';
 import {StatutFicheTechniqueService} from '../../../shared/services/statut-fiche-technique.service';
-import {TypeBandeFrequenceList} from '../../../shared/models/typeBandeFrequenceList';
-import {TypeCanalList} from '../../../shared/models/typeCanalList';
+import {TypeBandeFrequence,TypeBandeFrequenceRequest} from '../../../shared/models/typeBandeFrequenceDetail';
+import {TypeCanal} from '../../../shared/models/typeCanal';
 import {TypeStation} from '../../../shared/models/type-station';
 import {TypeBandesFrequenceService} from '../../../shared/services/type-bandes-frequence.service';
 import {TypeStationService} from '../../../shared/services/type-station.service';
@@ -135,10 +135,10 @@ export class FrequencesCrudComponent implements OnInit {
   statutFicheTechnique: StatutFicheTechnique;
   historiqueFicheTechniques: HistoriqueFicheTechnique[];
 
-  typeBandeFrequences: TypeBandeFrequenceList[];
-  typeBandeFrequence: TypeBandeFrequenceList;
-  typeCanaux: TypeCanalList[];
-  tyepCanal: TypeCanalList;
+  typeBandeFrequences: TypeBandeFrequence[];
+  typeBandeFrequence: TypeBandeFrequence;
+  typeCanaux: TypeCanal[];
+  tyepCanal: TypeCanal;
   typeStations: TypeStation[];
   typeStation: TypeStation;
   zoneCouvertures: ZoneCouverture[];
@@ -254,7 +254,7 @@ export class FrequencesCrudComponent implements OnInit {
       this.historiqueFicheTechniques = [];
     }
 
-    this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanalList[]) => {
+    this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanal[]) => {
       this.typeCanaux = listeCanaux;
     });
 
@@ -262,7 +262,7 @@ export class FrequencesCrudComponent implements OnInit {
       this.typeStations = listeTypeStations;
     });
 
-    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
+    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequence[]) => {
       this.typeBandeFrequences = listeTypeBandesFreq;
     });
 

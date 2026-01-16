@@ -1,0 +1,268 @@
+<!-- src/app/features/parametrage/regles-tarif-frequence/regles-tarif-frequence-crud/regles-tarif-frequence-crud.component.html -->
+
+<mat-card>
+
+  <!-- Titre -->
+  <div class="page-title">
+    <h2>{{ title }}</h2>
+  </div>
+
+  <!-- Messages d'erreur -->
+  <div *ngIf="errorMessage?.length > 0" class="alert-box">
+    <div *ngFor="let msg of errorMessage" class="alert-line">
+      <mat-icon class="alert-icon">error</mat-icon>
+      <span>{{ msg }}</span>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <section class="list-box">
+
+    <div class="list-header">
+      <h3 class="list-title">
+        <ng-container *ngIf="data_operation===operations.create">Nouvel enregistrement</ng-container>
+        <ng-container *ngIf="data_operation===operations.update">Mise à jour</ng-container>
+        <ng-container *ngIf="data_operation===operations.details">Détails</ng-container>
+      </h3>
+    </div>
+
+    <div class="list-body">
+      <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+        <!-- Catégorie -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Catégorie produit</mat-label>
+          <mat-select formControlName="categorie_produit"
+                      matTooltip="Catégorie produit"
+                      [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let item of categorieProduits" [value]="item.id">
+              {{ item.libelle }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Produit -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Produit</mat-label>
+          <mat-select formControlName="produit"
+                      matTooltip="Produit"
+                      [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let p of produits" [value]="p.id">
+              {{ p.libelle }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Objet -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Objet</mat-label>
+          <mat-select formControlName="objet"
+                      matTooltip="Objet"
+                      [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let o of objets" [value]="o">
+              {{ labelObjet(o) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Nature -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nature de frais</mat-label>
+          <mat-select formControlName="nature_frais"
+                      matTooltip="Nature de frais"
+                      [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let n of natures" [value]="n">
+              {{ labelNature(n) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Unité -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Unité de facturation</mat-label>
+          <mat-select formControlName="unite_facturation"
+                      matTooltip="Unité de facturation"
+                      [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let u of unites" [value]="u">
+              {{ labelUnite(u) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Tranches (nb_min / nb_max) -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nombre min (tranche)</mat-label>
+          <input matInput type="number" formControlName="nb_min"
+                 placeholder="Ex : 1" matTooltip="Nombre min"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nombre max (tranche)</mat-label>
+          <input matInput type="number" formControlName="nb_max"
+                 placeholder="Ex : 5" matTooltip="Nombre max"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Montants -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Montant unitaire</mat-label>
+          <input matInput type="number" formControlName="montant_unitaire"
+                 placeholder="Montant unitaire" matTooltip="Montant unitaire"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Plafond par dossier</mat-label>
+          <input matInput type="number" formControlName="plafond_par_dossier"
+                 placeholder="Plafond par dossier" matTooltip="Plafond par dossier"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Montant minimum par réseau</mat-label>
+          <input matInput type="number" formControlName="montant_min_par_reseau"
+                 placeholder="Montant min réseau" matTooltip="Montant min réseau"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Coefficients -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Coeff. simplex</mat-label>
+          <input matInput type="number" formControlName="coeff_simplex"
+                 placeholder="Coeff simplex" matTooltip="Coeff simplex"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Coeff. zone</mat-label>
+          <input matInput type="number" formControlName="coeff_zone"
+                 placeholder="Coeff zone" matTooltip="Coeff zone"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Coeff. bande</mat-label>
+          <input matInput type="number" formControlName="coeff_bande"
+                 placeholder="Coeff bande" matTooltip="Coeff bande"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Coeff. global</mat-label>
+          <input matInput type="number" formControlName="coeff_global"
+                 placeholder="Coeff global" matTooltip="Coeff global"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Scope plafond -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Scope plafond</mat-label>
+          <mat-select formControlName="scope_plafond"
+                      matTooltip="Scope plafond"
+                      [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let s of scopes" [value]="s">
+              {{ labelScope(s) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Priorité + Actif -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Priorité</mat-label>
+          <input matInput type="number" formControlName="priorite"
+                 placeholder="Priorité" matTooltip="Priorité"
+                 [readonly]="data_operation===operations.details">
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Actif</mat-label>
+          <mat-select formControlName="actif"
+                      matTooltip="Actif"
+                      [disabled]="data_operation===operations.details">
+            <mat-option [value]="true">Oui</mat-option>
+            <mat-option [value]="false">Non</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Référentiels optionnels (station/canal/bande/zone/...) -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Type station</mat-label>
+          <mat-select formControlName="type_station"
+                      matTooltip="Type station"
+                      [disabled]="data_operation===operations.details">
+            <mat-option [value]="null">--</mat-option>
+            <mat-option *ngFor="let x of typeStations" [value]="x.id">{{ x.libelle }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Type canal</mat-label>
+          <mat-select formControlName="type_canal"
+                      matTooltip="Type canal"
+                      [disabled]="data_operation===operations.details">
+            <mat-option [value]="null">--</mat-option>
+            <mat-option *ngFor="let x of typeCanaux" [value]="x.id">{{ x.libelle }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Bande de fréquence</mat-label>
+          <mat-select formControlName="type_bande_frequence"
+                      matTooltip="Bande de fréquence"
+                      [disabled]="data_operation===operations.details">
+            <mat-option [value]="null">--</mat-option>
+            <mat-option *ngFor="let x of typeBandes" [value]="x.id">{{ x.libelle }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Commentaire -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Commentaire</mat-label>
+          <textarea matInput rows="3" formControlName="commentaire"
+                    placeholder="Commentaire"
+                    matTooltip="Commentaire"
+                    [readonly]="data_operation===operations.details"></textarea>
+        </mat-form-field>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button mat-flat-button color="primary"
+                  type="submit"
+                  [disabled]="form.invalid"
+                  *ngIf="data_operation===operations.create || data_operation===operations.update">
+            <mat-icon>save</mat-icon>
+            {{ bouton_names.save }}
+          </button>
+
+          <button mat-stroked-button color="warn" type="button" mat-dialog-close>
+            <mat-icon>close</mat-icon>
+            {{ bouton_names.cancel }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+</mat-card>

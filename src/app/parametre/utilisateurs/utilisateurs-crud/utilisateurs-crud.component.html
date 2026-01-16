@@ -1,0 +1,139 @@
+<!-- src/app/type-directions/pages/type-direction/utilisateurs-crud/utilisateurs-crud.component.html -->
+
+<mat-card>
+
+  <div class="page-title">
+    <h2>{{ title }}</h2>
+  </div>
+
+  <!-- Messages d'erreur -->
+  <div *ngIf="errorMessage?.length > 0" class="alert-box">
+    <div *ngFor="let msg of errorMessage" class="alert-line">
+      <mat-icon class="alert-icon">error</mat-icon>
+      <span>{{ msg }}</span>
+    </div>
+  </div>
+
+  <section class="list-box">
+
+    <div class="list-header">
+      <h3 class="list-title">
+        <ng-container *ngIf="data_operation===operations.create">Nouvel enregistrement</ng-container>
+        <ng-container *ngIf="data_operation===operations.update">Mise à jour</ng-container>
+        <ng-container *ngIf="data_operation===operations.details">Détails</ng-container>
+      </h3>
+    </div>
+
+    <div class="list-body">
+
+      <div class="role-crud-scroll">
+        <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+          <!-- Username -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" placeholder="Username"
+                   matTooltip="Username"
+                   [readonly]="isDetails()" required>
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Nom -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Nom</mat-label>
+            <input matInput appUppercase formControlName="last_name" placeholder="Nom"
+                   [readonly]="isDetails()">
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Prénom -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Prénom</mat-label>
+            <input matInput appUppercase formControlName="first_name" placeholder="Prénom"
+                   [readonly]="isDetails()">
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Téléphone -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Téléphone</mat-label>
+            <input matInput formControlName="telephone" placeholder="Téléphone"
+                   [readonly]="isDetails()">
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Email -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="Email"
+                   [readonly]="isDetails()">
+            <mat-error *ngIf="form.get('email')?.hasError('email')">Email invalide</mat-error>
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Direction -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Direction</mat-label>
+            <mat-select formControlName="direction" [disabled]="isDetails()">
+              <mat-option [value]="null">—</mat-option>
+              <mat-option *ngFor="let d of typeDirections" [value]="d.id">
+                {{ d.libelle }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Rôles (multi select) -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Rôles</mat-label>
+            <mat-select formControlName="liste_roles" multiple [disabled]="isDetails()">
+              <mat-option *ngFor="let r of roles" [value]="r.id">
+                {{ r.libelle }} <span *ngIf="r.code">({{ r.code }})</span>
+              </mat-option>
+            </mat-select>
+            <mat-hint *ngIf="!isDetails()">Sélection multiple possible</mat-hint>
+          </mat-form-field>
+
+          <div class="blank-row"></div>
+
+          <!-- Mot de passe -->
+          <mat-form-field appearance="outline" class="w-full" *ngIf="data_operation!==operations.details">
+            <mat-label>Mot de passe</mat-label>
+            <input matInput type="password" formControlName="password"
+                   [required]="data_operation===operations.create"
+                   placeholder="Mot de passe">
+            <mat-hint *ngIf="data_operation===operations.update">
+              Laisser vide pour ne pas modifier
+            </mat-hint>
+          </mat-form-field>
+
+          <!-- Actions -->
+          <div class="form-actions">
+
+            <button mat-flat-button color="primary" type="submit"
+                    [disabled]="form.invalid"
+                    *ngIf="data_operation===operations.create || data_operation===operations.update">
+              <mat-icon>save</mat-icon>
+              {{ bouton_names.save }}
+            </button>
+
+            <button mat-stroked-button color="warn" type="button" mat-dialog-close>
+              <mat-icon>close</mat-icon>
+              {{ bouton_names.cancel }}
+            </button>
+
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+</mat-card>

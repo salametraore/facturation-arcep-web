@@ -1,5 +1,11 @@
 export class ZoneCouverture {
-  readonly id?: number;
+   id?: number;
+  code?: string;
+  libelle?: string;
+  categorie_produit?: number;
+}
+
+export class ZoneCouvertureDetailRequest {
   code?: string;
   libelle?: string;
   categorie_produit?: number;

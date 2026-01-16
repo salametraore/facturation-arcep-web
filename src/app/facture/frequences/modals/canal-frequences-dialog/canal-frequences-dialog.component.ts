@@ -13,9 +13,9 @@ import { FicheTechniqueCanalRequest } from '../../../../shared/models/fiche-tech
 import { buildCanalFG } from '../../forms/frequences.form';
 import { CATEGORY_CONFIG } from '../../config/frequences-category.config';
 
-import { TypeCanalList } from '../../../../shared/models/typeCanalList';
+import { TypeCanal } from '../../../../shared/models/typeCanal';
 import { TypeStation } from '../../../../shared/models/type-station';
-import { TypeBandeFrequenceList } from '../../../../shared/models/typeBandeFrequenceList';
+import { TypeBandeFrequence } from '../../../../shared/models/typeBandeFrequenceDetail';
 import { TypeBandesFrequenceService } from '../../../../shared/services/type-bandes-frequence.service';
 import { TypeStationService } from '../../../../shared/services/type-station.service';
 import { TypeCanauxService } from '../../../../shared/services/type-canaux.service';
@@ -42,8 +42,8 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
   cfg = CATEGORY_CONFIG[1 as CategoryId];
   private destroy$ = new Subject<void>();
 
-  typeBandeFrequences: TypeBandeFrequenceList[] = [];
-  typeCanaux: TypeCanalList[] = [];
+  typeBandeFrequences: TypeBandeFrequence[] = [];
+  typeCanaux: TypeCanal[] = [];
   typeStations: TypeStation[] = [];
   zoneCouvertures: ZoneCouverture[] = [];
 
@@ -143,7 +143,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
   loadData(): void {
     const cat = this.data.cat;
 
-    this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanalList[]) => {
+    this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanal[]) => {
       this.typeCanaux = (listeCanaux ?? []).filter(tc => tc.categorie_produit === cat);
 
       // re-apply : permet setTypeCanalByCode quand liste dispo (cat 5)
@@ -155,7 +155,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       this.typeStations = (listeTypeStations ?? []).filter(ts => ts.categorie_produit === cat);
     });
 
-    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
+    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequence[]) => {
       this.typeBandeFrequences = (listeTypeBandesFreq ?? []).filter(bf => bf.categorie_produit === cat);
     });
 

@@ -4,3 +4,9 @@ export class TypeStation {
   libelle?: string;
   categorie_produit?: number;
 }
+
+export class TypeStationRequest {
+  code?: string;
+  libelle?: string;
+  categorie_produit?: number;
+}

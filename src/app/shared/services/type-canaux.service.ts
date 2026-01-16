@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TypeCanalList } from '../models/typeCanalList';
-import { TypeCanalDetail } from '../models/typeCanalDetail';
+import {TypeCanal, TypeCanalRequest} from '../models/typeCanal';
 import { AppConfigService } from '../../core/config/app-config.service';
 
 @Injectable({ providedIn: 'root' })
@@ -18,23 +17,23 @@ export class TypeCanauxService {
     return `${this.cfg.baseUrl.replace(/\/$/, '')}/type-canaux`;
   }
 
-  getItem(id: number): Observable<TypeCanalDetail> {
-    return this.http.get<TypeCanalDetail>(`${this.baseUrl}/${id}/`);
+  getItem(id: number): Observable<TypeCanal> {
+    return this.http.get<TypeCanal>(`${this.baseUrl}/${id}/`);
   }
 
-  create(data: TypeCanalDetail): Observable<TypeCanalDetail> {
-    return this.http.post<TypeCanalDetail>(`${this.baseUrl}/`, data);
+  create(data: TypeCanalRequest): Observable<TypeCanal> {
+    return this.http.post<TypeCanal>(`${this.baseUrl}/`, data);
   }
 
-  update(id: number, value: TypeCanalDetail): Observable<TypeCanalDetail> {
-    return this.http.put<TypeCanalDetail>(`${this.baseUrl}/${id}/`, value);
+  update(id: number, value: TypeCanalRequest): Observable<TypeCanal> {
+    return this.http.put<TypeCanal>(`${this.baseUrl}/${id}/`, value);
   }
 
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}/`, { responseType: 'text' });
   }
 
-  getListItems(): Observable<TypeCanalList[]> {
-    return this.http.get<TypeCanalList[]>(`${this.baseUrl}/`);
+  getListItems(): Observable<TypeCanal[]> {
+    return this.http.get<TypeCanal[]>(`${this.baseUrl}/`);
   }
 }

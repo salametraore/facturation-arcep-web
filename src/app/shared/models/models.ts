@@ -104,7 +104,7 @@ export * from './triggerTypeEnum';
 export * from './type306Enum';
 export * from './typeBandeFrequenceDetail';
 export * from './typeBandeFrequenceList';
-export * from './typeCanalDetail';
+export * from './typeCanal';
 export * from './typeCanalList';
 export * from './typeDirection';
 export * from './typeEb9Enum';

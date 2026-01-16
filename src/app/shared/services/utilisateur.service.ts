@@ -50,7 +50,7 @@ export class UtilisateurService {
     return this.http.get<UtilisateurRole>(`${this.urlUserRoles}/`);
   }
 
-  getUtisateurByUsername(username: string): Observable<Utilisateur> {
+  getUtilisateurByUsername(username: string): Observable<Utilisateur> {
     // Si l’API attend /utilisateurs/by-username/{username}/, adapte ici
     return this.http.get<Utilisateur>(`${this.urlUsers}/${username}/`);
   }

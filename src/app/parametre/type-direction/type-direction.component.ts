@@ -1,4 +1,4 @@
-// src/app/type-directions/pages/type-direction/type-direction.component.ts
+// src/app/type-directions/pages/type-direction/type-bandes-frequence.component.ts
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';

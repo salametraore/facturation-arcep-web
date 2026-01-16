@@ -1,49 +1,36 @@
+// src/app/shared/models/droits-utilisateur.ts
 
-export class Fonctionnalite {
-  id: number;
-  code: string;
-  libelle: string;
-}
+// ✅ On réutilise les modèles officiels
+export * from './fonctionnalite.model';
+export * from './operation.model';
+export * from './role.model';
 
-export class Operation {
-  id: number;
-  code: string;
-  libelle: string;
-  fonctionnalite: Fonctionnalite;
-}
-
-export class Role {
-  id: number;
-  code: string;
-  libelle: string;
-  operations: Operation[];
-}
+// ✅ Typages spécifiques à “droits utilisateur”
+import { Role } from './role.model';
 
 export interface UtilisateurRole {
   id: number;
   utilisateur: string;
-  role: Role[];
+  role: Role;           // ✅ objet (pas tableau)
   created_at: string;
   updated_at: string;
 }
 
 export interface RequestPostRole {
-  id?: number;                 // optionnel, généré par le backend
-  code?: string;               // code interne du rôle
-  libelle: string;             // libellé du rôle (obligatoire)
-  liste_operations: number[];  // liste des IDs d’opérations associées (obligatoire)
+  id?: number;
+  code?: string;
+  libelle: string;
+  liste_operations: number[];
 }
 
-
-export class RequestPostUtilisateur {
-  id?: number;               // optionnel, généré par le backend
-  username: string;          // obligatoire
-  last_name?: string;        // nom de famille
-  first_name?: string;       // prénom
-  telephone?: string;        // téléphone
-  email?: string;            // adresse email
-  direction?: number | null; // ID ou objet Direction selon ton backend
-  password: string;          // obligatoire (writeOnly)
-  liste_roles: number[];     // liste des rôles (writeOnly)
+export interface RequestPostUtilisateur {
+  id?: number;
+  username: string;
+  last_name?: string;
+  first_name?: string;
+  telephone?: string | null;
+  email?: string;
+  direction?: number | null;
+  password: string;
+  liste_roles: number[];
 }
-

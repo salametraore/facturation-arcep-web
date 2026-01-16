@@ -1,0 +1,160 @@
+<!-- src/app/features/parametrage/tarif-redevance-gestion/tarif-redevance-gestion-crud/tarif-redevance-gestion-crud.component.html -->
+
+<mat-card>
+
+  <!-- Titre -->
+  <div class="page-title">
+    <h2>{{ title }}</h2>
+  </div>
+
+  <!-- Messages d'erreur -->
+  <div *ngIf="errorMessage?.length > 0" class="alert-box">
+    <div *ngFor="let msg of errorMessage" class="alert-line">
+      <mat-icon class="alert-icon">error</mat-icon>
+      <span>{{ msg }}</span>
+    </div>
+  </div>
+
+  <!-- Bloc formulaire -->
+  <section class="list-box">
+
+    <div class="list-header">
+      <h3 class="list-title">
+        <ng-container *ngIf="data_operation===operations.create">Nouvel enregistrement</ng-container>
+        <ng-container *ngIf="data_operation===operations.update">Mise à jour</ng-container>
+        <ng-container *ngIf="data_operation===operations.details">Détails</ng-container>
+      </h3>
+    </div>
+
+    <div class="list-body">
+      <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+        <!-- Produit -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Produit</mat-label>
+          <mat-select
+            formControlName="produit"
+            matTooltip="Produit"
+            [disabled]="data_operation===operations.details">
+            <mat-option *ngFor="let p of produits" [value]="p.id">
+              {{ p.libelle }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Zone -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Zone</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="zone"
+            placeholder="Zone"
+            matTooltip="Zone"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Puissance min -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Puissance min</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="puissance_min"
+            placeholder="Puissance min"
+            matTooltip="Puissance min"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Puissance max -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Puissance max</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="puissance_max"
+            placeholder="Puissance max"
+            matTooltip="Puissance max"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Prix unitaire -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Prix unitaire</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="prix_unitaire"
+            placeholder="Prix unitaire"
+            matTooltip="Prix unitaire"
+            [readonly]="data_operation===operations.details"
+            required>
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Montant min réseau -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Montant min réseau</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="montant_min_reseau"
+            placeholder="Montant min réseau"
+            matTooltip="Montant min réseau"
+            [readonly]="data_operation===operations.details">
+        </mat-form-field>
+
+        <div class="blank-row"></div>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            rows="3"
+            formControlName="component_desc"
+            placeholder="Description"
+            matTooltip="Description"
+            [readonly]="data_operation===operations.details">
+          </textarea>
+        </mat-form-field>
+
+        <!-- Actions -->
+        <div class="form-actions">
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid"
+            *ngIf="data_operation===operations.create || data_operation===operations.update">
+            <mat-icon>save</mat-icon>
+            {{ bouton_names.save }}
+          </button>
+
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            mat-dialog-close>
+            <mat-icon>close</mat-icon>
+            {{ bouton_names.cancel }}
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+
+  </section>
+
+</mat-card>

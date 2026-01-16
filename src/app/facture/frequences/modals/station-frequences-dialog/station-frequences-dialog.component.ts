@@ -13,7 +13,7 @@ import { buildStationFG } from '../../forms/frequences.form';
 import { CATEGORY_CONFIG } from '../../config/frequences-category.config';
 
 import { TypeStation } from '../../../../shared/models/type-station';
-import { TypeBandeFrequenceList } from '../../../../shared/models/typeBandeFrequenceList';
+import { TypeBandeFrequence } from '../../../../shared/models/typeBandeFrequenceDetail';
 import { TypeBandesFrequenceService } from '../../../../shared/services/type-bandes-frequence.service';
 import { TypeStationService } from '../../../../shared/services/type-station.service';
 
@@ -39,7 +39,7 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   title = 'Ajouter une station';
 
-  typeBandeFrequences: TypeBandeFrequenceList[] = [];
+  typeBandeFrequences: TypeBandeFrequence[] = [];
   typeStations: TypeStation[] = [];
   typeStationSeelectione: TypeStation;
   zoneCouvertures: ZoneCouverture[] = [];
@@ -116,7 +116,7 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
       // NB: on ne dépend plus de cette liste pour le code (on passe par getItem)
     });
 
-    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequenceList[]) => {
+    this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequence[]) => {
       this.typeBandeFrequences = (listeTypeBandesFreq ?? []).filter(bf => bf.categorie_produit === cat);
     });
 
