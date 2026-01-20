@@ -1,7 +1,7 @@
 // src/app/facture/frequences/frequences-crud/frequences-crud.component.ts
 
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {FormArray, FormBuilder, FormGroup, FormControl} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 
 import {MatTable} from '@angular/material/table';
@@ -68,7 +68,7 @@ import {ZoneCouvertureService} from '../../../shared/services/zone-couverture.se
 import {Utilisateur} from "../../../shared/models/utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
 import {FicheTechniqueCanal, FicheTechniqueStation} from "../../../shared/models/fiche-technique-frequence";
-import {finalize, mapTo, switchMap, tap} from 'rxjs/operators';
+import {startWith, map,finalize, mapTo, switchMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'frequences-crud',
@@ -128,6 +128,10 @@ export class FrequencesCrudComponent implements OnInit {
 
   clients: Client[];
   client: Client;
+
+  clientSearchCtrl = new FormControl<any>(''); // string ou Client
+  filteredClients: Client[] = [];
+
   categories: CategorieProduit[];
   categoriesFiltered: CategorieProduit[];
   categorie: CategorieProduit;
@@ -159,6 +163,8 @@ export class FrequencesCrudComponent implements OnInit {
   resultatCalcul?: CalculFraisFrequenceResult;
   loadingCalcul = false;
   errorCalcul = '';
+
+  transmitLocked = false;
 
   private stationIdToNo = new Map<number, number>();
   private canalIdToNo = new Map<number, number>();
@@ -196,6 +202,39 @@ export class FrequencesCrudComponent implements OnInit {
 
   get canauxFA(): FormArray {
     return getCanauxFA(this.form);
+  }
+
+  displayClient = (c: Client | null): string => {
+    return c?.denomination_sociale ?? '';
+  };
+
+  private filterClients(value: any): Client[] {
+    const q = (typeof value === 'string' ? value : value?.denomination_sociale ?? '')
+      .toLowerCase()
+      .trim();
+
+    if (!q) return this.clients ?? [];
+
+    return (this.clients ?? []).filter(c =>
+        (c?.denomination_sociale ?? '').toLowerCase().includes(q)
+      // tu peux enrichir : || (c?.ifu ?? '').includes(q) etc.
+    );
+  }
+
+  onClientSelected(c: Client): void {
+    if (!c) return;
+
+    // 1) on stocke l'ID dans le formGroup métier
+    this.ficheFG.get('client')?.setValue(c.id);
+
+    // 2) on garde l'objet pour tes usages
+    this.onGetClient(c);
+  }
+
+  clearClientSelection(): void {
+    this.clientSearchCtrl.setValue('');
+    this.ficheFG.get('client')?.setValue(null);
+    this.client = undefined as any; // optionnel si tu veux vider
   }
 
   ngOnInit(): void {
@@ -241,7 +280,28 @@ export class FrequencesCrudComponent implements OnInit {
     });
 
     this.clientService.getItems().subscribe((clients: Client[]) => {
-      this.clients = clients;
+      this.clients = clients ?? [];
+
+      // init liste filtrée
+      this.filteredClients = this.clients;
+
+      // écoute des saisies
+      this.clientSearchCtrl.valueChanges
+        .pipe(
+          startWith(''),
+          map(v => this.filterClients(v))
+        )
+        .subscribe(list => (this.filteredClients = list));
+
+      // si en update et client déjà connu, pré-remplir le champ texte
+      const clientId = this.ficheFG?.get('client')?.value;
+      if (clientId) {
+        const found = this.clients.find(x => x.id === clientId);
+        if (found) {
+          this.clientSearchCtrl.setValue(found, { emitEvent: false });
+          this.onGetClient(found);
+        }
+      }
     });
 
     if (this.ficheTechnique?.id) {
@@ -321,6 +381,8 @@ export class FrequencesCrudComponent implements OnInit {
     this.loading = false;
     this.errorMsg = '';
 
+    this.transmitLocked = false;
+
     const ficheFreq: Partial<FicheTechniqueFrequenceCreateRequest> = {
       client: null,
       categorie_produit: null,
@@ -369,6 +431,8 @@ export class FrequencesCrudComponent implements OnInit {
     this.loading = true;
     this.errorMsg = '';
 
+    this.transmitLocked = false;
+    
     this.fichesTechniquesFrequenceService.getDetailFicheTechniqueFrequence(this.ficheTechnique.id).subscribe({
       next: (fiche: FicheTechniqueFrequenceDetail) => {
         console.log("fiche initUpdate");
@@ -828,12 +892,20 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
 
-  onTransmettre() {
+  onTransmettre(): void {
     const ficheId = this.ficheTechnique?.id;
     if (!ficheId) {
-      this.dialogService.alert({message: "Aucune fiche sélectionnée."});
+      this.dialogService.alert({ message: "Aucune fiche sélectionnée." });
       return;
     }
+
+    // ✅ anti double-clic
+    if (this.loadingCalcul || this.transmitLocked) {
+      return;
+    }
+
+    // on verrouille dès le clic
+    this.loadingCalcul = true;
 
     // 1) payload calcul
     const payloadCalcul: CalculFraisFrequenceRequest = {
@@ -846,26 +918,29 @@ export class FrequencesCrudComponent implements OnInit {
     miseAJourStatutFiche.fiche_technique = ficheId;
     miseAJourStatutFiche.statut = 2;
 
-    this.loadingCalcul = true;
-
-    // ✅ calcul d'abord, puis transmission uniquement si succès
     this.fichesTechniquesFrequenceService.calculerFraisFicheTechniqueFrequence(payloadCalcul).pipe(
-      // on ignore le résultat du calcul (mais l’appel est exécuté)
       mapTo(void 0),
-
-      // si calcul OK => transmission
       switchMap(() => this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)),
-
-      tap(() => this.msgMessageService.success("Fiche transmise avec succès !")),
-
-      finalize(() => (this.loadingCalcul = false))
+      tap(() => {
+        // ✅ succès => on verrouille définitivement le bouton
+        this.transmitLocked = true;
+        this.msgMessageService.success("Fiche transmise avec succès !");
+      }),
+      finalize(() => {
+        // ✅ on arrête le chargement
+        // ⚠️ si succès, transmitLocked=true donc bouton restera désactivé
+        this.loadingCalcul = false;
+      })
     ).subscribe({
       next: () => {
-        // rien d'autre
+        // rien
       },
       error: (e) => {
-        // ❌ si calcul échoue, switchMap ne s'exécute jamais => pas de transmission
         console.error('Erreur (calcul ou transmission):', e);
+
+        // ❌ échec => on déverrouille (réactiver bouton)
+        this.transmitLocked = false;
+
         this.dialogService.alert({
           message: e?.message ?? "Le calcul a échoué : la fiche n'a pas été transmise."
         });

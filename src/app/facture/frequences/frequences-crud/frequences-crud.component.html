@@ -21,12 +21,46 @@
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Client</mat-label>
-            <mat-select formControlName="client" matTooltip="Client">
-              <mat-option *ngFor="let item of clients" (click)="onGetClient(item)" [value]="item.id">
-                {{ item?.denomination_sociale }}
+
+            <input
+              type="text"
+              matInput
+              [matAutocomplete]="autoClient"
+              [formControl]="clientSearchCtrl"
+              matTooltip="Client"
+              placeholder="Rechercher un client…">
+
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              aria-label="Effacer"
+              (click)="clearClientSelection()"
+              *ngIf="clientSearchCtrl.value">
+              <mat-icon>close</mat-icon>
+            </button>
+
+            <mat-autocomplete
+                #autoClient="matAutocomplete"
+                [displayWith]="displayClient"
+                (optionSelected)="onClientSelected($event.option.value)">
+
+              <mat-option *ngFor="let c of filteredClients" [value]="c">
+                {{ c?.denomination_sociale }}
               </mat-option>
-            </mat-select>
+
+              <mat-option *ngIf="!filteredClients?.length" disabled>
+                Aucun résultat
+              </mat-option>
+
+            </mat-autocomplete>
+
+            <!-- optionnel : montrer l'erreur si client obligatoire -->
+            <mat-error *ngIf="ficheFG.get('client')?.hasError('required')">
+              Le client est obligatoire
+            </mat-error>
           </mat-form-field>
+
 
           <div class="blank-row"></div>
 
@@ -554,9 +588,11 @@
                 mat-flat-button
                 color="warn"
                 *ngIf="operation===operations.transmettre"
-                (click)="onTransmettre()">
+                (click)="onTransmettre()"
+                [disabled]="loadingCalcul || transmitLocked">
                 <mat-icon>send</mat-icon>
-                Transmettre
+                <span *ngIf="!loadingCalcul; else sendingTpl">Transmettre</span>
+                <ng-template #sendingTpl>Transmission…</ng-template>
               </button>
 
               <button

@@ -27,7 +27,10 @@
     </div>
 
     <div class="list-body">
-      <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+      <div class="role-crud-scroll">
+
+        <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
 
         <!-- Catégorie -->
         <mat-form-field appearance="outline" class="w-full">
@@ -262,7 +265,11 @@
         </div>
 
       </form>
+
+      </div>
+
     </div>
+
   </section>
 
 </mat-card>

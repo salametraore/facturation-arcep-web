@@ -2103,3 +2103,6 @@ dashboard resumé client
 }
 
 
+.mini-field { width: 220px; }
+.search-field { flex: 1; min-width: 320px; }
+.filters-grid { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }

@@ -20,8 +20,21 @@ import { RegleTarifFrequenceService } from '../../shared/services/regle-tarif-fr
 import { DialogService } from '../../shared/services/dialog.service';
 import { MsgMessageServiceService } from '../../shared/services/msg-message-service.service';
 
-// ⚠️ À créer si besoin (CRUD Dialog)
 import { ReglesTarifFrequenceCrudComponent } from './regles-tarif-frequence-crud/regles-tarif-frequence-crud.component';
+import {CategorieProduit} from "../../shared/models/categorie-produit";
+import {CategorieProduitService} from "../../shared/services/categorie-produit.service";
+import {Produit} from "../../shared/models/produit";
+import {ProduitService} from "../../shared/services/produits.service";
+
+
+type ReglesTarifFilter = {
+  q: string;                 // texte
+  categorieId: number | null;
+  produitId: number | null;
+  objet: ObjetEnum | '';
+  tick: number;              // pour forcer même si identique
+};
+
 
 @Component({
   selector: 'regles-tarif-frequence',
@@ -36,19 +49,37 @@ export class ReglesTarifFrequenceComponent implements OnInit, AfterViewInit {
 
   t_Regles = new MatTableDataSource<RegleTarifFrequence>([]);
 
+  categories: CategorieProduit[] = [];
+  categoriesFiltered: CategorieProduit[] = [];
+  frequenceCategorie?: CategorieProduit;
+  produits: Produit[] = [];
+
+  // --- filtres listes (appliqués via bouton/Enter uniquement) ---
+  filterCategorieId: number | null = null;
+  filterProduitId: number | null = null;
+  filterObjet: ObjetEnum | '' = '';
+
+  private filterTick = 0;
+  private lastQuery = ''; // on mémorise le texte saisi (sans filtrer automatiquement)
+
+  // options (alimentées à partir des données chargées)
+  objetOptions: Array<{ value: ObjetEnum, label: string }> = [
+    { value: 'STATION', label: 'Station' },
+    { value: 'CANAL', label: 'Canal' }
+  ];
+
   displayedColumns: string[] = [
-    'priorite',
-    'actif',
+    'categorie_produit',
     'objet',
     'nature_frais',
-    'unite_facturation',
-    'categorie_produit',
     'produit',
     'montant_unitaire',
     'plafond_par_dossier',
     'scope_plafond',
+    'actif',
     'actions'
   ];
+
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -57,16 +88,35 @@ export class ReglesTarifFrequenceComponent implements OnInit, AfterViewInit {
     private regleService: RegleTarifFrequenceService,
     public dialog: MatDialog,
     public dialogService: DialogService,
+    private categorieProduitService: CategorieProduitService,
+    private produitService: ProduitService,
     private msgMessageService: MsgMessageServiceService
   ) {}
 
   ngOnInit(): void {
     this.reloadData();
 
-    // filtre global (inclut labels *_detail si présents)
-    this.t_Regles.filterPredicate = (data: RegleTarifFrequence, filter: string) => {
-      const f = (filter ?? '').trim().toLowerCase();
-      if (!f) return true;
+    // filtre global + filtres listes
+    this.t_Regles.filterPredicate = (data: RegleTarifFrequence, raw: string) => {
+      let f: ReglesTarifFilter;
+
+      try {
+        f = JSON.parse(raw || '{}');
+      } catch {
+        f = { q: (raw ?? ''), categorieId: null, produitId: null, objet: '', tick: 0 };
+      }
+
+      const q = (f.q ?? '').trim().toLowerCase();
+
+      // filtres selects (AND)
+      const okCategorie = f.categorieId == null || data.categorie_produit === f.categorieId;
+      const okProduit   = f.produitId == null   || data.produit === f.produitId;
+      const okObjet     = !f.objet              || data.objet === f.objet;
+
+      if (!okCategorie || !okProduit || !okObjet) return false;
+
+      // texte
+      if (!q) return true;
 
       const blob = [
         data.priorite ?? '',
@@ -74,24 +124,27 @@ export class ReglesTarifFrequenceComponent implements OnInit, AfterViewInit {
         this.labelObjet(data.objet),
         this.labelNatureFrais(data.nature_frais),
         this.labelUniteFacturation(data.unite_facturation),
-        this.getCategorie(data),
-        this.getProduit(data),
+
+        data.categorie_produit_detail?.libelle ?? '',
+        data.produit_detail?.libelle ?? '',
+
         data.montant_unitaire ?? '',
         data.plafond_par_dossier ?? '',
         this.labelScopePlafond(data.scope_plafond),
         data.commentaire ?? '',
-        this.getTypeStation(data),
-        this.getTypeCanal(data),
-        this.getZoneCouverture(data),
-        this.getBandeFrequence(data),
-        this.getClassePuissance(data),
-        this.getClasseDebit(data),
-        this.getCaractereRadio(data),
-        this.getClasseLargeurBande(data),
+
+        data.type_station_detail?.libelle ?? '',
+        data.type_canal_detail?.libelle ?? '',
+        data.zone_couverture_detail?.libelle ?? '',
+        data.type_bande_frequence_detail?.libelle ?? '',
+        data.classe_puissance_detail?.libelle ?? '',
+        data.classe_debit_detail?.libelle ?? '',
       ].join(' ').toLowerCase();
 
-      return blob.includes(f);
+      return blob.includes(q);
     };
+
+
   }
 
   ngAfterViewInit(): void {
@@ -100,29 +153,88 @@ export class ReglesTarifFrequenceComponent implements OnInit, AfterViewInit {
   }
 
   reloadData(): void {
+
+    // 1) catégories => on calcule frequenceCategorie => ensuite produits
+    this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
+      this.categories = categories ?? [];
+
+      // sécuriser la recherche FREQ (case-insensitive)
+      this.frequenceCategorie = this.categories.find(c => (c.code ?? '').toUpperCase() === 'FREQ') as CategorieProduit;
+
+      this.categoriesFiltered = this.categories
+        .filter(c => (c.id ?? 0) < 8)
+        .sort((a, b) => (a.libelle ?? '').localeCompare(b.libelle ?? '', 'fr', { sensitivity: 'base' }));
+
+      // charger produits seulement quand frequenceCategorie est dispo
+      if (this.frequenceCategorie?.id != null) {
+        this.produitService.getListItems().subscribe((produits: Produit[]) => {
+          const all = produits ?? [];
+          this.produits = all.filter(p => p.categorieProduit === this.frequenceCategorie.id);
+        });
+      } else {
+        this.produits = [];
+        console.warn("Catégorie FREQ introuvable => liste produits vide");
+      }
+    });
+
+    // 2) règles
     this.regleService.getListItems().subscribe((rows: RegleTarifFrequence[]) => {
       this.t_Regles.data = rows ?? [];
       if (this.t_Regles.paginator) this.t_Regles.paginator.firstPage();
+      this.applyFilters();
     });
   }
 
-  /** ✅ Pour (keyup)="applyFilter($event)" */
-  applyFilter(event: Event): void {
-    const value = (event.target as HTMLInputElement)?.value ?? '';
-    this.setFilter(value);
+
+  // --- Handlers selects : NE FILTRE PAS, juste set la valeur ---
+  onCategorieChange(v: any): void {
+    this.filterCategorieId = (v === null || v === '' || v === undefined) ? null : Number(v);
   }
 
-  /** ✅ Pour (click)="setFilter(input.value)" */
+  onObjetChange(v: any): void {
+    this.filterObjet = (v === null || v === '' || v === undefined) ? '' : (v as ObjetEnum);
+  }
+
+  onProduitChange(v: any): void {
+    this.filterProduitId = (v === null || v === '' || v === undefined) ? null : Number(v);
+  }
+
+  /** Appliquer filtre via bouton/Enter */
   setFilter(value: string): void {
-    this.t_Regles.filter = (value ?? '').trim().toLowerCase();
+    this.applyFilters(value);
+  }
+
+  resetFilter(input?: HTMLInputElement): void {
+    if (input) input.value = '';
+    this.applyFilters('');
+  }
+
+  resetAllFilters(input?: HTMLInputElement): void {
+    if (input) input.value = '';
+    this.filterCategorieId = null;
+    this.filterObjet = '';
+    this.filterProduitId = null;
+    this.applyFilters('');
+  }
+
+  applyFilters(query?: string): void {
+    if (query !== undefined) {
+      this.lastQuery = query;
+    }
+
+    const payload: ReglesTarifFilter = {
+      q: (this.lastQuery ?? '').trim().toLowerCase(),
+      categorieId: this.filterCategorieId,
+      produitId: this.filterProduitId,
+      objet: this.filterObjet,
+      tick: ++this.filterTick,
+    };
+
+    this.t_Regles.filter = JSON.stringify(payload);
+
     if (this.t_Regles.paginator) this.t_Regles.paginator.firstPage();
   }
 
-  /** ✅ Pour (click)="resetFilter(input)" */
-  resetFilter(input?: HTMLInputElement): void {
-    if (input) input.value = '';
-    this.setFilter('');
-  }
 
   crud(regle?: RegleTarifFrequence | null, operation?: string): void {
     const dialogConfig = new MatDialogConfig();
@@ -195,17 +307,17 @@ export class ReglesTarifFrequenceComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // ---------- Helpers détails (API renvoie souvent *_detail) ----------
+  // ---------- Helpers détails ----------
   private detailLabel(d: any): string {
     return d?.libelle ?? d?.code ?? '';
   }
 
   getCategorie(r: RegleTarifFrequence): string {
-    return this.detailLabel((r as any).categorie_produit_detail);
+    return this.detailLabel(r.categorie_produit_detail);
   }
 
   getProduit(r: RegleTarifFrequence): string {
-    return this.detailLabel((r as any).produit_detail);
+    return this.detailLabel(r.produit_detail);
   }
 
   getTypeStation(r: RegleTarifFrequence): string {
@@ -230,14 +342,6 @@ export class ReglesTarifFrequenceComponent implements OnInit, AfterViewInit {
 
   getClasseDebit(r: RegleTarifFrequence): string {
     return this.detailLabel((r as any).classe_debit_detail);
-  }
-
-  getCaractereRadio(r: RegleTarifFrequence): string {
-    return this.detailLabel((r as any).caractere_radio_detail);
-  }
-
-  getClasseLargeurBande(r: RegleTarifFrequence): string {
-    return this.detailLabel((r as any).classe_largeur_bande_detail);
   }
 
   // affichage montant (tolérant si API renvoie string)

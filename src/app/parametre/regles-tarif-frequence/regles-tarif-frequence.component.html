@@ -19,11 +19,38 @@
           #input
           matInput
           placeholder="Objet, nature, unité, catégorie, produit, montant, commentaire…"
-          (keyup)="applyFilter($event)">
+          (keyup.enter)="setFilter(input.value)">
 
         <button mat-icon-button matSuffix type="button" (click)="resetFilter(input)">
           <mat-icon>close</mat-icon>
         </button>
+      </mat-form-field>
+
+      <!-- Catégorie -->
+      <mat-form-field appearance="outline" class="mini-field">
+        <mat-label>Catégorie</mat-label>
+        <mat-select [value]="filterCategorieId" (selectionChange)="onCategorieChange($event.value)">
+          <mat-option [value]="null">Toutes</mat-option>
+          <mat-option *ngFor="let c of (categoriesFiltered ?? [])" [value]="c.id">{{ c.libelle }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Objet -->
+      <mat-form-field appearance="outline" class="mini-field">
+        <mat-label>Objet</mat-label>
+        <mat-select [value]="filterObjet" (selectionChange)="onObjetChange($event.value)">
+          <mat-option [value]="''">Tous</mat-option>
+          <mat-option *ngFor="let o of objetOptions" [value]="o.value">{{ o.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Produit -->
+      <mat-form-field appearance="outline" class="mini-field">
+        <mat-label>Produit</mat-label>
+        <mat-select [value]="filterProduitId" (selectionChange)="onProduitChange($event.value)">
+          <mat-option [value]="null">Tous</mat-option>
+          <mat-option *ngFor="let p of (produits ?? [])" [value]="p.id">{{ p.libelle }}</mat-option>
+        </mat-select>
       </mat-form-field>
 
       <!-- bouton search -->
@@ -31,8 +58,8 @@
         <mat-icon>search</mat-icon>
       </button>
 
-      <!-- bouton reset -->
-      <button mat-mini-fab color="primary" class="action-btn" (click)="resetFilter(input)">
+      <!-- reset global -->
+      <button mat-mini-fab color="primary" class="action-btn" (click)="resetAllFilters(input)">
         <mat-icon>cached</mat-icon>
       </button>
 
@@ -60,7 +87,7 @@
 
         <table mat-table [dataSource]="t_Regles" matSort style="width: 100%">
 
-          <!-- Priorité -->
+          <!-- Priorité (définie mais non affichée car pas dans displayedColumns) -->
           <ng-container matColumnDef="priorite">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Priorité</th>
             <td mat-cell *matCellDef="let r">{{ r.priorite }}</td>
@@ -163,7 +190,7 @@
 
           <!-- Row vide -->
           <tr mat-row *matNoDataRow>
-            <td class="mat-cell" colspan="11">
+            <td class="mat-cell" colspan="9">
               Aucune information trouvée : <strong>{{ input.value }}</strong>
             </td>
           </tr>
