@@ -1,6 +1,8 @@
 // src/app/facture/frequences/forms/frequences.form.ts
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { merge } from 'rxjs';
+import { startWith } from 'rxjs/operators';
 
 import { CategoryId } from '../../../shared/models/frequences-category.types';
 import { CATEGORY_CONFIG, requiredIf } from '../config/frequences-category.config';
@@ -10,7 +12,6 @@ import {
   FicheTechniqueStationRequest,
   FicheTechniqueFrequenceCreateRequest
 } from '../../../shared/models/fiche-technique-frequence-create-request';
-
 
 // ===============================================================
 // 1. FORMULAIRE PRINCIPAL (FicheTechniqueFrequenceCreateRequest)
@@ -45,6 +46,10 @@ export function buildFicheTechniqueFrequenceForm(
       date_fin:           new FormControl(fiche?.date_fin ?? null),
 
       periode:            new FormControl(fiche?.periode ?? null),
+
+      // NB: ton champ nbre_canaux "fiche" existe dans le CRUD, pas ici.
+      // Si tu l'ajoutes au DTO fiche, mets-le ici aussi.
+      // nbre_canaux: new FormControl((fiche as any)?.nbre_canaux ?? null),
     }),
 
     stations: fb.array([]),
@@ -52,11 +57,8 @@ export function buildFicheTechniqueFrequenceForm(
   });
 }
 
-
 // ===============================================================
 // 2. STATION (FicheTechniqueStationRequest)
-// - champs classe_* gardés dans le FormGroup (cachés dans l’UI)
-// - created_at / updated_at / updated_by ABSENTS du FormGroup
 // ---------------------------------------------------------------
 export function buildStationFG(
   fb: FormBuilder,
@@ -101,12 +103,21 @@ export function buildStationFG(
   });
 }
 
-
 // ===============================================================
 // 3. CANAL (FicheTechniqueCanalRequest)
-// - classe_largeur_bande gardé dans le FormGroup (caché)
-// - created_at / updated_at / updated_by ABSENTS du FormGroup
+// - nbre_canaux visible uniquement cat=4
+// - cat=4 => nbre_tranche_facturation calculé automatiquement
 // ---------------------------------------------------------------
+function computeTranchesForCat4(largeurBandeKhz: number, nbreCanaux: number): number {
+  const largeur = Math.max(0, largeurBandeKhz || 0);
+  const canaux = Math.max(1, Math.floor(nbreCanaux || 1));
+
+  const raw = (largeur * canaux) / 25;
+
+  // ✅ entier min 1
+  return Math.max(1, Math.ceil(raw));
+}
+
 export function buildCanalFG(
   fb: FormBuilder,
   c: Partial<FicheTechniqueCanalRequest> = {},
@@ -115,18 +126,40 @@ export function buildCanalFG(
 
   const cfg = CATEGORY_CONFIG[cat].canaux;
 
-  const trancheDefault =
-    cfg.nbre_tranche_facturation?.visible ? (c.nbre_tranche_facturation ?? 1) : (c.nbre_tranche_facturation ?? null);
+  // ✅ on considère que cat=4 => calc si nbre_canaux est visible (cat4 seulement)
+  const isCat4Calc = (cat === 4) && (cfg.nbre_canaux?.visible === true);
 
-  return fb.group({
+  const nbreCanauxDefault =
+    cfg.nbre_canaux?.visible ? (c.nbre_canaux ?? 1) : (c.nbre_canaux ?? null);
+
+  // ✅ cat=4 => tranche calculée ; sinon valeur fournie/saisie
+  const trancheDefault =
+    cfg.nbre_tranche_facturation?.visible
+      ? (
+        c.nbre_tranche_facturation ??
+          (isCat4Calc
+            ? computeTranchesForCat4(toNumber(c.largeur_bande_khz) ?? 0, nbreCanauxDefault ?? 1)
+            : 1)
+      )
+      : (c.nbre_tranche_facturation ?? null);
+
+  const group = fb.group({
     categorie_produit: new FormControl(c.categorie_produit ?? cat),
 
     type_station: new FormControl(c.type_station ?? null, requiredIf(cfg.type_station)),
     type_canal:   new FormControl(c.type_canal ?? null, requiredIf(cfg.type_canal)),
 
+    // ✅ nbre_canaux (existe toujours dans FG mais visible seulement cat=4)
+    nbre_canaux: new FormControl(
+      nbreCanauxDefault,
+      [
+        ...requiredIf(cfg.nbre_canaux),
+        ...(cfg.nbre_canaux?.visible ? [Validators.min(1)] : []),
+      ]
+    ),
+
     zone_couverture: new FormControl(c.zone_couverture ?? null, requiredIf(cfg.zone_couverture)),
 
-    // min(1) seulement si visible (sinon ça peut bloquer la soumission alors que le champ est masqué)
     nbre_tranche_facturation: new FormControl(
       trancheDefault,
       [
@@ -142,11 +175,43 @@ export function buildCanalFG(
 
     mode_duplexage: new FormControl(c.mode_duplexage ?? null, requiredIf(cfg.mode_duplexage)),
 
-    // ✅ AJOUT selon la config (cat 4 & 5 visible/required)
     puissance_sortie: new FormControl(c.puissance_sortie ?? null, requiredIf(cfg.puissance_sortie)),
   });
-}
 
+  // ✅ Auto-calc uniquement cat=4 : nbre_tranche_facturation = largeur_bande_khz * nbre_canaux / 25
+  if (isCat4Calc && cfg.nbre_tranche_facturation?.visible) {
+
+    const canauxCtrl  = group.get('nbre_canaux');
+    const largeurCtrl = group.get('largeur_bande_khz');
+    const trancheCtrl = group.get('nbre_tranche_facturation');
+
+    if (canauxCtrl && largeurCtrl && trancheCtrl) {
+
+      // ✅ champ calculé => pas de saisie manuelle
+      trancheCtrl.disable({ emitEvent: false });
+
+      const recompute = () => {
+        const nCanaux = Math.max(1, Math.floor(toNumber(canauxCtrl.value) ?? 1));
+        const largeur = toNumber(largeurCtrl.value) ?? 0;
+
+        trancheCtrl.setValue(
+          computeTranchesForCat4(largeur, nCanaux),
+          { emitEvent: false }
+        );
+      };
+
+      // ✅ recalcul initial + sur changement des 2 champs
+      merge(canauxCtrl.valueChanges, largeurCtrl.valueChanges)
+        .pipe(startWith(null))
+        .subscribe(() => recompute());
+
+      // 🔥 force une première fois
+      recompute();
+    }
+  }
+
+  return group;
+}
 
 // ===============================================================
 // 4. HELPERS
@@ -163,7 +228,6 @@ function toNumber(v: any): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-
 // ===============================================================
 // 5. MAPPING VERS L’API
 // ---------------------------------------------------------------
@@ -171,13 +235,11 @@ export function formToFicheTechniqueFrequenceCreateRequest(
   form: FormGroup,
   opts?: {
     updatedBy?: number | null;
-    nowIso?: string; // si non fourni => new Date().toISOString()
+    nowIso?: string;
   }
 ): FicheTechniqueFrequenceCreateRequest {
 
   const raw = form.getRawValue();
-  const nowIso = opts?.nowIso ?? new Date().toISOString();
-  const updatedBy = opts?.updatedBy ?? null;
 
   const stations = (raw.stations ?? []).map((s: FicheTechniqueStationRequest) => ({
     ...s,

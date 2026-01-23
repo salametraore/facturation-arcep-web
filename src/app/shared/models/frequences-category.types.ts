@@ -46,10 +46,11 @@ export interface FicheTechniqueStationRuleSet {
 export interface FicheTechniqueCanalRuleSet {
   type_station: FieldRule;
   type_canal: FieldRule;
+  nbre_canaux: FieldRule;
 
   zone_couverture: FieldRule;
 
-  // tranche facturation (ancien nbre_tranche)
+  // tranche facturation
   nbre_tranche_facturation: FieldRule;
 
   // largeur bande

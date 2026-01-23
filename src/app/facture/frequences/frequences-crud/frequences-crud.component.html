@@ -55,12 +55,10 @@
 
             </mat-autocomplete>
 
-            <!-- optionnel : montrer l'erreur si client obligatoire -->
             <mat-error *ngIf="ficheFG.get('client')?.hasError('required')">
               Le client est obligatoire
             </mat-error>
           </mat-form-field>
-
 
           <div class="blank-row"></div>
 
@@ -84,7 +82,7 @@
               [matDatepicker]="pickerStart"
               formControlName="date_debut"
               matTooltip="Date début prévu"
-              placeholder="Date début  prévu"
+              placeholder="Date début prévu"
               required>
             <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
             <mat-datepicker #pickerStart></mat-datepicker>
@@ -99,7 +97,6 @@
 
         </form>
 
-        <!-- Bouton Continuer aligné à droite -->
         <div class="actions-right">
           <button
             mat-flat-button color="primary"
@@ -117,7 +114,6 @@
         <mat-step [completed]="isStationsValid()" label="Les Stations (équipement)">
           <div [formGroup]="form" class="space-y-3">
 
-            <!-- Bouton Ajouter une station aligné à droite -->
             <div class="toolbar-right">
               <button mat-flat-button color="primary" (click)="onOpenStationDialog()">
                 <mat-icon>add</mat-icon>
@@ -217,7 +213,6 @@
 
             </table>
 
-            <!-- Retour / Continuer alignés à droite -->
             <div class="actions-right">
               <button mat-flat-button color="warn" matStepperPrevious>Retour</button>
               <button mat-flat-button color="primary" matStepperNext>Continuer</button>
@@ -231,11 +226,10 @@
         <mat-step [completed]="isCanauxValid()" label="Les Canaux">
           <div [formGroup]="form" class="space-y-3">
 
-            <!-- Bouton Ajouter un canal aligné à droite -->
             <div class="toolbar-right">
               <button mat-flat-button color="primary"
                       (click)="onOpenCanalDialog()"
-                      [disabled]="!hasCanauxToFill()">
+                      [disabled]="!canAddCanal()">
                 <mat-icon>add</mat-icon>
                 Ajouter un canal
               </button>
@@ -263,6 +257,14 @@
                 <th mat-header-cell *matHeaderCellDef> Type canal</th>
                 <td mat-cell *matCellDef="let row; let i=index">
                   {{ getLibelleTypeCanal(row.value.type_canal) }}
+                </td>
+              </ng-container>
+
+              <!-- ✅ nbre_canaux (visible seulement cat=4) -->
+              <ng-container matColumnDef="nbre_canaux" *ngIf="cfg[cat]?.canaux?.nbre_canaux?.visible">
+                <th mat-header-cell *matHeaderCellDef> Nb canaux</th>
+                <td mat-cell *matCellDef="let row; let i=index">
+                  {{ row.value.nbre_canaux }}
                 </td>
               </ng-container>
 
@@ -327,7 +329,6 @@
 
             </table>
 
-            <!-- Retour / Continuer alignés à droite -->
             <div class="actions-right">
               <button mat-flat-button color="warn" matStepperPrevious>Retour</button>
               <button mat-flat-button color="primary" matStepperNext [disabled]="!isCanauxValid()">Continuer</button>
@@ -358,15 +359,14 @@
 
             <div class="recap-grid">
 
-              <!-- ── Stations d’équipement : synthèse + tableau détaillé ── -->
+              <!-- ── Stations ── -->
               <section class="recap-card">
-                <h3>Stations </h3>
+                <h3>Stations</h3>
 
                 <p class="recap-count">
                   {{ stationsFA.length }} station(s)
                 </p>
 
-                <!-- liste courte -->
                 <ul class="recap-list" *ngIf="stationsFA.length">
                   <li *ngFor="let row of stationsFA.controls; let i = index">
                     <strong>N°{{ i + 1 }}</strong> — {{ formatStationLine(row.value) }}
@@ -377,7 +377,6 @@
                   Aucune station saisie.
                 </p>
 
-                <!-- tableau détaillé -->
                 <div *ngIf="stationsFA.length" class="recap-table-wrapper">
                   <table class="recap-table">
                     <thead>
@@ -411,18 +410,25 @@
                       <td *ngIf="cfg[cat]?.stations?.debit_kbps?.visible">
                         {{ row.value.debit_kbps | number:'1.0-0':'fr-FR' }}
                       </td>
+
+                      <!-- ✅ DECIMAL -->
                       <td *ngIf="cfg[cat]?.stations?.largeur_bande_mhz?.visible">
-                        {{ row.value.largeur_bande_mhz }}
+                        {{ row.value.largeur_bande_mhz | number:'1.0-2':'fr-FR' }}
                       </td>
+
                       <td *ngIf="cfg[cat]?.stations?.type_bande_frequence?.visible">
                         {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                       </td>
-                      <td mat-cell *matCellDef="let row; let i=index">
+
+                      <!-- ✅ FIX ALIGN : seulement si visible -->
+                      <td *ngIf="cfg[cat]?.stations?.caractere_radio?.visible">
                         {{ getLibelleCaractereRadio(row.value.caractere_radio) }}
                       </td>
+
                       <td *ngIf="cfg[cat]?.stations?.nbre_tranche?.visible">
                         {{ row.value.nbre_tranche | number:'1.0-0':'fr-FR'}}
                       </td>
+
                       <td *ngIf="cfg[cat]?.stations?.localite?.visible">
                         {{ row.value.localite }}
                       </td>
@@ -432,7 +438,7 @@
                 </div>
               </section>
 
-              <!-- ── Stations canal : synthèse + tableau détaillé ── -->
+              <!-- ── Canaux ── -->
               <section class="recap-card">
                 <h3>Les canaux</h3>
 
@@ -440,7 +446,6 @@
                   {{ canauxFA.length }} canal(aux)
                 </p>
 
-                <!-- liste courte -->
                 <ul class="recap-list" *ngIf="canauxFA.length">
                   <li *ngFor="let row of canauxFA.controls; let i = index">
                     <strong>N°{{ i + 1 }}</strong> — {{ formatCanalLine(row.value) }}
@@ -451,7 +456,6 @@
                   Aucun canal saisi.
                 </p>
 
-                <!-- tableau détaillé -->
                 <div *ngIf="canauxFA.length" class="recap-table-wrapper">
                   <table class="recap-table">
                     <thead>
@@ -459,6 +463,10 @@
                       <th>N°Canal</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_station?.visible">Type station</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_canal?.visible">Type canal</th>
+
+                      <!-- ✅ nbre_canaux (cat=4 only) -->
+                      <th *ngIf="cfg[cat]?.canaux?.nbre_canaux?.visible">Nb canaux</th>
+
                       <th *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">Zone</th>
                       <th *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">Tranches</th>
                       <th *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">Largeur bande</th>
@@ -478,15 +486,24 @@
                       <td *ngIf="cfg[cat]?.canaux?.type_canal?.visible">
                         {{ getLibelleTypeCanal(row.value.type_canal) }}
                       </td>
+
+                      <!-- ✅ nbre_canaux -->
+                      <td *ngIf="cfg[cat]?.canaux?.nbre_canaux?.visible">
+                        {{ row.value.nbre_canaux | number:'1.0-0':'fr-FR' }}
+                      </td>
+
                       <td *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">
                         {{ getLibelleZoneCouverture(row.value.zone_couverture) }}
                       </td>
                       <td *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">
                         {{ row.value.nbre_tranche_facturation | number:'1.0-0':'fr-FR'}}
                       </td>
+
+                      <!-- ✅ DECIMAL -->
                       <td *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">
-                        {{ row.value.largeur_bande_khz | number:'1.0-0':'fr-FR' }}
+                        {{ row.value.largeur_bande_khz | number:'1.0-2':'fr-FR' }}
                       </td>
+
                       <td *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">
                         {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                       </td>
@@ -507,13 +524,11 @@
 
             </div>
 
-
-            <!-- ── FRAIS CALCULÉS : affichage uniquement si fiche déjà créée ── -->
+            <!-- ── FRAIS CALCULÉS ── -->
             <section class="recap-card" *ngIf="!isNew && ficheTechnique?.id">
               <div class="recap-card__header">
                 <h3 class="recap-card__title">Frais calculés</h3>
 
-                <!-- ✅ total + nb lignes sur la même ligne que le titre -->
                 <div *ngIf="!loadingCalcul && resultatCalcul" class="recap-card__meta">
                   <span class="meta-item">
                     Total : <strong>{{ resultatCalcul?.total | number:'1.0-0':'fr-FR' }}</strong>
@@ -534,14 +549,10 @@
                   <table class="recap-table">
                     <thead>
                     <tr>
-
-                      <!-- ✅ nouveaux -->
                       <th>N° Station</th>
                       <th>N° Canal</th>
-
                       <th>Nature</th>
                       <th>Produit</th>
-
                       <th>Base</th>
                       <th>PU</th>
                       <th>Coef</th>
@@ -550,10 +561,6 @@
                     </thead>
                     <tbody>
                     <tr *ngFor="let d of resultatCalcul.details">
-
-                      <!-- ✅ nouveaux (affiche - si null) -->
-                      <!--                      <td>{{ d.station_id ?? '-' }}</td>
-                                            <td>{{ d.canal_id ?? '-' }}</td>-->
                       <td>{{ stationNo(d) }}</td>
                       <td>{{ canalNo(d) }}</td>
 
@@ -573,7 +580,6 @@
 
             <!-- Boutons bas de page -->
             <div class="actions-right recap-actions">
-
 
               <button
                 mat-flat-button
@@ -600,7 +606,6 @@
                 (click)="onRetourListe()">
                 ← Retour à la liste
               </button>
-
 
             </div>
 

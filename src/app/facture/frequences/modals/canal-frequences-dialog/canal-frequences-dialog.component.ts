@@ -4,7 +4,7 @@ import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { Subject, of } from 'rxjs';
+import { Subject, of, merge } from 'rxjs';
 import { takeUntil, switchMap, tap, catchError, distinctUntilChanged } from 'rxjs/operators';
 
 import { CategoryId } from '../../../../shared/models/frequences-category.types';
@@ -62,8 +62,14 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
   showModeDuplexage = false;
   showPuissanceSortie = false;
 
+  // ✅ nbre_canaux (sera visible uniquement si config le permet => cat=4)
+  showNbreCanaux = true;
+
   // ✅ code résolu (via API getItem)
   private selectedTypeStationCode: string | null = null;
+
+  // ✅ mode édition ?
+  private readonly isEditMode: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -74,16 +80,64 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     private typeCanauxService: TypeCanauxService,
     private zoneCouvertureService: ZoneCouvertureService,
     private classeLargeurBande: ClasseLargeurBandeService,
-  ) {}
+  ) {
+    this.isEditMode = !!data?.canal;
+  }
 
   get canalCfg() {
     return this.cfg.canaux;
+  }
+
+  private isCat4(): boolean {
+    return this.data?.cat === 4;
+  }
+
+  /**
+   * ✅ Cat=4
+   * nbre_tranche_facturation = largeur_bande_khz * nbre_canaux / 25
+   * (retour entier avec CEIL, min=1)
+   */
+  private computeTranchesCat4(): number {
+    const largeur = this.toNumber(this.form?.get('largeur_bande_khz')?.value) ?? 0;
+    const canaux = Math.max(1, Math.floor(this.toNumber(this.form?.get('nbre_canaux')?.value) ?? 1));
+
+    const raw = (largeur * canaux) / 25;
+
+    // ✅ règle de rounding : CEIL + min 1
+    return Math.max(1, Math.ceil(raw));
+  }
+
+  private applyCat4AutoCalc(): void {
+    if (!this.isCat4()) return;
+
+    const trancheCtrl = this.form.get('nbre_tranche_facturation');
+    if (!trancheCtrl) return;
+
+    // ✅ on bloque la saisie manuelle (calculé)
+    trancheCtrl.disable({ emitEvent: false });
+
+    const largeurCtrl = this.form.get('largeur_bande_khz');
+    const canauxCtrl = this.form.get('nbre_canaux');
+
+    // ✅ recalcul initial
+    trancheCtrl.setValue(this.computeTranchesCat4(), { emitEvent: false });
+
+    // ✅ recalcul à chaque changement de largeur / nbre_canaux
+    merge(
+      largeurCtrl?.valueChanges ?? of(null),
+      canauxCtrl?.valueChanges ?? of(null),
+    )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        trancheCtrl.setValue(this.computeTranchesCat4(), { emitEvent: false });
+      });
   }
 
   ngOnInit(): void {
     this.title = this.data.canal ? 'Modifier le canal' : 'Ajouter un canal';
     this.cfg = CATEGORY_CONFIG[this.data.cat];
 
+    // ✅ form avec buildCanalFG => contient mode_duplexage, puissance_sortie, nbre_canaux, etc.
     this.form = buildCanalFG(this.fb, this.data.canal ?? {}, this.data.cat);
 
     // classe_largeur_bande calculée à partir de largeur_bande_khz (champ caché)
@@ -91,6 +145,9 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
     // IMPORTANT : charger les listes
     this.loadData();
+
+    // ✅ Cat=4 => applique la formule + disable la saisie
+    this.applyCat4AutoCalc();
 
     // ✅ écoute changement type_station (id) -> getItem(id) -> code -> apply règles
     const typeCtrl = this.form.get('type_station');
@@ -107,7 +164,6 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
             return of(null);
           }
 
-          // ✅ Récupère TypeStation complet (avec code) via API
           return this.typeStationService.getItem(id).pipe(
             tap((ts) => {
               this.selectedTypeStationCode = ts?.code ?? null;
@@ -121,15 +177,13 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe(() => {
-        console.log('type_station=', typeCtrl?.value, 'code=', this.selectedTypeStationCode, 'cat=', this.data.cat);
         this.applyConditionalVisibilityAndValidators();
       });
 
-    // 1ère application (édition / valeur déjà présente)
-    // Si on est en mode édition, on déclenche manuellement le flux
+    // ✅ première application
     const init = typeCtrl?.value;
     if (init != null) {
-      typeCtrl?.setValue(init); // relance valueChanges (et donc getItem)
+      typeCtrl?.setValue(init, { emitEvent: true });
     } else {
       this.applyConditionalVisibilityAndValidators();
     }
@@ -145,12 +199,8 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
     this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanal[]) => {
       this.typeCanaux = (listeCanaux ?? []).filter(tc => tc.categorie_produit === cat);
-
-      // re-apply : permet setTypeCanalByCode quand liste dispo (cat 5)
-      this.applyConditionalVisibilityAndValidators();
     });
 
-    // On garde la liste pour l'affichage (libellés)
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
       this.typeStations = (listeTypeStations ?? []).filter(ts => ts.categorie_produit === cat);
     });
@@ -173,13 +223,23 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       this.form.markAllAsTouched();
       return;
     }
+
+    // ✅ sécurité : recalcul forcé avant sortie
+    if (this.isCat4()) {
+      const trancheCtrl = this.form.get('nbre_tranche_facturation');
+      if (trancheCtrl) {
+        trancheCtrl.enable({ emitEvent: false }); // pour que la valeur soit OK même si certains contrôles attendent enabled
+        trancheCtrl.setValue(this.computeTranchesCat4(), { emitEvent: false });
+        trancheCtrl.disable({ emitEvent: false });
+      }
+    }
+
     const value = this.form.getRawValue() as FicheTechniqueCanalRequest;
     this.dialogRef.close(value);
   }
 
   // -----------------------------
   // Visibilité côté template
-  // => pour cat 3/4/5 : on FORCE la visibilité via flags (même si cfg.visible=false)
   // -----------------------------
   private isCat345(): boolean {
     return this.data.cat === 3 || this.data.cat === 4 || this.data.cat === 5;
@@ -189,6 +249,11 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     if (this.isCat345()) return this.showTypeCanal;
     const base = this.canalCfg?.type_canal?.visible !== false;
     return base && this.showTypeCanal;
+  }
+
+  isNbreCanauxVisible(): boolean {
+    const base = this.canalCfg?.nbre_canaux?.visible !== false;
+    return base && this.showNbreCanaux;
   }
 
   isNbreTrancheVisible(): boolean {
@@ -246,6 +311,12 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     ctrl.updateValueAndValidity({ emitEvent: false });
   }
 
+  private hideButKeepValue(ctrl: any): void {
+    if (!ctrl) return;
+    ctrl.clearValidators();
+    ctrl.updateValueAndValidity({ emitEvent: false });
+  }
+
   private hideAndReset(ctrl: any): void {
     if (!ctrl) return;
     ctrl.clearValidators();
@@ -271,20 +342,16 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     const cat = this.data.cat;
     const code = this.getSelectedTypeStationCode();
 
-    console.log('type_station.code =', code, 'cat=', cat);
-
     const zoneCtrl = this.form.get('zone_couverture');
     const bandeCtrl = this.form.get('type_bande_frequence');
     const duplexCtrl = this.form.get('mode_duplexage');
     const puissanceCtrl = this.form.get('puissance_sortie');
 
-    // d'abord : nettoyer uniquement les validators (sans effacer les valeurs)
     this.clearValidators(zoneCtrl);
     this.clearValidators(bandeCtrl);
     this.clearValidators(duplexCtrl);
     this.clearValidators(puissanceCtrl);
 
-    // defaults (cat 3/4/5 : d’office)
     if (cat === 3 || cat === 4) {
       this.showTypeCanal = true;
       this.showNbreTrancheFact = true;
@@ -293,9 +360,8 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       this.showTypeCanal = true;
       this.showNbreTrancheFact = true;
       this.showLargeurBandeKhz = true;
-      this.showZoneCouverture = true; // d'office
+      this.showZoneCouverture = true;
     } else {
-      // autres catégories : on ne gère pas ici
       this.showTypeCanal = true;
       this.showNbreTrancheFact = true;
       this.showLargeurBandeKhz = true;
@@ -306,26 +372,28 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // reset des champs conditionnels (cat 3/4/5)
     this.showTypeBandeFrequence = false;
     this.showModeDuplexage = false;
     this.showPuissanceSortie = false;
 
-    // zone couverture : false sauf cat5 (d’office) ou règles
     this.showZoneCouverture = (cat === 5);
 
-    // si aucun code (pas encore résolu), on cache tout sauf d’office
     if (!code) {
-      if (cat !== 5) this.hideAndReset(zoneCtrl);
-      this.hideAndReset(bandeCtrl);
-      this.hideAndReset(duplexCtrl);
-      this.hideAndReset(puissanceCtrl);
+      if (this.isEditMode) {
+        if (cat !== 5) this.hideButKeepValue(zoneCtrl);
+        this.hideButKeepValue(bandeCtrl);
+        this.hideButKeepValue(duplexCtrl);
+        this.hideButKeepValue(puissanceCtrl);
+      } else {
+        if (cat !== 5) this.hideAndReset(zoneCtrl);
+        this.hideAndReset(bandeCtrl);
+        this.hideAndReset(duplexCtrl);
+        this.hideAndReset(puissanceCtrl);
+      }
       return;
     }
 
-    // =========================
     // CAT = 3
-    // =========================
     if (cat === 3) {
       if (code === 'TS_TRUNK_BASE') {
         this.showZoneCouverture = true;
@@ -357,9 +425,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // =========================
     // CAT = 4
-    // =========================
     if (cat === 4) {
       if (code === 'TS_MF_HF') {
         this.showPuissanceSortie = true;
@@ -402,9 +468,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // =========================
     // CAT = 5
-    // =========================
     if (cat === 5) {
       if (code === 'TS_RADIO_AN' || code === 'TS_RADIO_MUX') {
         this.setTypeCanalByCode('TC_RADIO');
@@ -423,5 +487,11 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       this.hideAndReset(puissanceCtrl);
       return;
     }
+  }
+
+  private toNumber(v: any): number | null {
+    if (v === null || v === undefined || v === '') return null;
+    const n = typeof v === 'number' ? v : Number(String(v).replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
   }
 }

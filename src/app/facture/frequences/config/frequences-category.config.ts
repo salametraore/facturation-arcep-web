@@ -37,6 +37,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: H(),
       type_canal: V(true),
+      nbre_canaux: H(),
       zone_couverture: V(true),
 
       nbre_tranche_facturation: V(true),
@@ -79,6 +80,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: H(),
       type_canal: H(),
+      nbre_canaux: H(),
       zone_couverture: H(),
 
       nbre_tranche_facturation: H(),
@@ -122,6 +124,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: V(true),
       type_canal: V(true),
+      nbre_canaux: H(),
       zone_couverture: V(false),
 
       nbre_tranche_facturation: V(true),
@@ -166,6 +169,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: V(true),
       type_canal: V(true),
+      nbre_canaux:V(true),
       zone_couverture: V(false),
 
       puissance_sortie:  V(false),
@@ -212,6 +216,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: V(true),
       type_canal: V(true),
+      nbre_canaux: H(),
       zone_couverture: V(false),
 
       puissance_sortie:  V(false),
@@ -253,6 +258,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: H(),
       type_canal: H(),
+      nbre_canaux: H(),
       zone_couverture: H(),
 
       nbre_tranche_facturation: H(),
@@ -295,6 +301,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: H(),
       type_canal: H(),
+      nbre_canaux: H(),
       zone_couverture: H(),
 
       puissance_sortie: H(),
@@ -307,7 +314,6 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       type_bande_frequence: H(),
 
       mode_duplexage: H(),
-
 
     }
   },

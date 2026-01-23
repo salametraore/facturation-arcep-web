@@ -6,6 +6,7 @@ export interface FicheTechniqueCanalRequest {
   categorie_produit: number;
 
   type_canal?: number;
+  nbre_canaux?: number;
   type_station?: number;
 
   zone_couverture?: number;
@@ -128,6 +129,7 @@ export interface FicheTechniqueCanalDetail {
 
   type_station: number;
   type_canal: number;
+  nbre_canaux?: number;
 
   zone_couverture: number;
 

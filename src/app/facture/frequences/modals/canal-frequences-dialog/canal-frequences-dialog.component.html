@@ -38,6 +38,21 @@
 
   <div class="blank-row"></div>
 
+  <!-- ✅ 2bis) Nombre de canaux (CAT=4 uniquement via config) -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="isNbreCanauxVisible()">
+    <mat-label>Nombre de canaux</mat-label>
+    <input matInput type="number" formControlName="nbre_canaux" min="1" step="1">
+    <mat-error *ngIf="form.get('nbre_canaux')?.hasError('required')">
+      Nombre de canaux obligatoire
+    </mat-error>
+    <mat-error *ngIf="form.get('nbre_canaux')?.hasError('min')">
+      Minimum 1
+    </mat-error>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
   <!-- 3) Mode duplexage -->
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="isModeDuplexageVisible()">
@@ -54,14 +69,19 @@
 
   <div class="blank-row"></div>
 
-  <!-- 4) Largeur de bande d'une tranche (kHz) -->
+  <!-- 4) Largeur de bande d'un canal (kHz) -->
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="isLargeurBandeKhzVisible()">
-    <mat-label>Largeur de bande (kHz)</mat-label>
-    <input matInput type="number" formControlName="largeur_bande_khz">
+    <mat-label>Largeur de bande d'un canal (kHz)</mat-label>
+    <input matInput type="number" formControlName="largeur_bande_khz" step="0.01">
     <mat-error *ngIf="form.get('largeur_bande_khz')?.hasError('required')">
       Largeur de bande obligatoire
     </mat-error>
+
+    <!-- ✅ info formule cat=4 -->
+    <mat-hint *ngIf="data.cat === 4">
+      Calcul automatique : tranches = (largeur × nb canaux) / 25
+    </mat-hint>
   </mat-form-field>
 
   <div class="blank-row"></div>
@@ -69,12 +89,13 @@
   <!-- 5) Nombre de tranches (facturation) -->
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="isNbreTrancheVisible()">
-    <mat-label>Nombre de tranches</mat-label>
+    <mat-label>Nombre de tranches de facturation</mat-label>
     <input
       matInput
       type="number"
       formControlName="nbre_tranche_facturation"
-      min="1">
+      min="1"
+      [disabled]="data.cat === 4">
     <mat-error *ngIf="form.get('nbre_tranche_facturation')?.hasError('required')">
       Nombre de tranches obligatoire
     </mat-error>

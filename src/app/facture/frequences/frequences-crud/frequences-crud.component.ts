@@ -3,16 +3,17 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, FormControl} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
-
 import {MatTable} from '@angular/material/table';
 
 import {FicheTechniques, MiseAJourStatutFiche} from '../../../shared/models/ficheTechniques';
 
 import {
   CategoryId,
-  CategoryRuleSet, FicheTechniqueCanalRuleSet,
+  CategoryRuleSet,
+  FicheTechniqueCanalRuleSet,
   FicheTechniqueStationRuleSet
 } from '../../../shared/models/frequences-category.types';
+
 import {
   CalculFraisFrequenceRequest,
   CalculFraisFrequenceResult,
@@ -57,7 +58,7 @@ import {CategorieProduitService} from '../../../shared/services/categorie-produi
 import {ProduitService} from '../../../shared/services/produits.service';
 import {ClientService} from '../../../shared/services/client.service';
 import {StatutFicheTechniqueService} from '../../../shared/services/statut-fiche-technique.service';
-import {TypeBandeFrequence,TypeBandeFrequenceRequest} from '../../../shared/models/typeBandeFrequenceDetail';
+import {TypeBandeFrequence} from '../../../shared/models/typeBandeFrequenceDetail';
 import {TypeCanal} from '../../../shared/models/typeCanal';
 import {TypeStation} from '../../../shared/models/type-station';
 import {TypeBandesFrequenceService} from '../../../shared/services/type-bandes-frequence.service';
@@ -65,10 +66,10 @@ import {TypeStationService} from '../../../shared/services/type-station.service'
 import {TypeCanauxService} from '../../../shared/services/type-canaux.service';
 import {ZoneCouverture} from '../../../shared/models/zone-couverture';
 import {ZoneCouvertureService} from '../../../shared/services/zone-couverture.service';
-import {Utilisateur} from "../../../shared/models/utilisateur";
-import {AuthService} from "../../../authentication/auth.service";
-import {FicheTechniqueCanal, FicheTechniqueStation} from "../../../shared/models/fiche-technique-frequence";
-import {startWith, map,finalize, mapTo, switchMap, tap} from 'rxjs/operators';
+import {Utilisateur} from '../../../shared/models/utilisateur';
+import {AuthService} from '../../../authentication/auth.service';
+import {FicheTechniqueCanal, FicheTechniqueStation} from '../../../shared/models/fiche-technique-frequence';
+import {startWith, map, finalize, mapTo, switchMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'frequences-crud',
@@ -83,7 +84,6 @@ export class FrequencesCrudComponent implements OnInit {
   @Output() notifyActionOperation = new EventEmitter<string>();
   @Output() notifyFicheTechnique = new EventEmitter<FicheTechniques>();
 
-  // 🔹 Colonnes alignées avec les nouveaux modèles / configs
   displayedColumnsStations: string[] = [
     'no',
     'type_station',
@@ -102,6 +102,10 @@ export class FrequencesCrudComponent implements OnInit {
     'no',
     'type_station',
     'type_canal',
+
+    // ✅ nbre_canaux (cat=4 uniquement via config)
+    'nbre_canaux',
+
     'zone_couverture',
     'nbre_tranche_facturation',
     'largeur_bande_khz',
@@ -111,17 +115,14 @@ export class FrequencesCrudComponent implements OnInit {
     'actions'
   ];
 
-
   @ViewChild('stationsTable') stationsTable: MatTable<any>;
   @ViewChild('canauxTable') canauxTable: MatTable<any>;
 
   form: FormGroup;
 
-
   cat: CategoryId;
   cfg = CATEGORY_CONFIG;
-
-  cfgRecap: Record<CategoryId, CategoryRuleSet> = CATEGORY_CONFIG ;
+  cfgRecap: Record<CategoryId, CategoryRuleSet> = CATEGORY_CONFIG;
 
   loading = false;
   errorMsg = '';
@@ -148,18 +149,15 @@ export class FrequencesCrudComponent implements OnInit {
   zoneCouvertures: ZoneCouverture[];
   zoneCouverture: ZoneCouverture;
 
-  // Gestion création / visibilité des steps
   isNew = true;
   showStationsStep = false;
   showCanauxStep = false;
-  showTarifsStep = false; // utilisé comme "step 4 : Récap"
+  showTarifsStep = false;
 
-  // 🔹 Stepper linéaire uniquement jusqu'à la validation de la fiche
   isLinear = true;
 
   utilisateurConnecte: Utilisateur;
 
-  // Résultat calcul frais (affiché uniquement si fiche déjà créée)
   resultatCalcul?: CalculFraisFrequenceResult;
   loadingCalcul = false;
   errorCalcul = '';
@@ -188,20 +186,19 @@ export class FrequencesCrudComponent implements OnInit {
     private statutFicheTechniqueService: StatutFicheTechniqueService,
     private msgMessageService: MsgMessageServiceService,
     private authService: AuthService,
-  ) {
-  }
+  ) {}
 
-  // Getters pratiques
+  // Getters pratiques (safe)
   get ficheFG(): FormGroup {
-    return this.form.get('fiche') as FormGroup;
+    return this.form?.get('fiche') as FormGroup;
   }
 
   get stationsFA(): FormArray {
-    return getStationsFA(this.form);
+    return this.form ? getStationsFA(this.form) : this.fb.array([]);
   }
 
   get canauxFA(): FormArray {
-    return getCanauxFA(this.form);
+    return this.form ? getCanauxFA(this.form) : this.fb.array([]);
   }
 
   displayClient = (c: Client | null): string => {
@@ -216,8 +213,7 @@ export class FrequencesCrudComponent implements OnInit {
     if (!q) return this.clients ?? [];
 
     return (this.clients ?? []).filter(c =>
-        (c?.denomination_sociale ?? '').toLowerCase().includes(q)
-      // tu peux enrichir : || (c?.ifu ?? '').includes(q) etc.
+      (c?.denomination_sociale ?? '').toLowerCase().includes(q)
     );
   }
 
@@ -225,7 +221,7 @@ export class FrequencesCrudComponent implements OnInit {
     if (!c) return;
 
     // 1) on stocke l'ID dans le formGroup métier
-    this.ficheFG.get('client')?.setValue(c.id);
+    this.ficheFG?.get('client')?.setValue(c.id);
 
     // 2) on garde l'objet pour tes usages
     this.onGetClient(c);
@@ -233,19 +229,18 @@ export class FrequencesCrudComponent implements OnInit {
 
   clearClientSelection(): void {
     this.clientSearchCtrl.setValue('');
-    this.ficheFG.get('client')?.setValue(null);
-    this.client = undefined as any; // optionnel si tu veux vider
+    this.ficheFG?.get('client')?.setValue(null);
+    this.client = undefined as any;
   }
 
   ngOnInit(): void {
-    this.loadData();
-
     this.utilisateurConnecte = this.authService.getConnectedUser();
 
     // Cas création
     if (this.operation === operations.create) {
       this.isNew = true;
       this.initCreate();
+      this.loadData();
       return;
     }
 
@@ -256,9 +251,10 @@ export class FrequencesCrudComponent implements OnInit {
     }
 
     this.isNew = false;
+    this.loadData();
     this.initUpdate();
 
-    console.log("operation : " + this.operation)
+    console.log('operation : ' + this.operation);
   }
 
   // ---------- Chargement des référentiels ----------
@@ -282,10 +278,8 @@ export class FrequencesCrudComponent implements OnInit {
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients ?? [];
 
-      // init liste filtrée
       this.filteredClients = this.clients;
 
-      // écoute des saisies
       this.clientSearchCtrl.valueChanges
         .pipe(
           startWith(''),
@@ -293,7 +287,7 @@ export class FrequencesCrudComponent implements OnInit {
         )
         .subscribe(list => (this.filteredClients = list));
 
-      // si en update et client déjà connu, pré-remplir le champ texte
+      // ✅ si en update et client déjà connu, pré-remplir le champ texte
       const clientId = this.ficheFG?.get('client')?.value;
       if (clientId) {
         const found = this.clients.find(x => x.id === clientId);
@@ -388,6 +382,7 @@ export class FrequencesCrudComponent implements OnInit {
       categorie_produit: null,
       objet: null,
       commentaire: null,
+
       direction: 3,
       utilisateur: null,
       date_creation: new Date().toISOString().substring(0, 10),
@@ -405,25 +400,19 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.form = buildFicheTechniqueFrequenceForm(this.fb, ficheFreq);
 
-    // steps 2–4 invisibles tant que fiche non validée
     this.showStationsStep = false;
     this.showCanauxStep = false;
     this.showTarifsStep = false;
 
-    //this.cat = 1 as CategoryId;
     this.updateDisplayedColumns();
 
     this.ficheFG.get('categorie_produit')?.valueChanges.subscribe(val => {
       if (val != null) {
         this.cat = val as CategoryId;
-
         this.updateDisplayedColumns();
-
-        // ✅ Très important : recalculer les validateurs des lignes existantes
         this.rebuildLinesForCategory(this.cat);
       }
     });
-
   }
 
   // ---------- Initialisation édition ----------
@@ -432,10 +421,10 @@ export class FrequencesCrudComponent implements OnInit {
     this.errorMsg = '';
 
     this.transmitLocked = false;
-    
+
     this.fichesTechniquesFrequenceService.getDetailFicheTechniqueFrequence(this.ficheTechnique.id).subscribe({
       next: (fiche: FicheTechniqueFrequenceDetail) => {
-        console.log("fiche initUpdate");
+        console.log('fiche initUpdate');
         console.log(fiche);
 
         this.cat = (fiche.categorie_produit as CategoryId);
@@ -449,13 +438,10 @@ export class FrequencesCrudComponent implements OnInit {
           this.canauxFA.push(buildCanalFG(this.fb, c, this.cat));
         });
 
-
-
         this.loading = false;
 
         this.updateDisplayedColumns();
 
-        // steps visibles en édition
         this.showStationsStep = true;
         this.showCanauxStep = true;
         this.showTarifsStep = true;
@@ -463,18 +449,13 @@ export class FrequencesCrudComponent implements OnInit {
         this.ficheFG.get('categorie_produit')?.valueChanges.subscribe(val => {
           if (val != null) {
             this.cat = val as CategoryId;
-
             this.updateDisplayedColumns();
-
-            // ✅ Très important : recalculer les validateurs des lignes existantes
             this.rebuildLinesForCategory(this.cat);
           }
         });
 
-        // Calcul des lignes tarifées (uniquement si fiche existe)
         this.buildNoMapsFromFiche(fiche);
         this.loadTarifsIfPossible(this.ficheTechnique.id);
-
       },
       error: (e) => {
         console.error('GET fiche fréquence failed:', e);
@@ -482,10 +463,7 @@ export class FrequencesCrudComponent implements OnInit {
         this.loading = false;
       }
     });
-
-
   }
-
 
   // ---------- CALCUL TARIFS (STEP 4) ----------
   private loadTarifsIfPossible(ficheId?: number | null): void {
@@ -506,17 +484,14 @@ export class FrequencesCrudComponent implements OnInit {
       .subscribe({
         next: (result: CalculFraisFrequenceResult) => {
           this.resultatCalcul = result;
-          console.log("resultatCalcul");
+          console.log('resultatCalcul');
           console.log(this.resultatCalcul);
-
         },
-        error: (e) => {
-          console.error('Erreur calcul:', e);
+        error: () => {
           this.errorCalcul = 'Erreur lors du calcul des frais';
         }
       });
   }
-
 
   // ---------- STATIONS : TABLE + MODALE ----------
   onOpenStationDialog(index?: number): void {
@@ -544,21 +519,16 @@ export class FrequencesCrudComponent implements OnInit {
 
       this.stationsTable?.renderRows();
     });
-
   }
-
 
   onRemoveStation(index: number): void {
     this.dialogService.yes_no({message: 'Supprimer cette station ?'})
       .subscribe(yes => {
         if (yes) {
           this.stationsFA.removeAt(index);
-
-
           this.stationsTable?.renderRows();
         }
       });
-
   }
 
   onRemoveCanal(index: number): void {
@@ -566,13 +536,16 @@ export class FrequencesCrudComponent implements OnInit {
       .subscribe(yes => {
         if (yes) {
           this.canauxFA.removeAt(index);
-
           this.canauxTable?.renderRows();
         }
       });
   }
 
   // ---------- CANAUX : TABLE + MODALE ----------
+  canAddCanal(): boolean {
+    return this.hasCanauxToFill();
+  }
+
   onOpenCanalDialog(index?: number): void {
     let canalValue: FicheTechniqueCanalRequest | undefined;
 
@@ -591,6 +564,15 @@ export class FrequencesCrudComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
 
+      // ✅ cat=4 : sécuriser le calcul en sortie (au cas où la modale ne le fait pas)
+      if (this.cat === 4) {
+        const largeur = Number(String(result.largeur_bande_khz ?? 0).replace(',', '.')) || 0;
+        const nbreCanaux = Math.max(1, Math.floor(Number(result.nbre_canaux ?? 1)));
+
+        const raw = (largeur * nbreCanaux) / 25;
+        result.nbre_tranche_facturation = Math.max(1, Math.ceil(raw));
+      }
+
       if (index != null) {
         (this.canauxFA.at(index) as FormGroup).patchValue(result);
       } else {
@@ -599,9 +581,7 @@ export class FrequencesCrudComponent implements OnInit {
 
       this.canauxTable?.renderRows();
     });
-
   }
-
 
   // ---------- VALIDATIONS PAR STEP ----------
   isFicheValid(): boolean {
@@ -613,7 +593,9 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   isCanauxValid(): boolean {
-    return this.canauxFA?.valid;
+    if (!this.hasCanauxToFill()) return true;
+    if (!this.canauxFA) return false;
+    return this.canauxFA.valid;
   }
 
   // ---------- VALIDATION DU STEP 1 (FICHE) ----------
@@ -629,7 +611,6 @@ export class FrequencesCrudComponent implements OnInit {
       this.updateDisplayedColumns();
     }
 
-    // en création, on ne garde pas d’éventuelles lignes résiduelles
     if (this.isNew) {
       this.stationsFA.clear();
       this.canauxFA.clear();
@@ -642,8 +623,7 @@ export class FrequencesCrudComponent implements OnInit {
     this.isLinear = false;
   }
 
-  // ---------- SAUVEGARDE SIMPLE (pas de lignes tarifées) ----------
-
+  // ---------- SAUVEGARDE ----------
   private logInvalidControls(fg: FormGroup, prefix = ''): void {
     Object.keys(fg.controls).forEach(key => {
       const c: any = fg.get(key);
@@ -652,7 +632,6 @@ export class FrequencesCrudComponent implements OnInit {
       if (!c) return;
 
       if (c.controls) {
-        // FormGroup / FormArray
         this.logInvalidControls(c, path);
       } else if (c.invalid) {
         console.log('INVALID:', path, 'value=', c.value, 'errors=', c.errors);
@@ -665,30 +644,25 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   private rebuildLinesForCategory(cat: CategoryId): void {
-    // Stations
     for (let i = 0; i < this.stationsFA.length; i++) {
       const old = this.stationsFA.at(i) as FormGroup;
       const value = old.getRawValue();
       this.stationsFA.setControl(i, buildStationFG(this.fb, value, cat));
     }
 
-    // Canaux
     for (let i = 0; i < this.canauxFA.length; i++) {
       const old = this.canauxFA.at(i) as FormGroup;
       const value = old.getRawValue();
       this.canauxFA.setControl(i, buildCanalFG(this.fb, value, cat));
     }
 
-    // Rafraîchir UI tables
     this.stationsTable?.renderRows();
     this.canauxTable?.renderRows();
   }
 
-
-
   onSave(): void {
-    console.log("debut save ");
-    console.log(" this.form.invalid :  " + this.form.invalid);
+    console.log('debut save ');
+    console.log(' this.form.invalid :  ' + this.form?.invalid);
 
     if (!this.form || this.form.invalid) {
       this.form.markAllAsTouched();
@@ -704,7 +678,6 @@ export class FrequencesCrudComponent implements OnInit {
       this.ficheFG.get('objet')?.setValue(objet);
     }
 
-    ///const payload = formToFicheTechniqueFrequenceCreateRequest(this.form);
     let payload = formToFicheTechniqueFrequenceCreateRequest(this.form);
 
     payload = {
@@ -728,19 +701,19 @@ export class FrequencesCrudComponent implements OnInit {
     this.loading = true;
     this.errorMsg = '';
 
+    // ✅ règle existante : si cat=6 et nombre_station vide => 1
     if (this.cat === 6) {
       payload = {
         ...payload,
         stations: (payload.stations ?? []).map(s => ({
           ...s,
-          nombre_station: (s.nombre_station == null ) ? 1 : s.nombre_station
+          nombre_station: (s.nombre_station == null) ? 1 : s.nombre_station
         }))
       };
     }
 
-    console.log("this.isNew : " + this.isNew);
-
-    console.log("payload");
+    console.log('this.isNew : ' + this.isNew);
+    console.log('payload');
     console.log(payload);
 
     const obs = this.isNew
@@ -752,21 +725,16 @@ export class FrequencesCrudComponent implements OnInit {
         this.loading = false;
         this.msgService.success('Fiche fréquences enregistrée');
 
-
-        // Si création: on a besoin de l'ID retourné par l'API pour afficher les frais
         if (this.isNew) {
           const newId = saved?.id;
           if (newId) {
             this.isNew = false;
-            // garder l'id côté composant
             this.ficheTechnique = {...(this.ficheTechnique ?? {}), id: newId} as any;
             this.loadTarifsIfPossible(newId);
           }
         } else {
-          // en édition : recalcul après save (facultatif, mais utile)
           this.loadTarifsIfPossible(this.ficheTechnique.id);
         }
-
 
         this.notifyActionOperation.emit(operations.table);
       },
@@ -785,65 +753,40 @@ export class FrequencesCrudComponent implements OnInit {
 
     // ---------- STATIONS ----------
     const sCols: string[] = [];
+    sCols.push('no');
 
-    sCols.push('no'); // ✅ toujours 1ère colonn
-
-    if (!stationCfg || stationCfg.type_station?.visible !== false) {
-      sCols.push('type_station');
-    }
-    if (!stationCfg || stationCfg.puissance?.visible !== false) {
-      sCols.push('puissance');
-    }
+    if (!stationCfg || stationCfg.type_station?.visible !== false) sCols.push('type_station');
+    if (!stationCfg || stationCfg.puissance?.visible !== false) sCols.push('puissance');
     if (!stationCfg || stationCfg.nombre_station?.visible !== false) sCols.push('nombre_station');
     if (!stationCfg || stationCfg.debit_kbps?.visible !== false) sCols.push('debit_kbps');
     if (!stationCfg || stationCfg.largeur_bande_mhz?.visible !== false) sCols.push('largeur_bande_mhz');
     if (!stationCfg || stationCfg.type_bande_frequence?.visible !== false) sCols.push('type_bande_frequence');
     if (!stationCfg || stationCfg.caractere_radio?.visible !== false) sCols.push('caractere_radio');
-
-    if (!stationCfg || stationCfg.nbre_tranche?.visible !== false) {
-      sCols.push('nbre_tranche');
-    }
-    if (!stationCfg || stationCfg.localite?.visible !== false) {
-      sCols.push('localite');
-    }
+    if (!stationCfg || stationCfg.nbre_tranche?.visible !== false) sCols.push('nbre_tranche');
+    if (!stationCfg || stationCfg.localite?.visible !== false) sCols.push('localite');
 
     sCols.push('actions');
     this.displayedColumnsStations = sCols;
 
-
     // ---------- CANAUX ----------
     const cCols: string[] = [];
+    cCols.push('no');
 
-    cCols.push('no'); // ✅ toujours 1ère colonne
+    if (!canalCfg || canalCfg.type_station?.visible !== false) cCols.push('type_station');
+    if (!canalCfg || canalCfg.type_canal?.visible !== false) cCols.push('type_canal');
 
-    if (!canalCfg || canalCfg.type_station?.visible !== false) {
-      cCols.push('type_station');
-    }
-    if (!canalCfg || canalCfg.type_canal?.visible !== false) {
-      cCols.push('type_canal');
-    }
-    if (!canalCfg || canalCfg.zone_couverture?.visible !== false) {
-      cCols.push('zone_couverture');
-    }
-    if (!canalCfg || canalCfg.nbre_tranche_facturation?.visible !== false) {
-      cCols.push('nbre_tranche_facturation');
-    }
-    if (!canalCfg || canalCfg.largeur_bande_khz?.visible !== false) {
-      cCols.push('largeur_bande_khz');
-    }
-    if (!canalCfg || canalCfg.type_bande_frequence?.visible !== false) {
-      cCols.push('type_bande_frequence');
-    }
-    if (!canalCfg || canalCfg.mode_duplexage?.visible !== false) {
-      cCols.push('mode_duplexage');
-    }
-    if (!canalCfg || canalCfg.puissance_sortie?.visible !== false) {
-      cCols.push('puissance_sortie');
-    }
+    // ✅ nbre_canaux visible uniquement en cat=4 via config
+    if (!canalCfg || canalCfg.nbre_canaux?.visible !== false) cCols.push('nbre_canaux');
+
+    if (!canalCfg || canalCfg.zone_couverture?.visible !== false) cCols.push('zone_couverture');
+    if (!canalCfg || canalCfg.nbre_tranche_facturation?.visible !== false) cCols.push('nbre_tranche_facturation');
+    if (!canalCfg || canalCfg.largeur_bande_khz?.visible !== false) cCols.push('largeur_bande_khz');
+    if (!canalCfg || canalCfg.type_bande_frequence?.visible !== false) cCols.push('type_bande_frequence');
+    if (!canalCfg || canalCfg.mode_duplexage?.visible !== false) cCols.push('mode_duplexage');
+    if (!canalCfg || canalCfg.puissance_sortie?.visible !== false) cCols.push('puissance_sortie');
 
     cCols.push('actions');
     this.displayedColumnsCanaux = cCols;
-
   }
 
   getRecapClient(): string {
@@ -856,15 +799,6 @@ export class FrequencesCrudComponent implements OnInit {
     const id = this.ficheFG?.get('categorie_produit')?.value;
     const found = this.categoriesFiltered?.find(c => c.id === id);
     return found?.libelle || '';
-  }
-
-
-  getRecapObjet(): string {
-    return this.ficheFG?.get('objet')?.value || '';
-  }
-
-  getRecapCommentaire(): string {
-    return this.ficheFG?.get('commentaire')?.value || '';
   }
 
   // ---------- RETOUR LISTE ----------
@@ -880,6 +814,10 @@ export class FrequencesCrudComponent implements OnInit {
     const keys: (keyof typeof canalCfg)[] = [
       'type_station',
       'type_canal',
+
+      // ✅ nbre_canaux (visible seulement cat=4)
+      'nbre_canaux',
+
       'zone_couverture',
       'nbre_tranche_facturation',
       'largeur_bande_khz',
@@ -891,29 +829,22 @@ export class FrequencesCrudComponent implements OnInit {
     return keys.some(k => canalCfg[k]?.visible === true);
   }
 
-
   onTransmettre(): void {
     const ficheId = this.ficheTechnique?.id;
     if (!ficheId) {
-      this.dialogService.alert({ message: "Aucune fiche sélectionnée." });
+      this.dialogService.alert({ message: 'Aucune fiche sélectionnée.' });
       return;
     }
 
-    // ✅ anti double-clic
-    if (this.loadingCalcul || this.transmitLocked) {
-      return;
-    }
+    if (this.loadingCalcul || this.transmitLocked) return;
 
-    // on verrouille dès le clic
     this.loadingCalcul = true;
 
-    // 1) payload calcul
     const payloadCalcul: CalculFraisFrequenceRequest = {
       fiche_id: ficheId,
       enregistrer: true
     };
 
-    // 2) payload transmission (statut = 2)
     const miseAJourStatutFiche: MiseAJourStatutFiche = new MiseAJourStatutFiche();
     miseAJourStatutFiche.fiche_technique = ficheId;
     miseAJourStatutFiche.statut = 2;
@@ -922,23 +853,16 @@ export class FrequencesCrudComponent implements OnInit {
       mapTo(void 0),
       switchMap(() => this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)),
       tap(() => {
-        // ✅ succès => on verrouille définitivement le bouton
         this.transmitLocked = true;
-        this.msgMessageService.success("Fiche transmise avec succès !");
+        this.msgMessageService.success('Fiche transmise avec succès !');
       }),
       finalize(() => {
-        // ✅ on arrête le chargement
-        // ⚠️ si succès, transmitLocked=true donc bouton restera désactivé
         this.loadingCalcul = false;
       })
     ).subscribe({
-      next: () => {
-        // rien
-      },
+      next: () => {},
       error: (e) => {
         console.error('Erreur (calcul ou transmission):', e);
-
-        // ❌ échec => on déverrouille (réactiver bouton)
         this.transmitLocked = false;
 
         this.dialogService.alert({
@@ -948,10 +872,9 @@ export class FrequencesCrudComponent implements OnInit {
     });
   }
 
-
   private isVisibleStation(field: keyof FicheTechniqueStationRuleSet): boolean {
     const rule = this.cfgRecap?.[this.cat]?.stations?.[field];
-    return rule?.visible !== false; // visible par défaut
+    return rule?.visible !== false;
   }
 
   private isVisibleCanal(field: keyof FicheTechniqueCanalRuleSet): boolean {
@@ -965,7 +888,7 @@ export class FrequencesCrudComponent implements OnInit {
 
   private fmtNumber(v: any, fractionDigits = 0): string {
     if (!this.hasValue(v)) return '';
-    const n = Number(v);
+    const n = Number(String(v).replace(',', '.'));
     if (Number.isNaN(n)) return String(v);
 
     return new Intl.NumberFormat('fr-FR', {
@@ -985,7 +908,6 @@ export class FrequencesCrudComponent implements OnInit {
       details.push(`${this.fmtNumber(s.nombre_station)} station(s)`);
     }
 
-    // ✅ puissance (number)
     if (this.isVisibleStation('puissance') && this.hasValue(s?.puissance)) {
       details.push(`Puissance : ${this.fmtNumber(s.puissance)} W`);
     }
@@ -994,8 +916,9 @@ export class FrequencesCrudComponent implements OnInit {
       details.push(`Débit : ${this.fmtNumber(s.debit_kbps)} kb/s`);
     }
 
+    // ✅ DECIMAL largeur bande (recap)
     if (this.isVisibleStation('largeur_bande_mhz') && this.hasValue(s?.largeur_bande_mhz)) {
-      details.push(`Largeur bande : ${this.fmtNumber(s.largeur_bande_mhz)} MHz`);
+      details.push(`Largeur bande : ${this.fmtNumber(s.largeur_bande_mhz, 2)} MHz`);
     }
 
     if (this.isVisibleStation('nbre_tranche') && this.hasValue(s?.nbre_tranche)) {
@@ -1018,7 +941,6 @@ export class FrequencesCrudComponent implements OnInit {
     return details.length ? `${title} — ${details.join(' · ')}` : title;
   }
 
-
   formatCanalLine(c: any): string {
     const title = this.isVisibleCanal('type_canal')
       ? (this.getLibelleTypeCanal(c?.type_canal) || 'Type canal ?')
@@ -1031,13 +953,19 @@ export class FrequencesCrudComponent implements OnInit {
       if (ts) details.push(`Station : ${ts}`);
     }
 
+    // ✅ nbre_canaux visible seulement cat=4
+    if (this.isVisibleCanal('nbre_canaux') && this.hasValue(c?.nbre_canaux)) {
+      details.push(`Nb canaux : ${this.fmtNumber(c.nbre_canaux)}`);
+    }
+
     if (this.isVisibleCanal('zone_couverture') && this.hasValue(c?.zone_couverture)) {
       const z = this.getLibelleZoneCouverture(c.zone_couverture);
       if (z) details.push(`Zone : ${z}`);
     }
 
+    // ✅ DECIMAL largeur bande (recap)
     if (this.isVisibleCanal('largeur_bande_khz') && this.hasValue(c?.largeur_bande_khz)) {
-      details.push(`Largeur bande : ${this.fmtNumber(c.largeur_bande_khz)} kHz`);
+      details.push(`Largeur bande : ${this.fmtNumber(c.largeur_bande_khz, 2)} kHz`);
     }
 
     if (this.isVisibleCanal('type_bande_frequence') && this.hasValue(c?.type_bande_frequence)) {
@@ -1060,7 +988,6 @@ export class FrequencesCrudComponent implements OnInit {
     return details.length ? `${title} — ${details.join(' · ')}` : title;
   }
 
-
   /** Reconstruit les correspondances ID -> N° (index+1) selon l’ordre du FormArray */
   private buildNoMapsFromFiche(fiche: FicheTechniqueFrequenceDetail): void {
     this.stationIdToNo.clear();
@@ -1076,7 +1003,6 @@ export class FrequencesCrudComponent implements OnInit {
       if (!Number.isNaN(id) && id > 0) this.canalIdToNo.set(id, idx + 1);
     });
   }
-
 
   stationNoFromId(id?: number | null): string {
     if (id == null) return '-';
