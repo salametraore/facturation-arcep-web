@@ -70,6 +70,8 @@ import {Utilisateur} from '../../../shared/models/utilisateur';
 import {AuthService} from '../../../authentication/auth.service';
 import {FicheTechniqueCanal, FicheTechniqueStation} from '../../../shared/models/fiche-technique-frequence';
 import {startWith, map, finalize, mapTo, switchMap, tap} from 'rxjs/operators';
+import {CaractereRadioService} from "../../../shared/services/caractere-radio.service";
+import {CaractereRadio} from "../../../shared/models/caractere-radio.model";
 
 @Component({
   selector: 'frequences-crud',
@@ -145,7 +147,9 @@ export class FrequencesCrudComponent implements OnInit {
   typeCanaux: TypeCanal[];
   tyepCanal: TypeCanal;
   typeStations: TypeStation[];
-  typeStation: TypeStation;
+
+  caractereRadios: CaractereRadio[];
+
   zoneCouvertures: ZoneCouverture[];
   zoneCouverture: ZoneCouverture;
 
@@ -182,6 +186,7 @@ export class FrequencesCrudComponent implements OnInit {
     private typeBandesFrequenceService: TypeBandesFrequenceService,
     private typeStationService: TypeStationService,
     private typeCanauxService: TypeCanauxService,
+    private caractereRadioService: CaractereRadioService,
     private zoneCouvertureService: ZoneCouvertureService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
     private msgMessageService: MsgMessageServiceService,
@@ -314,6 +319,10 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
       this.typeStations = listeTypeStations;
+    });
+
+    this.caractereRadioService.getListItems().subscribe((listeCaractereRadios: CaractereRadio[]) => {
+      this.caractereRadios = listeCaractereRadios;
     });
 
     this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequence[]) => {
@@ -1022,14 +1031,12 @@ export class FrequencesCrudComponent implements OnInit {
     return d?.canal_id ? this.canalNoFromId(d.canal_id) : '-';
   }
 
-  getLibelleCaractereRadio(id: number | null | undefined): string {
-    switch (id) {
-      case 1:
-        return 'Commercial';
-      case 2:
-        return 'Non commercial';
-      default:
-        return '';
+  getLibelleCaractereRadio(id?: number | null): string {
+    if (!id || !this.caractereRadios || this.caractereRadios.length === 0) {
+      return '';
     }
+    const found = this.caractereRadios.find(cr => cr.id === id);
+    return found?.libelle ?? '';
   }
+
 }

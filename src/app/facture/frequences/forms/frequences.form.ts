@@ -1,7 +1,7 @@
 // src/app/facture/frequences/forms/frequences.form.ts
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { merge } from 'rxjs';
+import { merge, of } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 
 import { CategoryId } from '../../../shared/models/frequences-category.types';
@@ -46,10 +46,6 @@ export function buildFicheTechniqueFrequenceForm(
       date_fin:           new FormControl(fiche?.date_fin ?? null),
 
       periode:            new FormControl(fiche?.periode ?? null),
-
-      // NB: ton champ nbre_canaux "fiche" existe dans le CRUD, pas ici.
-      // Si tu l'ajoutes au DTO fiche, mets-le ici aussi.
-      // nbre_canaux: new FormControl((fiche as any)?.nbre_canaux ?? null),
     }),
 
     stations: fb.array([]),
@@ -73,20 +69,17 @@ export function buildStationFG(
 
     type_station: new FormControl(s.type_station ?? null, requiredIf(cfg.type_station)),
 
-    // valeur saisie (visible)
     puissance: new FormControl(s.puissance ?? null, requiredIf(cfg.puissance)),
-    // classe calculée (cachée)
     classe_puissance: new FormControl(s.classe_puissance ?? null),
 
     nombre_station: new FormControl(s.nombre_station ?? null, requiredIf(cfg.nombre_station)),
 
     debit_kbps:   new FormControl(s.debit_kbps ?? null, requiredIf(cfg.debit_kbps)),
-    classe_debit: new FormControl(s.classe_debit ?? null), // caché
+    classe_debit: new FormControl(s.classe_debit ?? null),
 
     largeur_bande_mhz: new FormControl(s.largeur_bande_mhz ?? null, requiredIf(cfg.largeur_bande_mhz)),
-    classe_largeur_bande: new FormControl(s.classe_largeur_bande ?? null), // caché
+    classe_largeur_bande: new FormControl(s.classe_largeur_bande ?? null),
 
-    // min(1) seulement si le champ est visible
     nbre_tranche: new FormControl(
       s.nbre_tranche ?? null,
       [
@@ -105,17 +98,40 @@ export function buildStationFG(
 
 // ===============================================================
 // 3. CANAL (FicheTechniqueCanalRequest)
-// - nbre_canaux visible uniquement cat=4
-// - cat=4 => nbre_tranche_facturation calculé automatiquement
+// ✅ nbre_canaux obligatoire partout
+// ✅ nbre_tranche_facturation : suggestion auto, mais saisissable (pas d’écrasement)
 // ---------------------------------------------------------------
-function computeTranchesForCat4(largeurBandeKhz: number, nbreCanaux: number): number {
+const DUPLEX_CODES = new Set<string>([
+  'TC_CRED_PUBLIC',
+  'TC_PMR3_MOBILE',
+  'TC_PMR_FIXE',
+]);
+
+const SIMPLEXE_CODES = new Set<string>([
+  'TC_PMR2_MOBILE',
+]);
+
+function computeTranchesAuto(
+  largeurBandeKhz: number,
+  nbreCanaux: number,
+  typeCanalCode?: string | null
+): number {
   const largeur = Math.max(0, largeurBandeKhz || 0);
   const canaux = Math.max(1, Math.floor(nbreCanaux || 1));
+  const code = (typeCanalCode ?? '').trim();
 
-  const raw = (largeur * canaux) / 25;
+  if (DUPLEX_CODES.has(code)) {
+    const raw = (canaux * largeur) / 25;
+    return Math.max(1, Math.ceil(raw));
+  }
 
-  // ✅ entier min 1
-  return Math.max(1, Math.ceil(raw));
+  if (SIMPLEXE_CODES.has(code)) {
+    const raw = (canaux * largeur) / 12.5;
+    return Math.max(1, Math.ceil(raw));
+  }
+
+  // autres
+  return Math.max(1, canaux);
 }
 
 export function buildCanalFG(
@@ -126,22 +142,21 @@ export function buildCanalFG(
 
   const cfg = CATEGORY_CONFIG[cat].canaux;
 
-  // ✅ on considère que cat=4 => calc si nbre_canaux est visible (cat4 seulement)
-  const isCat4Calc = (cat === 4) && (cfg.nbre_canaux?.visible === true);
+  // ✅ nbre_canaux obligatoire partout
+  const nbreCanauxDefault = (c as any)?.nbre_canaux ?? 1;
 
-  const nbreCanauxDefault =
-    cfg.nbre_canaux?.visible ? (c.nbre_canaux ?? 1) : (c.nbre_canaux ?? null);
+  // ✅ champ caché : code du type canal (alimenté depuis le dialog)
+  const typeCanalCodeDefault = (c as any)?.type_canal_code ?? null;
 
-  // ✅ cat=4 => tranche calculée ; sinon valeur fournie/saisie
-  const trancheDefault =
-    cfg.nbre_tranche_facturation?.visible
-      ? (
-        c.nbre_tranche_facturation ??
-          (isCat4Calc
-            ? computeTranchesForCat4(toNumber(c.largeur_bande_khz) ?? 0, nbreCanauxDefault ?? 1)
-            : 1)
-      )
-      : (c.nbre_tranche_facturation ?? null);
+  // ✅ auto init (suggestion calculée)
+  const autoInit = computeTranchesAuto(
+    toNumber((c as any)?.largeur_bande_khz) ?? 0,
+    nbreCanauxDefault ?? 1,
+    typeCanalCodeDefault
+  );
+
+  // ✅ valeur initiale : si déjà renseignée => on la respecte
+  const trancheInitial = (c as any)?.nbre_tranche_facturation ?? autoInit;
 
   const group = fb.group({
     categorie_produit: new FormControl(c.categorie_produit ?? cat),
@@ -149,63 +164,84 @@ export function buildCanalFG(
     type_station: new FormControl(c.type_station ?? null, requiredIf(cfg.type_station)),
     type_canal:   new FormControl(c.type_canal ?? null, requiredIf(cfg.type_canal)),
 
-    // ✅ nbre_canaux (existe toujours dans FG mais visible seulement cat=4)
+    // ✅ NOUVEAU : code type canal (caché)
+    type_canal_code: new FormControl(typeCanalCodeDefault),
+
+    // ✅ obligatoire partout
     nbre_canaux: new FormControl(
       nbreCanauxDefault,
-      [
-        ...requiredIf(cfg.nbre_canaux),
-        ...(cfg.nbre_canaux?.visible ? [Validators.min(1)] : []),
-      ]
+      [Validators.required, Validators.min(1)]
     ),
 
     zone_couverture: new FormControl(c.zone_couverture ?? null, requiredIf(cfg.zone_couverture)),
 
+    // ✅ saisissable + min(1)
     nbre_tranche_facturation: new FormControl(
-      trancheDefault,
+      trancheInitial,
       [
         ...(cfg.nbre_tranche_facturation?.required ? [Validators.required] : []),
-        ...(cfg.nbre_tranche_facturation?.visible ? [Validators.min(1)] : []),
+        Validators.min(1),
       ]
     ),
 
     largeur_bande_khz:    new FormControl(c.largeur_bande_khz ?? null, requiredIf(cfg.largeur_bande_khz)),
-    classe_largeur_bande: new FormControl(c.classe_largeur_bande ?? null), // caché
+    classe_largeur_bande: new FormControl(c.classe_largeur_bande ?? null),
 
     type_bande_frequence: new FormControl(c.type_bande_frequence ?? null, requiredIf(cfg.type_bande_frequence)),
-
     mode_duplexage: new FormControl(c.mode_duplexage ?? null, requiredIf(cfg.mode_duplexage)),
-
     puissance_sortie: new FormControl(c.puissance_sortie ?? null, requiredIf(cfg.puissance_sortie)),
   });
 
-  // ✅ Auto-calc uniquement cat=4 : nbre_tranche_facturation = largeur_bande_khz * nbre_canaux / 25
-  if (isCat4Calc && cfg.nbre_tranche_facturation?.visible) {
+  /**
+   * ✅ Suggestion dynamique SANS écrasement :
+   * - si l'utilisateur a modifié (dirty) => on ne touche plus
+   * - sinon, on met à jour uniquement si la valeur actuelle était "auto"
+   */
+  if (cfg.nbre_tranche_facturation?.visible !== false) {
 
-    const canauxCtrl  = group.get('nbre_canaux');
+    const canauxCtrl = group.get('nbre_canaux');
     const largeurCtrl = group.get('largeur_bande_khz');
+    const typeCanalCodeCtrl = group.get('type_canal_code');
     const trancheCtrl = group.get('nbre_tranche_facturation');
 
     if (canauxCtrl && largeurCtrl && trancheCtrl) {
 
-      // ✅ champ calculé => pas de saisie manuelle
-      trancheCtrl.disable({ emitEvent: false });
+      let lastAutoComputed = autoInit;
 
       const recompute = () => {
         const nCanaux = Math.max(1, Math.floor(toNumber(canauxCtrl.value) ?? 1));
         const largeur = toNumber(largeurCtrl.value) ?? 0;
+        const code = (typeCanalCodeCtrl?.value ?? null) as string | null;
 
-        trancheCtrl.setValue(
-          computeTranchesForCat4(largeur, nCanaux),
-          { emitEvent: false }
-        );
+        const auto = computeTranchesAuto(largeur, nCanaux, code);
+
+        // ✅ si l'utilisateur a tapé une valeur => stop auto-update
+        if (trancheCtrl.dirty) {
+          lastAutoComputed = auto;
+          return;
+        }
+
+        const current = toNumber(trancheCtrl.value);
+
+        // ✅ on considère "auto" si null OU égal au dernier auto calculé
+        const isAutoValue = current == null || current === lastAutoComputed;
+
+        if (isAutoValue) {
+          trancheCtrl.setValue(auto, { emitEvent: false });
+        }
+
+        lastAutoComputed = auto;
       };
 
-      // ✅ recalcul initial + sur changement des 2 champs
-      merge(canauxCtrl.valueChanges, largeurCtrl.valueChanges)
+      merge(
+        canauxCtrl.valueChanges,
+        largeurCtrl.valueChanges,
+        typeCanalCodeCtrl?.valueChanges ?? of(null),
+      )
         .pipe(startWith(null))
         .subscribe(() => recompute());
 
-      // 🔥 force une première fois
+      // 🔥 premier calcul
       recompute();
     }
   }
@@ -245,9 +281,11 @@ export function formToFicheTechniqueFrequenceCreateRequest(
     ...s,
   }));
 
-  const canaux = (raw.canaux ?? []).map((c: FicheTechniqueCanalRequest) => ({
-    ...c,
-  }));
+  // ✅ On enlève le champ caché type_canal_code avant envoi API (safe)
+  const canaux = (raw.canaux ?? []).map((c: any) => {
+    const { type_canal_code, ...rest } = c;
+    return rest as FicheTechniqueCanalRequest;
+  });
 
   return {
     ...(raw.fiche as FicheTechniqueFrequenceCreateRequest),

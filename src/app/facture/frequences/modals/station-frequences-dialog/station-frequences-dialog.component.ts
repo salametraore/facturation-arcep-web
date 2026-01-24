@@ -24,6 +24,8 @@ import { ClasseLargeurBandeService } from "../../../../shared/services/classe-la
 import { ClasseDebitService } from "../../../../shared/services/classe-debit.service";
 import { ClassePuissanceService } from "../../../../shared/services/classe-puissance.service";
 import { bindStationClasses } from "../../forms/station-classes-binder";
+import { CaractereRadio } from "../../../../shared/models/caractere-radio.model";
+import { CaractereRadioService } from "../../../../shared/services/caractere-radio.service";
 
 export interface StationDialogData {
   station?: FicheTechniqueStationRequest;
@@ -43,6 +45,9 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
   typeStations: TypeStation[] = [];
   typeStationSeelectione: TypeStation;
   zoneCouvertures: ZoneCouverture[] = [];
+
+  caractereRadios: CaractereRadio[] = [];
+  caractereRadio!: CaractereRadio;
 
   cfg = CATEGORY_CONFIG[1 as CategoryId];
 
@@ -65,11 +70,27 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
     private zoneCouvertureService: ZoneCouvertureService,
     private classePuissance: ClassePuissanceService,
     private classeDebit: ClasseDebitService,
+    private caractereRadioService: CaractereRadioService,
     private classeLargeurBande: ClasseLargeurBandeService,
   ) {}
 
   get stationCfg() {
     return this.cfg.stations;
+  }
+
+  // ✅ NEW : permet d'afficher une étoile sur les champs required (même si required est ajouté/retiré dynamiquement)
+  isRequired(ctrlName: string): boolean {
+    const ctrl: any = this.form?.get(ctrlName);
+    if (!ctrl) return false;
+
+    // Angular >= 14
+    if (typeof ctrl.hasValidator === 'function') {
+      return ctrl.hasValidator(Validators.required);
+    }
+
+    // fallback
+    const res = ctrl.validator ? ctrl.validator({} as any) : null;
+    return !!(res && res.required);
   }
 
   ngOnInit(): void {
@@ -113,7 +134,6 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
 
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
       this.typeStations = (listeTypeStations ?? []).filter(ts => ts.categorie_produit === cat);
-      // NB: on ne dépend plus de cette liste pour le code (on passe par getItem)
     });
 
     this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequence[]) => {
@@ -122,6 +142,10 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
 
     this.zoneCouvertureService.getListItems().subscribe((listeZones: ZoneCouverture[]) => {
       this.zoneCouvertures = (listeZones ?? []).filter(z => z.categorie_produit === 2);
+    });
+
+    this.caractereRadioService.getListItems().subscribe((listeCaractereRadios: CaractereRadio[]) => {
+      this.caractereRadios = listeCaractereRadios ?? [];
     });
   }
 
@@ -168,7 +192,6 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (ts: TypeStation) => {
           this.selectedTypeStationCode = ts?.code ?? null;
-          console.log('type_station id=', id, 'code=', this.selectedTypeStationCode, 'cat=', this.data.cat);
           this.applyConditionalVisibilityAndValidators();
         },
         error: (e) => {
@@ -254,4 +277,13 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
     this.showDebitKbps = true;
     this.showLargeurBandeMhz = true;
   }
+
+  getLibelleCaractereRadio(id?: number | null): string {
+    if (!id || !this.caractereRadios || this.caractereRadios.length === 0) {
+      return '';
+    }
+    const found = this.caractereRadios.find(cr => cr.id === id);
+    return found?.libelle ?? '';
+  }
+
 }

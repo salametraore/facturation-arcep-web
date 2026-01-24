@@ -8,13 +8,19 @@
 
   <!-- 1) Type station -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="canalCfg.type_station?.visible">
-    <mat-label>Type station</mat-label>
+                  *ngIf="canalCfg.type_station?.visible"
+                  [ngClass]="{'required-field': isRequired('type_station')}">
+    <mat-label>
+      Type station
+      <span *ngIf="isRequired('type_station')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="type_station" matTooltip="Type station">
       <mat-option *ngFor="let item of typeStations" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+
     <mat-error *ngIf="form.get('type_station')?.hasError('required')">
       Type station obligatoire
     </mat-error>
@@ -24,13 +30,26 @@
 
   <!-- 2) Type canal -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isTypeCanalVisible()">
-    <mat-label>Type canal</mat-label>
+                  *ngIf="isTypeCanalVisible()"
+                  [ngClass]="{'required-field': isRequired('type_canal')}">
+    <mat-label>
+      Type canal
+      <span *ngIf="isRequired('type_canal')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="type_canal" matTooltip="Type canal">
       <mat-option *ngFor="let item of typeCanaux" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+
+    <!-- ✅ icône info discrète -->
+    <button mat-icon-button matSuffix type="button"
+            [matTooltip]="trancheHint"
+            aria-label="Info calcul tranches">
+      <mat-icon>info</mat-icon>
+    </button>
+
     <mat-error *ngIf="form.get('type_canal')?.hasError('required')">
       Type canal obligatoire
     </mat-error>
@@ -38,11 +57,21 @@
 
   <div class="blank-row"></div>
 
-  <!-- ✅ 2bis) Nombre de canaux (CAT=4 uniquement via config) -->
-  <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isNbreCanauxVisible()">
-    <mat-label>Nombre de canaux</mat-label>
+  <!-- ✅ 2bis) Nombre de canaux (obligatoire partout) -->
+  <mat-form-field appearance="outline" class="w-full required-field">
+    <mat-label>
+      Nombre de canaux
+      <span class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="nbre_canaux" min="1" step="1">
+
+    <button mat-icon-button matSuffix type="button"
+            [matTooltip]="trancheHint"
+            aria-label="Info calcul tranches">
+      <mat-icon>info</mat-icon>
+    </button>
+
     <mat-error *ngIf="form.get('nbre_canaux')?.hasError('required')">
       Nombre de canaux obligatoire
     </mat-error>
@@ -55,13 +84,19 @@
 
   <!-- 3) Mode duplexage -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isModeDuplexageVisible()">
-    <mat-label>Mode duplexage</mat-label>
+                  *ngIf="isModeDuplexageVisible()"
+                  [ngClass]="{'required-field': isRequired('mode_duplexage')}">
+    <mat-label>
+      Mode duplexage
+      <span *ngIf="isRequired('mode_duplexage')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="mode_duplexage" matTooltip="Mode duplexage">
       <mat-option *ngFor="let m of duplexModes" [value]="m.value">
         {{ m.label }}
       </mat-option>
     </mat-select>
+
     <mat-error *ngIf="form.get('mode_duplexage')?.hasError('required')">
       Mode duplexage obligatoire
     </mat-error>
@@ -71,47 +106,88 @@
 
   <!-- 4) Largeur de bande d'un canal (kHz) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isLargeurBandeKhzVisible()">
-    <mat-label>Largeur de bande d'un canal (kHz)</mat-label>
+                  *ngIf="isLargeurBandeKhzVisible()"
+                  [ngClass]="{'required-field': isRequired('largeur_bande_khz')}">
+    <mat-label>
+      Largeur de bande d'un canal (kHz)
+      <span *ngIf="isRequired('largeur_bande_khz')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="largeur_bande_khz" step="0.01">
+
+    <button mat-icon-button matSuffix type="button"
+            [matTooltip]="trancheHint"
+            aria-label="Info calcul tranches">
+      <mat-icon>info</mat-icon>
+    </button>
+
     <mat-error *ngIf="form.get('largeur_bande_khz')?.hasError('required')">
       Largeur de bande obligatoire
     </mat-error>
 
-    <!-- ✅ info formule cat=4 -->
-    <mat-hint *ngIf="data.cat === 4">
-      Calcul automatique : tranches = (largeur × nb canaux) / 25
+    <!-- ✅ hint discret -->
+    <mat-hint>
+      <span class="inline-flex items-center gap-1 opacity-80 text-xs">
+        <mat-icon class="!text-[16px]">info</mat-icon>
+        {{ trancheHint }}
+      </span>
     </mat-hint>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- 5) Nombre de tranches (facturation) -->
+  <!-- 5) Nombre de tranches (facturation) => saisissable -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isNbreTrancheVisible()">
-    <mat-label>Nombre de tranches de facturation</mat-label>
+                  *ngIf="isNbreTrancheVisible()"
+                  [ngClass]="{'required-field': isRequired('nbre_tranche_facturation')}">
+    <mat-label>
+      Nombre de tranches de facturation
+      <span *ngIf="isRequired('nbre_tranche_facturation')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input
       matInput
       type="number"
       formControlName="nbre_tranche_facturation"
-      min="1"
-      [disabled]="data.cat === 4">
+      min="1">
+
+    <button mat-icon-button matSuffix type="button"
+            [matTooltip]="trancheHint"
+            aria-label="Info calcul tranches">
+      <mat-icon>help_outline</mat-icon>
+    </button>
+
     <mat-error *ngIf="form.get('nbre_tranche_facturation')?.hasError('required')">
       Nombre de tranches obligatoire
     </mat-error>
+    <mat-error *ngIf="form.get('nbre_tranche_facturation')?.hasError('min')">
+      Minimum 1
+    </mat-error>
+
+    <mat-hint>
+      <span class="opacity-80 text-xs">
+        Valeur ajustable (référence : {{ trancheHint }})
+      </span>
+    </mat-hint>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- 6) Zone de couverture -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isZoneCouvertureVisible()">
-    <mat-label>Zone de couverture</mat-label>
+                  *ngIf="isZoneCouvertureVisible()"
+                  [ngClass]="{'required-field': isRequired('zone_couverture')}">
+    <mat-label>
+      Zone de couverture
+      <span *ngIf="isRequired('zone_couverture')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="zone_couverture" matTooltip="Zone de couverture">
       <mat-option *ngFor="let item of zoneCouvertures" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+
     <mat-error *ngIf="form.get('zone_couverture')?.hasError('required')">
       Zone de couverture obligatoire
     </mat-error>
@@ -121,9 +197,15 @@
 
   <!-- 7) Puissance sortie (W) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isPuissanceSortieVisible()">
-    <mat-label>Puissance sortie (W)</mat-label>
+                  *ngIf="isPuissanceSortieVisible()"
+                  [ngClass]="{'required-field': isRequired('puissance_sortie')}">
+    <mat-label>
+      Puissance sortie (W)
+      <span *ngIf="isRequired('puissance_sortie')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="puissance_sortie">
+
     <mat-error *ngIf="form.get('puissance_sortie')?.hasError('required')">
       Puissance sortie obligatoire
     </mat-error>
@@ -133,13 +215,19 @@
 
   <!-- 8) Bande de fréquence -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isTypeBandeFrequenceVisible()">
-    <mat-label>Bande de fréquence</mat-label>
+                  *ngIf="isTypeBandeFrequenceVisible()"
+                  [ngClass]="{'required-field': isRequired('type_bande_frequence')}">
+    <mat-label>
+      Bande de fréquence
+      <span *ngIf="isRequired('type_bande_frequence')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="type_bande_frequence" matTooltip="Bande de fréquence">
       <mat-option *ngFor="let item of typeBandeFrequences" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+
     <mat-error *ngIf="form.get('type_bande_frequence')?.hasError('required')">
       Bande de fréquence obligatoire
     </mat-error>

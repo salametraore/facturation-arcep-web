@@ -87,7 +87,7 @@ export class MainNavComponent implements OnInit {
   menuItems: MenuItem[] = [
     {
       id: 10,
-      direction: 100,
+      direction: 2,
       titre: 'Paramétrage',
       description: 'Paramétrage',
       actif: 'OUI',
@@ -98,7 +98,7 @@ export class MainNavComponent implements OnInit {
          // ===================== Référentiels généraux =====================
         {
           id: 1200,
-          direction: 5555,
+          direction: 2,
           titre: 'Référentiels généraux',
           description: 'Référentiels généraux',
           actif: 'OUI',
@@ -108,7 +108,7 @@ export class MainNavComponent implements OnInit {
           sous_menus: [
             {
               id: 1020,
-              direction: 5555,
+              direction: 2,
               titre: 'Les clients',
               description: 'Les clients',
               actif: 'OUI',
@@ -119,7 +119,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1020,
-              direction: 5555,
+              direction: 2,
               titre: 'Les paramètres applicatifs',
               description: 'Les paramètres applicatifs',
               actif: 'OUI',
@@ -130,7 +130,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1020,
-              direction: 5555,
+              direction: 2,
               titre: 'Les types de directions',
               description: 'Les types de directions',
               actif: 'OUI',
@@ -141,7 +141,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1020,
-              direction: 5555,
+              direction: 2,
               titre: 'Les directions',
               description: 'Les directions',
               actif: 'OUI',
@@ -152,7 +152,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1020,
-              direction: 5555,
+              direction: 2,
               titre: 'Les catégories de produits',
               description: 'Les catégories de produits',
               actif: 'OUI',
@@ -163,7 +163,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1025,
-              direction: 5555,
+              direction: 2,
               titre: 'Les produits',
               description: 'Les produits',
               actif: 'OUI',
@@ -174,7 +174,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1025,
-              direction: 5555,
+              direction: 2,
               titre: 'Les zones de couverture',
               description: 'Les zones de couverture',
               actif: 'OUI',
@@ -185,7 +185,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1025,
-              direction: 5555,
+              direction: 2,
               titre: 'Les statuts des fiches techniques',
               description: 'Les statuts des fiches techniques',
               actif: 'OUI',
@@ -201,7 +201,7 @@ export class MainNavComponent implements OnInit {
         // ===================== FREQUENCES =====================
         {
           id: 1100,
-          direction: 5555,
+          direction: 2,
           titre: 'Elements liés aux Fréquences',
           description: 'Elements liés aux Fréquences',
           actif: 'OUI',
@@ -211,7 +211,7 @@ export class MainNavComponent implements OnInit {
           sous_menus: [
             {
               id: 1005,
-              direction: 5555,
+              direction: 2,
               titre: 'Les types de station',
               description: 'Les types de station',
               actif: 'OUI',
@@ -222,7 +222,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1010,
-              direction: 5555,
+              direction: 2,
               titre: 'Les types de canaux',
               description: 'Les types de canaux',
               actif: 'OUI',
@@ -233,7 +233,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1010,
-              direction: 5555,
+              direction: 2,
               titre: 'Les types de bande de fréquence',
               description: 'Les types de bande de fréquence',
               actif: 'OUI',
@@ -244,7 +244,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1010,
-              direction: 5555,
+              direction: 2,
               titre: 'Les classes de débits',
               description: 'Les classes de débits',
               actif: 'OUI',
@@ -255,7 +255,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1010,
-              direction: 5555,
+              direction: 2,
               titre: 'Les classes de largeur de bande',
               description: 'Les classes de largeur de bande',
               actif: 'OUI',
@@ -266,7 +266,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1010,
-              direction: 5555,
+              direction: 2,
               titre: 'Les classes de puissance',
               description: 'Les classes de puissance',
               actif: 'OUI',
@@ -282,7 +282,7 @@ export class MainNavComponent implements OnInit {
         // ===================== TARIFS =====================
         {
           id: 1300,
-          direction: 5555,
+          direction: 2,
           titre: 'Tarifs',
           description: 'Paramètres liés aux tarifs',
           actif: 'OUI',
@@ -292,7 +292,7 @@ export class MainNavComponent implements OnInit {
           sous_menus: [
             {
               id: 1030,
-              direction: 5555,
+              direction: 2,
               titre: 'Les tarifs frais de dossier',
               description: 'Les tarifs frais de dossier',
               actif: 'OUI',
@@ -303,7 +303,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1035,
-              direction: 5555,
+              direction: 2,
               titre: 'Les tarifs des redevances annuelles de gestion',
               description: 'Les tarifs des redevances annuelles de gestion',
               actif: 'OUI',
@@ -325,7 +325,7 @@ export class MainNavComponent implements OnInit {
             },*/
             {
               id: 1045,
-              direction: 5555,
+              direction: 2,
               titre: 'Les tarifs liés aux fréquences',
               description: 'Les tarifss liés aux fréquences',
               actif: 'OUI',
@@ -342,7 +342,7 @@ export class MainNavComponent implements OnInit {
         // ===================== SECURITE / UTILISATEURS =====================
         {
           id: 1500,
-          direction: 5555,
+          direction: 2,
           titre: 'Sécurité / Utilisateurs',
           description: 'Rôles et droits',
           actif: 'OUI',
@@ -352,7 +352,7 @@ export class MainNavComponent implements OnInit {
           sous_menus: [
             {
               id: 1050,
-              direction: 5555,
+              direction: 2,
               titre: 'Les rôles',
               description: 'Les rôles',
               actif: 'OUI',
@@ -363,7 +363,7 @@ export class MainNavComponent implements OnInit {
             },
             {
               id: 1050,
-              direction: 5555,
+              direction: 2,
               titre: 'Les utilisateurs',
               description: 'Les utilisateurs',
               actif: 'OUI',

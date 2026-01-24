@@ -8,106 +8,202 @@
 
   <!-- Type de station -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.type_station?.visible">
-    <mat-label>Type station</mat-label>
+                  *ngIf="stationCfg.type_station?.visible"
+                  [ngClass]="{'required-field': isRequired('type_station')}">
+    <mat-label>
+      Type station
+      <span *ngIf="isRequired('type_station')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="type_station" matTooltip="Type station">
       <mat-option *ngFor="let item of typeStations" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+
+    <mat-error *ngIf="form.get('type_station')?.hasError('required')">
+      Type station obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Puissance -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isPuissanceVisible()">
-    <mat-label>Puissance(W)</mat-label>
+                  *ngIf="isPuissanceVisible()"
+                  [ngClass]="{'required-field': isRequired('puissance')}">
+    <mat-label>
+      Puissance (W)
+      <span *ngIf="isRequired('puissance')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="puissance">
+
+    <mat-error *ngIf="form.get('puissance')?.hasError('required')">
+      Puissance obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Nombre de stations -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.nombre_station?.visible">
-    <mat-label>Nombre de stations</mat-label>
+                  *ngIf="stationCfg.nombre_station?.visible"
+                  [ngClass]="{'required-field': isRequired('nombre_station')}">
+    <mat-label>
+      Nombre de stations
+      <span *ngIf="isRequired('nombre_station')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="nombre_station" min="1">
+
+    <mat-error *ngIf="form.get('nombre_station')?.hasError('required')">
+      Nombre de stations obligatoire
+    </mat-error>
+    <mat-error *ngIf="form.get('nombre_station')?.hasError('min')">
+      Minimum 1
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Largeur de bande (MHz) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isLargeurBandeMhzVisible()">
-    <mat-label>Largeur de bande (MHz)</mat-label>
+                  *ngIf="isLargeurBandeMhzVisible()"
+                  [ngClass]="{'required-field': isRequired('largeur_bande_mhz')}">
+    <mat-label>
+      Largeur de bande (MHz)
+      <span *ngIf="isRequired('largeur_bande_mhz')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="largeur_bande_mhz">
+
+    <mat-error *ngIf="form.get('largeur_bande_mhz')?.hasError('required')">
+      Largeur de bande obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Débit (kbps) -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="isDebitVisible()">
-    <mat-label>Débit (kbps)</mat-label>
+                  *ngIf="isDebitVisible()"
+                  [ngClass]="{'required-field': isRequired('debit_kbps')}">
+    <mat-label>
+      Débit (kbps)
+      <span *ngIf="isRequired('debit_kbps')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="debit_kbps">
+
+    <mat-error *ngIf="form.get('debit_kbps')?.hasError('required')">
+      Débit obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Bande de fréquence -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.type_bande_frequence?.visible">
-    <mat-label>Bande de fréquence</mat-label>
+                  *ngIf="stationCfg.type_bande_frequence?.visible"
+                  [ngClass]="{'required-field': isRequired('type_bande_frequence')}">
+    <mat-label>
+      Bande de fréquence
+      <span *ngIf="isRequired('type_bande_frequence')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="type_bande_frequence" matTooltip="Bande de fréquence">
       <mat-option *ngFor="let item of typeBandeFrequences" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+
+    <mat-error *ngIf="form.get('type_bande_frequence')?.hasError('required')">
+      Bande de fréquence obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Caractère radio -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.caractere_radio?.visible">
-    <mat-label>Caractère radio</mat-label>
+                  *ngIf="stationCfg.caractere_radio?.visible"
+                  [ngClass]="{'required-field': isRequired('caractere_radio')}">
+    <mat-label>
+      Caractère radio
+      <span *ngIf="isRequired('caractere_radio')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="caractere_radio" matTooltip="Caractère radio">
-      <!-- à remplacer par une liste dynamique si tu as un référentiel -->
-      <mat-option [value]="1">Commercial</mat-option>
-      <mat-option [value]="2">Non commercial</mat-option>
+      <mat-option *ngFor="let item of caractereRadios" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
     </mat-select>
+
+    <mat-error *ngIf="form.get('caractere_radio')?.hasError('required')">
+      Caractère radio obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Nombre de tranches -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.nbre_tranche?.visible">
-    <mat-label>Nombre de tranches de facturation</mat-label>
+                  *ngIf="stationCfg.nbre_tranche?.visible"
+                  [ngClass]="{'required-field': isRequired('nbre_tranche')}">
+    <mat-label>
+      Nombre de tranches de facturation
+      <span *ngIf="isRequired('nbre_tranche')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput type="number" formControlName="nbre_tranche" min="1">
+
+    <mat-error *ngIf="form.get('nbre_tranche')?.hasError('required')">
+      Nombre de tranches obligatoire
+    </mat-error>
+    <mat-error *ngIf="form.get('nbre_tranche')?.hasError('min')">
+      Minimum 1
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
-  <!-- Zone de couverture (si utilisée sur station dans certaines catégories) -->
+  <!-- Zone de couverture -->
   <mat-form-field appearance="outline" class="w-full"
-                  *ngIf="stationCfg.zone_couverture?.visible">
-    <mat-label>Zone de couverture</mat-label>
+                  *ngIf="stationCfg.zone_couverture?.visible"
+                  [ngClass]="{'required-field': isRequired('zone_couverture')}">
+    <mat-label>
+      Zone de couverture
+      <span *ngIf="isRequired('zone_couverture')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <mat-select formControlName="zone_couverture" matTooltip="Zone de couverture">
       <mat-option *ngFor="let item of zoneCouvertures" [value]="item.id">
         {{ item.libelle }}
       </mat-option>
     </mat-select>
+
+    <mat-error *ngIf="form.get('zone_couverture')?.hasError('required')">
+      Zone de couverture obligatoire
+    </mat-error>
   </mat-form-field>
 
   <div class="blank-row"></div>
 
   <!-- Localité (sur 2 colonnes) -->
   <mat-form-field appearance="outline" class="w-full col-span-2"
-                  *ngIf="stationCfg.localite?.visible">
-    <mat-label>Localité</mat-label>
+                  *ngIf="stationCfg.localite?.visible"
+                  [ngClass]="{'required-field': isRequired('localite')}">
+    <mat-label>
+      Localité
+      <span *ngIf="isRequired('localite')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
     <input matInput formControlName="localite">
+
+    <mat-error *ngIf="form.get('localite')?.hasError('required')">
+      Localité obligatoire
+    </mat-error>
   </mat-form-field>
 
 </mat-dialog-content>

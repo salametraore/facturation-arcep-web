@@ -4,7 +4,7 @@ import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { Subject, of, merge } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { takeUntil, switchMap, tap, catchError, distinctUntilChanged } from 'rxjs/operators';
 
 import { CategoryId } from '../../../../shared/models/frequences-category.types';
@@ -24,6 +24,8 @@ import { ZoneCouvertureService } from '../../../../shared/services/zone-couvertu
 
 import { ClasseLargeurBandeService } from '../../../../shared/services/classe-largeur-bande.service';
 import { bindCanalClasses } from '../../forms/canal-classes-binder';
+import { CaractereRadio } from '../../../../shared/models/caractere-radio.model';
+import { CaractereRadioService } from '../../../../shared/services/caractere-radio.service';
 
 export interface CanalDialogData {
   canal?: FicheTechniqueCanalRequest;
@@ -46,6 +48,8 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
   typeCanaux: TypeCanal[] = [];
   typeStations: TypeStation[] = [];
   zoneCouvertures: ZoneCouverture[] = [];
+  caractereRadios: CaractereRadio[] = [];
+  caractereRadio!: CaractereRadio;
 
   duplexModes = [
     { value: 'FDD', label: 'FDD' },
@@ -62,14 +66,26 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
   showModeDuplexage = false;
   showPuissanceSortie = false;
 
-  // ✅ nbre_canaux (sera visible uniquement si config le permet => cat=4)
+  // ✅ nbre_canaux désormais obligatoire partout
   showNbreCanaux = true;
 
-  // ✅ code résolu (via API getItem)
+  // ✅ codes résolus
   private selectedTypeStationCode: string | null = null;
+  private selectedTypeCanalCode: string | null = null;
 
   // ✅ mode édition ?
   private readonly isEditMode: boolean;
+
+  // ✅ uniquement pour le hint (pas de calcul ici !)
+  private readonly DUPLEX_CODES = new Set<string>([
+    'TC_CRED_PUBLIC',
+    'TC_PMR3_MOBILE',
+    'TC_PMR_FIXE',
+  ]);
+
+  private readonly SIMPLEXE_CODES = new Set<string>([
+    'TC_PMR2_MOBILE',
+  ]);
 
   constructor(
     private fb: FormBuilder,
@@ -79,6 +95,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     private typeStationService: TypeStationService,
     private typeCanauxService: TypeCanauxService,
     private zoneCouvertureService: ZoneCouvertureService,
+    private caractereRadioService: CaractereRadioService,
     private classeLargeurBande: ClasseLargeurBandeService,
   ) {
     this.isEditMode = !!data?.canal;
@@ -88,68 +105,112 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     return this.cfg.canaux;
   }
 
-  private isCat4(): boolean {
-    return this.data?.cat === 4;
-  }
-
-  /**
-   * ✅ Cat=4
-   * nbre_tranche_facturation = largeur_bande_khz * nbre_canaux / 25
-   * (retour entier avec CEIL, min=1)
-   */
-  private computeTranchesCat4(): number {
-    const largeur = this.toNumber(this.form?.get('largeur_bande_khz')?.value) ?? 0;
-    const canaux = Math.max(1, Math.floor(this.toNumber(this.form?.get('nbre_canaux')?.value) ?? 1));
-
-    const raw = (largeur * canaux) / 25;
-
-    // ✅ règle de rounding : CEIL + min 1
-    return Math.max(1, Math.ceil(raw));
-  }
-
-  private applyCat4AutoCalc(): void {
-    if (!this.isCat4()) return;
-
-    const trancheCtrl = this.form.get('nbre_tranche_facturation');
-    if (!trancheCtrl) return;
-
-    // ✅ on bloque la saisie manuelle (calculé)
-    trancheCtrl.disable({ emitEvent: false });
-
-    const largeurCtrl = this.form.get('largeur_bande_khz');
-    const canauxCtrl = this.form.get('nbre_canaux');
-
-    // ✅ recalcul initial
-    trancheCtrl.setValue(this.computeTranchesCat4(), { emitEvent: false });
-
-    // ✅ recalcul à chaque changement de largeur / nbre_canaux
-    merge(
-      largeurCtrl?.valueChanges ?? of(null),
-      canauxCtrl?.valueChanges ?? of(null),
-    )
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        trancheCtrl.setValue(this.computeTranchesCat4(), { emitEvent: false });
-      });
+  // ✅ hint dynamique selon code type canal
+  get trancheHint(): string {
+    const code = this.selectedTypeCanalCode;
+    if (code && this.DUPLEX_CODES.has(code)) {
+      return 'Calcul automatique : tranches = (nb canaux × largeur) / 25';
+    }
+    if (code && this.SIMPLEXE_CODES.has(code)) {
+      return 'Calcul automatique : tranches = (nb canaux × largeur) / 12,5';
+    }
+    return 'Calcul automatique : tranches = nb canaux';
   }
 
   ngOnInit(): void {
     this.title = this.data.canal ? 'Modifier le canal' : 'Ajouter un canal';
     this.cfg = CATEGORY_CONFIG[this.data.cat];
 
-    // ✅ form avec buildCanalFG => contient mode_duplexage, puissance_sortie, nbre_canaux, etc.
+    // ✅ FG : le calcul des tranches est fait dans buildCanalFG()
     this.form = buildCanalFG(this.fb, this.data.canal ?? {}, this.data.cat);
 
-    // classe_largeur_bande calculée à partir de largeur_bande_khz (champ caché)
+    // ✅ sécurité : nbre_canaux obligatoire partout (déjà dans buildCanalFG, mais on verrouille aussi ici)
+    const nbreCanauxCtrl = this.form.get('nbre_canaux');
+    if (nbreCanauxCtrl) {
+      nbreCanauxCtrl.setValidators([Validators.required, Validators.min(1)]);
+      nbreCanauxCtrl.updateValueAndValidity({ emitEvent: false });
+
+      if (nbreCanauxCtrl.value == null || nbreCanauxCtrl.value === '') {
+        nbreCanauxCtrl.setValue(1, { emitEvent: false });
+      }
+    }
+
+    // ✅ classe_largeur_bande calculée à partir de largeur_bande_khz
     bindCanalClasses(this.form, this.classeLargeurBande, this.destroy$);
 
-    // IMPORTANT : charger les listes
+    // ✅ charger les listes
     this.loadData();
 
-    // ✅ Cat=4 => applique la formule + disable la saisie
-    this.applyCat4AutoCalc();
+    // ✅ règles selon type station (inchangé)
+    this.listenTypeStationChanges();
 
-    // ✅ écoute changement type_station (id) -> getItem(id) -> code -> apply règles
+    // ✅ IMPORTANT :
+    // ici on fait juste : type_canal (ID) => type_canal_code (string)
+    // ==> le recalcul nbre_tranche_facturation est déjà géré dans buildCanalFG()
+    this.listenTypeCanalChanges();
+
+    // ✅ première application des règles UI
+    const typeStationCtrl = this.form.get('type_station');
+    const initStation = typeStationCtrl?.value;
+
+    if (initStation != null) {
+      typeStationCtrl?.setValue(initStation, { emitEvent: true });
+    } else {
+      this.applyConditionalVisibilityAndValidators();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ------------------------------------------------
+  // ✅ Synchronisation type_canal -> type_canal_code
+  // ------------------------------------------------
+  private listenTypeCanalChanges(): void {
+    const typeCanalCtrl = this.form.get('type_canal');
+
+    typeCanalCtrl?.valueChanges
+      .pipe(takeUntil(this.destroy$), distinctUntilChanged())
+      .subscribe((rawId) => {
+        const id = Number(rawId);
+        if (!id || Number.isNaN(id)) {
+          this.selectedTypeCanalCode = null;
+          this.form.get('type_canal_code')?.setValue(null, { emitEvent: true });
+          return;
+        }
+
+        // si la liste n'est pas encore chargée, on ne fait rien
+        const found = (this.typeCanaux ?? []).find(tc => tc.id === id);
+        this.selectedTypeCanalCode = found?.code ?? null;
+
+        // ✅ LA LIGNE IMPORTANTE : alimenter le champ caché
+        // emitEvent: true => buildCanalFG recalculera automatiquement les tranches
+        this.form.get('type_canal_code')?.setValue(this.selectedTypeCanalCode, { emitEvent: true });
+      });
+  }
+
+  private syncTypeCanalCodeFromCurrentSelection(): void {
+    const typeCanalCtrl = this.form.get('type_canal');
+    const id = Number(typeCanalCtrl?.value);
+
+    if (!id || Number.isNaN(id)) {
+      this.selectedTypeCanalCode = null;
+      this.form.get('type_canal_code')?.setValue(null, { emitEvent: true });
+      return;
+    }
+
+    const found = (this.typeCanaux ?? []).find(tc => tc.id === id);
+    this.selectedTypeCanalCode = found?.code ?? null;
+
+    this.form.get('type_canal_code')?.setValue(this.selectedTypeCanalCode, { emitEvent: true });
+  }
+
+  // ------------------------------------------------
+  // ✅ Type station (ID) -> getItem -> code
+  // ------------------------------------------------
+  private listenTypeStationChanges(): void {
     const typeCtrl = this.form.get('type_station');
 
     typeCtrl?.valueChanges
@@ -179,26 +240,23 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.applyConditionalVisibilityAndValidators();
       });
-
-    // ✅ première application
-    const init = typeCtrl?.value;
-    if (init != null) {
-      typeCtrl?.setValue(init, { emitEvent: true });
-    } else {
-      this.applyConditionalVisibilityAndValidators();
-    }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
+  // ------------------------------------------------
+  // DATA
+  // ------------------------------------------------
   loadData(): void {
     const cat = this.data.cat;
 
     this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanal[]) => {
       this.typeCanaux = (listeCanaux ?? []).filter(tc => tc.categorie_produit === cat);
+
+      // ✅ une fois la liste chargée, on résout le code si le type_canal était déjà pré-rempli (édition)
+      this.syncTypeCanalCodeFromCurrentSelection();
+    });
+
+    this.caractereRadioService.getListItems().subscribe((listeCaractereRadios: CaractereRadio[]) => {
+      this.caractereRadios = listeCaractereRadios ?? [];
     });
 
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
@@ -224,16 +282,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // ✅ sécurité : recalcul forcé avant sortie
-    if (this.isCat4()) {
-      const trancheCtrl = this.form.get('nbre_tranche_facturation');
-      if (trancheCtrl) {
-        trancheCtrl.enable({ emitEvent: false }); // pour que la valeur soit OK même si certains contrôles attendent enabled
-        trancheCtrl.setValue(this.computeTranchesCat4(), { emitEvent: false });
-        trancheCtrl.disable({ emitEvent: false });
-      }
-    }
-
+    // ✅ pas besoin de recalcul ici : c'est déjà géré dans buildCanalFG()
     const value = this.form.getRawValue() as FicheTechniqueCanalRequest;
     this.dialogRef.close(value);
   }
@@ -251,9 +300,9 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     return base && this.showTypeCanal;
   }
 
+  // ✅ toujours visible/obligatoire
   isNbreCanauxVisible(): boolean {
-    const base = this.canalCfg?.nbre_canaux?.visible !== false;
-    return base && this.showNbreCanaux;
+    return true;
   }
 
   isNbreTrancheVisible(): boolean {
@@ -330,13 +379,14 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
     const target = (this.typeCanaux ?? []).find(tc => tc.code === code);
     if (target?.id != null) {
-      ctrl.setValue(target.id, { emitEvent: false });
+      // ✅ emitEvent true => déclenche listenTypeCanalChanges => type_canal_code => recalcul tranches
+      ctrl.setValue(target.id, { emitEvent: true });
       ctrl.updateValueAndValidity({ emitEvent: false });
     }
   }
 
   // -----------------------------
-  // Règles métier cat 3/4/5
+  // Règles métier cat 3/4/5 (inchangé)
   // -----------------------------
   private applyConditionalVisibilityAndValidators(): void {
     const cat = this.data.cat;
@@ -489,9 +539,19 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  private toNumber(v: any): number | null {
-    if (v === null || v === undefined || v === '') return null;
-    const n = typeof v === 'number' ? v : Number(String(v).replace(',', '.'));
-    return Number.isFinite(n) ? n : null;
+  // ✅ permet d'afficher une étoile sur les champs required (même si required est ajouté/retiré dynamiquement)
+  isRequired(ctrlName: string): boolean {
+    const ctrl: any = this.form?.get(ctrlName);
+    if (!ctrl) return false;
+
+    // Angular >= 14
+    if (typeof ctrl.hasValidator === 'function') {
+      return ctrl.hasValidator(Validators.required);
+    }
+
+    // fallback
+    const res = ctrl.validator ? ctrl.validator({} as any) : null;
+    return !!(res && res.required);
   }
+
 }

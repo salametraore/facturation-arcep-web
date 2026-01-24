@@ -3,6 +3,7 @@ export interface TypeCanal {
     code?: string;
     libelle?: string;
     categorie_produit? :number
+    valeur? :number
 }
 
 

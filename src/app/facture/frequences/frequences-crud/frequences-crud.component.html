@@ -468,7 +468,7 @@
                       <th *ngIf="cfg[cat]?.canaux?.nbre_canaux?.visible">Nb canaux</th>
 
                       <th *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">Zone</th>
-                      <th *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">Tranches</th>
+                      <th *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">Nbre Tranches</th>
                       <th *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">Largeur bande</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">Bande fréquence</th>
                       <th *ngIf="cfg[cat]?.canaux?.mode_duplexage?.visible">Mode Duplexage</th>
@@ -553,10 +553,10 @@
                       <th>N° Canal</th>
                       <th>Nature</th>
                       <th>Produit</th>
-                      <th>Base</th>
+                      <th>Nbre Stations/Tranches</th>
                       <th>PU</th>
-                      <th>Coef</th>
                       <th>Montant</th>
+                      <th>Mnt prorata</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -569,8 +569,8 @@
 
                       <td>{{ d.base_quantite | number:'1.0-0':'fr-FR' }}</td>
                       <td>{{ d.montant_unitaire | number:'1.0-0':'fr-FR' }}</td>
-                      <td>{{ d.coefficient_global | number:'1.2-2':'fr-FR' }}</td>
                       <td><strong>{{ d.montant_calcule | number:'1.0-0':'fr-FR' }}</strong></td>
+                      <td><strong>{{ d.prorata_valeur | number:'1.0-0':'fr-FR' }}</strong></td>
                     </tr>
                     </tbody>
                   </table>
