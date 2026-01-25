@@ -1,11 +1,11 @@
 // src/app/facture/frequences/frequences-crud/frequences-crud.component.ts
 
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, FormControl} from '@angular/forms';
-import {MatDialog} from '@angular/material/dialog';
-import {MatTable} from '@angular/material/table';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTable } from '@angular/material/table';
 
-import {FicheTechniques, MiseAJourStatutFiche} from '../../../shared/models/ficheTechniques';
+import { FicheTechniques, MiseAJourStatutFiche } from '../../../shared/models/ficheTechniques';
 
 import {
   CategoryId,
@@ -32,12 +32,12 @@ import {
   getStationsFA
 } from '../forms/frequences.form';
 
-import {CATEGORY_CONFIG} from '../config/frequences-category.config';
+import { CATEGORY_CONFIG } from '../config/frequences-category.config';
 
-import {FichesTechniquesFrequenceService} from '../../../shared/services/fiches-techniques-frequences';
-import {MsgMessageServiceService} from '../../../shared/services/msg-message-service.service';
-import {DialogService} from '../../../shared/services/dialog.service';
-import {operations, date_converte} from '../../../constantes';
+import { FichesTechniquesFrequenceService } from '../../../shared/services/fiches-techniques-frequences';
+import { MsgMessageServiceService } from '../../../shared/services/msg-message-service.service';
+import { DialogService } from '../../../shared/services/dialog.service';
+import { operations, date_converte } from '../../../constantes';
 
 import {
   StationDialogData,
@@ -49,29 +49,31 @@ import {
   CanalFrequencesDialogComponent
 } from '../modals/canal-frequences-dialog/canal-frequences-dialog.component';
 
-import {CategorieProduit} from '../../../shared/models/categorie-produit';
-import {StatutFicheTechnique} from '../../../shared/models/statut-fiche-technique';
-import {Client} from '../../../shared/models/client';
-import {HistoriqueFicheTechnique} from '../../../shared/models/historique-traitement-fiche-technique';
-import {FicheTechniquesService} from '../../../shared/services/fiche-techniques.service';
-import {CategorieProduitService} from '../../../shared/services/categorie-produit.service';
-import {ProduitService} from '../../../shared/services/produits.service';
-import {ClientService} from '../../../shared/services/client.service';
-import {StatutFicheTechniqueService} from '../../../shared/services/statut-fiche-technique.service';
-import {TypeBandeFrequence} from '../../../shared/models/typeBandeFrequenceDetail';
-import {TypeCanal} from '../../../shared/models/typeCanal';
-import {TypeStation} from '../../../shared/models/type-station';
-import {TypeBandesFrequenceService} from '../../../shared/services/type-bandes-frequence.service';
-import {TypeStationService} from '../../../shared/services/type-station.service';
-import {TypeCanauxService} from '../../../shared/services/type-canaux.service';
-import {ZoneCouverture} from '../../../shared/models/zone-couverture';
-import {ZoneCouvertureService} from '../../../shared/services/zone-couverture.service';
-import {Utilisateur} from '../../../shared/models/utilisateur';
-import {AuthService} from '../../../authentication/auth.service';
-import {FicheTechniqueCanal, FicheTechniqueStation} from '../../../shared/models/fiche-technique-frequence';
-import {startWith, map, finalize, mapTo, switchMap, tap} from 'rxjs/operators';
-import {CaractereRadioService} from "../../../shared/services/caractere-radio.service";
-import {CaractereRadio} from "../../../shared/models/caractere-radio.model";
+import { CategorieProduit } from '../../../shared/models/categorie-produit';
+import { StatutFicheTechnique } from '../../../shared/models/statut-fiche-technique';
+import { Client } from '../../../shared/models/client';
+import { HistoriqueFicheTechnique } from '../../../shared/models/historique-traitement-fiche-technique';
+import { FicheTechniquesService } from '../../../shared/services/fiche-techniques.service';
+import { CategorieProduitService } from '../../../shared/services/categorie-produit.service';
+import { ProduitService } from '../../../shared/services/produits.service';
+import { ClientService } from '../../../shared/services/client.service';
+import { StatutFicheTechniqueService } from '../../../shared/services/statut-fiche-technique.service';
+import { TypeBandeFrequence } from '../../../shared/models/typeBandeFrequenceDetail';
+import { TypeCanal } from '../../../shared/models/typeCanal';
+import { TypeStation } from '../../../shared/models/type-station';
+import { TypeBandesFrequenceService } from '../../../shared/services/type-bandes-frequence.service';
+import { TypeStationService } from '../../../shared/services/type-station.service';
+import { TypeCanauxService } from '../../../shared/services/type-canaux.service';
+import { ZoneCouverture } from '../../../shared/models/zone-couverture';
+import { ZoneCouvertureService } from '../../../shared/services/zone-couverture.service';
+import { Utilisateur } from '../../../shared/models/utilisateur';
+import { AuthService } from '../../../authentication/auth.service';
+import { FicheTechniqueCanal, FicheTechniqueStation } from '../../../shared/models/fiche-technique-frequence';
+
+import { startWith, map, finalize, mapTo, switchMap, tap } from 'rxjs/operators';
+
+import { CaractereRadioService } from '../../../shared/services/caractere-radio.service';
+import { CaractereRadio } from '../../../shared/models/caractere-radio.model';
 
 @Component({
   selector: 'frequences-crud',
@@ -189,7 +191,6 @@ export class FrequencesCrudComponent implements OnInit {
     private caractereRadioService: CaractereRadioService,
     private zoneCouvertureService: ZoneCouvertureService,
     private statutFicheTechniqueService: StatutFicheTechniqueService,
-    private msgMessageService: MsgMessageServiceService,
     private authService: AuthService,
   ) {}
 
@@ -204,6 +205,24 @@ export class FrequencesCrudComponent implements OnInit {
 
   get canauxFA(): FormArray {
     return this.form ? getCanauxFA(this.form) : this.fb.array([]);
+  }
+
+  // ==========================================================
+  // ✅ PATCH Binder : propagation categorie_produit aux lignes
+  // ==========================================================
+  /** Injecte la catégorie dans une ligne Station/Canal pour que les binders filtrent correctement */
+  private setCategorieOnLineFG(fg: FormGroup, cat: CategoryId): void {
+    const c = fg.get('categorie_produit');
+    if (!c) return;
+
+    // emitEvent:true => permet aux binders (combineLatest) de recalculer
+    c.setValue(cat, { emitEvent: true });
+  }
+
+  /** Propagation de la catégorie à toutes les stations/canaux existants */
+  private propagateCategorieToAllLines(cat: CategoryId): void {
+    (this.stationsFA?.controls ?? []).forEach(ctrl => this.setCategorieOnLineFG(ctrl as FormGroup, cat));
+    (this.canauxFA?.controls ?? []).forEach(ctrl => this.setCategorieOnLineFG(ctrl as FormGroup, cat));
   }
 
   displayClient = (c: Client | null): string => {
@@ -271,7 +290,7 @@ export class FrequencesCrudComponent implements OnInit {
       this.categoriesFiltered = categories
         .filter(c => c.id < 8)
         .sort((a, b) =>
-          (a.libelle ?? '').localeCompare(b.libelle ?? '', 'fr', {sensitivity: 'base'})
+          (a.libelle ?? '').localeCompare(b.libelle ?? '', 'fr', { sensitivity: 'base' })
         );
     });
 
@@ -415,11 +434,17 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.updateDisplayedColumns();
 
+    // ✅ PATCH : si categorie change, rebuild + propagation categorie aux lignes
     this.ficheFG.get('categorie_produit')?.valueChanges.subscribe(val => {
       if (val != null) {
         this.cat = val as CategoryId;
         this.updateDisplayedColumns();
+
+        // rebuild champs visibles/validations
         this.rebuildLinesForCategory(this.cat);
+
+        // important binder classes
+        this.propagateCategorieToAllLines(this.cat);
       }
     });
   }
@@ -440,11 +465,15 @@ export class FrequencesCrudComponent implements OnInit {
         this.form = buildFicheTechniqueFrequenceForm(this.fb, fiche);
 
         (fiche.stations || []).forEach((s: FicheTechniqueStation) => {
-          this.stationsFA.push(buildStationFG(this.fb, s, this.cat));
+          const fg = buildStationFG(this.fb, s, this.cat);
+          this.setCategorieOnLineFG(fg, this.cat); // ✅ PATCH binder
+          this.stationsFA.push(fg);
         });
 
         (fiche.canaux || []).forEach((c: FicheTechniqueCanal) => {
-          this.canauxFA.push(buildCanalFG(this.fb, c, this.cat));
+          const fg = buildCanalFG(this.fb, c, this.cat);
+          this.setCategorieOnLineFG(fg, this.cat); // ✅ PATCH binder
+          this.canauxFA.push(fg);
         });
 
         this.loading = false;
@@ -455,11 +484,13 @@ export class FrequencesCrudComponent implements OnInit {
         this.showCanauxStep = true;
         this.showTarifsStep = true;
 
+        // ✅ PATCH : si categorie change, rebuild + propagation categorie aux lignes
         this.ficheFG.get('categorie_produit')?.valueChanges.subscribe(val => {
           if (val != null) {
             this.cat = val as CategoryId;
             this.updateDisplayedColumns();
             this.rebuildLinesForCategory(this.cat);
+            this.propagateCategorieToAllLines(this.cat);
           }
         });
 
@@ -514,16 +545,23 @@ export class FrequencesCrudComponent implements OnInit {
     const dialogRef = this.dialog.open<StationFrequencesDialogComponent, StationDialogData,
       FicheTechniqueStationRequest>(StationFrequencesDialogComponent, {
       width: '800px',
-      data: {station: stationValue, cat: this.cat}
+      data: { station: stationValue, cat: this.cat }
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
 
+      // ✅ PATCH : sécurise categorie_produit dans la ligne (binder + backend)
+      (result as any).categorie_produit = this.cat;
+
       if (index != null) {
-        (this.stationsFA.at(index) as FormGroup).patchValue(result);
+        const fg = this.stationsFA.at(index) as FormGroup;
+        fg.patchValue(result);
+        this.setCategorieOnLineFG(fg, this.cat);
       } else {
-        this.stationsFA.push(buildStationFG(this.fb, result, this.cat));
+        const fg = buildStationFG(this.fb, result, this.cat);
+        this.setCategorieOnLineFG(fg, this.cat);
+        this.stationsFA.push(fg);
       }
 
       this.stationsTable?.renderRows();
@@ -531,7 +569,7 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   onRemoveStation(index: number): void {
-    this.dialogService.yes_no({message: 'Supprimer cette station ?'})
+    this.dialogService.yes_no({ message: 'Supprimer cette station ?' })
       .subscribe(yes => {
         if (yes) {
           this.stationsFA.removeAt(index);
@@ -541,7 +579,7 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   onRemoveCanal(index: number): void {
-    this.dialogService.yes_no({message: 'Supprimer ce canal ?'})
+    this.dialogService.yes_no({ message: 'Supprimer ce canal ?' })
       .subscribe(yes => {
         if (yes) {
           this.canauxFA.removeAt(index);
@@ -567,11 +605,14 @@ export class FrequencesCrudComponent implements OnInit {
       CanalDialogData,
       FicheTechniqueCanalRequest>(CanalFrequencesDialogComponent, {
       width: '800px',
-      data: {canal: canalValue, cat: this.cat}
+      data: { canal: canalValue, cat: this.cat }
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
+
+      // ✅ PATCH : sécurise categorie_produit dans la ligne (binder + backend)
+      (result as any).categorie_produit = this.cat;
 
       // ✅ cat=4 : sécuriser le calcul en sortie (au cas où la modale ne le fait pas)
       if (this.cat === 4) {
@@ -583,9 +624,13 @@ export class FrequencesCrudComponent implements OnInit {
       }
 
       if (index != null) {
-        (this.canauxFA.at(index) as FormGroup).patchValue(result);
+        const fg = this.canauxFA.at(index) as FormGroup;
+        fg.patchValue(result);
+        this.setCategorieOnLineFG(fg, this.cat);
       } else {
-        this.canauxFA.push(buildCanalFG(this.fb, result, this.cat));
+        const fg = buildCanalFG(this.fb, result, this.cat);
+        this.setCategorieOnLineFG(fg, this.cat);
+        this.canauxFA.push(fg);
       }
 
       this.canauxTable?.renderRows();
@@ -618,6 +663,9 @@ export class FrequencesCrudComponent implements OnInit {
     if (catVal != null) {
       this.cat = catVal as CategoryId;
       this.updateDisplayedColumns();
+
+      // ✅ PATCH : garantie propagation catégorie sur lignes existantes
+      this.propagateCategorieToAllLines(this.cat);
     }
 
     if (this.isNew) {
@@ -649,20 +697,26 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   getCategorieProduit(id: number) {
-    return this.categories.find(p => p.id === id)?.libelle;
+    return this.categories?.find(p => p.id === id)?.libelle;
   }
 
   private rebuildLinesForCategory(cat: CategoryId): void {
     for (let i = 0; i < this.stationsFA.length; i++) {
       const old = this.stationsFA.at(i) as FormGroup;
       const value = old.getRawValue();
-      this.stationsFA.setControl(i, buildStationFG(this.fb, value, cat));
+
+      const fg = buildStationFG(this.fb, value, cat);
+      this.setCategorieOnLineFG(fg, cat); // ✅ PATCH binder
+      this.stationsFA.setControl(i, fg);
     }
 
     for (let i = 0; i < this.canauxFA.length; i++) {
       const old = this.canauxFA.at(i) as FormGroup;
       const value = old.getRawValue();
-      this.canauxFA.setControl(i, buildCanalFG(this.fb, value, cat));
+
+      const fg = buildCanalFG(this.fb, value, cat);
+      this.setCategorieOnLineFG(fg, cat); // ✅ PATCH binder
+      this.canauxFA.setControl(i, fg);
     }
 
     this.stationsTable?.renderRows();
@@ -738,7 +792,7 @@ export class FrequencesCrudComponent implements OnInit {
           const newId = saved?.id;
           if (newId) {
             this.isNew = false;
-            this.ficheTechnique = {...(this.ficheTechnique ?? {}), id: newId} as any;
+            this.ficheTechnique = { ...(this.ficheTechnique ?? {}), id: newId } as any;
             this.loadTarifsIfPossible(newId);
           }
         } else {
@@ -863,7 +917,7 @@ export class FrequencesCrudComponent implements OnInit {
       switchMap(() => this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)),
       tap(() => {
         this.transmitLocked = true;
-        this.msgMessageService.success('Fiche transmise avec succès !');
+        this.msgService.success('Fiche transmise avec succès !');
       }),
       finalize(() => {
         this.loadingCalcul = false;

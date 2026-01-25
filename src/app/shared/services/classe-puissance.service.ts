@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, of } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config.service';
-import { BaseClasseService } from './base-classe.service';
+import { BaseClasseService, CategorieProduitValue } from './base-classe.service';
 
 import {
   ClassePuissance,
@@ -37,7 +37,10 @@ export class ClassePuissanceService extends BaseClasseService<ClassePuissance> {
   }
 
   // --------- Helper métier ---------
-  getClasseIdByPuissance(puissanceW: number | string | null | undefined): Observable<number | null> {
+  getClasseIdByPuissance(
+    puissanceW: number | string | null | undefined,
+    categorieProduit?: CategorieProduitValue | null
+  ): Observable<number | null> {
     const p = this.toNumber(puissanceW);
     if (p == null) return of(null);
 
@@ -46,8 +49,9 @@ export class ClassePuissanceService extends BaseClasseService<ClassePuissance> {
         this.findBestClasseId(
           items,
           p,
-          x => this.toNumber(x.p_min_w),   // p_min_w peut être string/number selon ton modèle
-          x => this.toNumber(x.p_max_w)
+          x => this.toNumber(x.p_min_w),
+          x => this.toNumber(x.p_max_w),
+          categorieProduit
         )
       )
     );

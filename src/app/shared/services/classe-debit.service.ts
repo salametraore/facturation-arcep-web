@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, of } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config.service';
-import { BaseClasseService } from './base-classe.service';
+import { BaseClasseService, CategorieProduitValue } from './base-classe.service';
 
 import { ClasseDebit, ClasseDebitRequest } from '../models/classe-debit.model';
 
@@ -33,10 +33,11 @@ export class ClasseDebitService extends BaseClasseService<ClasseDebit> {
     return this.http.put<ClasseDebit>(`${this.baseUrl}/${id}/`, payload);
   }
 
-  // getListItems/getItem/delete hérités (getListItems est caché via shareReplay)
-
   // --------- Helper métier ---------
-  getClasseIdByDebit(debitKbps: number | string | null | undefined): Observable<number | null> {
+  getClasseIdByDebit(
+    debitKbps: number | string | null | undefined,
+    categorieProduit?: CategorieProduitValue | null
+  ): Observable<number | null> {
     const d = this.toNumber(debitKbps);
     if (d == null) return of(null);
 
@@ -46,7 +47,8 @@ export class ClasseDebitService extends BaseClasseService<ClasseDebit> {
           items,
           d,
           x => (x.debit_min_kbps ?? null),
-          x => (x.debit_max_kbps ?? null)
+          x => (x.debit_max_kbps ?? null),
+          categorieProduit
         )
       )
     );

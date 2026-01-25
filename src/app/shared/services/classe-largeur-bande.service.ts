@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, of } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config.service';
-import { BaseClasseService } from './base-classe.service';
+import { BaseClasseService, CategorieProduitValue } from './base-classe.service';
 
 import {
   ClasseLargeurBande,
@@ -36,21 +36,24 @@ export class ClasseLargeurBandeService extends BaseClasseService<ClasseLargeurBa
     return this.http.put<ClasseLargeurBande>(`${this.baseUrl}/${id}/`, payload);
   }
 
-  // getListItems/getItem/delete hérités (avec cache sur getListItems())
-
   // --------- Helper métier ---------
-  getClasseIdByLargeurBande(largeurMhz: number | string | null | undefined): Observable<number | null> {
+  getClasseIdByLargeurBande(
+    largeurMhz: number | string | null | undefined,
+    categorieProduit?: CategorieProduitValue | null
+  ): Observable<number | null> {
     const lb = this.toNumber(largeurMhz);
     if (lb == null) return of(null);
 
     return this.getListItems().pipe(
       map(items => {
         const actifs = (items ?? []).filter(x => x.actif !== false);
+
         return this.findBestClasseId(
           actifs,
           lb,
           x => this.toNumber(x.lb_min_mhz),
-          x => this.toNumber(x.lb_max_mhz)
+          x => this.toNumber(x.lb_max_mhz),
+          categorieProduit
         );
       })
     );

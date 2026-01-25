@@ -1,14 +1,17 @@
-//src/app/shared/services/base-classe.service.ts
+// src/app/shared/services/base-classe.service.ts
 
 import { HttpClient } from '@angular/common/http';
 import { Observable, shareReplay } from 'rxjs';
+
+export type CategorieProduitValue = number | string;
 
 /**
  * Base générique pour les classes (puissance / débit / largeur bande)
  * - cache getListItems() via shareReplay(1)
  * - utilitaires: isInRange + choix de la classe la plus "spécifique"
+ * - support optionnel de categorie_produit (important si les plages se chevauchent)
  */
-export abstract class BaseClasseService<T extends { id: number }> {
+export abstract class BaseClasseService<T extends { id: number; categorie_produit?: CategorieProduitValue | null }> {
 
   protected constructor(protected http: HttpClient) {}
 
@@ -49,19 +52,62 @@ export abstract class BaseClasseService<T extends { id: number }> {
   }
 
   // ---------- utilitaires communs ----------
+
+  /**
+   * Détermine la meilleure classe pour une valeur donnée.
+   * Si categorieProduit est fourni, on filtre d'abord sur cette catégorie
+   * (sinon chevauchement possible entre catégories).
+   *
+   * Stratégie :
+   * 1) classes exact match categorie_produit
+   * 2) fallback sur classes globales (categorie_produit null) si aucune classe catégorie n'existe
+   */
   protected findBestClasseId(
     items: T[],
     value: number,
     getMin: (x: T) => number | null,
-    getMax: (x: T) => number | null
+    getMax: (x: T) => number | null,
+    categorieProduit?: CategorieProduitValue | null
   ): number | null {
 
-    const candidates = (items ?? [])
+    const scoped = this.pickItemsForCategorie(items ?? [], categorieProduit);
+
+    const candidates = scoped
       .filter(x => x?.id != null)
       .filter(x => this.isInRange(value, getMin(x), getMax(x)))
       .sort((a, b) => this.rangeSize(getMin(a), getMax(a)) - this.rangeSize(getMin(b), getMax(b)));
 
     return candidates.length ? candidates[0].id : null;
+  }
+
+  /**
+   * Filtrage catégorie :
+   * - si categorieProduit null/undefined => pas de filtre
+   * - sinon :
+   *   - on prend d'abord les items de la catégorie
+   *   - si aucun item dans cette catégorie => fallback sur items globaux (categorie_produit null)
+   */
+  protected pickItemsForCategorie(items: T[], categorieProduit?: CategorieProduitValue | null): T[] {
+    if (categorieProduit === null || categorieProduit === undefined || categorieProduit === '') {
+      return items;
+    }
+
+    const target = this.normalizeCategorie(categorieProduit);
+
+    const exact = items.filter(x => {
+      const c = (x?.categorie_produit ?? null);
+      if (c === null || c === undefined || c === '') return false;
+      return this.normalizeCategorie(c) === target;
+    });
+
+    if (exact.length > 0) return exact;
+
+    // fallback sur classes "globales"
+    return items.filter(x => (x?.categorie_produit ?? null) === null || x?.categorie_produit === undefined || x?.categorie_produit === '');
+  }
+
+  protected normalizeCategorie(v: CategorieProduitValue): string {
+    return String(v).trim().toLowerCase();
   }
 
   protected isInRange(v: number, min: number | null, max: number | null): boolean {
