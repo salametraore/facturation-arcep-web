@@ -102,6 +102,11 @@ export class FrequencesCrudComponent implements OnInit {
     'actions'
   ];
 
+  /**
+   * ✅ IMPORTANT
+   * classe_puissance est un champ NON AFFICHÉ (renseigné par canal-classes-binder),
+   * donc il ne doit PAS apparaître dans les colonnes.
+   */
   displayedColumnsCanaux: string[] = [
     'no',
     'type_station',
@@ -542,8 +547,11 @@ export class FrequencesCrudComponent implements OnInit {
       stationValue = fg.getRawValue() as FicheTechniqueStationRequest;
     }
 
-    const dialogRef = this.dialog.open<StationFrequencesDialogComponent, StationDialogData,
-      FicheTechniqueStationRequest>(StationFrequencesDialogComponent, {
+    const dialogRef = this.dialog.open<
+      StationFrequencesDialogComponent,
+      StationDialogData,
+      FicheTechniqueStationRequest
+      >(StationFrequencesDialogComponent, {
       width: '800px',
       data: { station: stationValue, cat: this.cat }
     });
@@ -601,9 +609,11 @@ export class FrequencesCrudComponent implements OnInit {
       canalValue = fg.getRawValue() as FicheTechniqueCanalRequest;
     }
 
-    const dialogRef = this.dialog.open<CanalFrequencesDialogComponent,
+    const dialogRef = this.dialog.open<
+      CanalFrequencesDialogComponent,
       CanalDialogData,
-      FicheTechniqueCanalRequest>(CanalFrequencesDialogComponent, {
+      FicheTechniqueCanalRequest
+      >(CanalFrequencesDialogComponent, {
       width: '800px',
       data: { canal: canalValue, cat: this.cat }
     });
@@ -614,21 +624,19 @@ export class FrequencesCrudComponent implements OnInit {
       // ✅ PATCH : sécurise categorie_produit dans la ligne (binder + backend)
       (result as any).categorie_produit = this.cat;
 
-      // ✅ cat=4 : sécuriser le calcul en sortie (au cas où la modale ne le fait pas)
-      if (this.cat === 4) {
-        const largeur = Number(String(result.largeur_bande_khz ?? 0).replace(',', '.')) || 0;
-        const nbreCanaux = Math.max(1, Math.floor(Number(result.nbre_canaux ?? 1)));
-
-        const raw = (largeur * nbreCanaux) / 25;
-        result.nbre_tranche_facturation = Math.max(1, Math.ceil(raw));
-      }
+      /**
+       * ✅ IMPORTANT
+       * - nbre_tranche_facturation est géré dans buildCanalFG() (suggestion auto sans écrasement)
+       * - classe_puissance est un champ non affiché, alimenté par le binder dans la MODALE,
+       *   donc on le conserve simplement via patchValue/result.
+       */
 
       if (index != null) {
         const fg = this.canauxFA.at(index) as FormGroup;
-        fg.patchValue(result);
+        fg.patchValue(result); // ✅ garde aussi classe_puissance
         this.setCategorieOnLineFG(fg, this.cat);
       } else {
-        const fg = buildCanalFG(this.fb, result, this.cat);
+        const fg = buildCanalFG(this.fb, result, this.cat); // ✅ garde aussi classe_puissance
         this.setCategorieOnLineFG(fg, this.cat);
         this.canauxFA.push(fg);
       }
@@ -714,6 +722,7 @@ export class FrequencesCrudComponent implements OnInit {
       const old = this.canauxFA.at(i) as FormGroup;
       const value = old.getRawValue();
 
+      // ✅ buildCanalFG conserve classe_puissance (même si non affiché)
       const fg = buildCanalFG(this.fb, value, cat);
       this.setCategorieOnLineFG(fg, cat); // ✅ PATCH binder
       this.canauxFA.setControl(i, fg);
@@ -758,6 +767,7 @@ export class FrequencesCrudComponent implements OnInit {
       canaux: (payload.canaux ?? []).map(c => ({
         ...c,
         designation: this.formatCanalLine(c),
+        // ✅ classe_puissance part déjà dans payload (champ non affiché mais présent dans le form)
       })),
     };
 
@@ -811,8 +821,8 @@ export class FrequencesCrudComponent implements OnInit {
 
   // ---------- Mise à jour des colonnes dynamiques ----------
   private updateDisplayedColumns(): void {
-    const stationCfg = this.cfg[this.cat]?.stations;
-    const canalCfg = this.cfg[this.cat]?.canaux;
+    const stationCfg: any = this.cfg[this.cat]?.stations as any;
+    const canalCfg: any = this.cfg[this.cat]?.canaux as any;
 
     // ---------- STATIONS ----------
     const sCols: string[] = [];
@@ -848,6 +858,7 @@ export class FrequencesCrudComponent implements OnInit {
     if (!canalCfg || canalCfg.mode_duplexage?.visible !== false) cCols.push('mode_duplexage');
     if (!canalCfg || canalCfg.puissance_sortie?.visible !== false) cCols.push('puissance_sortie');
 
+    // ❌ classe_puissance NON affiché => ne jamais push ici
     cCols.push('actions');
     this.displayedColumnsCanaux = cCols;
   }
@@ -871,10 +882,14 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   hasCanauxToFill(): boolean {
-    const canalCfg = this.cfg?.[this.cat]?.canaux;
+    const canalCfg: any = this.cfg?.[this.cat]?.canaux as any;
     if (!canalCfg) return false;
 
-    const keys: (keyof typeof canalCfg)[] = [
+    /**
+     * ✅ classe_puissance est NON affiché
+     * donc il ne doit pas intervenir dans la logique "a-t-on des champs canal à saisir ?"
+     */
+    const keys: string[] = [
       'type_station',
       'type_canal',
 
@@ -889,7 +904,7 @@ export class FrequencesCrudComponent implements OnInit {
       'puissance_sortie',
     ];
 
-    return keys.some(k => canalCfg[k]?.visible === true);
+    return keys.some(k => canalCfg?.[k]?.visible === true);
   }
 
   onTransmettre(): void {
@@ -941,7 +956,7 @@ export class FrequencesCrudComponent implements OnInit {
   }
 
   private isVisibleCanal(field: keyof FicheTechniqueCanalRuleSet): boolean {
-    const rule = this.cfgRecap?.[this.cat]?.canaux?.[field];
+    const rule = (this.cfgRecap?.[this.cat]?.canaux as any)?.[field];
     return rule?.visible !== false;
   }
 
@@ -1048,6 +1063,7 @@ export class FrequencesCrudComponent implements OnInit {
       details.push(`Tranches : ${this.fmtNumber(c.nbre_tranche_facturation)}`);
     }
 
+    // ❌ on n'affiche pas classe_puissance (champ technique non visible)
     return details.length ? `${title} — ${details.join(' · ')}` : title;
   }
 

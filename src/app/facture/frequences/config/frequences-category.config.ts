@@ -37,7 +37,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: H(),
       type_canal: V(true),
-      nbre_canaux:V(true),
+      nbre_canaux: V(true),
       zone_couverture: V(true),
 
       nbre_tranche_facturation: V(true),
@@ -50,6 +50,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       mode_duplexage: H(),
 
       puissance_sortie: H(),
+
+      classe_puissance_id: H(),
     }
   },
 
@@ -93,6 +95,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       mode_duplexage: H(),
 
       puissance_sortie: H(),
+      classe_puissance_id: H(),
     }
   },
 
@@ -124,7 +127,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: V(true),
       type_canal: V(true),
-      nbre_canaux:V(true),
+      nbre_canaux: V(true),
       zone_couverture: V(false),
 
       nbre_tranche_facturation: V(true),
@@ -137,6 +140,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       mode_duplexage: V(false),
 
       puissance_sortie: H(),
+      classe_puissance_id: H(),
     }
   },
 
@@ -145,7 +149,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     stations: {
       type_station: V(true),
 
-      puissance:  H(),
+      puissance: H(),
       classe_puissance: H(),
 
       nombre_station: V(true),
@@ -169,10 +173,11 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: V(true),
       type_canal: V(true),
-      nbre_canaux:V(true),
+      nbre_canaux: V(true),
       zone_couverture: V(false),
 
-      puissance_sortie:  V(false),
+      puissance_sortie: V(false),
+      classe_puissance_id: H(),
 
       nbre_tranche_facturation: V(true),
 
@@ -197,7 +202,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
 
       localite: V(false),
 
-      puissance:H(),
+      puissance: H(),
       classe_puissance: H(),
 
       debit_kbps: H(),
@@ -206,7 +211,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       largeur_bande_mhz: H(),
       classe_largeur_bande: H(),
 
-      nbre_tranche:H(),
+      nbre_tranche: H(),
 
       type_bande_frequence: H(),
 
@@ -216,10 +221,11 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     canaux: {
       type_station: V(true),
       type_canal: V(true),
-      nbre_canaux:V(true),
+      nbre_canaux: V(true),
       zone_couverture: V(false),
 
-      puissance_sortie:  V(false),
+      puissance_sortie: V(false),
+      classe_puissance_id: H(),
 
       nbre_tranche_facturation: V(true),
 
@@ -271,6 +277,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       mode_duplexage: H(),
 
       puissance_sortie: H(),
+      classe_puissance_id: H(),
     }
   },
 
@@ -305,6 +312,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       zone_couverture: H(),
 
       puissance_sortie: H(),
+      classe_puissance_id: H(),
 
       nbre_tranche_facturation: H(),
 

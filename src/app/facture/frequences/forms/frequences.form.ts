@@ -189,7 +189,10 @@ export function buildCanalFG(
 
     type_bande_frequence: new FormControl(c.type_bande_frequence ?? null, requiredIf(cfg.type_bande_frequence)),
     mode_duplexage: new FormControl(c.mode_duplexage ?? null, requiredIf(cfg.mode_duplexage)),
+
     puissance_sortie: new FormControl(c.puissance_sortie ?? null, requiredIf(cfg.puissance_sortie)),
+    classe_puissance_id: new FormControl(c.classe_puissance_id ?? null),
+
   });
 
   /**

@@ -1,6 +1,7 @@
 // fiche-technique-frequence-create-request.ts
 
 import {StatutFicheTechnique} from "./statut-fiche-technique";
+import {FieldRule} from "./frequences-category.types";
 
 export interface FicheTechniqueCanalRequest {
   categorie_produit: number;
@@ -21,6 +22,8 @@ export interface FicheTechniqueCanalRequest {
   mode_duplexage?: string;
 
   puissance_sortie : number;
+
+  classe_puissance_id : number;
 
   designation?: string;
 }
@@ -143,6 +146,8 @@ export interface FicheTechniqueCanalDetail {
   mode_duplexage?: string;
 
   puissance_sortie : number;
+
+  classe_puissance_id : number;
 
   designation?: string;
 }

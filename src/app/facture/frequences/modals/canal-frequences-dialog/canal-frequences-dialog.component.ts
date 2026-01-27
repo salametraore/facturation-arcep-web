@@ -23,7 +23,9 @@ import { ZoneCouverture } from '../../../../shared/models/zone-couverture';
 import { ZoneCouvertureService } from '../../../../shared/services/zone-couverture.service';
 
 import { ClasseLargeurBandeService } from '../../../../shared/services/classe-largeur-bande.service';
+import { ClassePuissanceService } from '../../../../shared/services/classe-puissance.service'; // ✅ NEW
 import { bindCanalClasses } from '../../forms/canal-classes-binder';
+
 import { CaractereRadio } from '../../../../shared/models/caractere-radio.model';
 import { CaractereRadioService } from '../../../../shared/services/caractere-radio.service';
 
@@ -97,6 +99,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     private zoneCouvertureService: ZoneCouvertureService,
     private caractereRadioService: CaractereRadioService,
     private classeLargeurBande: ClasseLargeurBandeService,
+    private classePuissance: ClassePuissanceService, // ✅ NEW
   ) {
     this.isEditMode = !!data?.canal;
   }
@@ -124,7 +127,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     // ✅ FG : le calcul des tranches est fait dans buildCanalFG()
     this.form = buildCanalFG(this.fb, this.data.canal ?? {}, this.data.cat);
 
-    // ✅ sécurité : nbre_canaux obligatoire partout (déjà dans buildCanalFG, mais on verrouille aussi ici)
+    // ✅ sécurité : nbre_canaux obligatoire partout
     const nbreCanauxCtrl = this.form.get('nbre_canaux');
     if (nbreCanauxCtrl) {
       nbreCanauxCtrl.setValidators([Validators.required, Validators.min(1)]);
@@ -135,8 +138,15 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       }
     }
 
-    // ✅ classe_largeur_bande calculée à partir de largeur_bande_khz
-    bindCanalClasses(this.form, this.classeLargeurBande, this.destroy$);
+    // ✅ classes auto:
+    // - largeur_bande_khz => classe_largeur_bande
+    // - puissance_sortie  => classe_puissance_id
+    bindCanalClasses(
+      this.form,
+      this.classeLargeurBande,
+      this.classePuissance,
+      this.destroy$
+    );
 
     // ✅ charger les listes
     this.loadData();
@@ -144,9 +154,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     // ✅ règles selon type station (inchangé)
     this.listenTypeStationChanges();
 
-    // ✅ IMPORTANT :
-    // ici on fait juste : type_canal (ID) => type_canal_code (string)
-    // ==> le recalcul nbre_tranche_facturation est déjà géré dans buildCanalFG()
+    // ✅ IMPORTANT : type_canal (ID) => type_canal_code (string)
     this.listenTypeCanalChanges();
 
     // ✅ première application des règles UI
@@ -181,12 +189,10 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // si la liste n'est pas encore chargée, on ne fait rien
         const found = (this.typeCanaux ?? []).find(tc => tc.id === id);
         this.selectedTypeCanalCode = found?.code ?? null;
 
-        // ✅ LA LIGNE IMPORTANTE : alimenter le champ caché
-        // emitEvent: true => buildCanalFG recalculera automatiquement les tranches
+        // ✅ alimenter le champ caché (recalc tranches dans buildCanalFG)
         this.form.get('type_canal_code')?.setValue(this.selectedTypeCanalCode, { emitEvent: true });
       });
   }
@@ -250,8 +256,6 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
     this.typeCanauxService.getListItems().subscribe((listeCanaux: TypeCanal[]) => {
       this.typeCanaux = (listeCanaux ?? []).filter(tc => tc.categorie_produit === cat);
-
-      // ✅ une fois la liste chargée, on résout le code si le type_canal était déjà pré-rempli (édition)
       this.syncTypeCanalCodeFromCurrentSelection();
     });
 
@@ -282,7 +286,6 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // ✅ pas besoin de recalcul ici : c'est déjà géré dans buildCanalFG()
     const value = this.form.getRawValue() as FicheTechniqueCanalRequest;
     this.dialogRef.close(value);
   }
@@ -300,7 +303,6 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     return base && this.showTypeCanal;
   }
 
-  // ✅ toujours visible/obligatoire
   isNbreCanauxVisible(): boolean {
     return true;
   }
@@ -379,7 +381,6 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
     const target = (this.typeCanaux ?? []).find(tc => tc.code === code);
     if (target?.id != null) {
-      // ✅ emitEvent true => déclenche listenTypeCanalChanges => type_canal_code => recalcul tranches
       ctrl.setValue(target.id, { emitEvent: true });
       ctrl.updateValueAndValidity({ emitEvent: false });
     }
@@ -387,6 +388,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
   // -----------------------------
   // Règles métier cat 3/4/5 (inchangé)
+  // + ✅ reset classe_puissance_id quand on reset puissance_sortie
   // -----------------------------
   private applyConditionalVisibilityAndValidators(): void {
     const cat = this.data.cat;
@@ -397,10 +399,19 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     const duplexCtrl = this.form.get('mode_duplexage');
     const puissanceCtrl = this.form.get('puissance_sortie');
 
+    // ✅ NEW : champ calculé
+    const classePuissanceIdCtrl = this.form.get('classe_puissance_id');
+
     this.clearValidators(zoneCtrl);
     this.clearValidators(bandeCtrl);
     this.clearValidators(duplexCtrl);
     this.clearValidators(puissanceCtrl);
+
+    // helper : quand on efface puissance_sortie => on efface aussi la classe
+    const resetClassePuissanceId = () => {
+      classePuissanceIdCtrl?.setValue(null, { emitEvent: false });
+      classePuissanceIdCtrl?.updateValueAndValidity({ emitEvent: false });
+    };
 
     if (cat === 3 || cat === 4) {
       this.showTypeCanal = true;
@@ -434,11 +445,13 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
         this.hideButKeepValue(bandeCtrl);
         this.hideButKeepValue(duplexCtrl);
         this.hideButKeepValue(puissanceCtrl);
+        // ✅ en edit mode, on conserve aussi la classe (cohérent avec "keep value")
       } else {
         if (cat !== 5) this.hideAndReset(zoneCtrl);
         this.hideAndReset(bandeCtrl);
         this.hideAndReset(duplexCtrl);
         this.hideAndReset(puissanceCtrl);
+        resetClassePuissanceId(); // ✅ NEW
       }
       return;
     }
@@ -452,6 +465,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
         this.hideAndReset(bandeCtrl);
         this.hideAndReset(duplexCtrl);
         this.hideAndReset(puissanceCtrl);
+        resetClassePuissanceId(); // ✅ NEW
         return;
       }
 
@@ -465,6 +479,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
         this.require(duplexCtrl);
 
         this.hideAndReset(puissanceCtrl);
+        resetClassePuissanceId(); // ✅ NEW
         return;
       }
 
@@ -472,6 +487,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       this.hideAndReset(bandeCtrl);
       this.hideAndReset(duplexCtrl);
       this.hideAndReset(puissanceCtrl);
+      resetClassePuissanceId(); // ✅ NEW
       return;
     }
 
@@ -496,6 +512,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
         this.hideAndReset(bandeCtrl);
         this.hideAndReset(puissanceCtrl);
+        resetClassePuissanceId(); // ✅ NEW
         return;
       }
 
@@ -508,6 +525,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
 
         this.hideAndReset(duplexCtrl);
         this.hideAndReset(puissanceCtrl);
+        resetClassePuissanceId(); // ✅ NEW
         return;
       }
 
@@ -515,6 +533,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       this.hideAndReset(bandeCtrl);
       this.hideAndReset(duplexCtrl);
       this.hideAndReset(puissanceCtrl);
+      resetClassePuissanceId(); // ✅ NEW
       return;
     }
 
@@ -531,25 +550,25 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       if (code === 'TS_TV_AN' || code === 'TS_TV_NUM' || code === 'TS_MMDS') {
         this.setTypeCanalByCode('TC_VIDEO8');
         this.hideAndReset(puissanceCtrl);
+        resetClassePuissanceId(); // ✅ NEW
         return;
       }
 
       this.hideAndReset(puissanceCtrl);
+      resetClassePuissanceId(); // ✅ NEW
       return;
     }
   }
 
-  // ✅ permet d'afficher une étoile sur les champs required (même si required est ajouté/retiré dynamiquement)
+  // ✅ permet d'afficher une étoile sur les champs required
   isRequired(ctrlName: string): boolean {
     const ctrl: any = this.form?.get(ctrlName);
     if (!ctrl) return false;
 
-    // Angular >= 14
     if (typeof ctrl.hasValidator === 'function') {
       return ctrl.hasValidator(Validators.required);
     }
 
-    // fallback
     const res = ctrl.validator ? ctrl.validator({} as any) : null;
     return !!(res && res.required);
   }
