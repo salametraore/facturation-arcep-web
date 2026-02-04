@@ -235,6 +235,27 @@
 
   <div class="blank-row"></div>
 
+
+  <!-- ✅ 9) Caractère radio (CANAL) -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="isCaractereRadioVisible()"
+                  [ngClass]="{'required-field': isRequired('caractere_radio')}">
+    <mat-label>
+      Caractère radio
+      <span *ngIf="isRequired('caractere_radio')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
+    <mat-select formControlName="caractere_radio" matTooltip="Caractère radio">
+      <mat-option *ngFor="let item of caractereRadios" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
+    </mat-select>
+
+    <mat-error *ngIf="form.get('caractere_radio')?.hasError('required')">
+      Caractère radio obligatoire
+    </mat-error>
+  </mat-form-field>
+
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

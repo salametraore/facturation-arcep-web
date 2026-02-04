@@ -188,11 +188,14 @@ export function buildCanalFG(
     classe_largeur_bande: new FormControl(c.classe_largeur_bande ?? null),
 
     type_bande_frequence: new FormControl(c.type_bande_frequence ?? null, requiredIf(cfg.type_bande_frequence)),
+
+    // ✅ AJOUT : caractere_radio sur CANAL
+    caractere_radio: new FormControl(c.caractere_radio ?? null, requiredIf(cfg.caractere_radio)),
+
     mode_duplexage: new FormControl(c.mode_duplexage ?? null, requiredIf(cfg.mode_duplexage)),
 
     puissance_sortie: new FormControl(c.puissance_sortie ?? null, requiredIf(cfg.puissance_sortie)),
     classe_puissance_id: new FormControl(c.classe_puissance_id ?? null),
-
   });
 
   /**

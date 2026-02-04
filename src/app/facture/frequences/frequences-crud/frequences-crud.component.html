@@ -7,7 +7,6 @@
 <div class="blank-row"></div>
 
 <section class="list-box">
-
   <div class="list-body">
 
     <mat-horizontal-stepper [linear]="isLinear" *ngIf="form">
@@ -71,6 +70,11 @@
                 {{ item.libelle }}
               </mat-option>
             </mat-select>
+
+            <!-- ✅ PATCH: feedback si required -->
+            <mat-error *ngIf="ficheFG.get('categorie_produit')?.hasError('required')">
+              La catégorie est obligatoire
+            </mat-error>
           </mat-form-field>
 
           <div class="blank-row"></div>
@@ -86,6 +90,11 @@
               required>
             <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
             <mat-datepicker #pickerStart></mat-datepicker>
+
+            <!-- ✅ PATCH: feedback si required -->
+            <mat-error *ngIf="ficheFG.get('date_debut')?.hasError('required')">
+              La date début est obligatoire
+            </mat-error>
           </mat-form-field>
 
           <div class="blank-row"></div>
@@ -125,6 +134,8 @@
                    class="mat-elevation-z1 w-full"
                    formArrayName="stations">
 
+              <!-- ✅ PATCH: plus de *ngIf sur matColumnDef (évite "Could not find column with id") -->
+
               <ng-container matColumnDef="no">
                 <th mat-header-cell *matHeaderCellDef> N°Station</th>
                 <td mat-cell *matCellDef="let row; let i = index">
@@ -132,66 +143,65 @@
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="type_station" *ngIf="cfg[cat]?.stations?.type_station?.visible">
+              <ng-container matColumnDef="type_station">
                 <th mat-header-cell *matHeaderCellDef> Type</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ getLibelleTypeStation(row.value.type_station) }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="puissance" *ngIf="cfg[cat]?.stations?.puissance?.visible">
+              <ng-container matColumnDef="puissance">
                 <th mat-header-cell *matHeaderCellDef> Puissance(W)</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.puissance }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="nombre_station" *ngIf="cfg[cat]?.stations?.nombre_station?.visible">
+              <ng-container matColumnDef="nombre_station">
                 <th mat-header-cell *matHeaderCellDef> Nombre</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.nombre_station }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="debit_kbps" *ngIf="cfg[cat]?.stations?.debit_kbps?.visible">
+              <ng-container matColumnDef="debit_kbps">
                 <th mat-header-cell *matHeaderCellDef> Débit (Kbps)</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.debit_kbps }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="largeur_bande_mhz" *ngIf="cfg[cat]?.stations?.largeur_bande_mhz?.visible">
+              <ng-container matColumnDef="largeur_bande_mhz">
                 <th mat-header-cell *matHeaderCellDef> Largeur bande</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.largeur_bande_mhz }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="type_bande_frequence"
-                            *ngIf="cfg[cat]?.stations?.type_bande_frequence?.visible">
+              <ng-container matColumnDef="type_bande_frequence">
                 <th mat-header-cell *matHeaderCellDef> Bande fréquence</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="caractere_radio" *ngIf="cfg[cat]?.stations?.caractere_radio?.visible">
+              <ng-container matColumnDef="caractere_radio">
                 <th mat-header-cell *matHeaderCellDef> Caractère</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ getLibelleCaractereRadio(row.value.caractere_radio) }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="nbre_tranche" *ngIf="cfg[cat]?.stations?.nbre_tranche?.visible">
+              <ng-container matColumnDef="nbre_tranche">
                 <th mat-header-cell *matHeaderCellDef> Nombre tranches de facturation</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.nbre_tranche }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="localite" *ngIf="cfg[cat]?.stations?.localite?.visible">
+              <ng-container matColumnDef="localite">
                 <th mat-header-cell *matHeaderCellDef> Localité</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.localite }}
                 </td>
               </ng-container>
@@ -239,6 +249,8 @@
                    class="mat-elevation-z1 w-full"
                    formArrayName="canaux">
 
+              <!-- ✅ PATCH: plus de *ngIf sur matColumnDef -->
+
               <ng-container matColumnDef="no">
                 <th mat-header-cell *matHeaderCellDef> N°Canal</th>
                 <td mat-cell *matCellDef="let row; let i = index">
@@ -246,68 +258,72 @@
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="type_station" *ngIf="cfg[cat]?.canaux?.type_station?.visible">
+              <ng-container matColumnDef="type_station">
                 <th mat-header-cell *matHeaderCellDef> Type station</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ getLibelleTypeStation(row.value.type_station) }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="type_canal" *ngIf="cfg[cat]?.canaux?.type_canal?.visible">
+              <ng-container matColumnDef="type_canal">
                 <th mat-header-cell *matHeaderCellDef> Type canal</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ getLibelleTypeCanal(row.value.type_canal) }}
                 </td>
               </ng-container>
 
-              <!-- ✅ nbre_canaux (visible seulement cat=4) -->
-              <ng-container matColumnDef="nbre_canaux" *ngIf="cfg[cat]?.canaux?.nbre_canaux?.visible">
+              <ng-container matColumnDef="nbre_canaux">
                 <th mat-header-cell *matHeaderCellDef> Nb canaux</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.nbre_canaux }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="zone_couverture" *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">
+              <ng-container matColumnDef="zone_couverture">
                 <th mat-header-cell *matHeaderCellDef> Zone</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ getLibelleZoneCouverture(row.value.zone_couverture) }}
                 </td>
               </ng-container>
 
-              <!-- puissance_sortie -->
-              <ng-container matColumnDef="puissance_sortie" *ngIf="cfg[cat]?.canaux?.puissance_sortie?.visible">
+              <ng-container matColumnDef="puissance_sortie">
                 <th mat-header-cell *matHeaderCellDef> Puissance sortie (W)</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.puissance_sortie }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="nbre_tranche_facturation"
-                            *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">
+              <ng-container matColumnDef="nbre_tranche_facturation">
                 <th mat-header-cell *matHeaderCellDef> Nombre tranches</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.nbre_tranche_facturation }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="largeur_bande_khz" *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">
+              <ng-container matColumnDef="largeur_bande_khz">
                 <th mat-header-cell *matHeaderCellDef> Largeur bande</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.largeur_bande_khz }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="type_bande_frequence" *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">
+              <ng-container matColumnDef="type_bande_frequence">
                 <th mat-header-cell *matHeaderCellDef> Bande de fréquence</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="mode_duplexage" *ngIf="cfg[cat]?.canaux?.mode_duplexage?.visible">
+              <ng-container matColumnDef="caractere_radio">
+                <th mat-header-cell *matHeaderCellDef> Caractère</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ getLibelleCaractereRadio(row.value.caractere_radio) }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="mode_duplexage">
                 <th mat-header-cell *matHeaderCellDef> Mode duplexage</th>
-                <td mat-cell *matCellDef="let row; let i=index">
+                <td mat-cell *matCellDef="let row">
                   {{ row.value.mode_duplexage }}
                 </td>
               </ng-container>
@@ -411,7 +427,6 @@
                         {{ row.value.debit_kbps | number:'1.0-0':'fr-FR' }}
                       </td>
 
-                      <!-- ✅ DECIMAL -->
                       <td *ngIf="cfg[cat]?.stations?.largeur_bande_mhz?.visible">
                         {{ row.value.largeur_bande_mhz | number:'1.0-2':'fr-FR' }}
                       </td>
@@ -420,7 +435,6 @@
                         {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
                       </td>
 
-                      <!-- ✅ FIX ALIGN : seulement si visible -->
                       <td *ngIf="cfg[cat]?.stations?.caractere_radio?.visible">
                         {{ getLibelleCaractereRadio(row.value.caractere_radio) }}
                       </td>
@@ -463,14 +477,12 @@
                       <th>N°Canal</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_station?.visible">Type station</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_canal?.visible">Type canal</th>
-
-                      <!-- ✅ nbre_canaux (cat=4 only) -->
                       <th *ngIf="cfg[cat]?.canaux?.nbre_canaux?.visible">Nb canaux</th>
-
                       <th *ngIf="cfg[cat]?.canaux?.zone_couverture?.visible">Zone</th>
                       <th *ngIf="cfg[cat]?.canaux?.nbre_tranche_facturation?.visible">Nbre Tranches</th>
                       <th *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">Largeur bande</th>
                       <th *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">Bande fréquence</th>
+                      <th *ngIf="cfg[cat]?.canaux?.caractere_radio?.visible">Caractère</th>
                       <th *ngIf="cfg[cat]?.canaux?.mode_duplexage?.visible">Mode Duplexage</th>
                       <th *ngIf="cfg[cat]?.canaux?.puissance_sortie?.visible">Puissance sortie (W)</th>
                     </tr>
@@ -487,7 +499,6 @@
                         {{ getLibelleTypeCanal(row.value.type_canal) }}
                       </td>
 
-                      <!-- ✅ nbre_canaux -->
                       <td *ngIf="cfg[cat]?.canaux?.nbre_canaux?.visible">
                         {{ row.value.nbre_canaux | number:'1.0-0':'fr-FR' }}
                       </td>
@@ -499,13 +510,16 @@
                         {{ row.value.nbre_tranche_facturation | number:'1.0-0':'fr-FR'}}
                       </td>
 
-                      <!-- ✅ DECIMAL -->
                       <td *ngIf="cfg[cat]?.canaux?.largeur_bande_khz?.visible">
                         {{ row.value.largeur_bande_khz | number:'1.0-2':'fr-FR' }}
                       </td>
 
                       <td *ngIf="cfg[cat]?.canaux?.type_bande_frequence?.visible">
                         {{ getLibelleTypeBandeFrequence(row.value.type_bande_frequence) }}
+                      </td>
+
+                      <td *ngIf="cfg[cat]?.canaux?.caractere_radio?.visible">
+                        {{ getLibelleCaractereRadio(row.value.caractere_radio) }}
                       </td>
 
                       <td *ngIf="cfg[cat]?.canaux?.mode_duplexage?.visible">
@@ -555,10 +569,20 @@
                       <th>Produit</th>
                       <th>Nbre Stations/Tranches</th>
                       <th>PU</th>
+                      <th>Coef</th>
                       <th>Montant</th>
                       <th>Mnt prorata</th>
+
+                      <!-- ✅ déjà présent -->
+                      <th>Mnt plafond</th>
+
+                      <!-- ✅ NOUVEAU -->
+                      <th>Réduction ?</th>
+                      <th>Taux réduction</th>
+                      <th>Mnt après réduction</th>
                     </tr>
                     </thead>
+
                     <tbody>
                     <tr *ngFor="let d of resultatCalcul.details">
                       <td>{{ stationNo(d) }}</td>
@@ -569,11 +593,33 @@
 
                       <td>{{ d.base_quantite | number:'1.0-0':'fr-FR' }}</td>
                       <td>{{ d.montant_unitaire | number:'1.0-0':'fr-FR' }}</td>
+                      <td>{{ d.coefficient_global | number:'1.2-2':'fr-FR' }}</td>
+
                       <td><strong>{{ d.montant_calcule | number:'1.0-0':'fr-FR' }}</strong></td>
                       <td><strong>{{ d.prorata_valeur | number:'1.0-0':'fr-FR' }}</strong></td>
+
+                      <td><strong>{{ d.montant_plafond | number:'1.0-0':'fr-FR' }}</strong></td>
+
+                      <!-- ✅ NOUVEAU -->
+                      <td>{{ formatBoolean(d.reduction_applique) }}</td>
+
+                      <td>
+                        <ng-container *ngIf="d.taux_reduction != null; else dashTpl">
+                          {{ formatTauxReduction(d.taux_reduction) }} %
+                        </ng-container>
+                        <ng-template #dashTpl>-</ng-template>
+                      </td>
+
+                      <td>
+                        <ng-container *ngIf="d.montant_apres_reduction != null; else dashTpl2">
+                          <strong>{{ d.montant_apres_reduction | number:'1.0-0':'fr-FR' }}</strong>
+                        </ng-container>
+                        <ng-template #dashTpl2>-</ng-template>
+                      </td>
                     </tr>
                     </tbody>
                   </table>
+
                 </div>
               </ng-container>
             </section>
@@ -617,5 +663,4 @@
     </mat-horizontal-stepper>
 
   </div>
-
 </section>

@@ -67,6 +67,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
   showTypeBandeFrequence = false;
   showModeDuplexage = false;
   showPuissanceSortie = false;
+  showCaractereRadio = true;
 
   // ✅ nbre_canaux désormais obligatoire partout
   showNbreCanaux = true;
@@ -276,6 +277,10 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     });
   }
 
+  isCaractereRadioVisible(): boolean {
+    return this.canalCfg?.caractere_radio?.visible === true;
+  }
+
   onCancel(): void {
     this.dialogRef.close();
   }
@@ -422,6 +427,7 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
       this.showNbreTrancheFact = true;
       this.showLargeurBandeKhz = true;
       this.showZoneCouverture = true;
+      this.showCaractereRadio = true;
     } else {
       this.showTypeCanal = true;
       this.showNbreTrancheFact = true;
@@ -573,4 +579,11 @@ export class CanalFrequencesDialogComponent implements OnInit, OnDestroy {
     return !!(res && res.required);
   }
 
+  getLibelleCaractereRadio(id?: number | null): string {
+    if (!id || !this.caractereRadios || this.caractereRadios.length === 0) {
+      return '';
+    }
+    const found = this.caractereRadios.find(cr => cr.id === id);
+    return found?.libelle ?? '';
+  }
 }

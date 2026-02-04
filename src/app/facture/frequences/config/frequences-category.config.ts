@@ -52,6 +52,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       puissance_sortie: H(),
 
       classe_puissance_id: H(),
+
+      caractere_radio: H(),
     }
   },
 
@@ -96,6 +98,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
 
       puissance_sortie: H(),
       classe_puissance_id: H(),
+
+      caractere_radio: H(),
     }
   },
 
@@ -141,6 +145,9 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
 
       puissance_sortie: H(),
       classe_puissance_id: H(),
+
+      caractere_radio: H(),
+
     }
   },
 
@@ -188,6 +195,7 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
 
       mode_duplexage: V(false),
 
+      caractere_radio: H(),
     }
   },
 
@@ -234,6 +242,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
 
       type_bande_frequence: V(false),
       mode_duplexage: H(),
+
+      caractere_radio: V(true),
     }
   },
 
@@ -278,6 +288,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
 
       puissance_sortie: H(),
       classe_puissance_id: H(),
+
+      caractere_radio: H(),
     }
   },
 
@@ -322,6 +334,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
       type_bande_frequence: H(),
 
       mode_duplexage: H(),
+
+      caractere_radio: H(),
 
     }
   },

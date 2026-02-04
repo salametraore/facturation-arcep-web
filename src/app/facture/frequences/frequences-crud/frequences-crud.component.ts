@@ -88,41 +88,14 @@ export class FrequencesCrudComponent implements OnInit {
   @Output() notifyActionOperation = new EventEmitter<string>();
   @Output() notifyFicheTechnique = new EventEmitter<FicheTechniques>();
 
-  displayedColumnsStations: string[] = [
-    'no',
-    'type_station',
-    'puissance',
-    'nombre_station',
-    'debit_kbps',
-    'largeur_bande_mhz',
-    'type_bande_frequence',
-    'caractere_radio',
-    'nbre_tranche',
-    'localite',
-    'actions'
-  ];
-
   /**
-   * ✅ IMPORTANT
-   * classe_puissance est un champ NON AFFICHÉ (renseigné par canal-classes-binder),
-   * donc il ne doit PAS apparaître dans les colonnes.
+   * ✅ PATCH (robustesse)
+   * On démarre avec des colonnes minimales pour éviter tout mismatch transient
+   * (cat pas encore connue / *ngIf / MatTable).
+   * updateDisplayedColumns() posera les bonnes colonnes dès que cat est définie.
    */
-  displayedColumnsCanaux: string[] = [
-    'no',
-    'type_station',
-    'type_canal',
-
-    // ✅ nbre_canaux (cat=4 uniquement via config)
-    'nbre_canaux',
-
-    'zone_couverture',
-    'nbre_tranche_facturation',
-    'largeur_bande_khz',
-    'type_bande_frequence',
-    'mode_duplexage',
-    'puissance_sortie',
-    'actions'
-  ];
+  displayedColumnsStations: string[] = ['no', 'actions'];
+  displayedColumnsCanaux: string[]   = ['no', 'actions'];
 
   @ViewChild('stationsTable') stationsTable: MatTable<any>;
   @ViewChild('canauxTable') canauxTable: MatTable<any>;
@@ -627,16 +600,15 @@ export class FrequencesCrudComponent implements OnInit {
       /**
        * ✅ IMPORTANT
        * - nbre_tranche_facturation est géré dans buildCanalFG() (suggestion auto sans écrasement)
-       * - classe_puissance est un champ non affiché, alimenté par le binder dans la MODALE,
+       * - classe_puissance_id est un champ non affiché, alimenté par le binder dans la MODALE,
        *   donc on le conserve simplement via patchValue/result.
        */
-
       if (index != null) {
         const fg = this.canauxFA.at(index) as FormGroup;
-        fg.patchValue(result); // ✅ garde aussi classe_puissance
+        fg.patchValue(result); // ✅ garde aussi classe_puissance_id
         this.setCategorieOnLineFG(fg, this.cat);
       } else {
-        const fg = buildCanalFG(this.fb, result, this.cat); // ✅ garde aussi classe_puissance
+        const fg = buildCanalFG(this.fb, result, this.cat); // ✅ garde aussi classe_puissance_id
         this.setCategorieOnLineFG(fg, this.cat);
         this.canauxFA.push(fg);
       }
@@ -722,7 +694,7 @@ export class FrequencesCrudComponent implements OnInit {
       const old = this.canauxFA.at(i) as FormGroup;
       const value = old.getRawValue();
 
-      // ✅ buildCanalFG conserve classe_puissance (même si non affiché)
+      // ✅ buildCanalFG conserve classe_puissance_id (même si non affiché)
       const fg = buildCanalFG(this.fb, value, cat);
       this.setCategorieOnLineFG(fg, cat); // ✅ PATCH binder
       this.canauxFA.setControl(i, fg);
@@ -767,7 +739,7 @@ export class FrequencesCrudComponent implements OnInit {
       canaux: (payload.canaux ?? []).map(c => ({
         ...c,
         designation: this.formatCanalLine(c),
-        // ✅ classe_puissance part déjà dans payload (champ non affiché mais présent dans le form)
+        // ✅ classe_puissance_id part déjà dans payload (champ non affiché mais présent dans le form)
       })),
     };
 
@@ -821,44 +793,45 @@ export class FrequencesCrudComponent implements OnInit {
 
   // ---------- Mise à jour des colonnes dynamiques ----------
   private updateDisplayedColumns(): void {
-    const stationCfg: any = this.cfg[this.cat]?.stations as any;
-    const canalCfg: any = this.cfg[this.cat]?.canaux as any;
+    if (!this.cat) {
+      this.displayedColumnsStations = ['no', 'actions'];
+      this.displayedColumnsCanaux   = ['no', 'actions'];
+      return;
+    }
 
-    // ---------- STATIONS ----------
-    const sCols: string[] = [];
-    sCols.push('no');
+    const stationCfg = this.cfg[this.cat]?.stations;
+    const canalCfg   = this.cfg[this.cat]?.canaux;
 
-    if (!stationCfg || stationCfg.type_station?.visible !== false) sCols.push('type_station');
-    if (!stationCfg || stationCfg.puissance?.visible !== false) sCols.push('puissance');
-    if (!stationCfg || stationCfg.nombre_station?.visible !== false) sCols.push('nombre_station');
-    if (!stationCfg || stationCfg.debit_kbps?.visible !== false) sCols.push('debit_kbps');
-    if (!stationCfg || stationCfg.largeur_bande_mhz?.visible !== false) sCols.push('largeur_bande_mhz');
-    if (!stationCfg || stationCfg.type_bande_frequence?.visible !== false) sCols.push('type_bande_frequence');
-    if (!stationCfg || stationCfg.caractere_radio?.visible !== false) sCols.push('caractere_radio');
-    if (!stationCfg || stationCfg.nbre_tranche?.visible !== false) sCols.push('nbre_tranche');
-    if (!stationCfg || stationCfg.localite?.visible !== false) sCols.push('localite');
-
+    // ----- STATIONS
+    const sCols: string[] = ['no'];
+    if (stationCfg?.type_station?.visible === true) sCols.push('type_station');
+    if (stationCfg?.puissance?.visible === true) sCols.push('puissance');
+    if (stationCfg?.nombre_station?.visible === true) sCols.push('nombre_station');
+    if (stationCfg?.debit_kbps?.visible === true) sCols.push('debit_kbps');
+    if (stationCfg?.largeur_bande_mhz?.visible === true) sCols.push('largeur_bande_mhz');
+    if (stationCfg?.type_bande_frequence?.visible === true) sCols.push('type_bande_frequence');
+    if (stationCfg?.caractere_radio?.visible === true) sCols.push('caractere_radio');
+    if (stationCfg?.nbre_tranche?.visible === true) sCols.push('nbre_tranche');
+    if (stationCfg?.localite?.visible === true) sCols.push('localite');
     sCols.push('actions');
     this.displayedColumnsStations = sCols;
 
-    // ---------- CANAUX ----------
-    const cCols: string[] = [];
-    cCols.push('no');
+    // ----- CANAUX
+    const cCols: string[] = ['no'];
+    if (canalCfg?.type_station?.visible === true) cCols.push('type_station');
+    if (canalCfg?.type_canal?.visible === true) cCols.push('type_canal');
+    if (canalCfg?.nbre_canaux?.visible === true) cCols.push('nbre_canaux');
+    if (canalCfg?.zone_couverture?.visible === true) cCols.push('zone_couverture');
+    if (canalCfg?.nbre_tranche_facturation?.visible === true) cCols.push('nbre_tranche_facturation');
+    if (canalCfg?.largeur_bande_khz?.visible === true) cCols.push('largeur_bande_khz');
+    if (canalCfg?.type_bande_frequence?.visible === true) cCols.push('type_bande_frequence');
 
-    if (!canalCfg || canalCfg.type_station?.visible !== false) cCols.push('type_station');
-    if (!canalCfg || canalCfg.type_canal?.visible !== false) cCols.push('type_canal');
+    // ✅ AJOUT
+    if (canalCfg?.caractere_radio?.visible === true) cCols.push('caractere_radio');
 
-    // ✅ nbre_canaux visible uniquement en cat=4 via config
-    if (!canalCfg || canalCfg.nbre_canaux?.visible !== false) cCols.push('nbre_canaux');
+    if (canalCfg?.mode_duplexage?.visible === true) cCols.push('mode_duplexage');
+    if (canalCfg?.puissance_sortie?.visible === true) cCols.push('puissance_sortie');
 
-    if (!canalCfg || canalCfg.zone_couverture?.visible !== false) cCols.push('zone_couverture');
-    if (!canalCfg || canalCfg.nbre_tranche_facturation?.visible !== false) cCols.push('nbre_tranche_facturation');
-    if (!canalCfg || canalCfg.largeur_bande_khz?.visible !== false) cCols.push('largeur_bande_khz');
-    if (!canalCfg || canalCfg.type_bande_frequence?.visible !== false) cCols.push('type_bande_frequence');
-    if (!canalCfg || canalCfg.mode_duplexage?.visible !== false) cCols.push('mode_duplexage');
-    if (!canalCfg || canalCfg.puissance_sortie?.visible !== false) cCols.push('puissance_sortie');
-
-    // ❌ classe_puissance NON affiché => ne jamais push ici
     cCols.push('actions');
     this.displayedColumnsCanaux = cCols;
   }
@@ -886,20 +859,18 @@ export class FrequencesCrudComponent implements OnInit {
     if (!canalCfg) return false;
 
     /**
-     * ✅ classe_puissance est NON affiché
+     * ✅ classe_puissance_id est NON affiché
      * donc il ne doit pas intervenir dans la logique "a-t-on des champs canal à saisir ?"
      */
     const keys: string[] = [
       'type_station',
       'type_canal',
-
-      // ✅ nbre_canaux (visible seulement cat=4)
       'nbre_canaux',
-
       'zone_couverture',
       'nbre_tranche_facturation',
       'largeur_bande_khz',
       'type_bande_frequence',
+      'caractere_radio',
       'mode_duplexage',
       'puissance_sortie',
     ];
@@ -950,14 +921,18 @@ export class FrequencesCrudComponent implements OnInit {
     });
   }
 
+  /**
+   * ✅ PATCH (cohérence)
+   * On rend la logique “visible” STRICTE partout :
+   * visible doit être explicitement true.
+   * (évite d’afficher/formatter un champ absent du config par erreur)
+   */
   private isVisibleStation(field: keyof FicheTechniqueStationRuleSet): boolean {
-    const rule = this.cfgRecap?.[this.cat]?.stations?.[field];
-    return rule?.visible !== false;
+    return this.cfgRecap?.[this.cat]?.stations?.[field]?.visible === true;
   }
 
   private isVisibleCanal(field: keyof FicheTechniqueCanalRuleSet): boolean {
-    const rule = (this.cfgRecap?.[this.cat]?.canaux as any)?.[field];
-    return rule?.visible !== false;
+    return this.cfgRecap?.[this.cat]?.canaux?.[field]?.visible === true;
   }
 
   private hasValue(v: any): boolean {
@@ -1031,7 +1006,6 @@ export class FrequencesCrudComponent implements OnInit {
       if (ts) details.push(`Station : ${ts}`);
     }
 
-    // ✅ nbre_canaux visible seulement cat=4
     if (this.isVisibleCanal('nbre_canaux') && this.hasValue(c?.nbre_canaux)) {
       details.push(`Nb canaux : ${this.fmtNumber(c.nbre_canaux)}`);
     }
@@ -1041,7 +1015,6 @@ export class FrequencesCrudComponent implements OnInit {
       if (z) details.push(`Zone : ${z}`);
     }
 
-    // ✅ DECIMAL largeur bande (recap)
     if (this.isVisibleCanal('largeur_bande_khz') && this.hasValue(c?.largeur_bande_khz)) {
       details.push(`Largeur bande : ${this.fmtNumber(c.largeur_bande_khz, 2)} kHz`);
     }
@@ -1049,6 +1022,11 @@ export class FrequencesCrudComponent implements OnInit {
     if (this.isVisibleCanal('type_bande_frequence') && this.hasValue(c?.type_bande_frequence)) {
       const b = this.getLibelleTypeBandeFrequence(c.type_bande_frequence);
       if (b) details.push(`Type bande : ${b}`);
+    }
+
+    if (this.isVisibleCanal('caractere_radio') && this.hasValue(c?.caractere_radio)) {
+      const cr = this.getLibelleCaractereRadio(c.caractere_radio);
+      if (cr) details.push(`Caractère : ${cr}`);
     }
 
     if (this.isVisibleCanal('mode_duplexage') && this.hasValue(c?.mode_duplexage)) {
@@ -1063,7 +1041,6 @@ export class FrequencesCrudComponent implements OnInit {
       details.push(`Tranches : ${this.fmtNumber(c.nbre_tranche_facturation)}`);
     }
 
-    // ❌ on n'affiche pas classe_puissance (champ technique non visible)
     return details.length ? `${title} — ${details.join(' · ')}` : title;
   }
 
@@ -1107,6 +1084,27 @@ export class FrequencesCrudComponent implements OnInit {
     }
     const found = this.caractereRadios.find(cr => cr.id === id);
     return found?.libelle ?? '';
+  }
+  formatBoolean(v?: boolean | null): string {
+    return v ? 'Oui' : 'Non';
+  }
+
+  /**
+   * Affichage robuste :
+   * - si backend renvoie 0.15 => 15%
+   * - si backend renvoie 15   => 15%
+   */
+  formatTauxReduction(v?: number | null): string {
+    if (v == null) return '';
+    const n = Number(v);
+    if (Number.isNaN(n)) return String(v);
+
+    const percent = n <= 1 ? n * 100 : n;
+
+    return new Intl.NumberFormat('fr-FR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(percent);
   }
 
 }

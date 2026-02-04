@@ -66,6 +66,9 @@ export interface FicheTechniqueCanalRuleSet {
   puissance_sortie : FieldRule;
 
   classe_puissance_id : FieldRule;
+
+  caractere_radio: FieldRule;
+
 }
 
 /** Config complète pour une catégorie */

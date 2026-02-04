@@ -1,7 +1,6 @@
 // fiche-technique-frequence-create-request.ts
 
 import {StatutFicheTechnique} from "./statut-fiche-technique";
-import {FieldRule} from "./frequences-category.types";
 
 export interface FicheTechniqueCanalRequest {
   categorie_produit: number;
@@ -21,13 +20,14 @@ export interface FicheTechniqueCanalRequest {
 
   mode_duplexage?: string;
 
-  puissance_sortie : number;
+  puissance_sortie: number;
 
-  classe_puissance_id : number;
+  classe_puissance_id: number;
+
+  caractere_radio?: number;
 
   designation?: string;
 }
-
 
 
 export interface FicheTechniqueStationRequest {
@@ -90,9 +90,9 @@ export interface FicheTechniqueFrequenceCreateRequest {
 
 
 export interface FicheTechniqueFrequenceDetail {
-  id : number;
+  id: number;
   client: number;
-  client_nom : string;
+  client_nom: string;
 
   direction: number;
   utilisateur: number;
@@ -104,7 +104,7 @@ export interface FicheTechniqueFrequenceDetail {
 
   categorie_produit: number;
 
-  statut : StatutFicheTechnique;
+  statut: StatutFicheTechnique;
   objet?: string;
   commentaire?: string;
 
@@ -122,7 +122,6 @@ export interface FicheTechniqueFrequenceDetail {
   canaux?: FicheTechniqueCanalDetail[];
   stations?: FicheTechniqueStationDetail[];
 }
-
 
 
 export interface FicheTechniqueCanalDetail {
@@ -145,9 +144,11 @@ export interface FicheTechniqueCanalDetail {
 
   mode_duplexage?: string;
 
-  puissance_sortie : number;
+  puissance_sortie: number;
 
-  classe_puissance_id : number;
+  classe_puissance_id: number;
+
+  caractere_radio?: number;
 
   designation?: string;
 }
@@ -186,8 +187,7 @@ export interface FicheTechniqueStationDetail {
   updated_at: string; // ISO date-time
 }
 
-export class  CalculFraisFrequenceRequest
-{
+export class CalculFraisFrequenceRequest {
   fiche_id: number;
   enregistrer: Boolean;
 }
@@ -220,6 +220,12 @@ export interface CalculFraisFrequenceDetail {
   montant_unitaire: string;     // "20000.00"
   coefficient_global: string;   // "1.0000"
   montant_calcule: string;      // "100000.00"
+
+  montant_plafond: number;
+
+  reduction_applique: boolean;
+  taux_reduction: number;
+  montant_apres_reduction: number;
 
   created_at: string;           // ISO datetime
 }
