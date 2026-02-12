@@ -13,6 +13,8 @@ export interface FieldRule {
 export interface FicheTechniqueStationRuleSet {
   type_station: FieldRule;
 
+  sous_type_station: FieldRule;
+
   // puissance : tu as soit puissance soit classe_puissance (selon tes écrans)
   puissance: FieldRule;
   classe_puissance: FieldRule;

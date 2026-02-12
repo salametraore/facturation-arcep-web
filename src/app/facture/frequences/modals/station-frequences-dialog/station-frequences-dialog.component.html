@@ -28,6 +28,28 @@
 
   <div class="blank-row"></div>
 
+  <!-- ✅ Sous-type de station -->
+  <mat-form-field appearance="outline" class="w-full"
+                  *ngIf="stationCfg.sous_type_station?.visible"
+                  [ngClass]="{'required-field': isRequired('sous_type_station')}">
+    <mat-label>
+      Sous-type station
+      <span *ngIf="isRequired('sous_type_station')" class="text-red-500 font-bold ml-1">*</span>
+    </mat-label>
+
+    <mat-select formControlName="sous_type_station" matTooltip="Sous-type station">
+      <mat-option *ngFor="let item of sousTypeStations" [value]="item.id">
+        {{ item.libelle }}
+      </mat-option>
+    </mat-select>
+
+    <mat-error *ngIf="form.get('sous_type_station')?.hasError('required')">
+      Sous-type station obligatoire
+    </mat-error>
+  </mat-form-field>
+
+  <div class="blank-row"></div>
+
   <!-- Puissance -->
   <mat-form-field appearance="outline" class="w-full"
                   *ngIf="isPuissanceVisible()"

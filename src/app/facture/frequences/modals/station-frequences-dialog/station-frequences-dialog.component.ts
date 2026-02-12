@@ -12,7 +12,8 @@ import { FicheTechniqueStationRequest } from '../../../../shared/models/fiche-te
 import { buildStationFG } from '../../forms/frequences.form';
 import { CATEGORY_CONFIG } from '../../config/frequences-category.config';
 
-import { TypeStation } from '../../../../shared/models/type-station';
+import {TypeStation} from '../../../../shared/models/type-station';
+import {SousTypeStation} from '../../../../shared/models/sous-type-station';
 import { TypeBandeFrequence } from '../../../../shared/models/typeBandeFrequenceDetail';
 import { TypeBandesFrequenceService } from '../../../../shared/services/type-bandes-frequence.service';
 import { TypeStationService } from '../../../../shared/services/type-station.service';
@@ -26,6 +27,7 @@ import { ClassePuissanceService } from "../../../../shared/services/classe-puiss
 import { bindStationClasses } from "../../forms/station-classes-binder";
 import { CaractereRadio } from "../../../../shared/models/caractere-radio.model";
 import { CaractereRadioService } from "../../../../shared/services/caractere-radio.service";
+import {SousTypeStationService} from "../../../../shared/services/sous-type-station.service";
 
 export interface StationDialogData {
   station?: FicheTechniqueStationRequest;
@@ -43,6 +45,7 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
 
   typeBandeFrequences: TypeBandeFrequence[] = [];
   typeStations: TypeStation[] = [];
+  sousTypeStations: SousTypeStation[] = [];
   typeStationSeelectione: TypeStation;
   zoneCouvertures: ZoneCouverture[] = [];
 
@@ -67,6 +70,7 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: StationDialogData,
     private typeBandesFrequenceService: TypeBandesFrequenceService,
     private typeStationService: TypeStationService,
+    private sousTypeStationService: SousTypeStationService,
     private zoneCouvertureService: ZoneCouvertureService,
     private classePuissance: ClassePuissanceService,
     private classeDebit: ClasseDebitService,
@@ -134,6 +138,10 @@ export class StationFrequencesDialogComponent implements OnInit, OnDestroy {
 
     this.typeStationService.getListItems().subscribe((listeTypeStations: TypeStation[]) => {
       this.typeStations = (listeTypeStations ?? []).filter(ts => ts.categorie_produit === cat);
+    });
+
+    this.sousTypeStationService.getListItems().subscribe((listeSousTypeStations: SousTypeStation[]) => {
+      this.sousTypeStations = (listeSousTypeStations ?? []).filter(ts => ts.categorie_produit === cat);
     });
 
     this.typeBandesFrequenceService.getListItems().subscribe((listeTypeBandesFreq: TypeBandeFrequence[]) => {

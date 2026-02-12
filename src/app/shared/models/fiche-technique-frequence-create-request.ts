@@ -35,6 +35,8 @@ export interface FicheTechniqueStationRequest {
   categorie_produit: number;
   type_station?: number;
 
+  sous_type_station: number;
+
   puissance?: number;
   classe_puissance?: number;
 
@@ -130,6 +132,8 @@ export interface FicheTechniqueCanalDetail {
   categorie_produit: number;
 
   type_station: number;
+
+
   type_canal: number;
   nbre_canaux?: number;
 
@@ -160,6 +164,8 @@ export interface FicheTechniqueStationDetail {
   categorie_produit: number;
 
   type_station?: number;
+
+  sous_type_station: number;
 
   puissance?: number;
   classe_puissance?: number;

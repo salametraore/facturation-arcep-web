@@ -1,183 +1,191 @@
-:host{
-  .mat-icon{
+/* =======================================================
+   PATCH COMPLET (à coller tel quel)
+   - Sidenav BLANC
+   - Logo aligné (toolbar dédié)
+   - Pas d'effets de bord sur mat-toolbar global
+======================================================= */
+
+/* Icônes : alignement */
+:host {
+  .mat-icon {
     vertical-align: middle;
-    margin-right: 10px;
+    margin-right: 8px; /* unifié (au lieu de 10 puis 8) */
   }
 }
-
 
 .sidenav-container {
- // height: 100%;
+  // height: 100%;
 }
 
+/* =======================================================
+   SIDENAV : dimensions + fond blanc partout
+======================================================= */
 .sidenav {
-  width: 240px;
+  width: 300px; /* unifié (au lieu de 240 puis 300) */
 }
 
-.sidenav .mat-toolbar {
-  background: #ffebee;
-}
-
-mat-sidenav{
-  background: #ffebee;
-  height: content-box;
-}
-
-.mat-toolbar.mat-primary {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-mat-toolbar{
-  margin-bottom: 20px;
-}
-
-.profil-card{
-  text-align: center;
-  //padding: 0 5px 5px 5px;
-  img{
-    width: 50%;
-    height: 50%;
-    object-fit: cover;
-    border-radius: 50%;
+@media (max-width: 960px) {
+  .sidenav {
+    width: 220px;
   }
 }
 
-.a_size{
-  font-size: 1em;
+/* Fond blanc drawer + container interne (important !) */
+mat-sidenav.sidenav,
+mat-sidenav.sidenav.mat-drawer,
+mat-sidenav.sidenav .mat-drawer-inner-container {
+  background: #ffffff !important;
 }
 
-mat-expansion-panel{
-  background-color: #ffebee;
+/* Séparateur propre à droite */
+mat-sidenav.sidenav {
+  border-right: 1px solid rgba(0,0,0,.08);
+  height: auto; /* on évite "content-box" qui est un value étrange ici */
+}
+
+/* Toolbar dans la sidenav (zone logo) : BLANC + centré */
+mat-sidenav.sidenav mat-toolbar.side-brand,
+mat-sidenav.sidenav .mat-toolbar.side-brand {
+  background: #ffffff !important;
+  height: 72px;
+  margin: 0;               /* pas de margin-bottom ici */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+}
+
+/* Logo : taille stable (évite height="100%" dans le HTML) */
+.brand-logo {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
+/* Ancienne règle qui mettait le toolbar sidenav en rose -> neutralisée */
+.sidenav .mat-toolbar {
+  background: #ffffff !important;
+}
+
+/* Scroll zone menu */
+.menu-scroll {
+  background: transparent;
+  overflow: auto;
+  padding: 8px 6px 12px;
+}
+
+/* Nav list : pas de marge négative (ça désaligne souvent) */
+mat-nav-list {
   padding-right: 0px;
   padding-left: 0px;
+  margin-top: 0; /* PATCH : au lieu de -30px */
 }
 
+/* =======================================================
+   EXPANSION PANELS (menu) : blancs, style “carte”
+======================================================= */
+mat-expansion-panel {
+  background-color: #ffffff !important; /* PATCH : plus de #ffebee */
+  padding-right: 0px;
+  padding-left: 0px;
+
+  border-radius: 12px;
+  margin: 4px 6px;
+
+  box-shadow: none;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+/* ARCEP touch-ups (gardés) */
+.menu-header {
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+}
+
+.mat-expansion-indicator::after {
+  color: var(--brand-primary);
+}
+
+/* Header panel : compact */
 mat-expansion-panel-header {
   display: flex;
   flex-direction: row;
   align-items: center;
-  //padding: 0px;
+
   padding-top: 0px;
   padding-bottom: 0px;
   padding-left: 0px;
   padding-right: 7px;
-  //border-radius: inherit;
+
   transition: height 225ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-mat-icon{
-  //  margin-right: 0px;
-}
-
+/* Body panel : padding zéro */
 .parametersPanel .mat-expansion-panel-body {
   padding: 0;
-}
-
-mat-nav-list{
-  padding-right: 0px;
-  padding-left: 0px;
-  margin-top: -30px;
 }
 
 ::ng-deep .mat-expansion-panel-body {
   padding: 0 !important;
 }
 
-
-mat-toolbar{
-  height: 50px;
-}
-
-ul li {
-  list-style: none;
-}
-
-li{
-  cursor: pointer;
-}
-
-/* Icône/texte mieux alignés */
-:host .mat-icon {
-  vertical-align: middle;
-  margin-right: 8px;
-}
-
-/* État actif doux */
-a.mat-list-item.active-link,
-a.mat-list-item:hover {
-  background: rgba(0,0,0,.04);
-  border-radius: 8px;
-}
-
-/* Panneau plus “carte” */
-mat-expansion-panel {
-  background-color: #ffebee;
-  border-radius: 12px;
-  margin: 4px 6px;
-}
-
-/* Titres des modules (en-tête des panneaux) en gras */
+/* Titres des modules en gras */
 .sidenav .mat-expansion-panel-header-title {
-  font-weight: 700; /* ou 600 si tu veux un peu plus léger */
+  font-weight: 700;
 }
 
-/* Items de 1er niveau (modules SANS sous-menus) en gras */
+/* Items 1er niveau en gras */
 .sidenav mat-nav-list > div > a.mat-mdc-list-item .mdc-list-item__primary-text {
   font-weight: 700;
 }
 
-/* Sous-menus : garder un poids normal pour la hiérarchie visuelle */
+/* Sous-menus : poids normal */
 .sidenav mat-expansion-panel .mat-nav-list a.mat-mdc-list-item .mdc-list-item__primary-text {
-  font-weight: 500; /* ajuste à 400/600 selon ton goût */
+  font-weight: 500;
 }
 
-/* Titre de la navbar en gras */
-.app-toolbar .app-title {
-  font-weight: 700;         /* gras */
-  letter-spacing: .2px;
+/* Leaf menu arrondi */
+.menu-leaf {
+  border-radius: 10px;
 }
 
-/* Regroupe proprement la zone d'actions à droite */
-.app-toolbar .toolbar-actions {
+.menu-panel {
+  margin: 4px 0;
+}
+
+/* État actif / hover (accent doux) */
+a.mat-list-item.active-link,
+a.mat-list-item:hover {
+  background: color-mix(in srgb, var(--brand-primary) 10%, #fff 90%);
+  border-radius: 8px;
+}
+
+/* =======================================================
+   TOP TOOLBAR (APP) : sticky + alignements
+   IMPORTANT : on ne met PLUS de règles globales mat-toolbar
+======================================================= */
+
+/* Remplace .mat-toolbar.mat-primary global par app-toolbar seulement */
+mat-toolbar.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
   display: flex;
   align-items: center;
-  gap: .25rem;
+  min-height: 50px;
+  padding: 0 8px;
 }
 
-/* Bouton "Se connecter" : lisible et compact */
-.app-toolbar .auth-btn {
-  text-transform: none;
-  font-weight: 600;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: .25rem;
-}
-
-/* Chevron plus discret */
-.app-toolbar .auth-btn .chevron {
-  font-size: 20px;
-  line-height: 1;
-}
-
-/* Ouvrir le menu légèrement plus bas pour ne pas coller au bouton */
-.auth-menu .mat-mdc-menu-panel {
-  margin-top: 6px;
-}
-
-.app-toolbar {
-  display: flex;              /* s’assure que la toolbar est en flex */
-  align-items: center;
-}
-
-.app-title {                  /* titre en gras */
+/* Titre topbar */
+.app-toolbar .app-title {
   font-weight: 700;
   letter-spacing: .2px;
 }
 
-.spacer {                     /* pousse le bloc d’actions à droite */
+/* pousse actions à droite */
+.spacer {
   flex: 1 1 auto;
 }
 
@@ -187,59 +195,28 @@ mat-expansion-panel {
   gap: .5rem;
 }
 
-.auth-btn {
-  text-transform: none;
-  display: inline-flex;
-  align-items: center;
-  gap: .25rem;
-  font-weight: 600;
-}
-
-.auth-btn .chevron {
-  font-size: 20px;
-  line-height: 1;
-}
-
-/* --- Toolbar en flex + hauteur uniforme --- */
-.app-toolbar {
-  display: flex;
-  align-items: center;     /* centre verticalement tout le contenu */
-  min-height: 50px;        /* ta barre fait ~50px */
-  padding: 0 8px;
-}
-
-/* Pousse le bloc d’actions à droite (si tu utilises .spacer) */
-.spacer { flex: 1 1 auto; }
-
-/* --- Bloc d’actions (à droite) --- */
-.toolbar-actions {
-  display: flex;
-  align-items: center;     /* centre les enfants verticalement */
-  gap: .5rem;
-}
-
-/* --- Icônes rondes (fullscreen, home, etc.) --- */
+/* icon buttons centrés */
 .app-toolbar .mat-mdc-icon-button {
   display: inline-flex;
-  align-items: center;     /* centre l’icône dans le bouton */
+  align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
   padding: 0;
 }
 
-/* --- Bouton "Se connecter" (texte + 2 icônes) --- */
+/* auth button */
 .app-toolbar .auth-btn {
-  display: inline-flex;
-  align-items: center;     /* centre les deux icônes et le texte sur la hauteur de la navbar */
-  gap: .25rem;
-  height: 40px;            /* même hauteur que les icon-buttons */
-  line-height: 1;          /* évite le décalage vertical du texte */
   text-transform: none;
-  font-weight: 600;        /* si tu veux le texte légèrement plus fort */
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  height: 40px;
+  line-height: 1;
+  font-weight: 600;
 }
 
-/* Icônes à l'intérieur des boutons : pas de décalage baseline */
+/* icônes dans topbar */
 .app-toolbar .mat-icon {
   vertical-align: middle;
   line-height: 1;
@@ -248,41 +225,38 @@ mat-expansion-panel {
   justify-content: center;
 }
 
+/* =======================================================
+   PROFIL CARD / DIVERS
+======================================================= */
+.profil-card {
+  text-align: center;
 
-/* === ARCEP theme touch-ups === */
-.menu-header {
-  color: var(--brand-primary);
-}
-
-mat-expansion-panel {
-  background: color-mix(in srgb, var(--brand-primary) 5%, #fff);
-}
-
-.mat-expansion-indicator::after {
-  color: var(--brand-primary);
-}
-/* === end ARCEP theme touch-ups === */
-
-
-.sidenav {
-  width: 300px;
-}
-
-@media (max-width: 960px) {
-  .sidenav {
-    width: 220px;      // un peu plus étroit sur petits écrans
+  img {
+    width: 50%;
+    height: 50%;
+    object-fit: cover;
+    border-radius: 50%;
   }
 }
 
-.menu-leaf {
-  border-radius: 10px;
+.a_size {
+  font-size: 1em;
 }
 
-.menu-panel {
-  margin: 4px 0;
+ul li {
+  list-style: none;
 }
 
-.menu-header {
-  display: flex;
-  align-items: center;
+li {
+  cursor: pointer;
 }
+
+/* =======================================================
+   IMPORTANT : suppression des règles globales mat-toolbar
+   (elles cassaient side-brand)
+======================================================= */
+/*
+  ANCIEN (à ne plus remettre) :
+  mat-toolbar { margin-bottom: 20px; }
+  mat-toolbar { height: 50px; }
+*/

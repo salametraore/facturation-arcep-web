@@ -15,6 +15,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     stations: {
       type_station: V(true),
 
+      sous_type_station: V(false),
+
       puissance: V(false),
       classe_puissance: H(),
 
@@ -62,6 +64,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     stations: {
       type_station: V(true),
 
+      sous_type_station: H(),
+
       puissance: H(),
       classe_puissance: H(),
 
@@ -107,6 +111,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
   3: {
     stations: {
       type_station: V(true),
+
+      sous_type_station: V(false),
 
       puissance: H(),
       classe_puissance: H(),
@@ -156,6 +162,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     stations: {
       type_station: V(true),
 
+      sous_type_station: H(),
+
       puissance: H(),
       classe_puissance: H(),
 
@@ -203,6 +211,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
   5: {
     stations: {
       type_station: V(true),
+
+      sous_type_station: H(),
 
       nombre_station: V(true),
 
@@ -252,6 +262,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
     stations: {
       type_station: V(true),
 
+      sous_type_station: H(),
+
       puissance: H(),
       classe_puissance: H(),
 
@@ -297,6 +309,8 @@ export const CATEGORY_CONFIG: Record<CategoryId, CategoryRuleSet> = {
   7: {
     stations: {
       type_station: V(true),
+
+      sous_type_station: H(),
 
       puissance: H(),
       classe_puissance: H(),

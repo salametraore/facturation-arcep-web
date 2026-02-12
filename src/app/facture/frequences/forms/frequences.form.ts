@@ -69,6 +69,8 @@ export function buildStationFG(
 
     type_station: new FormControl(s.type_station ?? null, requiredIf(cfg.type_station)),
 
+    sous_type_station: new FormControl(s.sous_type_station ?? null, requiredIf(cfg.sous_type_station)),
+
     puissance: new FormControl(s.puissance ?? null, requiredIf(cfg.puissance)),
     classe_puissance: new FormControl(s.classe_puissance ?? null),
 

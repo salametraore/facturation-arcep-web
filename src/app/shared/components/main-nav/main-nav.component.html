@@ -1,72 +1,95 @@
 <mat-sidenav-container class="sidenav-container app-shell">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport
-               [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-               [mode]="(isHandset$ | async) ? 'over' : 'side'"
-               [opened]="(isHandset$ | async) === false">
 
-    <mat-toolbar class="side-brand" role="banner">
-      <img
-        class="brand-logo"
-        src="assets/images/arcep-logo.png"
-        alt="ARCEP"
-        height="100%"
-      />
-    </mat-toolbar>
-    <mat-divider></mat-divider>
+  <!-- ===================== SIDENAV ===================== -->
+  <mat-sidenav
+      #drawer
+      class="sidenav"
+      fixedInViewport
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false"
+  >
+    <!-- Wrapper (aide à garantir le fond blanc sur toute la hauteur) -->
+    <div class="sidenav-shell">
 
-    <div class="menu-scroll">
-      <ng-container *ngFor="let item of menuItems">
-        <ng-container
-          [ngTemplateOutlet]="menuNodeTpl"
-          [ngTemplateOutletContext]="{ node: item, level: 0 }">
-        </ng-container>
-      </ng-container>
-    </div>
+      <!-- Zone Logo -->
+      <mat-toolbar class="side-brand" role="banner">
+        <img
+          class="brand-logo"
+          src="assets/images/arcep-logo.png"
+          alt="ARCEP"
+        />
+      </mat-toolbar>
 
-    <!-- ===================== TEMPLATE RECURSIF ===================== -->
-    <ng-template #menuNodeTpl let-node="node" let-level="level">
+      <mat-divider></mat-divider>
 
-      <!-- FEUILLE : lien cliquable -->
-      <mat-nav-list *ngIf="!node.sous_menus || node.sous_menus.length === 0">
-        <a mat-list-item
-           class="menu-leaf"
-           [style.paddingLeft.px]="12 + level * 12"
-           (click)="onNavigate(menuRoute(node))">
-
-          <mat-icon matListIcon fontSet="material-symbols-outlined">
-            {{ node.icone || (level === 0 ? 'folder' : 'description') }}
-          </mat-icon>
-
-          <span matLine>{{ node.titre }}</span>
-        </a>
-      </mat-nav-list>
-
-      <!-- GROUPE : expansion panel -->
-      <mat-expansion-panel *ngIf="node.sous_menus?.length" class="menu-panel" [class.lvl-0]="level===0">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="menu-header" [style.paddingLeft.px]="8 + level * 12">
-            <mat-icon fontSet="material-symbols-outlined" class="mr-2">
-              {{ node.icone || 'folder' }}
-            </mat-icon>
-            <span>{{ node.titre }}</span>
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <ng-container *ngFor="let child of visibleSousMenus(node)">
+      <!-- Menu -->
+      <div class="menu-scroll">
+        <ng-container *ngFor="let item of menuItems">
           <ng-container
             [ngTemplateOutlet]="menuNodeTpl"
-            [ngTemplateOutletContext]="{ node: child, level: level + 1 }">
+            [ngTemplateOutletContext]="{ node: item, level: 0 }">
           </ng-container>
         </ng-container>
-      </mat-expansion-panel>
+      </div>
 
-    </ng-template>
+      <!-- ===================== TEMPLATE RECURSIF ===================== -->
+      <ng-template #menuNodeTpl let-node="node" let-level="level">
+
+        <!-- FEUILLE : lien cliquable -->
+        <mat-nav-list *ngIf="!node.sous_menus || node.sous_menus.length === 0">
+          <a mat-list-item
+             class="menu-leaf"
+             [style.paddingLeft.px]="12 + level * 12"
+             (click)="onNavigate(menuRoute(node))">
+
+            <mat-icon matListIcon fontSet="material-symbols-outlined">
+              {{ node.icone || (level === 0 ? 'folder' : 'description') }}
+            </mat-icon>
+
+            <span matLine>{{ node.titre }}</span>
+          </a>
+        </mat-nav-list>
+
+        <!-- GROUPE : expansion panel -->
+        <mat-expansion-panel
+          *ngIf="node.sous_menus?.length"
+          class="menu-panel"
+          [class.lvl-0]="level===0"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title
+              class="menu-header"
+              [style.paddingLeft.px]="8 + level * 12"
+            >
+              <mat-icon fontSet="material-symbols-outlined" class="mr-2">
+                {{ node.icone || 'folder' }}
+              </mat-icon>
+              <span>{{ node.titre }}</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <ng-container *ngFor="let child of visibleSousMenus(node)">
+            <ng-container
+              [ngTemplateOutlet]="menuNodeTpl"
+              [ngTemplateOutletContext]="{ node: child, level: level + 1 }">
+            </ng-container>
+          </ng-container>
+        </mat-expansion-panel>
+
+      </ng-template>
+
+    </div>
   </mat-sidenav>
 
-  <mat-sidenav-content class="app-content"  [style.--bg-image]="'url(' + shellBgUrl + ')'">
+  <!-- ===================== CONTENT ===================== -->
+  <mat-sidenav-content class="app-content" [style.--bg-image]="'url(' + shellBgUrl + ')'">
+
     <mat-toolbar color="primary" class="app-toolbar">
-      <button type="button" aria-label="Toggle sidenav"
-              mat-icon-button (click)="drawer?.toggle()">
+      <button type="button"
+              aria-label="Toggle sidenav"
+              mat-icon-button
+              (click)="drawer?.toggle()">
         <mat-icon fontSet="material-symbols-outlined" aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
 
@@ -89,6 +112,7 @@
         <button mat-button [matMenuTriggerFor]="authMenu" class="auth-btn">
           <mat-icon fontSet="material-symbols-outlined">account_circle</mat-icon>
         </button>
+
         <mat-menu #authMenu="matMenu" xPosition="after" yPosition="below" [overlapTrigger]="false">
 
           <!-- En-tête : Nom Prénom (non cliquable) -->
@@ -97,10 +121,10 @@
               <mat-icon fontSet="material-symbols-outlined">account_circle</mat-icon>
               <div class="user-lines">
                 <div class="name">{{ u.first_name || '—' }} {{ u.last_name || '' }}</div>
-                <!-- Optionnel : affiche email/username si dispo -->
                 <div class="meta" *ngIf="u.username || u.email">{{ u.username || u.email }}</div>
               </div>
             </button>
+
             <mat-divider></mat-divider>
 
             <!-- Actions -->
@@ -122,6 +146,7 @@
                 <div class="name">Non connecté</div>
               </div>
             </button>
+
             <mat-divider></mat-divider>
 
             <button mat-menu-item (click)="connect_deconnect()">
@@ -130,9 +155,10 @@
             </button>
             <button mat-menu-item (click)="changePassword()">
               <mat-icon fontSet="material-symbols-outlined">edit</mat-icon>
-              <span>Changer de mot de passe </span>
+              <span>Changer de mot de passe</span>
             </button>
           </ng-template>
+
         </mat-menu>
       </div>
     </mat-toolbar>
@@ -141,5 +167,6 @@
       <router-outlet></router-outlet>
       <app-footer></app-footer>
     </div>
+
   </mat-sidenav-content>
 </mat-sidenav-container>
