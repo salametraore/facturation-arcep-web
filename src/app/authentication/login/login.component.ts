@@ -164,7 +164,8 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: () => {
           // On ne navigue qu’après récupération user + rôle
-          this.router.navigate(['/dashboard']);
+          //this.router.navigate(['/dashboard']);
+          this.router.navigate(['/home']);
         },
         error: () => { /* message déjà géré dans catchError */ }
       });

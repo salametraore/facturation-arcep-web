@@ -88,7 +88,9 @@ export class DomaineComponent implements OnInit, AfterViewInit {
 
     this.utilisateurConnecte=this.authService.getConnectedUser();
     this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
-    console.log(this.utilisateurConnecte);
+
+    console.log("roleUtilisateurConnecte");
+    console.log(this.roleUtilisateurConnecte);
 
     // ⬇️ Predicate de filtre multi-champs
     this.ficheTechniques.filterPredicate = (row: FicheTechniques, filter: string) => {
@@ -166,6 +168,8 @@ export class DomaineComponent implements OnInit, AfterViewInit {
       this.ficheTechniques.data = response
         .filter(f => f.categorie_produit === this.fixeCategorie)
         .sort((a, b) => b.id - a.id);
+      console.log("fiches techniques noms de domaine !!!");
+      console.log(this.ficheTechniques.data);
 
       // ⬇️ Ré-applique le filtre courant après rechargement
       if (this.ficheTechniques.paginator) this.ficheTechniques.paginator.firstPage();

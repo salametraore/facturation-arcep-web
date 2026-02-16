@@ -54,7 +54,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
   nomClient: string | null = null;
 
   // === IDs produits (adapte si nécessaire) ===
-/*  private readonly PRODUCT_BASE_ID = 72;*/
+  private readonly PRODUCT_BASE_ID = 72;
   private readonly PRODUCT_RADIO_ID = 73;
   private readonly PRODUCT_TERMINAL_ID = 74;
 
@@ -63,7 +63,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
   private readonly PRICE_RADIO = 50000;
   private readonly PRICE_TERMINAL = 30000;
 
-  /*private isBase = (id: number) => id === this.PRODUCT_BASE_ID;*/
+  private isBase = (id: number) => id === this.PRODUCT_BASE_ID;
   private isRadio = (id: number) => id === this.PRODUCT_RADIO_ID;
   private isTerminal = (id: number) => id === this.PRODUCT_TERMINAL_ID;
 
@@ -305,18 +305,18 @@ export class EncaissementDirectCrudComponent implements OnInit {
 
   addProduitLine(): void {
     const cat = this.ficheForm.get('categorie_produit')!.value;
-    //const defId = (cat === 12) ? this.PRODUCT_BASE_ID : null;
+    const defId = (cat === 12) ? this.PRODUCT_BASE_ID : null;
 
-    //this.produitsFormArray.push(this.createProduitFG(defId!, undefined));
+    this.produitsFormArray.push(this.createProduitFG(defId!, undefined));
     this.refreshDS();
 
-/*    if (defId) {
+    if (defId) {
       const fg = this.produitsFormArray.at(this.produitsFormArray.length - 1) as FormGroup;
       const pu = this.getUnitPriceFor(defId);
       fg.get('prix_unitaire')!.setValue(pu, { emitEvent: false });
       const q = +fg.get('quantite')!.value || 0;
       fg.get('total')!.setValue(q * pu, { emitEvent: false });
-    }*/
+    }
 
     this.updateMontants();
   }

@@ -1,3 +1,6 @@
+//src/app/shared/components/main-nav/main-nav.component.scss
+
+
 /* =======================================================
    PATCH COMPLET (à coller tel quel)
    - Sidenav BLANC
@@ -260,3 +263,64 @@ li {
   mat-toolbar { margin-bottom: 20px; }
   mat-toolbar { height: 50px; }
 */
+
+
+/* =======================================================
+   MENU COMPACT : réduit les distances entre menus
+   (ajoute ce bloc en bas du fichier)
+======================================================= */
+
+/* 1) Zone scroll : moins de padding */
+.menu-scroll {
+  padding: 4px 4px 8px; /* au lieu de 8px 6px 12px */
+}
+
+/* 2) Cartes (groupes) : moins d'espace entre panneaux */
+mat-expansion-panel {
+  margin: 2px 4px;      /* au lieu de 4px 6px */
+  border-radius: 10px;  /* optionnel : un peu plus compact visuellement */
+}
+
+/* 3) Hauteur des headers d'expansion (Angular Material) */
+mat-expansion-panel.menu-panel {
+  --mat-expansion-header-collapsed-state-height: 40px; /* essaye 36px si tu veux plus serré */
+  --mat-expansion-header-expanded-state-height: 40px;
+}
+
+/* 4) Header : padding plus serré */
+mat-expansion-panel.menu-panel mat-expansion-panel-header {
+  padding: 0 6px 0 0; /* réduit la “respiration” */
+}
+
+/* évite des marges internes inutiles */
+mat-expansion-panel.menu-panel .mat-expansion-panel-header-title,
+mat-expansion-panel.menu-panel .mat-expansion-panel-header-description {
+  margin: 0 !important;
+}
+
+/* 5) Listes (feuilles) : supprime le padding vertical par défaut */
+::ng-deep mat-nav-list,
+::ng-deep mat-nav-list .mat-mdc-list-base {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 6) Hauteur des items de liste (MDC) */
+::ng-deep mat-nav-list {
+  --mdc-list-list-item-one-line-container-height: 36px; /* 32/34 = très compact */
+  --mdc-list-list-item-two-line-container-height: 44px;
+}
+
+/* 7) Item : moins d'espace autour */
+::ng-deep a.mat-mdc-list-item {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 1px 0; /* évite l’effet “bloc séparé” */
+}
+
+/* Optionnel : icône un poil plus serrée */
+:host {
+  .mat-icon {
+    margin-right: 6px; /* au lieu de 8px */
+  }
+}

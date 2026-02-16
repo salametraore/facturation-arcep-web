@@ -64,7 +64,7 @@
           </mat-form-field>
         </form>
 
-        <div align="center" *ngIf=" ficheTechnique && ficheTechnique?.statut?.id <4">
+        <div align="center" *ngIf=" ficheTechnique && ficheTechnique?.statut?.id > 5">
           <avis-technique-infos
             [ficheTechnique]="ficheTechnique">
           </avis-technique-infos>

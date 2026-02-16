@@ -1,20 +1,123 @@
+<!--<mat-card>
 
-<div class="card">
-  <mat-card class="example-card">
-    <mat-card-content>
-      <img src="assets/images/mission.jpg" class="responsive-image">
-    </mat-card-content>
-  </mat-card>
-</div>
+  &lt;!&ndash; Bandeau &ndash;&gt;
+  <div class="page-title home-title">
+    <div class="home-title__left">
+      <mat-icon fontSet="material-symbols-outlined">home</mat-icon>
+      <h2>Bienvenue {{ fullName }}</h2>
+    </div>
 
-<!--<div class="stats-container">-->
-<!--  <mat-card *ngFor="let item of stats" [ngClass]="item?.class" class="stat-card">-->
-<!--    <mat-card-header>-->
-<!--      <mat-card-title>{{ item?.title }}</mat-card-title>-->
-<!--    </mat-card-header>-->
-<!--    <mat-card-content>-->
-<!--      <p>{{ item?.value }}</p>-->
-<!--     &lt;!&ndash; <button mat-mini-fab [ngClass]="item.class">{{ item.value }}</button>&ndash;&gt;-->
-<!--    </mat-card-content>-->
-<!--  </mat-card>-->
-<!--</div>-->
+    <mat-chip-set class="home-title__chips" aria-label="Direction">
+      <mat-chip *ngIf="directionLabel && directionLabel !== '—'" disableRipple>
+        <mat-icon matChipAvatar fontSet="material-symbols-outlined">apartment</mat-icon>
+        {{ directionLabel }}
+      </mat-chip>
+    </mat-chip-set>
+  </div>
+
+  <section class="list-box">
+    <div class="list-header">
+      <h3 class="list-title">Accès rapide</h3>
+    </div>
+
+    <div class="list-body">
+      <div class="module-grid">
+
+        <mat-card class="list-box module-card"
+                  *ngFor="let t of tiles; trackBy: trackById">
+
+          &lt;!&ndash; Tuile cliquable si au moins 1 lien visible &ndash;&gt;
+          <a class="module-hero"
+             [class.module-hero&#45;&#45;disabled]="!tileEnabled(t)"
+             (click)="!tileEnabled(t) && $event.preventDefault()"
+             [attr.href]="tileEnabled(t) ? '' : null"
+             [routerLink]="tileEnabled(t) ? tilePrimaryRoute(t) : []">
+
+            <div class="module-hero__icon">
+              <mat-icon fontSet="material-symbols-outlined">{{ t.icon }}</mat-icon>
+            </div>
+
+            <div class="module-hero__text">
+              <div class="module-hero__title">{{ t.title }}</div>
+              <div class="module-hero__desc">{{ t.description }}</div>
+            </div>
+
+            <mat-icon class="module-hero__chevron"
+                      fontSet="material-symbols-outlined">chevron_right</mat-icon>
+          </a>
+
+          <mat-divider></mat-divider>
+
+          &lt;!&ndash; Liens visibles (déjà filtrés par direction) &ndash;&gt;
+          <mat-nav-list class="module-links" *ngIf="t.links.length > 0; else noneTpl">
+            <a mat-list-item *ngFor="let l of t.links" [routerLink]="l.route">
+              <mat-icon matListIcon fontSet="material-symbols-outlined">{{ l.icon || 'chevron_right' }}</mat-icon>
+              <span matLine>{{ l.label }}</span>
+              <mat-icon class="meta" fontSet="material-symbols-outlined">arrow_forward</mat-icon>
+            </a>
+          </mat-nav-list>
+
+          <ng-template #noneTpl>
+            <div class="module-empty">
+              Aucun écran disponible pour votre direction.
+            </div>
+          </ng-template>
+
+        </mat-card>
+
+      </div>
+    </div>
+  </section>
+
+</mat-card>-->
+<div class="blank-row"></div>
+<div class="blank-row"></div>
+<section class="list-box">
+  <div class="list-header">
+    <h3 class="list-title">Vision globale des workflows</h3>
+  </div>
+
+  <div class="list-body">
+    <mat-accordion>
+
+      <mat-expansion-panel *ngFor="let wf of workflows" class="wf-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon fontSet="material-symbols-outlined">{{ wf.icon }}</mat-icon>
+            {{ wf.title }}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ wf.description }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="wf-steps">
+          <div class="wf-step" *ngFor="let s of wf.steps">
+            <div class="wf-step__head">
+              <div class="wf-step__title">{{ s.title }}</div>
+              <div class="wf-step__actor">
+                <mat-icon fontSet="material-symbols-outlined">person</mat-icon>
+                {{ s.actor }}
+              </div>
+            </div>
+
+            <ul class="wf-step__bullets">
+              <li *ngFor="let b of s.bullets">{{ b }}</li>
+            </ul>
+
+            <div class="wf-step__actions" *ngIf="s.route">
+              <button mat-stroked-button color="primary" [routerLink]="s.route">
+                <mat-icon fontSet="material-symbols-outlined">arrow_forward</mat-icon>
+                {{ s.routeLabel || 'Aller à l’écran' }}
+              </button>
+            </div>
+
+            <mat-divider></mat-divider>
+          </div>
+        </div>
+
+      </mat-expansion-panel>
+
+    </mat-accordion>
+  </div>
+</section>

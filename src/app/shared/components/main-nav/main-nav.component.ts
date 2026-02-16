@@ -7,6 +7,10 @@ import {AuthService} from "../../../authentication/auth.service";
 import {User} from "../../../authentication/auth.models";
 import {Utilisateur} from "../../models/utilisateur";
 import {UtilisateurRole} from "../../models/droits-utilisateur";
+import {filterByDirection} from "../../utils/menu-visibility.util";
+
+
+
 export interface MenuItem {
   id: number;
   direction: number;
@@ -776,9 +780,7 @@ export class MainNavComponent implements OnInit {
 
   visibleSousMenus(item: any) {
     const dir = this.utilisateurConnecte?.direction;
-    return (item.sous_menus || []).filter(
-      (sm: any) => dir === 0 || sm.direction === dir || sm.direction === 0
-    );
+    return filterByDirection(item.sous_menus || [], dir);
   }
 
   menuRoute(item: MenuItem): string {
