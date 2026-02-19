@@ -38,35 +38,8 @@
 
         <div class="dialog-body field-xl">
 
-          <!-- Ligne 1 : Catégorie + Signataire -->
+          <!-- Ligne 1 : Année + Signataire -->
           <div style="display: flex; gap: 16px; margin-bottom: 16px;">
-
-            <!-- Catégorie -->
-            <mat-form-field appearance="outline" style="flex: 1;">
-              <mat-label>Catégorie de produit</mat-label>
-              <mat-select formControlName="categorie" required>
-                <mat-option *ngFor="let c of categories" [value]="c.id">
-                  {{ c.libelle }}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="form.controls.categorie.hasError('required')">
-                La catégorie est requise.
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Signataire -->
-            <mat-form-field appearance="outline" style="flex: 1;">
-              <mat-label>Signataire</mat-label>
-              <input formControlName="signataire" matInput required type="text">
-              <mat-error *ngIf="form.controls.signataire.hasError('required')">
-                Le signataire est requis.
-              </mat-error>
-            </mat-form-field>
-
-          </div>
-
-          <!-- Ligne 2 : Année + Client -->
-          <div style="display: flex; gap: 16px;">
 
             <!-- Année -->
             <mat-form-field appearance="outline" style="flex: 1;">
@@ -83,19 +56,123 @@
               </mat-error>
             </mat-form-field>
 
+            <!-- Signataire -->
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Signataire</mat-label>
+              <input formControlName="signataire" matInput required type="text">
+              <mat-error *ngIf="form.controls.signataire.hasError('required')">
+                Le signataire est requis.
+              </mat-error>
+            </mat-form-field>
+
+          </div>
+
+          <!-- Ligne 2 : Client + Catégorie -->
+          <!-- Ligne 2 : Client + Catégorie -->
+          <div style="display: flex; gap: 16px;">
+
             <!-- Client -->
+            <!-- Client (autocomplete) -->
             <mat-form-field appearance="outline" style="flex: 1;">
               <mat-label>Client</mat-label>
-              <mat-select formControlName="client">
-                <mat-option *ngFor="let c of clients" [value]="c.id">
+
+              <input
+                type="text"
+                matInput
+                [formControl]="clientCtrl"
+                [matAutocomplete]="autoClient"
+                placeholder="Rechercher un client…">
+
+              <!-- Bouton clear -->
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                aria-label="Effacer"
+                *ngIf="clientCtrl.value"
+                (click)="clientCtrl.setValue(null)">
+                <mat-icon>close</mat-icon>
+              </button>
+
+              <mat-autocomplete
+                  #autoClient="matAutocomplete"
+                  [displayWith]="displayClient">
+
+                <!-- Option "Tous les clients" -->
+                <mat-option [value]="null">Tous les clients</mat-option>
+
+                <!-- Suggestions filtrées -->
+                <mat-option *ngFor="let c of (filteredClients$ | async)" [value]="c">
                   {{ c.denomination_sociale }}
                 </mat-option>
+              </mat-autocomplete>
+
+              <mat-hint *ngIf="!form.controls.client.value">
+                Optionnel. Sélectionnez un client pour filtrer les catégories selon ses fiches techniques.
+              </mat-hint>
+              <mat-hint *ngIf="form.controls.client.value">
+                Catégories filtrées selon les fiches techniques du client sélectionné.
+              </mat-hint>
+            </mat-form-field>
+
+            <!-- Catégorie de produit / service -->
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Catégorie de produit</mat-label>
+
+              <mat-select
+                formControlName="categorie"
+                required
+                [disabled]="isCategoriesLoading">
+
+                <!-- Affichage dans le champ -->
+                <mat-select-trigger>
+                  <ng-container *ngIf="isCategoriesLoading; else showCat">
+                    Chargement…
+                  </ng-container>
+                  <ng-template #showCat>
+                    {{ getCategorieLabel(form.controls.categorie.value) }}
+                  </ng-template>
+                </mat-select-trigger>
+
+                <!-- Option "loading" -->
+                <mat-option *ngIf="isCategoriesLoading" disabled>
+                  <span class="inline-flex items-center gap-2">
+                    <mat-progress-spinner [diameter]="16" mode="indeterminate"></mat-progress-spinner>
+                    Chargement des catégories…
+                  </span>
+                </mat-option>
+
+                <!-- Options normales -->
+                <ng-container *ngIf="!isCategoriesLoading">
+                  <ng-container *ngIf="categories?.length > 0; else noCat">
+                    <mat-option *ngFor="let c of categories" [value]="c.id">
+                      {{ c.libelle }}
+                    </mat-option>
+                  </ng-container>
+
+                  <ng-template #noCat>
+                    <mat-option disabled>Aucune catégorie disponible pour ce client</mat-option>
+                  </ng-template>
+                </ng-container>
+
               </mat-select>
+
+              <mat-hint *ngIf="!isCategoriesLoading && !form.controls.client.value">
+                Liste de base (catégories autorisées). Choisissez un client pour affiner.
+              </mat-hint>
+              <mat-hint *ngIf="!isCategoriesLoading && form.controls.client.value">
+                Liste filtrée par les fiches techniques du client.
+              </mat-hint>
+
+              <mat-error *ngIf="form.controls.categorie.hasError('required')">
+                La catégorie est requise.
+              </mat-error>
             </mat-form-field>
 
           </div>
 
         </div>
+
 
       </form>
     </mat-step>
@@ -274,8 +351,10 @@
                           </td>
                         </ng-container>
 
-                        <tr mat-header-row *matHeaderRowDef="['produit','quantite','prix_unitaire','montant_ligne']"></tr>
-                        <tr mat-row *matRowDef="let ligne; columns: ['produit','quantite','prix_unitaire','montant_ligne'];"></tr>
+                        <tr mat-header-row
+                            *matHeaderRowDef="['produit','quantite','prix_unitaire','montant_ligne']"></tr>
+                        <tr mat-row
+                            *matRowDef="let ligne; columns: ['produit','quantite','prix_unitaire','montant_ligne'];"></tr>
                       </table>
 
                     </div>
@@ -447,7 +526,8 @@
                       </ng-container>
 
                       <tr mat-header-row *matHeaderRowDef="['produit','quantite','prix_unitaire','montant_ligne']"></tr>
-                      <tr mat-row *matRowDef="let ligne; columns: ['produit','quantite','prix_unitaire','montant_ligne'];"></tr>
+                      <tr mat-row
+                          *matRowDef="let ligne; columns: ['produit','quantite','prix_unitaire','montant_ligne'];"></tr>
                     </table>
 
                   </div>

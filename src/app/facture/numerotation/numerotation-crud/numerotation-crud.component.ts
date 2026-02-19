@@ -19,6 +19,7 @@ import {DialogService} from "../../../shared/services/dialog.service";
 import {operations,bouton_names} from "../../../constantes";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 import {Subject, takeUntil} from "rxjs";
+import {finalize} from "rxjs/operators";
 
 @Component({
   selector: 'numerotation-crud',
@@ -53,6 +54,9 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
   produits: Produit[]= [];
 
   saveLocked = false;
+
+  transmitLocked = false;
+  isTransmitting = false;
 
   private destroy$ = new Subject<void>();
 
@@ -139,16 +143,43 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
     this.client = item;
   }
 
-  onTransmettre(){
-    const miseAJourStatutFiche:MiseAJourStatutFiche = new MiseAJourStatutFiche();
+  onTransmettre() {
+    // Empêche double-clic / double submit
+    if (this.transmitLocked || this.isTransmitting) return;
+
+    // 🔒 lock immédiat : ne sera réactivé qu’en relançant la page
+    this.transmitLocked = true;
+    this.isTransmitting = true;
+
+    const miseAJourStatutFiche: MiseAJourStatutFiche = new MiseAJourStatutFiche();
     miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
     miseAJourStatutFiche.statut = 2;
-    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone:MiseAJourStatutFiche)=>{
-      this.msgMessageService.success("Fiche transmise avec succès !");
-    },error => {
-      this.dialogService.alert({message:error.message});
-    });
+
+    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)
+      .pipe(
+        finalize(() => {
+          // On enlève juste le spinner, mais on garde le bouton désactivé
+          this.isTransmitting = false;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.msgMessageService.success("Fiche transmise avec succès !");
+        },
+        error: (error) => {
+          // ❌ erreur => on réactive pour permettre retry
+          this.transmitLocked = false;
+
+          this.dialogService.alert({
+            message: error?.message ?? "Erreur lors de la transmission. Réessayez."
+          });
+
+          // ⚠️ On NE déverrouille PAS, conformément à ta demande.
+          // this.transmitLocked reste true jusqu’au reload / retour sur la page.
+        }
+      });
   }
+
 
 
   /*initFormFicheTechniquesProduit_create() {

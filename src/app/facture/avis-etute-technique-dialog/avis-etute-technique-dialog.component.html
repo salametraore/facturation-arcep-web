@@ -1,24 +1,20 @@
-<!-- avis-fiche-technique-dialog.component.html (exemple) -->
 <mat-card class="facture-edit">
   <form [formGroup]="form" (ngSubmit)="crud()">
 
-    <!-- Titre de page -->
     <div class="page-title">
       <h2>Avis sur fiche technique</h2>
     </div>
 
     <section class="list-box">
-      <!-- En-tête : titre + actions à droite -->
       <div class="list-header">
-
         <div class="list-actions">
           <button
             mat-flat-button
             color="primary"
             type="submit"
-            [disabled]="form.invalid">
+            [disabled]="form.invalid || isSaving">
             <mat-icon>save</mat-icon>
-            {{ bouton_names.save }}
+            {{ isSaving ? 'Enregistrement...' : bouton_names.save }}
           </button>
 
           <button
@@ -32,68 +28,40 @@
         </div>
       </div>
 
-      <!-- Corps -->
       <div class="list-body">
         <div class="form-grid">
 
-          <!-- Client 70% | Catégorie 30% -->
           <div class="row cols-70-30">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Client</mat-label>
-              <input
-                matInput
-                formControlName="client"
-                matTooltip="Client"
-                placeholder="Client"
-                readonly>
+              <input matInput formControlName="client" placeholder="Client" readonly>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Catégorie</mat-label>
-              <input
-                matInput
-                formControlName="categorie_produit"
-                matTooltip="Catégorie"
-                placeholder="Catégorie"
-                readonly>
+              <input matInput formControlName="categorie_produit_libelle" placeholder="Catégorie" readonly>
             </mat-form-field>
           </div>
 
           <div class="blank-row"></div>
 
-          <!-- Objet 70% | Commentaire 30% -->
           <div class="row cols-70-30">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Objet</mat-label>
-              <input
-                matInput
-                formControlName="objet"
-                matTooltip="Objet"
-                placeholder="Objet"
-                readonly>
+              <input matInput formControlName="objet" placeholder="Objet" readonly>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Commentaire</mat-label>
-              <input
-                matInput
-                formControlName="commentaire"
-                matTooltip="Commentaire"
-                placeholder="Commentaire"
-                readonly>
+              <input matInput formControlName="commentaire" placeholder="Commentaire" readonly>
             </mat-form-field>
           </div>
 
           <div class="blank-row"></div>
 
-          <!-- Avis (plein largeur) -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Avis</mat-label>
-            <mat-select
-              formControlName="avis"
-              matTooltip="Avis"
-              placeholder="Avis"
-              required>
+            <mat-select formControlName="avis" placeholder="Avis" required>
               <mat-option *ngFor="let avis of avisChoices" [value]="avis.value">
                 {{ avis.label }}
               </mat-option>
@@ -102,17 +70,10 @@
 
           <div class="blank-row"></div>
 
-          <!-- Ligne des dates -->
           <div class="date-row">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Date début</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerStart"
-                formControlName="date_debut"
-                matTooltip="Date début"
-                placeholder="Date début"
-                required>
+              <input matInput [matDatepicker]="pickerStart" formControlName="date_debut" placeholder="Date début" required>
               <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
               <mat-datepicker #pickerStart></mat-datepicker>
             </mat-form-field>
@@ -122,22 +83,14 @@
               <input
                 matInput
                 formControlName="duree"
-                matTooltip="Durée"
                 type="number"
-                placeholder="Durée"
-                [readonly]="form.get('avis')?.value === 'DEF'"
+                placeholder="Durée (mois)"
                 required>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Date fin</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerEnd"
-                formControlName="date_fin"
-                matTooltip="Date fin"
-                placeholder="Date fin"
-                readonly>
+              <input matInput [matDatepicker]="pickerEnd" formControlName="date_fin" placeholder="Date fin" readonly>
               <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
               <mat-datepicker #pickerEnd></mat-datepicker>
             </mat-form-field>

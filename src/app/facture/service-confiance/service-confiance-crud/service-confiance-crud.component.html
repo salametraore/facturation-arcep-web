@@ -83,11 +83,19 @@
 
             <button
               mat-flat-button
-              color="primary"
-              type="button"
+              color="warn"
               *ngIf="data_operation===operations.transmettre"
-              (click)="onTransmettre()">
-              Transmettre
+              (click)="onTransmettre()"
+              [disabled]="transmitLocked || isTransmitting">
+
+              <mat-icon *ngIf="!isTransmitting">send</mat-icon>
+
+              <span *ngIf="!isTransmitting">Transmettre</span>
+
+              <span *ngIf="isTransmitting" class="inline-flex items-center gap-2">
+              <mat-progress-spinner [diameter]="16" mode="indeterminate"></mat-progress-spinner>
+              Transmission...
+            </span>
             </button>
 
             <button mat-flat-button color="primary" type="button" (click)="onFerme()">

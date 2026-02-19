@@ -14,6 +14,7 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 import {AuthService} from "../../../authentication/auth.service";
 import {bouton_names, operations} from "../../../constantes";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
+import {finalize} from "rxjs/operators";
 
 @Component({
   selector: 'agrement-installeur-crud',
@@ -41,6 +42,9 @@ export class AgrementInstalleurCrudComponent implements OnInit {
   nomClient: string;
 
   saveLocked = false;
+
+  transmitLocked = false;
+  isTransmitting = false;
 
   historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
@@ -183,14 +187,35 @@ export class AgrementInstalleurCrudComponent implements OnInit {
   }
 
   onTransmettre() {
+    if (this.transmitLocked || this.isTransmitting) return;
+
+    this.transmitLocked = true;   // lock immédiat anti double-clic
+    this.isTransmitting = true;
+
     const miseAJourStatutFiche: MiseAJourStatutFiche = new MiseAJourStatutFiche();
     miseAJourStatutFiche.fiche_technique = this.ficheTechnique?.id;
     miseAJourStatutFiche.statut = 2;
-    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche).subscribe((respone: MiseAJourStatutFiche) => {
-      this.msgMessageService.success("Fiche transmise avec succès !");
-    }, error => {
-      this.dialogService.alert({message: error.message});
-    });
+
+    this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)
+      .pipe(
+        finalize(() => {
+          this.isTransmitting = false; // stop spinner
+        })
+      )
+      .subscribe({
+        next: (respone: MiseAJourStatutFiche) => {
+          this.msgMessageService.success("Fiche transmise avec succès !");
+          // ✅ on garde transmitLocked = true => bouton reste désactivé
+        },
+        error: (error) => {
+          // ❌ erreur => on réactive pour permettre retry
+          this.transmitLocked = false;
+
+          this.dialogService.alert({
+            message: error?.message ?? "Erreur lors de la transmission. Réessayez."
+          });
+        }
+      });
   }
 
   onSubmit() {

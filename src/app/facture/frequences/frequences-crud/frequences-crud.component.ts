@@ -146,7 +146,9 @@ export class FrequencesCrudComponent implements OnInit {
   loadingCalcul = false;
   errorCalcul = '';
 
+
   transmitLocked = false;
+  isTransmitting = false;
 
   private stationIdToNo = new Map<number, number>();
   private canalIdToNo = new Map<number, number>();
@@ -279,25 +281,13 @@ export class FrequencesCrudComponent implements OnInit {
 
     this.clientService.getItems().subscribe((clients: Client[]) => {
       this.clients = clients ?? [];
-
       this.filteredClients = this.clients;
 
       this.clientSearchCtrl.valueChanges
-        .pipe(
-          startWith(''),
-          map(v => this.filterClients(v))
-        )
+        .pipe(startWith(''), map(v => this.filterClients(v)))
         .subscribe(list => (this.filteredClients = list));
 
-      // ✅ si en update et client déjà connu, pré-remplir le champ texte
-      const clientId = this.ficheFG?.get('client')?.value;
-      if (clientId) {
-        const found = this.clients.find(x => x.id === clientId);
-        if (found) {
-          this.clientSearchCtrl.setValue(found, { emitEvent: false });
-          this.onGetClient(found);
-        }
-      }
+      this.tryPrefillClientAutocompleteFrom();
     });
 
     if (this.ficheTechnique?.id) {
@@ -441,6 +431,9 @@ export class FrequencesCrudComponent implements OnInit {
 
         this.cat = (fiche.categorie_produit as CategoryId);
         this.form = buildFicheTechniqueFrequenceForm(this.fb, fiche);
+
+        // ✅ force id sur le form + affiche l'objet si dispo + match liste sinon
+        this.tryPrefillClientAutocompleteFrom(fiche);
 
         (fiche.stations || []).forEach((s: FicheTechniqueStation) => {
           const fg = buildStationFG(this.fb, s, this.cat);
@@ -791,6 +784,82 @@ export class FrequencesCrudComponent implements OnInit {
     });
   }
 
+
+  private extractClientId(v: any): number | null {
+    if (v == null) return null;
+
+    if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+
+    if (typeof v === 'string') {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    if (typeof v === 'object') {
+      // cas fréquent : {id: 12, ...}
+      if ((v as any).id != null) return this.extractClientId((v as any).id);
+
+      // autres variantes possibles
+      if ((v as any).client_id != null) return this.extractClientId((v as any).client_id);
+      if ((v as any).clientId != null) return this.extractClientId((v as any).clientId);
+    }
+
+    return null;
+  }
+
+  private setClientIdOnForm(id: number | null): void {
+    const ctrl = this.ficheFG?.get('client');
+    if (!ctrl) return;
+    ctrl.setValue(id, { emitEvent: false });
+  }
+
+  private tryPrefillClientAutocompleteFrom(fiche?: any): void {
+    if (!this.form) return;
+
+    // 1) On tente de récupérer l'ID depuis le form (quel que soit le type)
+    let id = this.extractClientId(this.ficheFG?.get('client')?.value);
+
+    // 2) Fallback depuis la réponse backend (si le form n’a rien)
+    if (id == null && fiche) {
+      id =
+        this.extractClientId(fiche?.client) ??
+          this.extractClientId(fiche?.client_id) ??
+            this.extractClientId(fiche?.clientId);
+      if (id != null) this.setClientIdOnForm(id);
+    }
+
+    if (id == null) return;
+
+    // 3) Affichage : si le backend a déjà l'objet client, on peut l'afficher direct
+    if (fiche && typeof fiche.client === 'object' && fiche.client?.denomination_sociale) {
+      this.clientSearchCtrl.setValue(fiche.client, { emitEvent: false });
+      this.onGetClient(fiche.client);
+      return;
+    }
+
+    // 4) Sinon, on cherche dans la liste
+    if (!this.clients?.length) return;
+
+    const found = this.clients.find(c => Number(c.id) === Number(id));
+    if (found) {
+      this.clientSearchCtrl.setValue(found, { emitEvent: false });
+      this.onGetClient(found);
+    }
+  }
+
+  private tryPrefillClientAutocomplete(): void {
+    if (!this.form || !this.clients?.length) return;
+
+    const clientId = this.ficheFG?.get('client')?.value;
+    if (!clientId) return;
+
+    const found = this.clients.find(c => c.id === clientId);
+    if (found) {
+      this.clientSearchCtrl.setValue(found, { emitEvent: false });
+      this.onGetClient(found);
+    }
+  }
+
   // ---------- Mise à jour des colonnes dynamiques ----------
   private updateDisplayedColumns(): void {
     if (!this.cat) {
@@ -885,9 +954,11 @@ export class FrequencesCrudComponent implements OnInit {
       return;
     }
 
-    if (this.loadingCalcul || this.transmitLocked) return;
+    // ✅ Anti double-clic / double submit
+    if (this.isTransmitting || this.transmitLocked) return;
 
-    this.loadingCalcul = true;
+    this.transmitLocked = true;     // lock immédiat (reste jusqu'au reload si succès)
+    this.isTransmitting = true;     // spinner + disable
 
     const payloadCalcul: CalculFraisFrequenceRequest = {
       fiche_id: ficheId,
@@ -898,27 +969,33 @@ export class FrequencesCrudComponent implements OnInit {
     miseAJourStatutFiche.fiche_technique = ficheId;
     miseAJourStatutFiche.statut = 2;
 
-    this.fichesTechniquesFrequenceService.calculerFraisFicheTechniqueFrequence(payloadCalcul).pipe(
-      mapTo(void 0),
-      switchMap(() => this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)),
-      tap(() => {
-        this.transmitLocked = true;
-        this.msgService.success('Fiche transmise avec succès !');
-      }),
-      finalize(() => {
-        this.loadingCalcul = false;
-      })
-    ).subscribe({
-      next: () => {},
-      error: (e) => {
-        console.error('Erreur (calcul ou transmission):', e);
-        this.transmitLocked = false;
+    this.fichesTechniquesFrequenceService
+      .calculerFraisFicheTechniqueFrequence(payloadCalcul)
+      .pipe(
+        mapTo(void 0),
+        switchMap(() => this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)),
+        tap(() => {
+          this.msgService.success('Fiche transmise avec succès !');
+          // ✅ on garde transmitLocked = true => bouton reste désactivé jusqu'au reload
+        }),
+        finalize(() => {
+          this.isTransmitting = false;
+          this.loadingCalcul = false; // si tu veux garder loadingCalcul, sinon supprime cette ligne
+        })
+      )
+      .subscribe({
+        next: () => {},
+        error: (e) => {
+          console.error('Erreur (calcul ou transmission):', e);
 
-        this.dialogService.alert({
-          message: e?.message ?? "Le calcul a échoué : la fiche n'a pas été transmise."
-        });
-      }
-    });
+          // ❌ erreur => on réactive le bouton (retry)
+          this.transmitLocked = false;
+
+          this.dialogService.alert({
+            message: e?.message ?? "Le calcul a échoué : la fiche n'a pas été transmise."
+          });
+        }
+      });
   }
 
   /**
