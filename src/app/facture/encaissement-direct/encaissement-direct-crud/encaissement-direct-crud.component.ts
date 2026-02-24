@@ -186,21 +186,22 @@ export class EncaissementDirectCrudComponent implements OnInit {
 
   /** --------- CHANGEMENT DE CATÉGORIE PRODUIT --------- */
   onCategorieChange(): void {
-    const cat = this.ficheForm.get('categorie_produit')!.value;
+    const cat = +this.ficheForm.get('categorie_produit')!.value;
 
-    // Filtrage produits selon la catégorie
     this.produitsFiltered = (this.produitsAll || []).filter(p => {
-      if (cat === 12) {
-        // Agrément d’équipement : restreindre aux 3 lignes
-        /*return [this.PRODUCT_BASE_ID, this.PRODUCT_RADIO_ID, this.PRODUCT_TERMINAL_ID].includes(p.id);*/
-      }
+      // Cat 13 : seulement le produit 81
       if (cat === 13) {
-        return p.id === 81; // ton cas existant
+        return p.id === 81;
       }
+
+      // Cat 12 : produits de la catégorie 12 MAIS on exclut 72
+      if (cat === 12) {
+        return p.categorieProduit === 12 && p.id !== this.PRODUCT_BASE_ID;
+      }
+
+      // Autres catégories : filtrage normal
       return p.categorieProduit === cat;
     });
-
-    // … (le reste de ta méthode inchangé)
 
     // Colonnes affichées
     this.displayedColumns =
@@ -209,8 +210,8 @@ export class EncaissementDirectCrudComponent implements OnInit {
           cat === 13 ? ['produit', 'zone', 'quantite', 'prix_unitaire', 'total', 'actions'] :
             ['produit', 'designation', 'quantite', 'prix_unitaire', 'total', 'actions'];
 
+    // Validators conditionnels
     this.produitsFormArray.controls.forEach((fg: FormGroup) => {
-      // reset des validators pour éviter accumulation
       fg.get('marque')!.clearValidators();
       fg.get('modele')!.clearValidators();
 
@@ -222,13 +223,6 @@ export class EncaissementDirectCrudComponent implements OnInit {
       fg.get('marque')!.updateValueAndValidity({ emitEvent: false });
       fg.get('modele')!.updateValueAndValidity({ emitEvent: false });
     });
-
-    // si cat=12, s'assurer que la ligne "Base" existe (ton ajout auto)
-    //if (cat === 12 && !this.hasProduct(this.PRODUCT_BASE_ID)) {
-    if (cat === 12 ) {
-      //this.produitsFormArray.push(this.createProduitFG(this.PRODUCT_BASE_ID, this.PRICE_BASE));
-      this.refreshDS();
-    }
 
     this.recomputeAllUnitPrices();
   }
@@ -246,8 +240,6 @@ export class EncaissementDirectCrudComponent implements OnInit {
       total: [{ value: 0, disabled: true }],
     });
 
-    // (validators cat=12) ...
-
     // total auto sur qté
     fg.get('quantite')!.valueChanges.subscribe(() => {
       const q = +fg.get('quantite')!.value || 0;
@@ -262,7 +254,7 @@ export class EncaissementDirectCrudComponent implements OnInit {
       fg.get('total')!.setValue(q * pu, { emitEvent: false });
     });
 
-    // changement de produit (PU depuis grille + base auto)
+    // ✅ changement de produit (PU depuis grille) — SANS insertion auto "Base"
     fg.get('produit')!.valueChanges.subscribe((id: number) => {
       const lib = this.produitsAll.find(p => p.id === id)?.libelle ?? '';
       fg.get('produit_libelle')!.setValue(lib, { emitEvent: false });
@@ -273,30 +265,25 @@ export class EncaissementDirectCrudComponent implements OnInit {
       const q = +fg.get('quantite')!.value || 0;
       fg.get('total')!.setValue(q * pu, { emitEvent: false });
 
-      const currentCat = this.ficheForm.get('categorie_produit')!.value;
-      //if (currentCat === 12 && (this.isRadio(id) || this.isTerminal(id)) && !this.hasProduct(this.PRODUCT_BASE_ID)) {
-      if (currentCat === 12 && (this.isRadio(id) || this.isTerminal(id))) {
-        //this.produitsFormArray.insert(0, this.createProduitFG(this.PRODUCT_BASE_ID, undefined));
-        this.refreshDS();
-        this.recomputeAllUnitPrices();
-      }
+      this.updateMontants();
     });
 
-    // ✅ ICI : abonné global pour remettre à jour affecte/solde quand la ligne change
+    // ✅ MAJ affecte/solde quand la ligne change
     fg.valueChanges.subscribe(() => {
-      this.updateMontants();   // utilise sommeProduits() et le champ 'montant'
+      this.updateMontants();
     });
 
-    // (optionnel) init si defaultProductId fourni
+    // init si defaultProductId fourni
     if (defaultProductId) {
       const lib = this.produitsAll.find(p => p.id === defaultProductId)?.libelle ?? '';
       fg.get('produit_libelle')!.setValue(lib, { emitEvent: false });
+
       const puInit = this.getUnitPriceFor(defaultProductId);
       fg.get('prix_unitaire')!.setValue(puInit, { emitEvent: false });
+
       const qInit = +fg.get('quantite')!.value || 0;
       fg.get('total')!.setValue(qInit * puInit, { emitEvent: false });
 
-      // si tu veux MAJ immédiate d'affecte/solde à l'init :
       this.updateMontants();
     }
 
@@ -304,20 +291,8 @@ export class EncaissementDirectCrudComponent implements OnInit {
   }
 
   addProduitLine(): void {
-    const cat = this.ficheForm.get('categorie_produit')!.value;
-    const defId = (cat === 12) ? this.PRODUCT_BASE_ID : null;
-
-    this.produitsFormArray.push(this.createProduitFG(defId!, undefined));
+    this.produitsFormArray.push(this.createProduitFG()); // ✅ plus de base auto
     this.refreshDS();
-
-    if (defId) {
-      const fg = this.produitsFormArray.at(this.produitsFormArray.length - 1) as FormGroup;
-      const pu = this.getUnitPriceFor(defId);
-      fg.get('prix_unitaire')!.setValue(pu, { emitEvent: false });
-      const q = +fg.get('quantite')!.value || 0;
-      fg.get('total')!.setValue(q * pu, { emitEvent: false });
-    }
-
     this.updateMontants();
   }
 

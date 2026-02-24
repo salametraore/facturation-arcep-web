@@ -18,7 +18,11 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 import {DialogService} from "../../../shared/services/dialog.service";
 import {operations,bouton_names} from "../../../constantes";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
-import {finalize} from "rxjs/operators";
+import { startWith, takeUntil ,finalize} from 'rxjs/operators';
+import { combineLatest, Subject } from 'rxjs';
+import { OnDestroy } from '@angular/core';
+
+
 
 @Component({
   selector: 'service-a-valeur-ajoute-crud',
@@ -51,6 +55,8 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
   transmitLocked = false;
   isTransmitting = false;
 
+  private destroy$ = new Subject<void>();
+
   displayedColumns: string[] = ['produit','designation','quantite', 'actions'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -74,6 +80,12 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     this.t_FicheTechniquesProduits.paginator = this.paginator;
     this.t_FicheTechniquesProduits.sort = this.sort;
   }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
 
   ngOnInit(): void {
     console.log(this.ficheTechnique)
@@ -124,7 +136,17 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
       id: [],
       client: [this.ficheTechnique?.client],
       commentaire: [],
+
+      // ✅ DATES
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
+      duree: [this.ficheTechnique?.duree],
+
+      // ✅ calculée => on désactive
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
     });
+
+    this.setupAutoDateFin();
+    this.updateDateFin(); // calc immédiat
   }
 
   initFormCommandeClient_update() {
@@ -132,7 +154,63 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
       id: [],
       client: [this.ficheTechnique?.client],
       commentaire: [this.ficheTechnique?.commentaire],
+
+      // ✅ DATES
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
+      duree: [this.ficheTechnique?.duree],
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
     });
+
+    this.setupAutoDateFin();
+    this.updateDateFin();
+  }
+
+  private setupAutoDateFin() {
+    const dateCtrl = this.form_ficheTechnique.get('date_debut');
+    const dureeCtrl = this.form_ficheTechnique.get('duree');
+    if (!dateCtrl || !dureeCtrl) return;
+
+    combineLatest([
+      dateCtrl.valueChanges.pipe(startWith(dateCtrl.value)),
+      dureeCtrl.valueChanges.pipe(startWith(dureeCtrl.value)),
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.updateDateFin());
+  }
+
+  updateDateFin() {
+    const dateDebut = this.form_ficheTechnique.get('date_debut')?.value;
+    const duree = this.form_ficheTechnique.get('duree')?.value;
+
+    const dateFin = this.addMonthsSafe(dateDebut, duree);
+    this.form_ficheTechnique.get('date_fin')?.setValue(dateFin, { emitEvent: false });
+  }
+
+  private addMonthsSafe(dateInput: any, monthsInput: any): Date | null {
+    const d = this.toDateOrNull(dateInput);
+    const m = Number(monthsInput);
+
+    if (!d || !Number.isFinite(m)) return null;
+
+    const day = d.getDate();
+
+    // éviter les sauts fin de mois
+    const res = new Date(d);
+    res.setDate(1);
+    res.setMonth(res.getMonth() + m);
+
+    const lastDay = new Date(res.getFullYear(), res.getMonth() + 1, 0).getDate();
+    res.setDate(Math.min(day, lastDay));
+
+    return res;
+  }
+
+  private toDateOrNull(v: any): Date | null {
+    if (!v) return null;
+    if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+
+    const d = new Date(v); // ISO 'YYYY-MM-DD' ou 'YYYY-MM-DDTHH:mm:ss'
+    return isNaN(d.getTime()) ? null : d;
   }
 
   onGetClient(item: Client) {
@@ -223,6 +301,24 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
 
   }
 
+  private formatDateYYYYMMDD(input: any): string {
+    if (!input) return '';
+
+    // si c'est déjà une string ISO/date-only
+    if (typeof input === 'string') {
+      // "2026-02-24" ou "2026-02-24T..." => on garde YYYY-MM-DD
+      return input.length >= 10 ? input.substring(0, 10) : input;
+    }
+
+    const d = input instanceof Date ? input : new Date(input);
+    if (isNaN(d.getTime())) return '';
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   onSave() {
     const formValue = this.form_ficheTechnique.value;
 
@@ -248,6 +344,12 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
     formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
 
+    const dDebut = this.form_ficheTechnique.get('date_debut')?.value;
+    const dFin = this.form_ficheTechnique.get('date_fin')?.value;
+
+    formData.append('date_debut', this.formatDateYYYYMMDD(dDebut));
+    formData.append('duree', String(this.form_ficheTechnique.get('duree')?.value ?? ''));
+    formData.append('date_fin', this.formatDateYYYYMMDD(dFin));
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));

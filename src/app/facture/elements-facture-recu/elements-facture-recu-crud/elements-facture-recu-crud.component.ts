@@ -15,7 +15,7 @@ import {bouton_names, operations} from "../../../constantes";
 import {MatTableDataSource} from "@angular/material/table";
 import {FicheTechniqueAFacturer, ProduitFiche} from "../../../shared/models/fiche-technique-a-facturer";
 import {FactureService} from "../../../shared/services/facture.service";
-import {RequestGenererFacture} from "../../../shared/models/ficheTechniques";
+import {FicheTechniques, RequestGenererFacture} from "../../../shared/models/ficheTechniques";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
 import { finalize } from 'rxjs/operators';
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -34,6 +34,7 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
   t_ProduitFiche?: MatTableDataSource<ProduitFiche>;
 
   ficheTechniqueAFacturer?: FicheTechniqueAFacturer;
+  ficheTechnique?: FicheTechniques;
   fixeCategorie?: number;
   form: FormGroup;
   mode: string = '';
@@ -56,6 +57,9 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
+  date_debut: any;
+  duree: any;
+  date_fin: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -117,6 +121,22 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
         // Remplit aussi le champ client du form pour passer la validation
         this.form.get('client')?.setValue(this.client?.id ?? null);
         this.form.get('numenroCompte')?.setValue(this.client?.compte_comptable);
+
+        this.ficheTechniquesService
+          .getItem(this.ficheTechniqueAFacturer?.fiche_technique_id)
+          .subscribe((fiche: FicheTechniques) => {
+            console.log("fiche technique infos ");
+            ///console.log(fiche);
+            this.ficheTechnique = fiche;
+            console.log(this.ficheTechnique);
+
+            this.form.patchValue({
+              date_debut: fiche?.date_debut ?? null,
+              date_fin: fiche?.date_fin ?? null,
+              // duree: fiche?.duree ?? null,
+            });
+          });
+
       }
       if (this.ficheTechniqueAFacturer?.liste_produits?.length > 0) {
         this.t_ProduitFiche!.data = [...this.ficheTechniqueAFacturer?.liste_produits];
@@ -156,6 +176,8 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       statut: [1],
       position: [1],
       etat: ['INIT'],
+      date_debut: [{ value: null, disabled: true }],
+      date_fin: [{ value: null, disabled: true }],
     });
   }
 
@@ -172,6 +194,8 @@ export class ElementsFactureRecuCrudComponent implements OnInit {
       statut: [1],
       position: [1],
       etat: ['INIT'],
+      date_debut: [{ value: null, disabled: true }],
+      date_fin: [{ value: null, disabled: true }],
     });
   }
 

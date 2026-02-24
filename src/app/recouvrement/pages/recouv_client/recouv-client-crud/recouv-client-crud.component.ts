@@ -179,28 +179,62 @@ export class RecouvClientCrudComponent implements OnInit, AfterViewInit {
     }
 
     this.clientService.genererRelevePDF(this.client.id).subscribe({
-      next: (res: HttpResponse<ArrayBuffer>) => {
-        if (!res.body) {
+      next: (arrayBuffer: ArrayBuffer) => {
+        if (!arrayBuffer || arrayBuffer.byteLength === 0) {
           this.dialogService.alert({ message: 'Le PDF est vide.' });
           return;
         }
 
-        // Convertit l’ArrayBuffer en Blob PDF
-        const blob = new Blob([res.body], { type: 'application/pdf' });
+        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
 
-        // Essaie de récupérer un nom de fichier depuis Content-Disposition
-        const cd = res.headers.get('Content-Disposition') || '';
-        const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(cd);
-        const fallback = `releve_client_${this.client.id}.pdf`;
-        const filename = match ? decodeURIComponent(match[1]) : fallback;
+        // plus de headers => filename impossible ici
+        // si tu veux un nom : const filename = `releve_client_${this.client.id}.pdf`;
 
-        // Comme pour onPrint : on envoie le Blob (ou Blob + filename si ton service le gère)
-        // this.pdfViewService.printDirectly(blob, filename);
         this.pdfViewService.printDirectly(blob);
+        // ou si ton service le supporte : this.pdfViewService.printDirectly(blob, filename);
       },
       error: (err) => {
         this.dialogService.alert({
           message: 'Erreur lors de la génération du relevé PDF : ' + (err?.message || err)
+        });
+      }
+    });
+  }
+
+
+  onExportReleveClientExcel(): void {
+    if (!this.client.id) {
+      this.dialogService.alert({ message: 'Veuillez d’abord sélectionner un client.' });
+      return;
+    }
+
+    this.clientService.genererReleveExcel(this.client.id).subscribe({
+      next: (arrayBuffer: ArrayBuffer) => {
+        if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+          this.dialogService.alert({ message: 'Le fichier Excel est vide.' });
+          return;
+        }
+
+        const blob = new Blob([arrayBuffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        const filename = `releve_client_${this.client.id}.xlsx`;
+
+        const objectUrl = URL.createObjectURL(blob); // ✅ pas de window.URL
+
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(objectUrl); // ✅ pas de window.URL
+      },
+      error: (err) => {
+        this.dialogService.alert({
+          message: 'Erreur lors de la génération du relevé Excel : ' + (err?.message || err)
         });
       }
     });

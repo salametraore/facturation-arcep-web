@@ -106,6 +106,11 @@ export class FactureService {
     }); // Observable<HttpResponse<ArrayBuffer>>
   }
 
+  genererFactureExcel(facture_id: number) {
+    const url = `${this.urlFactures}/generate-excel/${facture_id}/`;
+    return this.http.get(url, { responseType: 'arraybuffer' });
+  }
+
   genererDevisPDF(devis_id: number) {
     const url = `${this.urlDevis}/generate-pdf/${devis_id}/`;
     return this.http.get<ArrayBuffer>(url, {

@@ -66,6 +66,34 @@
           </mat-form-field>
 
           <div class="blank-row"></div>
+
+          <div class="date-row">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Date début</mat-label>
+              <input matInput [matDatepicker]="pickerStart" formControlName="date_debut" placeholder="Date début" required>
+              <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+              <mat-datepicker #pickerStart></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Durée</mat-label>
+              <input
+                matInput
+                formControlName="duree"
+                type="number"
+                placeholder="Durée (mois)"
+                required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Date fin</mat-label>
+              <input matInput [matDatepicker]="pickerEnd" formControlName="date_fin" placeholder="Date fin" readonly>
+              <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+              <mat-datepicker #pickerEnd></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="blank-row"></div>
           <!-- Commentaire -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Commentaire</mat-label>

@@ -14,8 +14,10 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 import {AuthService} from "../../../authentication/auth.service";
 import {bouton_names, operations} from "../../../constantes";
 import {WorkflowHistory} from "../../../shared/models/workflowHistory";
+
+import { startWith, takeUntil ,finalize} from 'rxjs/operators';
+import { combineLatest, Subject } from 'rxjs';
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
-import {finalize} from "rxjs/operators";
 
 @Component({
   selector: 'app-service-confiance-crud',
@@ -38,8 +40,10 @@ export class ServiceConfianceCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
+
   historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
+  private destroy$ = new Subject<void>();
 
   transmitLocked = false;
   isTransmitting = false;
@@ -66,6 +70,11 @@ export class ServiceConfianceCrudComponent implements OnInit {
   ngOnInit(): void {
     this.init();
     this.reloadData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   init() {
@@ -114,19 +123,6 @@ export class ServiceConfianceCrudComponent implements OnInit {
     }
   }
 
-  initForm_update() {
-    this.form = this.formBuilder.group({
-      id: [this.ficheTechnique?.id],
-      client: [this.ficheTechnique?.client],
-      produit: [this.ficheTechnique?.produits_detail[0].produit],
-      commentaire: [this.ficheTechnique?.commentaire],
-      direction: [2],
-      statut:  [this.ficheTechnique?.statut.id],
-      position: [1],
-      etat: ['INIT'],
-    });
-  }
-
   initForm_create() {
     this.form = this.formBuilder.group({
       id: [],
@@ -137,7 +133,105 @@ export class ServiceConfianceCrudComponent implements OnInit {
       statut: [1],
       position: [1],
       etat: ['INIT'],
+
+      // ✅ DATES
+      date_debut: [null],
+      duree: [null],
+      date_fin: [{ value: null, disabled: true }],
     });
+
+    this.setupAutoDateFin();
+    this.updateDateFin();
+  }
+
+  initForm_update() {
+    this.form = this.formBuilder.group({
+      id: [this.ficheTechnique?.id],
+      client: [this.ficheTechnique?.client],
+      produit: [this.ficheTechnique?.produits_detail?.[0]?.produit],
+      commentaire: [this.ficheTechnique?.commentaire],
+      direction: [2],
+
+      // ⚠️ sécurise si statut null
+      statut: [this.ficheTechnique?.statut?.id ?? 1],
+
+      position: [1],
+      etat: ['INIT'],
+
+      // ✅ DATES
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
+      duree: [this.ficheTechnique?.duree],
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
+    });
+
+    this.setupAutoDateFin();
+    this.updateDateFin(); // calc immédiat
+  }
+
+
+  private setupAutoDateFin() {
+    const dateCtrl = this.form.get('date_debut');
+    const dureeCtrl = this.form.get('duree');
+    if (!dateCtrl || !dureeCtrl) return;
+
+    combineLatest([
+      dateCtrl.valueChanges.pipe(startWith(dateCtrl.value)),
+      dureeCtrl.valueChanges.pipe(startWith(dureeCtrl.value)),
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.updateDateFin());
+  }
+
+  updateDateFin() {
+    const dateDebut = this.form.get('date_debut')?.value;
+    const duree = this.form.get('duree')?.value;
+
+    const dateFin = this.addMonthsSafe(dateDebut, duree);
+    this.form.get('date_fin')?.setValue(dateFin, { emitEvent: false });
+  }
+
+  private addMonthsSafe(dateInput: any, monthsInput: any): Date | null {
+    const d = this.toDateOrNull(dateInput);
+    const m = Number(monthsInput);
+
+    if (!d || !Number.isFinite(m)) return null;
+
+    const day = d.getDate();
+
+    // évite les sauts de fin de mois
+    const res = new Date(d);
+    res.setDate(1);
+    res.setMonth(res.getMonth() + m);
+
+    const lastDay = new Date(res.getFullYear(), res.getMonth() + 1, 0).getDate();
+    res.setDate(Math.min(day, lastDay));
+
+    return res;
+  }
+
+  private toDateOrNull(v: any): Date | null {
+    if (!v) return null;
+    if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+    const d = new Date(v); // ISO 'YYYY-MM-DD' / 'YYYY-MM-DDTHH:mm:ss'
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  private formatDateYYYYMMDD(input: any): string {
+    if (!input) return '';
+
+    // si c'est déjà une string ISO/date-only
+    if (typeof input === 'string') {
+      // "2026-02-24" ou "2026-02-24T..." => on garde YYYY-MM-DD
+      return input.length >= 10 ? input.substring(0, 10) : input;
+    }
+
+    const d = input instanceof Date ? input : new Date(input);
+    if (isNaN(d.getTime())) return '';
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   crud() {
@@ -171,6 +265,13 @@ export class ServiceConfianceCrudComponent implements OnInit {
     formData.append('commentaire', String(dataFicheTechnique.commentaire));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
     formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
+
+    const dDebut = this.form.get('date_debut')?.value;
+    const dFin = this.form.get('date_fin')?.value;
+
+    formData.append('date_debut', this.formatDateYYYYMMDD(dDebut));
+    formData.append('duree', String(this.form.get('duree')?.value ?? ''));
+    formData.append('date_fin', this.formatDateYYYYMMDD(dFin));
 
     // Produits (JSON stringifié)
     formData.append('produits', JSON.stringify(dataFicheTechnique.produits));

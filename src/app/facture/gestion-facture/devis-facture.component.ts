@@ -248,7 +248,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     return this.clients?.find(c => c.id === id)?.denomination_sociale;
   }
 
-  onPrint(facture: Facture) {
+  onPrintFacturePDF(facture: Facture) {
     this.factureService.genererFacturePDF(facture?.id).subscribe({
       next: (res: HttpResponse<ArrayBuffer>) => {
         if (!res.body) {
@@ -275,6 +275,45 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     });
   }
 
+  onPrintFactureExcel(facture: Facture): void {
+    const factureId =facture?.id;
+
+    if (!factureId) {
+      this.dialogService.alert({ message: 'Aucun devis associé à cette facture.' });
+      return;
+    }
+
+    this.factureService.genererFactureExcel(factureId).subscribe({
+      next: (arrayBuffer: ArrayBuffer) => {
+        if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+          this.dialogService.alert({ message: 'Le fichier Excel est vide.' });
+          return;
+        }
+
+        const blob = new Blob([arrayBuffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        const filename = `releve_client_${factureId}.xlsx`;
+
+        const objectUrl = URL.createObjectURL(blob); // ✅ pas de window.URL
+
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(objectUrl); // ✅ pas de window.URL
+      },
+      error: (err) => {
+        this.dialogService.alert({
+          message: 'Erreur lors de la génération du relevé Excel : ' + (err?.message || err)
+        });
+      }
+    });
+  }
 
   openGenererRedevancesAnnuelles(): void {
     const dialogRef = this.dialog.open(GenerationRedevanceCrudComponent, {

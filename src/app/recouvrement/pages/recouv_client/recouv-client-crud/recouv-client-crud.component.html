@@ -9,7 +9,10 @@
       <h3 class="list-title">Synthèse — Relevé de compte</h3>
       <div class="list-actions">
         <button mat-flat-button color="primary" (click)="onPrintReleveClient()">
-          <mat-icon>print</mat-icon> Éditer relevé
+          <mat-icon>print</mat-icon> Éditer relevé PDF
+        </button>
+        <button mat-flat-button color="primary" (click)="onExportReleveClientExcel()">
+          <mat-icon>print</mat-icon> Éditer relevé Excel
         </button>
         <button mat-stroked-button color="primary" (click)="onFerme()">
           <mat-icon>undo</mat-icon> Fermer

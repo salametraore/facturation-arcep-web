@@ -29,7 +29,8 @@ export class ClientService {
   private get urlClients()              { return this.joinUrl(this.cfg.baseUrl, 'clients'); }
   private get urlRecouv()               { return this.joinUrl(this.cfg.baseUrl, 'recouv'); }
   private get urlReleveClient()         { return this.joinUrl(this.cfg.baseUrl, 'releve-client'); }
-  private get urlReleveGenerate()       { return this.joinUrl(this.cfg.baseUrl, 'releve/generate-pdf'); }
+  private get urlReleveGeneratePDF()       { return this.joinUrl(this.cfg.baseUrl, 'releve/generate-pdf'); }
+  private get urlReleveGenerateExcel()       { return this.joinUrl(this.cfg.baseUrl, 'releve/generate-excel'); }
   private get urlClientAutorisePostal() { return this.joinUrl(this.cfg.baseUrl, 'clients/autorise-postal'); }
 
   // --- CRUD Clients ---
@@ -75,14 +76,23 @@ export class ClientService {
     return this.httpClient.get<ReleveCompteClient[]>(`${this.urlReleveClient}/${id}/`);
   }
 
-  genererRelevePDF(client_id: number) {
+/*  genererRelevePDF(client_id: number) {
     const url = `${this.urlReleveGenerate}/${client_id}/`;
     return this.httpClient.get(url, {
       observe: 'response',
       responseType: 'arraybuffer' as 'json'
     });
+  }*/
+
+  genererRelevePDF(client_id: number) {
+    const url = `${this.urlReleveGeneratePDF}/${client_id}/`;
+    return this.httpClient.get(url, { responseType: 'arraybuffer' });
   }
 
+  genererReleveExcel(client_id: number) {
+    const url = `${this.urlReleveGenerateExcel}/${client_id}/`;
+    return this.httpClient.get(url, { responseType: 'arraybuffer' });
+  }
 
   getListeClientsAutorisesPostal(): Observable<ClientAutorisePostal[]> {
     return this.httpClient

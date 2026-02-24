@@ -73,6 +73,11 @@ export class DevisService {
     }); // Observable<HttpResponse<ArrayBuffer>>
   }
 
+  genererDevisExcel(devis_id: number) {
+    const url = `${this.urlDevis}/generate-excel/${devis_id}/`;
+    return this.http.get(url, { responseType: 'arraybuffer' });
+  }
+
   annulerDevis(devis_id: number): Observable<any> {
     return this.http.get(`${this.cfg.baseUrl}/devis-annuler/${devis_id}/`);
   }

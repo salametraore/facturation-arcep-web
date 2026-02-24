@@ -15,7 +15,9 @@ import {ClientService} from "../../../shared/services/client.service";
 import {Client} from "../../../shared/models/client";
 import {WorkflowHistory} from "../../../shared/models/workflowHistory";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
-import {finalize} from "rxjs/operators";
+import { OnDestroy } from '@angular/core';
+import { combineLatest, Subject } from 'rxjs';
+import { startWith, takeUntil ,finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'app-domaine-crud',
@@ -38,6 +40,8 @@ export class DomaineCrudComponent implements OnInit {
   public data_operation: string = '';
   errorMessage: any;
   nomClient: any;
+
+  private destroy$ = new Subject<void>();
 
   historiqueFicheTechniques:HistoriqueFicheTechnique[];
 
@@ -65,6 +69,13 @@ export class DomaineCrudComponent implements OnInit {
   ngOnInit(): void {
     this.init();
     this.reloadData();
+    console.log("ficheTechnique a afficher")
+    console.log(this.ficheTechnique)
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   init() {
@@ -121,13 +132,22 @@ export class DomaineCrudComponent implements OnInit {
     this.form = this.formBuilder.group({
       id: [this.ficheTechnique?.id],
       client: [this.ficheTechnique?.client],
-      produit: [this.ficheTechnique?.produits_detail[0].produit],
+      produit: [this.ficheTechnique?.produits_detail?.[0]?.produit],
       commentaire: [this.ficheTechnique?.commentaire],
       direction: [2],
       statut: [1],
       position: [1],
       etat: ['INIT'],
+
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
+      duree: [this.ficheTechnique?.duree],
+
+      // ✅ calculée : on la désactive pour éviter la saisie manuelle
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
     });
+
+    this.setupAutoDateFin();
+    this.updateDateFin(); // calc immédiat
   }
 
   initForm_create() {
@@ -140,7 +160,68 @@ export class DomaineCrudComponent implements OnInit {
       statut: [1],
       position: [1],
       etat: ['INIT'],
+
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
+      duree: [this.ficheTechnique?.duree],
+
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
     });
+
+    this.setupAutoDateFin();
+    this.updateDateFin();
+  }
+
+  private setupAutoDateFin() {
+    const dateCtrl = this.form.get('date_debut');
+    const dureeCtrl = this.form.get('duree');
+
+    if (!dateCtrl || !dureeCtrl) return;
+
+    combineLatest([
+      dateCtrl.valueChanges.pipe(startWith(dateCtrl.value)),
+      dureeCtrl.valueChanges.pipe(startWith(dureeCtrl.value)),
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.updateDateFin());
+  }
+
+  updateDateFin() {
+    const dateDebut = this.form.get('date_debut')?.value;
+    const duree = this.form.get('duree')?.value;
+
+    const dateFin = this.addMonthsSafe(dateDebut, duree);
+
+    // date_fin est disabled => setValue OK, mais il faut écrire sur le contrôle
+    this.form.get('date_fin')?.setValue(dateFin, { emitEvent: false });
+  }
+
+  private addMonthsSafe(dateInput: any, monthsInput: any): Date | null {
+    const d = this.toDateOrNull(dateInput);
+    const m = Number(monthsInput);
+
+    if (!d || !Number.isFinite(m)) return null;
+
+    const day = d.getDate();
+
+    // On se met au 1er du mois pour éviter les sauts (ex: 31 -> mois suivant)
+    const res = new Date(d);
+    res.setDate(1);
+    res.setMonth(res.getMonth() + m);
+
+    // Dernier jour du mois cible
+    const lastDay = new Date(res.getFullYear(), res.getMonth() + 1, 0).getDate();
+    res.setDate(Math.min(day, lastDay));
+
+    return res;
+  }
+
+  private toDateOrNull(v: any): Date | null {
+    if (!v) return null;
+    if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+
+    // ISO 'YYYY-MM-DD' ou 'YYYY-MM-DDTHH:mm:ss'
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? null : d;
   }
 
   crud() {

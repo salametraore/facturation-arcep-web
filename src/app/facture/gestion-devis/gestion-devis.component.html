@@ -171,9 +171,14 @@
                   Generer Facture
                 </button>
 
-                <button mat-menu-item (click)="onPrintDevis(element)">
+                <button mat-menu-item (click)="onPrintDevisPDF(element)">
                   <mat-icon color="primary">print</mat-icon>
-                  Éditer devis
+                  Éditer devis PDF
+                </button>
+
+                <button mat-menu-item (click)="onPrintDevisExcel(element)">
+                  <mat-icon color="primary">print</mat-icon>
+                  Éditer devis Excel
                 </button>
 
               </mat-menu>

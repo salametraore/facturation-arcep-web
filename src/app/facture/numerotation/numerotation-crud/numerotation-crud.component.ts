@@ -18,8 +18,10 @@ import {MsgMessageServiceService} from "../../../shared/services/msg-message-ser
 import {DialogService} from "../../../shared/services/dialog.service";
 import {operations,bouton_names} from "../../../constantes";
 import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
-import {Subject, takeUntil} from "rxjs";
-import {finalize} from "rxjs/operators";
+import {combineLatest, Subject} from "rxjs";
+import {startWith,finalize, takeUntil} from "rxjs/operators";
+
+
 
 @Component({
   selector: 'numerotation-crud',
@@ -123,12 +125,28 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
 
   }
 
+  updateDateFin() {
+    const dateDebut = this.form_ficheTechnique.get('date_debut')?.value;
+    const duree = this.form_ficheTechnique.get('duree')?.value;
+
+    const dateFin = this.addMonthsSafe(dateDebut, duree);
+
+    this.form_ficheTechnique.get('date_fin')
+      ?.setValue(dateFin, { emitEvent: false });
+  }
+
   initFormCommandeClient_create() {
     this.form_ficheTechnique = this.formBuilder.group({
       id: [],
       client: [this.ficheTechnique?.client],
       commentaire: [],
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut), Validators.required],
+      duree: [this.ficheTechnique?.duree, Validators.required],
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
     });
+
+    this.setupAutoDateFin();
+    this.updateDateFin(); // calcule tout de suite
   }
 
   initFormCommandeClient_update() {
@@ -136,7 +154,55 @@ export class NumerotationCrudComponent implements OnInit, AfterViewInit {
       id: [],
       client: [this.ficheTechnique?.client],
       commentaire: [this.ficheTechnique?.commentaire],
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut), Validators.required],
+      duree: [this.ficheTechnique?.duree, Validators.required],
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
     });
+
+    this.setupAutoDateFin();
+    this.updateDateFin(); // calcule tout de suite
+  }
+
+  private setupAutoDateFin() {
+    const dateCtrl = this.form_ficheTechnique.get('date_debut');
+    const dureeCtrl = this.form_ficheTechnique.get('duree');
+
+    if (!dateCtrl || !dureeCtrl) return;
+
+    combineLatest([
+      dateCtrl.valueChanges.pipe(startWith(dateCtrl.value)),
+      dureeCtrl.valueChanges.pipe(startWith(dureeCtrl.value)),
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.updateDateFin());
+  }
+
+  private addMonthsSafe(dateInput: any, monthsInput: any): Date | null {
+    const d = this.toDateOrNull(dateInput);
+    const m = Number(monthsInput);
+
+    if (!d || !Number.isFinite(m)) return null;
+
+    const day = d.getDate();
+
+    // on se met au 1er du mois pour éviter les sauts
+    const res = new Date(d);
+    res.setDate(1);
+    res.setMonth(res.getMonth() + m);
+
+    // dernier jour du mois cible
+    const lastDay = new Date(res.getFullYear(), res.getMonth() + 1, 0).getDate();
+    res.setDate(Math.min(day, lastDay));
+
+    return res;
+  }
+
+  private toDateOrNull(v: any): Date | null {
+    if (!v) return null;
+    if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+
+    const d = new Date(v); // marche pour ISO '2026-02-25' / '2026-02-25T...'
+    return isNaN(d.getTime()) ? null : d;
   }
 
   onGetClient(item: Client) {

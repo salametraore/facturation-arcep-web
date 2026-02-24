@@ -171,10 +171,16 @@
               </button>
 
 
-                <button mat-menu-item (click)="onPrint(element)">
+                <button mat-menu-item (click)="onPrintFacturePDF(element)">
                   <mat-icon color="primary">print</mat-icon>
-                  Éditer facture
+                  Éditer devis PDF
                 </button>
+
+                <button mat-menu-item (click)="onPrintFactureExcel(element)">
+                  <mat-icon color="primary">print</mat-icon>
+                  Éditer devis Excel
+                </button>
+
 
 
               </mat-menu>

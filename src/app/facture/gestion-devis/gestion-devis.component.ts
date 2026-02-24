@@ -234,7 +234,7 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
     return this.categories?.find(cat=>cat.id===id)?.libelle;
   }
 
-  onPrintDevis(devis: Devis) {
+  onPrintDevisPDF(devis: Devis) {
     const devisId =devis?.id;
 
     if (!devisId) {
@@ -262,6 +262,46 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
           message: 'Erreur lors de la génération du PDF : ' + (err?.message || err),
         });
       },
+    });
+  }
+
+  onPrintDevisExcel(devis: Devis): void {
+    const devisId =devis?.id;
+
+    if (!devisId) {
+      this.dialogService.alert({ message: 'Aucun devis associé à cette facture.' });
+      return;
+    }
+
+    this.devisService.genererDevisExcel(devisId).subscribe({
+      next: (arrayBuffer: ArrayBuffer) => {
+        if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+          this.dialogService.alert({ message: 'Le fichier Excel est vide.' });
+          return;
+        }
+
+        const blob = new Blob([arrayBuffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        const filename = `releve_client_${devisId}.xlsx`;
+
+        const objectUrl = URL.createObjectURL(blob); // ✅ pas de window.URL
+
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(objectUrl); // ✅ pas de window.URL
+      },
+      error: (err) => {
+        this.dialogService.alert({
+          message: 'Erreur lors de la génération du relevé Excel : ' + (err?.message || err)
+        });
+      }
     });
   }
 

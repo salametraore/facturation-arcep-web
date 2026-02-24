@@ -18,6 +18,11 @@ import { AuthService } from "../../../../authentication/auth.service";
 import { operations } from "../../../../constantes";
 import { RecouvDashboardClient } from "../../../../shared/models/recouv-dashboard-client";
 import { ActivatedRoute, Router } from "@angular/router";
+import {HttpResponse} from "@angular/common/http";
+import {PdfViewService} from "../../../../shared/services/pdf-view.service";
+import {DialogService} from "../../../../shared/services/dialog.service";
+import {RecouvListeEncaissement} from "../../../../shared/models/recouv-liste-encaissement";
+import {window} from "rxjs/operators";
 
 @Component({
   selector: 'client-details-releve-compte',
@@ -59,6 +64,8 @@ export class ClientDetailsReleveCompteComponent implements OnInit, AfterViewInit
     private formBuilder: FormBuilder,
     private clientService: ClientService,
     private authServiceService: AuthService,
+    private pdfViewService: PdfViewService,
+    public dialogService: DialogService,
     private route: ActivatedRoute,
     private router: Router,
   ) {
@@ -128,4 +135,64 @@ export class ClientDetailsReleveCompteComponent implements OnInit, AfterViewInit
   onGetClient(client: Client) {
     this.client = client;
   }
+
+  onPrintReleveClient(): void {
+    if (!this.clientId) {
+      this.dialogService.alert({ message: 'Veuillez d’abord sélectionner un client.' });
+      return;
+    }
+
+    this.clientService.genererRelevePDF(this.clientId).subscribe({
+      next: (arrayBuffer: ArrayBuffer) => {
+        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        this.pdfViewService.printDirectly(blob);
+      },
+      error: (err) => {
+        this.dialogService.alert({
+          message: 'Erreur lors de la génération du relevé PDF : ' + (err?.message || err)
+        });
+      }
+    });
+  }
+
+
+  onExportReleveClientExcel(): void {
+    if (!this.clientId) {
+      this.dialogService.alert({ message: 'Veuillez d’abord sélectionner un client.' });
+      return;
+    }
+
+    this.clientService.genererReleveExcel(this.clientId).subscribe({
+      next: (arrayBuffer: ArrayBuffer) => {
+        if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+          this.dialogService.alert({ message: 'Le fichier Excel est vide.' });
+          return;
+        }
+
+        const blob = new Blob([arrayBuffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        const filename = `releve_client_${this.clientId}.xlsx`;
+
+        const objectUrl = URL.createObjectURL(blob); // ✅ pas de window.URL
+
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(objectUrl); // ✅ pas de window.URL
+      },
+      error: (err) => {
+        this.dialogService.alert({
+          message: 'Erreur lors de la génération du relevé Excel : ' + (err?.message || err)
+        });
+      }
+    });
+  }
+
+
 }

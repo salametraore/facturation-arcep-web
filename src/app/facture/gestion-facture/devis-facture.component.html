@@ -171,11 +171,15 @@
               </button>
 
 
-                <button mat-menu-item (click)="onPrint(element)">
+                <button mat-menu-item (click)="onPrintFacturePDF(element)">
                   <mat-icon color="primary">print</mat-icon>
-                  Éditer facture
+                  Éditer facture PDF
                 </button>
 
+                <button mat-menu-item (click)="onPrintFactureExcel(element)">
+                  <mat-icon color="primary">print</mat-icon>
+                  Éditer facture Excel
+                </button>
 
               </mat-menu>
             </td>
