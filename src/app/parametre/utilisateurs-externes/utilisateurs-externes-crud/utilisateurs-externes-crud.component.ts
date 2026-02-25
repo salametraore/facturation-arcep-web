@@ -49,11 +49,11 @@ export function minArrayLength(min: number): ValidatorFn {
 }
 
 @Component({
-  selector: 'app-utilisateurs-crud',
-  templateUrl: './utilisateurs-crud.component.html',
-  styleUrls: ['./utilisateurs-crud.component.scss']
+  selector: 'utilisateurs-externes-crud',
+  templateUrl: './utilisateurs-externes-crud.component.html',
+  styleUrls: ['./utilisateurs-externes-crud.component.scss']
 })
-export class UtilisateursCrudComponent implements OnInit {
+export class UtilisateursExternesCrudComponent implements OnInit {
 
   utilisateur?: Utilisateur | null;
 
@@ -104,7 +104,7 @@ export class UtilisateursCrudComponent implements OnInit {
     private roleService: RoleService,
     private directionsService: DirectionsService,
     private typeDirectionsService: TypeDirectionsService,
-    public dialogRef: MatDialogRef<UtilisateursCrudComponent>,
+    public dialogRef: MatDialogRef<UtilisateursExternesCrudComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private msgMessageService: MsgMessageServiceService
   ) {

@@ -26,6 +26,12 @@
           <mat-card-content>
             <div *ngIf="errorMessage" class="alert alert-danger mat-body-1">{{ errorMessage }}</div>
 
+            <div class="alert-box" *ngIf="authErrorMsg">
+              {{ authErrorMsg }}
+            </div>
+
+            <div class="spacer-12" *ngIf="authErrorMsg"></div>
+
             <!-- Formulaire de login (inchangé, sauf commentaires) -->
             <form *ngIf="!show2faForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
               <mat-form-field class="full-width">

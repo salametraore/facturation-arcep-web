@@ -56,6 +56,8 @@ import {ClasseLargeurBandeComponent} from "./classe-largeur-bande/classe-largeur
 import {ClasseLargeurBandeCrudComponent} from "./classe-largeur-bande/classe-largeur-bande-crud/classe-largeur-bande-crud.component";
 import {UtilisateursComponent} from "./utilisateurs/utilisateurs.component";
 import {UtilisateursCrudComponent} from "./utilisateurs/utilisateurs-crud/utilisateurs-crud.component";
+import {UtilisateursExternesComponent} from "./utilisateurs-externes/utilisateurs-externes.component";
+import {UtilisateursExternesCrudComponent} from "./utilisateurs-externes/utilisateurs-externes-crud/utilisateurs-externes-crud.component";
 
 @NgModule({
   declarations: [
@@ -105,6 +107,8 @@ import {UtilisateursCrudComponent} from "./utilisateurs/utilisateurs-crud/utilis
     ClasseLargeurBandeCrudComponent,
     UtilisateursComponent,
     UtilisateursCrudComponent,
+    UtilisateursExternesComponent,
+    UtilisateursExternesCrudComponent,
   ],
   imports: [
     CommonModule,

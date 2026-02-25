@@ -6,7 +6,7 @@ import {Router} from '@angular/router';
 import {UtilisateurService} from "../../shared/services/utilisateur.service";
 import {Utilisateur} from "../../shared/models/utilisateur";
 import {UtilisateurRole} from "../../shared/models/droits-utilisateur";
-import {UtilisateurRoleRoleService} from "../../shared/services/utilsateur-role.service";
+import {UtilisateurRoleService} from "../../shared/services/utilsateur-role.service";
 import { forkJoin, throwError } from 'rxjs';
 import { switchMap, map, take, tap, finalize, catchError } from 'rxjs/operators';
 
@@ -33,12 +33,14 @@ export class LoginComponent implements OnInit {
   // [BYPASS 2FA] Code OTP par défaut utilisé pour contourner l'étape 2FA
   private readonly DEFAULT_OTP_CODE = '002025';
 
+  authErrorMsg: string | null = null;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private utilisateurService: UtilisateurService,
-    private utilisateurRoleRoleService:UtilisateurRoleRoleService,
+    private utilisateurRoleRoleService:UtilisateurRoleService,
     private router: Router
   ) {
   }
@@ -52,6 +54,8 @@ export class LoginComponent implements OnInit {
     this.twoFaForm = this.fb.group({
       code: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]], // Valide un code de 6 chiffres
     });
+
+    this.authService.authError$.subscribe(msg => this.authErrorMsg = msg);
   }
 
   // La méthode de soumission du formulaire

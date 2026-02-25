@@ -5,6 +5,11 @@ import { Role } from './role.model';
 /** Pour coller à la regex DRF: ^[\w.@+-]+$ */
 export type Username = string;
 
+
+/** Enum "nature" */
+export type NatureEnum = 'PERSONNEL' | 'CLIENT';
+
+
 /** Réponse API: Utilisateur (avec roles_detail readOnly) */
 export interface Utilisateur {
   /** readOnly */
@@ -19,6 +24,8 @@ export interface Utilisateur {
   email?: string;
 
   direction?: number | null;
+
+  nature?: string;
 
   /** readOnly */
   roles_detail: Role[];
@@ -35,6 +42,8 @@ export interface UtilisateurRequest {
   email?: string;
 
   direction?: number | null;
+
+  nature?: string;
 
   /** writeOnly */
   password: string;
@@ -61,10 +70,10 @@ export function utilisateurToUpdateRequest(u: Utilisateur): UtilisateurUpdateReq
     telephone: u.telephone ?? null,  // null si non renseigné
     email: u.email,                  // garde undefined si absent
     direction: u.direction ?? null,
+    nature: u.nature,
     liste_roles: (u.roles_detail ?? []).map(r => r.id),
   };
 }
-
 
 
 export interface UtilisateurRole {

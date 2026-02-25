@@ -25,6 +25,7 @@ import {ClasseDebitComponent} from "./classe-debit/classe-debit.component";
 import {ClassePuissanceComponent} from "./classe-puissance/classe-puissance.component";
 import {ClasseLargeurBandeComponent} from "./classe-largeur-bande/classe-largeur-bande.component";
 import {UtilisateursComponent} from "./utilisateurs/utilisateurs.component";
+import {UtilisateursExternesComponent} from "./utilisateurs-externes/utilisateurs-externes.component";
 
 const routes: Routes = [
   {
@@ -41,6 +42,7 @@ const routes: Routes = [
 
       {path: 'roles-page', component: RolesPageComponent},
       {path: 'utilisateurs', component: UtilisateursComponent},
+      {path: 'utilisateurs-externes', component: UtilisateursExternesComponent},
 
       { path: 'clients', component: ClientsComponent },
       { path: 'clients/new', component: ClientsCrudComponent },

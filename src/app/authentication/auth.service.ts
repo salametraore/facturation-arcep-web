@@ -13,10 +13,10 @@ import { Utilisateur } from '../shared/models/utilisateur';
 import { UtilisateurRole } from '../shared/models/droits-utilisateur';
 
 import { AppConfigService } from '../core/config/app-config.service';
+import { UtilisateurService } from '../shared/services/utilisateur.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // URL backend lue depuis assets/app-config.json
   private get apiUrl(): string {
     return this.cfg.baseUrl.replace(/\/$/, '');
   }
@@ -24,10 +24,19 @@ export class AuthService {
   private authState = new BehaviorSubject<AuthState>(this.getInitialState());
   public authState$ = this.authState.asObservable();
 
+  // ✅ message “à afficher” sur l’écran login (persisté en session)
+  private authErrorSubject = new BehaviorSubject<string | null>(
+    sessionStorage.getItem('auth_error')
+  );
+  public authError$ = this.authErrorSubject.asObservable();
+
+  utilisateurConnecte!: Utilisateur;
+
   constructor(
     private http: HttpClient,
     private router: Router,
-    private cfg: AppConfigService
+    private cfg: AppConfigService,
+    private utilisateurService: UtilisateurService
   ) {}
 
   private getInitialState(): AuthState {
@@ -37,22 +46,62 @@ export class AuthService {
     return { isAuthenticated: !!token, token, user };
   }
 
-  // ---- Auth 1/2 : login ----
+  private setAuthError(msg: string | null): void {
+    this.authErrorSubject.next(msg);
+    if (msg) sessionStorage.setItem('auth_error', msg);
+    else sessionStorage.removeItem('auth_error');
+  }
+
+  // (optionnel) à appeler depuis login.component après affichage du message
+  clearAuthError(): void {
+    this.setAuthError(null);
+  }
+
+  private isPersonnel(util: Utilisateur | null | undefined): boolean {
+    return String(util?.nature ?? '').toUpperCase() === 'PERSONNEL';
+  }
+
   login(payload: LoginPayload): Observable<LoginResponse> {
+    // ✅ on efface les anciens messages
+    this.setAuthError(null);
+
     const url = `${this.apiUrl}/auth/login/`;
     return this.http.post<LoginResponse>(url, payload).pipe(
       catchError(this.handleError)
     );
   }
 
-  // ---- Auth 2/2 : vérification 2FA ----
   verify2fa(payload: TwoFaPayload): Observable<LoginResponse> {
     const url = `${this.apiUrl}/auth/verify-otp/`;
     return this.http.post<LoginResponse>(url, payload).pipe(
       tap((response) => {
-        if (response.token) {
-          this.setToken(response.token, response.user);
-        }
+        if (!response?.token) return;
+
+        // ✅ on pose le token (nécessaire si getItem est protégé)
+        this.setToken(response.token, response.user);
+
+        // ✅ charger l'utilisateur complet
+        this.utilisateurService.getItem(response.user.id).subscribe({
+          next: (util: Utilisateur) => {
+            this.utilisateurConnecte = util;
+
+            // ✅ contrôle nature
+            if (!this.isPersonnel(util)) {
+              this.setAuthError('Cette application est réservée uniquement aux utilisateurs internes.');
+              this.logout(); // nettoie + redirige /auth/login
+              return;
+            }
+
+            // ✅ ok : on continue
+            this.setAuthError(null);
+            this.setConnectedUser(util);
+          },
+          error: (err) => {
+            // si on ne peut pas récupérer le profil, on bloque par sécurité
+            this.setAuthError('Impossible de vérifier le profil utilisateur.');
+            this.logout();
+          }
+        });
       }),
       catchError(this.handleError)
     );
@@ -68,7 +117,6 @@ export class AuthService {
     return localStorage.getItem('auth_token');
   }
 
-  // ---- Stockage session utilisateur connecté (profil étendu) ----
   setConnectedUser(utilisateur: Utilisateur): void {
     sessionStorage.setItem('UtilisateurConnecte', JSON.stringify(utilisateur));
   }
@@ -101,21 +149,10 @@ export class AuthService {
     return !!token && this.isTokenValid(token);
   }
 
-  // À adapter si vous validez réellement l’expiration JWT
   private isTokenValid(_token: string): boolean {
     return true;
   }
 
-  private decodeToken(token: string): any {
-    try {
-      return JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-      console.error('Erreur lors du décodage du token JWT:', e);
-      return null;
-    }
-  }
-
-  // ---- Reset mot de passe (3 étapes) ----
   requestPasswordReset(payload: PasswordResetPayload): Observable<any> {
     const url = `${this.apiUrl}/password_reset/`;
     return this.http.post(url, payload).pipe(catchError(this.handleError));
@@ -131,7 +168,6 @@ export class AuthService {
     return this.http.post(url, payload).pipe(catchError(this.handleError));
   }
 
-  // ---- Gestion d'erreur commune ----
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Une erreur inconnue est survenue.';
     if (error.error instanceof ErrorEvent) {

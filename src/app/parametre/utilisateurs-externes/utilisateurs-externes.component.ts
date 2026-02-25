@@ -16,16 +16,16 @@ import { TypeDirectionsService } from '../../shared/services/type-directions.ser
 import { DialogService } from '../../shared/services/dialog.service';
 import { MsgMessageServiceService } from '../../shared/services/msg-message-service.service';
 
-import { UtilisateursCrudComponent } from './utilisateurs-crud/utilisateurs-crud.component';
+import { UtilisateursExternesCrudComponent } from './utilisateurs-externes-crud/utilisateurs-externes-crud.component';
 import {DirectionsService} from "../../shared/services/directions.services";
 import {Direction} from "../../shared/models/direction";
 import {AuthService} from "../../authentication/auth.service";
 
 @Component({
-  selector: 'utilisateurs',
-  templateUrl: './utilisateurs.component.html'
+  selector: 'utilisateurs-externes',
+  templateUrl: './utilisateurs-externes.component.html'
 })
-export class UtilisateursComponent implements OnInit, AfterViewInit {
+export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
 
   selectedRow: any = undefined;
 
@@ -90,7 +90,7 @@ export class UtilisateursComponent implements OnInit, AfterViewInit {
   reloadData(): void {
 
     this.utilisateurService.getListItems().subscribe((users: Utilisateur[]) => {
-      this.t_Utilisateurs.data = (users ?? []).filter(u => u.nature === 'PERSONNEL');
+      this.t_Utilisateurs.data = (users ?? []).filter(u => u.nature === 'CLIENT');
       this.t_Utilisateurs.paginator?.firstPage();
     });
 
@@ -133,7 +133,7 @@ export class UtilisateursComponent implements OnInit, AfterViewInit {
     dialogConfig.disableClose = true;
     dialogConfig.data = { utilisateur, operation };
 
-    const ref = this.dialog.open(UtilisateursCrudComponent, dialogConfig);
+    const ref = this.dialog.open(UtilisateursExternesCrudComponent, dialogConfig);
     ref.afterClosed().subscribe(() => this.reloadData());
   }
 

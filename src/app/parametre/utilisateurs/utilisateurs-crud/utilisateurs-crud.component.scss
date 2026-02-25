@@ -1,0 +1,72 @@
+.form-row-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.form-row-2 > * {
+  min-width: 0; /* évite tout overflow */
+}
+
+@media (max-width: 720px) {
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-row-dir-user {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* 50/50 sans débordement */
+  gap: 12px;
+  width: 100%;
+}
+
+.form-row-dir-user > * {
+  min-width: 0; /* autorise le contenu à rétrécir */
+}
+
+@media (max-width: 720px) {
+  .form-row-dir-user {
+    grid-template-columns: 1fr;
+  }
+}
+
+.roles-block {
+  width: 100%;
+}
+
+.roles-add {
+  margin-bottom: 10px;
+}
+
+.roles-table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.col-actions {
+  width: 90px;
+  text-align: right;
+}
+
+.roles-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #f44336; /* rouge Material */
+}
+
+
+.list-header--with-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; /* si écran étroit */
+}

@@ -6,7 +6,7 @@ import { UtilisateurRole } from '../models/droits-utilisateur';
 import { AppConfigService } from '../../core/config/app-config.service';
 
 @Injectable({ providedIn: 'root' })
-export class UtilisateurRoleRoleService {
+export class UtilisateurRoleService {
 
   constructor(
     private http: HttpClient,

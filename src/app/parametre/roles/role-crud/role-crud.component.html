@@ -1,104 +1,158 @@
-<!-- src/app/parametre/roles/role-crud/role-crud.component.html -->
-
 <mat-card>
 
-  <!-- Titre -->
   <div class="page-title">
     <h2>{{ title }}</h2>
   </div>
 
+  <mat-progress-bar *ngIf="loadingOps" mode="indeterminate"></mat-progress-bar>
+
   <section class="list-box">
-    <div class="list-header">
+
+    <!-- Header : titre à gauche + actions à droite -->
+    <div class="list-header list-header--with-actions">
       <h3 class="list-title">
         <ng-container *ngIf="!data?.id">Nouvel enregistrement</ng-container>
         <ng-container *ngIf="data?.id">Mise à jour</ng-container>
       </h3>
+
+      <div class="header-actions">
+        <!-- IMPORTANT : bouton hors form => type="button" + (click)="save()" -->
+        <button mat-flat-button color="primary" type="button"
+                (click)="save()"
+                [disabled]="form.invalid || saving || loadingOps">
+          <mat-icon>save</mat-icon>
+          Enregistrer
+        </button>
+
+        <button mat-stroked-button color="warn" type="button"
+                (click)="close()"
+                [disabled]="saving">
+          <mat-icon>close</mat-icon>
+          Fermer
+        </button>
+      </div>
     </div>
 
     <div class="list-body">
-
       <div class="role-crud-scroll">
+
+        <div class="blank-row"></div>
 
         <form [formGroup]="form" (ngSubmit)="save()" class="form-grid">
 
-        <!-- Code -->
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Code</mat-label>
-          <input matInput formControlName="code" placeholder="Code">
-        </mat-form-field>
+          <!-- Code + Libellé sur la même ligne (30% / 70%) -->
+          <div class="role-fields-row">
+            <mat-form-field appearance="outline" class="code-field">
+              <mat-label>Code</mat-label>
+              <input matInput formControlName="code" placeholder="Code">
+            </mat-form-field>
 
-        <div class="blank-row"></div>
-
-        <!-- Libellé -->
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Libellé</mat-label>
-          <input matInput formControlName="libelle" placeholder="Libellé" required>
-          <mat-error *ngIf="form.get('libelle')?.hasError('required')">
-            Libellé obligatoire
-          </mat-error>
-        </mat-form-field>
-
-        <div class="blank-row"></div>
-
-        <!-- Dual list -->
-        <div class="dual-list">
-
-          <div class="pane">
-            <b>Opérations disponibles</b>
-
-            <mat-selection-list
-              (selectionChange)="onLeftSelectionChange($event)">
-              <mat-list-option *ngFor="let op of left" [value]="op">
-                {{ op.libelle }}
-              </mat-list-option>
-            </mat-selection-list>
+            <mat-form-field appearance="outline" class="libelle-field">
+              <mat-label>Libellé</mat-label>
+              <input matInput formControlName="libelle" placeholder="Libellé" required>
+              <mat-error *ngIf="form.get('libelle')?.hasError('required')">
+                Libellé obligatoire
+              </mat-error>
+            </mat-form-field>
           </div>
 
-          <div class="actions">
-            <button mat-mini-fab type="button" (click)="toRightAll()" matTooltip="Tout à droite">
-              <mat-icon>keyboard_double_arrow_right</mat-icon>
-            </button>
+          <div class="blank-row"></div>
 
-            <button mat-mini-fab type="button" (click)="toRightSelected()" matTooltip="Sélection à droite">
-              <mat-icon>chevron_right</mat-icon>
-            </button>
+          <!-- ===========================
+               Maître : Dual list opérations
+          ============================ -->
+          <div class="dual-list">
 
-            <button mat-mini-fab type="button" (click)="toLeftSelected()" matTooltip="Sélection à gauche">
-              <mat-icon>chevron_left</mat-icon>
-            </button>
+            <!-- LEFT -->
+            <div class="pane">
+              <div class="pane-head">
+                <b>Opérations disponibles</b>
+                <span class="count">{{ left.length }}</span>
+              </div>
 
-            <button mat-mini-fab type="button" (click)="toLeftAll()" matTooltip="Tout à gauche">
-              <mat-icon>keyboard_double_arrow_left</mat-icon>
-            </button>
+              <mat-form-field appearance="outline" class="w-full compact-field">
+                <mat-label>Filtrer</mat-label>
+                <input matInput [formControl]="leftFilter" placeholder="Code / libellé...">
+                <button mat-icon-button matSuffix type="button" (click)="leftFilter.setValue('')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-selection-list (selectionChange)="onLeftSelectionChange($event)">
+                <mat-list-option
+                  *ngFor="let op of leftView; trackBy: trackByOpId"
+                  [value]="op"
+                  (click)="focus(op, 'LEFT')">
+                  <div class="op-row">
+                    <span class="op-lib">{{ op.libelle }}</span>
+                  <!--  <span class="op-code" *ngIf="op.code">({{ op.code }})</span>-->
+                  </div>
+                </mat-list-option>
+              </mat-selection-list>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+              <button mat-mini-fab type="button"
+                      (click)="toRightAll()"
+                      matTooltip="Tout à droite"
+                      [disabled]="!left.length">
+                <mat-icon>keyboard_double_arrow_right</mat-icon>
+              </button>
+
+              <button mat-mini-fab type="button"
+                      (click)="toRightSelected()"
+                      matTooltip="Sélection à droite"
+                      [disabled]="!selectedLeft.length">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+
+              <button mat-mini-fab type="button"
+                      (click)="toLeftSelected()"
+                      matTooltip="Sélection à gauche"
+                      [disabled]="!selectedRight.length">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+
+              <button mat-mini-fab type="button"
+                      (click)="toLeftAll()"
+                      matTooltip="Tout à gauche"
+                      [disabled]="!right.length">
+                <mat-icon>keyboard_double_arrow_left</mat-icon>
+              </button>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="pane">
+              <div class="pane-head">
+                <b>Opérations du rôle</b>
+                <span class="count">{{ right.length }}</span>
+              </div>
+
+              <mat-form-field appearance="outline" class="w-full compact-field">
+                <mat-label>Filtrer</mat-label>
+                <input matInput [formControl]="rightFilter" placeholder="Code / libellé...">
+                <button mat-icon-button matSuffix type="button" (click)="rightFilter.setValue('')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-selection-list (selectionChange)="onRightSelectionChange($event)">
+                <mat-list-option
+                  *ngFor="let op of rightView; trackBy: trackByOpId"
+                  [value]="op"
+                  (click)="focus(op, 'RIGHT')">
+                  <div class="op-row">
+                    <span class="op-lib">{{ op.libelle }}</span>
+<!--                    <span class="op-code" *ngIf="op.code">({{ op.code }})</span>-->
+                  </div>
+                </mat-list-option>
+              </mat-selection-list>
+            </div>
+
           </div>
 
-          <div class="pane">
-            <b>Opérations du rôle</b>
-
-            <mat-selection-list
-              (selectionChange)="onRightSelectionChange($event)">
-              <mat-list-option *ngFor="let op of right" [value]="op">
-                {{ op.libelle }}
-              </mat-list-option>
-            </mat-selection-list>
-          </div>
-
-        </div>
-
-        <!-- Actions -->
-        <div class="form-actions">
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-            <mat-icon>save</mat-icon>
-            Enregistrer
-          </button>
-
-          <button mat-stroked-button color="warn" type="button" (click)="close()">
-            <mat-icon>close</mat-icon>
-            Annuler
-          </button>
-        </div>
-
-      </form>
+        </form>
 
       </div>
     </div>

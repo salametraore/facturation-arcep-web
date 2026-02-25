@@ -24,7 +24,8 @@ export interface User {
   direction : Direction ;
   last_name : string;
   first_name : string;
-  // ... autres propriétés de l'utilisateur
+  nature : string;
+
 }
 export interface Direction{
   id: number;

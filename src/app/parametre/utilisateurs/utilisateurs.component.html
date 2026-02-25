@@ -1,4 +1,4 @@
-<!-- src/app/type-directions/pages/type-direction/utilisateurs.component.html -->
+<!-- src/app/type-directions/pages/type-direction/utilisateurs-externes.component.html -->
 
 <mat-card>
 
@@ -34,7 +34,7 @@
   <section class="list-box">
 
     <div class="list-header">
-      <h3 class="list-title">Liste des utilisateurs</h3>
+      <h3 class="list-title">Liste des utilisateurs internes</h3>
 
       <div class="list-actions">
         <button mat-flat-button color="primary" (click)="crud(null, this.operations.create)">
@@ -77,12 +77,6 @@
           <ng-container matColumnDef="direction">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Direction</th>
             <td mat-cell *matCellDef="let u">{{ getDirectionLibelle(u.direction) }}</td>
-          </ng-container>
-
-          <!-- Rôles -->
-          <ng-container matColumnDef="roles">
-            <th mat-header-cell *matHeaderCellDef>Rôles</th>
-            <td mat-cell *matCellDef="let u">{{ getRolesLibelle(u) }}</td>
           </ng-container>
 
           <!-- Actions -->
@@ -128,7 +122,7 @@
 
         </table>
 
-        <mat-paginator [pageSizeOptions]="[5, 10, 15, 25]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[5, 10, 15, 25]" [pageSize]="5" showFirstLastButtons></mat-paginator>
 
       </div>
     </div>

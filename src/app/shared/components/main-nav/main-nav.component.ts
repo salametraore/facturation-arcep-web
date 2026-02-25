@@ -368,13 +368,24 @@ export class MainNavComponent implements OnInit {
             {
               id: 1050,
               direction: 2,
-              titre: 'Les utilisateurs',
-              description: 'Les utilisateurs',
+              titre: 'Les utilisateurs internes' ,
+              description: 'Les utilisateurs internes',
               actif: 'OUI',
               module: 0,
               feuille: 1,
               sous_menus: null,
               url: 'parametre/utilisateurs'
+            },
+            {
+              id: 1060,
+              direction: 2,
+              titre: 'Les utilisateurs externes',
+              description: 'Les utilisateurs externes',
+              actif: 'OUI',
+              module: 0,
+              feuille: 1,
+              sous_menus: null,
+              url: 'parametre/utilisateurs-externes'
             }
           ]
         }
