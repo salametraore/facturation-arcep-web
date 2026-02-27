@@ -1,52 +1,21 @@
 // src/app/type-directions/pages/type-direction/utilisateurs-externes-crud/utilisateurs-externes-crud.component.ts
 
 import { Component, Inject, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormControl,
-  ValidationErrors,
-  AbstractControl,
-  ValidatorFn
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-
-import { bouton_names, operations } from '../../../constantes';
-
-import {
-  Utilisateur,
-  UtilisateurRequest,
-  UtilisateurUpdateRequest
-} from '../../../shared/models/utilisateur.model';
-
-import { Role } from '../../../shared/models/role.model';
-import { TypeDirection } from '../../../shared/models/typeDirection';
-
-import { UtilisateurCrudService } from '../../../shared/services/utilisateur-crud.service';
-import { TypeDirectionsService } from '../../../shared/services/type-directions.services';
-import { RoleService } from '../../../shared/services/role.services';
-
-import { DialogService } from '../../../shared/services/dialog.service';
-import { MsgMessageServiceService } from '../../../shared/services/msg-message-service.service';
-import { Direction } from '../../../shared/models/direction';
-import { DirectionsService } from '../../../shared/services/directions.services';
-
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
-import { UtilisateurRole } from '../../../shared/models/droits-utilisateur';
-import { UtilisateurRoleService } from '../../../shared/services/utilsateur-role.service';
+import { bouton_names, operations } from '../../../constantes';
 
-export function minArrayLength(min: number): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const v = control.value;
-    const len = Array.isArray(v) ? v.length : 0;
-    return len >= min ? null : { minArrayLength: { requiredLength: min, actualLength: len } };
-  };
-}
+import { Utilisateur, UtilisateurRequest, UtilisateurUpdateRequest } from '../../../shared/models/utilisateur.model';
+import { Client } from '../../../shared/models/client';
+import { ClientService } from '../../../shared/services/client.service';
+
+import { UtilisateurCrudService } from '../../../shared/services/utilisateur-crud.service';
+import { DialogService } from '../../../shared/services/dialog.service';
+import { MsgMessageServiceService } from '../../../shared/services/msg-message-service.service';
 
 @Component({
   selector: 'utilisateurs-externes-crud',
@@ -69,41 +38,22 @@ export class UtilisateursExternesCrudComponent implements OnInit {
 
   errorMessage: any;
 
-  // ✅ roles attribuables (retournés par le backend)
-  roles: Role[] = [];
+  // ✅ clients + autocomplete
+  clients: Client[] = [];
+  clientSearchCtrl = new FormControl<Client | string>('');
+  filteredClients$!: Observable<Client[]>;
 
-  typeDirections: TypeDirection[] = [];
-  directions: Direction[] = [];
-
-  // ✅ ids attribuables (set rapide)
-  assignableRoleIds = new Set<number>();
-
-  // ✅ catalogue pour affichage table (attribuables + déjà attribués via utilisateurRoles)
-  rolesCatalog = new Map<number, Role>();
-
-  /** Autocomplete */
-  roleSearchCtrl = new FormControl<Role | string>('');
-  filteredRoles$!: Observable<Role[]>;
-
-  /** Table des rôles attribués */
-  assignedRolesDS = new MatTableDataSource<Role>([]);
-  assignedRolesColumns: string[] = ['libelle', 'code', 'actions'];
-
-  // ✅ rôles déjà attribués à l'utilisateur (via table utilisateur_role)
-  utilisateurRoles: UtilisateurRole[] = [];
-
-  // petits flags pour l’ordre de chargement
-  private rolesLoaded = false;
-  private utilisateurRolesLoaded = false;
+  // ✅ rôle portail
+  portailRoles: Array<'PORTAIL_CONSULTATION' | 'PORTAIL_PAIEMENT'> = [
+    'PORTAIL_CONSULTATION',
+    'PORTAIL_PAIEMENT'
+  ];
 
   constructor(
     private fb: FormBuilder,
     private dialogService: DialogService,
     private utilisateurService: UtilisateurCrudService,
-    private utilisateurRoleService: UtilisateurRoleService,
-    private roleService: RoleService,
-    private directionsService: DirectionsService,
-    private typeDirectionsService: TypeDirectionsService,
+    private clientService: ClientService,
     public dialogRef: MatDialogRef<UtilisateursExternesCrudComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private msgMessageService: MsgMessageServiceService
@@ -114,19 +64,13 @@ export class UtilisateursExternesCrudComponent implements OnInit {
 
   ngOnInit(): void {
     this.init();
-    this.loadData();
+    this.loadClients();
+    console.log('Init Crud utilisateur externes')
+    console.log(this.utilisateur);
 
-    // ✅ rendre obligatoire uniquement en create/update (Validators.required sur array n’est pas fiable)
-    if (this.data_operation === this.operations.create || this.data_operation === this.operations.update) {
-      const rolesCtrl = this.form.get('liste_roles');
-      rolesCtrl?.setValidators([minArrayLength(1)]);
-      rolesCtrl?.updateValueAndValidity({ emitEvent: false });
+    if (this.isDetails()) {
+      this.clientSearchCtrl.disable({ emitEvent: false });
     }
-
-    // ✅ si liste_roles change, refresh table
-    this.form.get('liste_roles')?.valueChanges.subscribe(() => {
-      this.refreshAssignedRolesTable();
-    });
   }
 
   init(): void {
@@ -142,198 +86,115 @@ export class UtilisateursExternesCrudComponent implements OnInit {
       this.mode = this.data_operation;
       this.title = 'Détails';
       this.initForm_update();
-      this.form.disable(); // lecture seule
+      this.form.disable();
     }
 
     this.title = `${this.title} - ${this.window_name}`;
   }
 
-  loadData(): void {
-    // 1) rôles attribuables
-    this.roleService.getListItems().subscribe((roles: Role[]) => {
-      this.roles = roles ?? [];
-      this.assignableRoleIds = new Set(this.roles.map(r => r.id));
-      this.rolesLoaded = true;
+  private initForm_update(): void {
+    this.form = this.fb.group({
+      id: [this.utilisateur?.id],
+      username: [this.utilisateur?.username, [Validators.required, Validators.maxLength(150)]],
+      last_name: [this.utilisateur?.last_name ?? '', [Validators.maxLength(150)]],
+      first_name: [this.utilisateur?.first_name ?? '', [Validators.maxLength(150)]],
+      telephone: [this.utilisateur?.telephone ?? null, [Validators.maxLength(20)]],
+      email: [this.utilisateur?.email ?? '', [Validators.email, Validators.maxLength(254)]],
 
-      this.rebuildRolesCatalog(); // peut être partiel tant que utilisateurRoles pas encore là
-      this.initRolesUi();         // autocomplete + table (ok même si table se met à jour ensuite)
+      // ✅ obligatoire pour CLIENT
+      client_id: [this.utilisateur?.client ?? null, [Validators.required]],
+
+      // ✅ obligatoire, défaut consultation
+      portail_role: [this.utilisateur?.portail_role ?? 'PORTAIL_CONSULTATION', [Validators.required]],
+
+      // hidden : ne pas toucher en update
+      nature: [this.utilisateur?.nature ?? 'CLIENT'],
+
+      // hidden : si backend attend encore
+      liste_roles: [[]]
     });
-
-    // 2) directions
-    this.typeDirectionsService.getItems().subscribe((dirs: TypeDirection[]) => {
-      this.typeDirections = dirs ?? [];
-    });
-
-    this.directionsService.getItems().subscribe((dirs: Direction[]) => {
-      this.directions = dirs ?? [];
-    });
-
-    if (this.utilisateur?.username) {
-      const uname = (this.utilisateur.username ?? '').trim().toLowerCase();
-
-      this.utilisateurRoleService.getListItems().subscribe((vRoles: UtilisateurRole[]) => {
-        const all = vRoles ?? [];
-
-        // ✅ filtre strict sur l'utilisateur (username)
-        this.utilisateurRoles = all.filter(ur =>
-          (ur?.utilisateur ?? '').trim().toLowerCase() === uname
-        );
-
-        this.utilisateurRolesLoaded = true;
-
-        // ✅ injecte les IDs dans le form à partir des utilisateurRoles filtrés
-        this.patchListeRolesFromUtilisateurRoles();
-
-        // ✅ reconstruit le catalog + refresh table
-        this.rebuildRolesCatalog();
-      });
-
-    } else {
-      // create: rien à charger
-      this.utilisateurRoles = [];
-      this.utilisateurRolesLoaded = true;
-      this.rebuildRolesCatalog();
-    }
   }
 
-  private patchListeRolesFromUtilisateurRoles(): void {
-    const ids = this.getUtilisateurRoleIds();
+  private initForm_create(): void {
+    this.form = this.fb.group({
+      id: [''],
+      username: ['', [Validators.required, Validators.maxLength(150)]],
+      last_name: ['', [Validators.maxLength(150)]],
+      first_name: ['', [Validators.maxLength(150)]],
+      telephone: [null, [Validators.maxLength(20)]],
+      email: ['', [Validators.email, Validators.maxLength(254)]],
 
-    // si form existe déjà (oui), on patch
-    const ctrl = this.form.get('liste_roles');
-    if (ctrl) {
-      ctrl.setValue(ids);
-      ctrl.markAsTouched();
-      ctrl.updateValueAndValidity({ emitEvent: true });
-    }
+      // ✅ obligatoire
+      client_id: [null, [Validators.required]],
+
+      // ✅ défaut
+      portail_role: ['PORTAIL_CONSULTATION', [Validators.required]],
+
+      // ✅ hidden nature
+      nature: ['CLIENT'],
+
+      // ✅ password par défaut non affiché
+      password: ['Facture2026', [Validators.required]],
+
+      // hidden : si backend attend encore
+      liste_roles: [[]]
+    });
   }
 
-  private getUtilisateurRoleIds(): number[] {
-    const idsFromUtilisateurRoles = (this.utilisateurRoles ?? [])
-      .map(ur => ur?.role?.id)
-      .filter((id): id is number => typeof id === 'number');
-
-    if (idsFromUtilisateurRoles.length > 0) return idsFromUtilisateurRoles;
-
-    // fallback si jamais utilisateurRoles n’est pas dispo
-    return (this.utilisateur?.roles_detail ?? []).map(r => r.id);
+  isDetails(): boolean {
+    return this.data_operation === this.operations.details;
   }
 
-  private rebuildRolesCatalog(): void {
-    this.rolesCatalog.clear();
+  // ---------- Autocomplete clients ----------
+  private loadClients(): void {
+    this.clientService.getItems().subscribe((clients: Client[]) => {
+      this.clients = clients ?? [];
 
-    // 1) rôles attribuables
-    for (const r of (this.roles ?? [])) {
-      this.rolesCatalog.set(r.id, r);
-    }
+      this.filteredClients$ = this.clientSearchCtrl.valueChanges.pipe(
+        startWith(''),
+        map(v => this.filterClients(typeof v === 'string' ? v : (v?.denomination_sociale ?? '')))
+      );
 
-    // 2) rôles déjà attribués via utilisateurRoles (peuvent ne pas être attribuables)
-    for (const ur of (this.utilisateurRoles ?? [])) {
-      const role = ur?.role;
-      if (role?.id) {
-        this.rolesCatalog.set(role.id, role);
+      // Pré-remplissage en update/details
+      const cid = this.form?.get('client_id')?.value;
+      if (cid) {
+        const found = this.clients.find(c => c.id === cid);
+        if (found) this.clientSearchCtrl.setValue(found, { emitEvent: false });
       }
-    }
-
-    // fallback (au cas où) si utilisateurRoles pas encore chargés
-    if (!this.utilisateurRolesLoaded) {
-      for (const r of (this.utilisateur?.roles_detail ?? [])) {
-        this.rolesCatalog.set(r.id, r);
-      }
-    }
-
-    if (this.form) this.refreshAssignedRolesTable();
+    });
   }
 
-  isRoleAssignable(roleId: number): boolean {
-    return this.assignableRoleIds.has(roleId);
-  }
+  private filterClients(q: string): Client[] {
+    const s = this.norm(q);
+    if (!s) return (this.clients ?? []).slice(0, 50);
 
-  /** À appeler dès que `this.roles` est alimenté ET que le form existe */
-  initRolesUi(): void {
-    this.refreshAssignedRolesTable();
-
-    this.filteredRoles$ = this.roleSearchCtrl.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        const q = typeof value === 'string' ? value : (value?.libelle ?? '');
-        return this.filterAvailableRoles(q);
+    return (this.clients ?? [])
+      .filter(c => {
+        const hay = this.norm(`${c.id} ${c.denomination_sociale ?? ''} ${c.rccm ?? ''} ${c.ifu ?? ''}`);
+        return hay.includes(s);
       })
-    );
+      .slice(0, 50);
   }
 
-  displayRole = (r?: Role | string | null): string => {
-    if (!r) return '';
-    if (typeof r === 'string') return r;
-    return r.code ? `${r.libelle} (${r.code})` : r.libelle;
+  displayClient = (c?: Client | string | null): string => {
+    if (!c) return '';
+    if (typeof c === 'string') return c;
+    return c.denomination_sociale ? `${c.denomination_sociale} (ID:${c.id})` : `Client #${c.id}`;
   };
 
-  private filterAvailableRoles(query: string): Role[] {
-    const q = this.norm(query);
-    const assignedIds = new Set<number>(this.form.get('liste_roles')?.value ?? []);
+  onClientPicked(e: MatAutocompleteSelectedEvent): void {
+    const client = e.option.value as Client;
+    if (!client?.id) return;
 
-    return (this.roles ?? []) // ✅ attribuables seulement
-      .filter(r => !assignedIds.has(r.id))
-      .filter(r => {
-        if (!q) return true;
-        const hay = this.norm(`${r.libelle ?? ''} ${r.code ?? ''}`);
-        return hay.includes(q);
-      })
-      .slice()
-      .sort((a, b) => (a.libelle ?? '').localeCompare(b.libelle ?? '', 'fr', { sensitivity: 'base' }));
+    this.form.get('client_id')?.setValue(client.id);
+    this.form.get('client_id')?.markAsDirty();
+    this.form.get('client_id')?.markAsTouched();
   }
 
-  onRolePicked(e: MatAutocompleteSelectedEvent): void {
-    const role = e.option.value as Role;
-    this.addRole(role);
-  }
-
-  addRole(role: Role): void {
-    if (!role?.id || this.isDetails()) return;
-
-    const ctrl = this.form.get('liste_roles');
-    const current: number[] = (ctrl?.value ?? []).slice();
-
-    if (!current.includes(role.id)) {
-      current.push(role.id);
-      ctrl?.setValue(current);
-      ctrl?.markAsDirty();
-      ctrl?.markAsTouched();
-    }
-
-    this.roleSearchCtrl.setValue('');
-    this.refreshAssignedRolesTable();
-  }
-
-  removeRole(role: Role): void {
-    if (!role?.id || this.isDetails()) return;
-
-    // ✅ on n’autorise la suppression que si le rôle est attribuable (présent dans this.roles)
-    if (!this.isRoleAssignable(role.id)) {
-      this.dialogService.alert({ message: "Vous ne pouvez pas retirer ce rôle." });
-      return;
-    }
-
-    const ctrl = this.form.get('liste_roles');
-    const current: number[] = (ctrl?.value ?? []).slice();
-
-    ctrl?.setValue(current.filter(id => id !== role.id));
-    ctrl?.markAsDirty();
-    ctrl?.markAsTouched();
-
-    this.refreshAssignedRolesTable();
-  }
-
-  private refreshAssignedRolesTable(): void {
-    const ids: number[] = this.form.get('liste_roles')?.value ?? [];
-
-    const assigned: Role[] = ids.map(id => {
-      return this.rolesCatalog.get(id) ?? ({ id, libelle: `Rôle #${id}` } as any);
-    });
-
-    this.assignedRolesDS.data = assigned.slice().sort((a, b) =>
-      (a.libelle ?? '').localeCompare(b.libelle ?? '', 'fr', { sensitivity: 'base' })
-    );
+  onClientBlur(): void {
+    // si l’utilisateur tape sans choisir, on force la validation du client_id
+    this.form.get('client_id')?.markAsTouched();
+    this.form.get('client_id')?.updateValueAndValidity({ emitEvent: false });
   }
 
   private norm(v: any): string {
@@ -345,45 +206,7 @@ export class UtilisateursExternesCrudComponent implements OnInit {
       .toLowerCase();
   }
 
-  initForm_update(): void {
-    this.form = this.fb.group({
-      id: [this.utilisateur?.id],
-      username: [this.utilisateur?.username, [Validators.required, Validators.maxLength(150)]],
-      last_name: [this.utilisateur?.last_name ?? '', [Validators.maxLength(150)]],
-      first_name: [this.utilisateur?.first_name ?? '', [Validators.maxLength(150)]],
-      telephone: [this.utilisateur?.telephone ?? null, [Validators.maxLength(20)]],
-      email: [this.utilisateur?.email ?? '', [Validators.email, Validators.maxLength(254)]],
-      direction: [this.utilisateur?.direction ?? null],
-
-      // ✅ on stocke des IDs (on initialise via utilisateurRoles si déjà dispo, sinon fallback roles_detail)
-      liste_roles: [this.getUtilisateurRoleIds()],
-
-      password: ['']
-    });
-  }
-
-  initForm_create(): void {
-    this.form = this.fb.group({
-      id: [''],
-      username: ['', [Validators.required, Validators.maxLength(150)]],
-      last_name: ['', [Validators.maxLength(150)]],
-      first_name: ['', [Validators.maxLength(150)]],
-      telephone: [null, [Validators.maxLength(20)]],
-      email: ['', [Validators.email, Validators.maxLength(254)]],
-      direction: [null],
-
-      // ✅ IDs seulement
-      liste_roles: [[]],
-
-      // obligatoire en create (⚠️ tu as mis Facture2026 en dur : ok si c’est voulu)
-      password: ['Facture2026', [Validators.required, Validators.minLength(1)]]
-    });
-  }
-
-  isDetails(): boolean {
-    return this.data_operation === this.operations.details;
-  }
-
+  // ---------- CRUD ----------
   crud(): void {
     if (this.form.invalid) return;
 
@@ -397,8 +220,15 @@ export class UtilisateursExternesCrudComponent implements OnInit {
         first_name: v.first_name || undefined,
         telephone: v.telephone ?? null,
         email: v.email || undefined,
-        direction: v.direction ?? null,
+
+        nature: v.nature ?? 'CLIENT',
+        client: v.client_id,
+        portail_role: v.portail_role ?? 'PORTAIL_CONSULTATION',
+
+        // password par défaut
         password: v.password,
+
+        // si backend attend encore
         liste_roles: v.liste_roles ?? []
       };
 
@@ -415,7 +245,7 @@ export class UtilisateursExternesCrudComponent implements OnInit {
       return;
     }
 
-    // UPDATE
+    // UPDATE : ✅ ne touche pas au password / nature
     if (this.mode === operations.update) {
       const payload: UtilisateurUpdateRequest = {
         username: v.username,
@@ -423,16 +253,13 @@ export class UtilisateursExternesCrudComponent implements OnInit {
         first_name: v.first_name || undefined,
         telephone: v.telephone ?? null,
         email: v.email || undefined,
-        direction: v.direction ?? null,
+
+        client: v.client_id,
+        portail_role: v.portail_role ?? 'PORTAIL_CONSULTATION',
+
+        // si backend attend encore
         liste_roles: v.liste_roles ?? []
       };
-
-      if (v.password && String(v.password).trim().length > 0) {
-        payload.password = v.password;
-      }
-      else {
-        payload.password = 'admin';
-      }
 
       this.utilisateurService.update(v.id, payload).subscribe(
         () => {
@@ -446,14 +273,5 @@ export class UtilisateursExternesCrudComponent implements OnInit {
       );
       return;
     }
-  }
-
-  getDirectionLibelle(id: number | null | undefined): string {
-    if (!id) return '';
-    return this.directions?.find(d => d.id === id)?.libelle ?? '';
-  }
-
-  compareById(a: any, b: any): boolean {
-    return a === b;
   }
 }

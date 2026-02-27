@@ -70,3 +70,10 @@
   gap: 10px;
   flex-wrap: wrap; /* si écran étroit */
 }
+
+
+.form-row-1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}

@@ -1,4 +1,4 @@
-// src/app/type-directions/pages/type-direction/type-bandes-frequence.component.ts
+// src/app/parametre/utilisateurs-externes/utilisateurs-externes.component.ts
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -6,20 +6,15 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { bouton_names, operations } from '../../constantes';
-
-import {Utilisateur, UtilisateurRole} from '../../shared/models/utilisateur.model';
-import { TypeDirection } from '../../shared/models/typeDirection';
+import { Utilisateur } from '../../shared/models/utilisateur.model';
 
 import { UtilisateurCrudService } from '../../shared/services/utilisateur-crud.service';
-import { TypeDirectionsService } from '../../shared/services/type-directions.services';
-
 import { DialogService } from '../../shared/services/dialog.service';
 import { MsgMessageServiceService } from '../../shared/services/msg-message-service.service';
 
 import { UtilisateursExternesCrudComponent } from './utilisateurs-externes-crud/utilisateurs-externes-crud.component';
-import {DirectionsService} from "../../shared/services/directions.services";
-import {Direction} from "../../shared/models/direction";
-import {AuthService} from "../../authentication/auth.service";
+import {Client} from "../../shared/models/client";
+import {ClientService} from "../../shared/services/client.service";
 
 @Component({
   selector: 'utilisateurs-externes',
@@ -32,30 +27,28 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
   public operations = operations;
   public bouton_names = bouton_names;
 
-  // ✅ datasource
   t_Utilisateurs = new MatTableDataSource<Utilisateur>([]);
+  clients:Client[]=[];
+  private clientNameById = new Map<number, string>();
 
+
+  // ✅ direction supprimé, portail_role + client_id ajoutés
   displayedColumns: string[] = [
     'username',
     'nom',
     'telephone',
     'email',
-    'direction',
+    'client',
+    'portail_role',
     'actions'
   ];
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  typeDirections: TypeDirection[] = [];
-  directions: Direction[] = [];
-  roleUtilisateurConnecte:UtilisateurRole;
-
   constructor(
     private utilisateurService: UtilisateurCrudService,
-    private typeDirectionsService: TypeDirectionsService,
-    private directionsService: DirectionsService,
-    private authService:AuthService,
+    private clientService: ClientService,
     public dialog: MatDialog,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService
@@ -64,7 +57,7 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.reloadData();
 
-    // ✅ filtre : username / nom / prenom / tel / email / direction libellé / roles
+    // ✅ filtre : username / nom / prenom / tel / email / client_id / portail_role
     this.t_Utilisateurs.filterPredicate = (data: Utilisateur, filter: string) => {
       const f = (filter ?? '').trim().toLowerCase();
       if (!f) return true;
@@ -74,11 +67,10 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
       const prenom = (data.first_name ?? '').toLowerCase();
       const tel = (data.telephone ?? '').toLowerCase();
       const email = (data.email ?? '').toLowerCase();
+      const clientId = (data.client?? '').toString().toLowerCase();
+      const portailRole = (data.portail_role ?? '').toLowerCase();
 
-      const direction = (this.getDirectionLibelle(data.direction) ?? '').toLowerCase();
-
-
-      return `${username} ${nom} ${prenom} ${tel} ${email} ${direction}`.includes(f);
+      return `${username} ${nom} ${prenom} ${tel} ${email} ${clientId} ${portailRole}`.includes(f);
     };
   }
 
@@ -89,38 +81,31 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
 
   reloadData(): void {
 
+    this.clientService.getItems().subscribe((clients: Client[]) => {
+      this.clients = clients ?? [];
+
+      this.buildClientIndex(); // ✅ important
+    });
+
     this.utilisateurService.getListItems().subscribe((users: Utilisateur[]) => {
+      // ✅ externes = CLIENT
+      console.log(users);
       this.t_Utilisateurs.data = (users ?? []).filter(u => u.nature === 'CLIENT');
       this.t_Utilisateurs.paginator?.firstPage();
     });
 
-    // 🔸 directions (pour l’affichage du libellé)
-    this.typeDirectionsService.getItems().subscribe((dirs: TypeDirection[]) => {
-      this.typeDirections = dirs ?? [];
-    });
-
-    this.directionsService.getItems().subscribe((dirs: Direction[]) => {
-      this.directions = dirs ?? [];
-      // retrigger filtre si déjà appliqué
-      this.t_Utilisateurs.filter = this.t_Utilisateurs.filter;
-    });
-
-
   }
 
-  /** (keyup)="applyFilter($event)" */
   applyFilter(event: Event): void {
     const value = (event.target as HTMLInputElement)?.value ?? '';
     this.setFilter(value);
   }
 
-  /** (click)="setFilter(input.value)" */
   setFilter(value: string): void {
     this.t_Utilisateurs.filter = (value ?? '').trim().toLowerCase();
     if (this.t_Utilisateurs.paginator) this.t_Utilisateurs.paginator.firstPage();
   }
 
-  /** (click)="resetFilter(input)" */
   resetFilter(input?: HTMLInputElement): void {
     if (input) input.value = '';
     this.setFilter('');
@@ -153,28 +138,33 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
   }
 
   onRowClicked(row: any): void {
-    if (this.selectedRow && this.selectedRow !== row) {
-      this.selectedRow = row;
-    } else if (!this.selectedRow) {
-      this.selectedRow = row;
-    } else if (this.selectedRow === row) {
-      this.selectedRow = undefined;
-    }
-  }
-
-  getDirectionLibelle(directionId?: number | null): string {
-    if (!directionId) return '';
-    return this.directions?.find(d => d.id === directionId)?.libelle ?? '';
-  }
-
-  getRolesLibelle(u: Utilisateur): string {
-    const roles = (u.roles_detail ?? []).map(r => r.libelle || r.code).filter(Boolean);
-    return roles.join(', ');
+    if (this.selectedRow && this.selectedRow !== row) this.selectedRow = row;
+    else if (!this.selectedRow) this.selectedRow = row;
+    else if (this.selectedRow === row) this.selectedRow = undefined;
   }
 
   getNomComplet(u: Utilisateur): string {
     const prenom = u.first_name ?? '';
     const nom = u.last_name ?? '';
     return `${prenom} ${nom}`.trim();
+  }
+
+  getPortailRoleLabel(role?: string | null): string {
+    if (!role) return '—';
+    return role === 'PORTAIL_PAIEMENT' ? 'PORTAIL_PAIEMENT' : 'PORTAIL_CONSULTATION';
+  }
+
+  private buildClientIndex(): void {
+    this.clientNameById.clear();
+    for (const c of (this.clients ?? [])) {
+      if (typeof c.id === 'number') {
+        this.clientNameById.set(c.id, c.denomination_sociale ?? '');
+      }
+    }
+  }
+
+  getClientName(clientId: number | null | undefined): string {
+    if (!clientId) return '';
+    return this.clientNameById.get(clientId) ?? '';
   }
 }

@@ -27,6 +27,9 @@ export interface Utilisateur {
 
   nature?: string;
 
+  client?: number | null;
+  portail_role?: 'PORTAIL_CONSULTATION' | 'PORTAIL_PAIEMENT' | null;
+
   /** readOnly */
   roles_detail: Role[];
 }
@@ -47,6 +50,9 @@ export interface UtilisateurRequest {
 
   /** writeOnly */
   password: string;
+
+  client?: number | null;
+  portail_role?: 'PORTAIL_CONSULTATION' | 'PORTAIL_PAIEMENT' | null;
 
   /** writeOnly */
   liste_roles: number[];
@@ -71,9 +77,12 @@ export function utilisateurToUpdateRequest(u: Utilisateur): UtilisateurUpdateReq
     email: u.email,                  // garde undefined si absent
     direction: u.direction ?? null,
     nature: u.nature,
+    client : u.client,
+    portail_role : u.portail_role,
     liste_roles: (u.roles_detail ?? []).map(r => r.id),
   };
 }
+
 
 
 export interface UtilisateurRole {

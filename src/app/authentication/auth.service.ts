@@ -57,7 +57,12 @@ export class AuthService {
     this.setAuthError(null);
   }
 
-  private isPersonnel(util: Utilisateur | null | undefined): boolean {
+  private isPersonnel(util: any): boolean {
+    // Source de vérité : home (BACKOFFICE)
+    const home = String(util?.home ?? '').toUpperCase();
+    if (home) return home === 'BACKOFFICE';
+
+    // Fallback si home absent
     return String(util?.nature ?? '').toUpperCase() === 'PERSONNEL';
   }
 
@@ -77,27 +82,44 @@ export class AuthService {
       tap((response) => {
         if (!response?.token) return;
 
-        // ✅ on pose le token (nécessaire si getItem est protégé)
+        console.log(response);
+
+        // ✅ 1) Blocage immédiat si ce n'est pas un user interne/backoffice
+        // (on ne stocke pas le token, on ne charge pas le profil)
+        if (!this.isPersonnel(response.user)) {
+          this.setAuthError(
+            "Cette application est réservée uniquement aux utilisateurs internes. " +
+            "Veuillez utiliser l'application Portail Client."
+          );
+          // Nettoyage (au cas où)
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user');
+          sessionStorage.removeItem('UtilisateurConnecte');
+          sessionStorage.removeItem('utilisateurRole');
+          this.authState.next({ isAuthenticated: false, token: null, user: null });
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        // ✅ 2) OK : on pose le token uniquement pour les internes
         this.setToken(response.token, response.user);
 
-        // ✅ charger l'utilisateur complet
+        // ✅ 3) Charger l'utilisateur complet (profil interne)
         this.utilisateurService.getItem(response.user.id).subscribe({
           next: (util: Utilisateur) => {
             this.utilisateurConnecte = util;
 
-            // ✅ contrôle nature
+            // ✅ contrôle final nature (sécurité + cohérence)
             if (!this.isPersonnel(util)) {
-              this.setAuthError('Cette application est réservée uniquement aux utilisateurs internes.');
-              this.logout(); // nettoie + redirige /auth/login
+              this.setAuthError('Compte client détecté. Merci d\'utiliser l\'application Portail Client.');
+              this.logout();
               return;
             }
 
-            // ✅ ok : on continue
             this.setAuthError(null);
             this.setConnectedUser(util);
           },
-          error: (err) => {
-            // si on ne peut pas récupérer le profil, on bloque par sécurité
+          error: () => {
             this.setAuthError('Impossible de vérifier le profil utilisateur.');
             this.logout();
           }

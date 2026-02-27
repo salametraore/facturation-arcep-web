@@ -355,10 +355,11 @@ export class UtilisateursCrudComponent implements OnInit {
       email: [this.utilisateur?.email ?? '', [Validators.email, Validators.maxLength(254)]],
       direction: [this.utilisateur?.direction ?? null],
 
-      // ✅ on stocke des IDs (on initialise via utilisateurRoles si déjà dispo, sinon fallback roles_detail)
+      // ✅ hidden, conservé mais on NE L’ENVOIE PAS en UPDATE
+      nature: [this.utilisateur?.nature ?? 'PERSONNEL'],
+
       liste_roles: [this.getUtilisateurRoleIds()],
 
-      password: ['']
     });
   }
 
@@ -372,10 +373,10 @@ export class UtilisateursCrudComponent implements OnInit {
       email: ['', [Validators.email, Validators.maxLength(254)]],
       direction: [null],
 
-      // ✅ IDs seulement
-      liste_roles: [[]],
+      // ✅ hidden, valeur par défaut
+      nature: ['PERSONNEL'],
 
-      // obligatoire en create (⚠️ tu as mis Facture2026 en dur : ok si c’est voulu)
+      liste_roles: [[]],
       password: ['Facture2026', [Validators.required, Validators.minLength(1)]]
     });
   }
@@ -398,6 +399,10 @@ export class UtilisateursCrudComponent implements OnInit {
         telephone: v.telephone ?? null,
         email: v.email || undefined,
         direction: v.direction ?? null,
+
+        // ✅ nature fixé à PERSONNEL
+        nature: v.nature ?? 'PERSONNEL',
+
         password: v.password,
         liste_roles: v.liste_roles ?? []
       };
@@ -424,15 +429,12 @@ export class UtilisateursCrudComponent implements OnInit {
         telephone: v.telephone ?? null,
         email: v.email || undefined,
         direction: v.direction ?? null,
+
+        // 🚫 pas de nature ici
+        // 🚫 pas de password ici
+
         liste_roles: v.liste_roles ?? []
       };
-
-      if (v.password && String(v.password).trim().length > 0) {
-        payload.password = v.password;
-      }
-      else {
-        payload.password = 'admin';
-      }
 
       this.utilisateurService.update(v.id, payload).subscribe(
         () => {
@@ -446,6 +448,7 @@ export class UtilisateursCrudComponent implements OnInit {
       );
       return;
     }
+
   }
 
   getDirectionLibelle(id: number | null | undefined): string {
@@ -456,4 +459,5 @@ export class UtilisateursCrudComponent implements OnInit {
   compareById(a: any, b: any): boolean {
     return a === b;
   }
+
 }

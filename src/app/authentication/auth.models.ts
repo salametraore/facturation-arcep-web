@@ -18,15 +18,30 @@ export interface LoginResponse {
 
 export interface User {
   id: number;
-  email: string;
-  telephone : string;
-  role : string;
-  direction : Direction ;
-  last_name : string;
-  first_name : string;
-  nature : string;
 
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  telephone?: string;
+
+  // ✅ nouveaux champs renvoyés par l’API
+  home?: 'BACKOFFICE' | 'PORTAIL_CLIENT';
+  nature?: 'PERSONNEL' | 'CLIENT';
+
+  client_id?: number | null;
+  client?: { id: number; denomination_sociale?: string } | null;
+
+  portail_role?: 'PORTAIL_CONSULTATION' | 'PORTAIL_PAIEMENT' | null;
+  scopes?: string[];
+
+  direction?: { id: number; libelle?: string } | null;
+
+  // (optionnel) si ton backend renvoie encore roles/operations
+  roles?: any[];
+  operations?: any[];
 }
+
+
 export interface Direction{
   id: number;
   code:string ;

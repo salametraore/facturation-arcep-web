@@ -27,6 +27,7 @@ import {ClasseLargeurBandeComponent} from "./classe-largeur-bande/classe-largeur
 import {UtilisateursComponent} from "./utilisateurs/utilisateurs.component";
 import {UtilisateursExternesComponent} from "./utilisateurs-externes/utilisateurs-externes.component";
 
+
 const routes: Routes = [
   {
     path: '', component: DefaultComponent,

@@ -6,14 +6,13 @@
     <h2>Paramétrage : utilisateurs</h2>
   </div>
 
-  <!-- Filtres compacts et centrés -->
   <div class="filters filters--one-line">
     <div class="filters-grid">
 
       <mat-form-field class="search-field" appearance="outline">
         <mat-label>Recherche</mat-label>
         <input appUppercase #input matInput
-               placeholder="Username, nom, email, direction, rôle…"
+               placeholder="Username, nom, email, client_id, rôle portail…"
                (keyup)="applyFilter($event)">
         <button mat-icon-button matSuffix type="button" (click)="resetFilter(input)">
           <mat-icon>close</mat-icon>
@@ -49,37 +48,38 @@
 
         <table mat-table [dataSource]="t_Utilisateurs" matSort style="width: 100%">
 
-          <!-- Username -->
           <ng-container matColumnDef="username">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
             <td mat-cell *matCellDef="let u">{{ u.username }}</td>
           </ng-container>
 
-          <!-- Nom complet -->
           <ng-container matColumnDef="nom">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
             <td mat-cell *matCellDef="let u">{{ getNomComplet(u) }}</td>
           </ng-container>
 
-          <!-- Téléphone -->
           <ng-container matColumnDef="telephone">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Téléphone</th>
             <td mat-cell *matCellDef="let u">{{ u.telephone }}</td>
           </ng-container>
 
-          <!-- Email -->
           <ng-container matColumnDef="email">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
             <td mat-cell *matCellDef="let u">{{ u.email }}</td>
           </ng-container>
 
-          <!-- Direction -->
-          <ng-container matColumnDef="direction">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Direction</th>
-            <td mat-cell *matCellDef="let u">{{ getDirectionLibelle(u.direction) }}</td>
+          <!-- ✅ client_id -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let u">{{ getClientName(u.client) || '—' }}</td>
           </ng-container>
 
-          <!-- Actions -->
+          <!-- ✅ portail_role -->
+          <ng-container matColumnDef="portail_role">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Rôle portail</th>
+            <td mat-cell *matCellDef="let u">{{ getPortailRoleLabel(u.portail_role) }}</td>
+          </ng-container>
+
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let u">
@@ -106,14 +106,12 @@
             </td>
           </ng-container>
 
-          <!-- Lignes -->
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"
               (click)="onRowClicked(row)"
               [ngClass]="{ 'selected': row === selectedRow }">
           </tr>
 
-          <!-- Row vide -->
           <tr mat-row *matNoDataRow>
             <td class="mat-cell" [attr.colspan]="displayedColumns.length">
               Aucune information trouvée : <strong>{{ input.value }}</strong>
