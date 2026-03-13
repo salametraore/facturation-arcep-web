@@ -1,13 +1,17 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 
+import { Observable, from, isObservable, of } from 'rxjs';
+
 import { LocalPageDataSource } from '../../../../rcv/local-page-datasource';
 import { RcvGroupesApi } from '../../../../rcv/endpoints/rcv-groupes.api';
 import { RcvStoreService } from '../../../../rcv/rcv-store.service';
-import {RecouvGroupesDynFacturesDialogComponent} from "../recouv-groupes-dyn-factures-dialog/recouv-groupes-dyn-factures-dialog.component";
+import { RecouvGroupesDynFacturesDialogComponent } from '../recouv-groupes-dyn-factures-dialog/recouv-groupes-dyn-factures-dialog.component';
+
+import { finalize } from 'rxjs/operators';
 
 type GroupeType = 'MANUEL' | 'DYNAMIQUE';
 
@@ -62,8 +66,6 @@ export class RecouvGroupesEditDialogComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
-
-
   get typeGroupe(): GroupeType {
     return (this.form?.get('type_groupe')?.value ?? 'DYNAMIQUE') as GroupeType;
   }
@@ -71,34 +73,7 @@ export class RecouvGroupesEditDialogComponent implements OnInit {
   get isDynamique(): boolean { return this.typeGroupe === 'DYNAMIQUE'; }
 
   ngOnInit(): void {
-    if (isEditData(this.data)) {
-      this.isEdit = true;
-      this.groupeId = this.data.groupeId;
-
-      const g = this.groupesApi.get(this.groupeId);
-
-      this.form = this.fb.group({
-        code: [g?.code ?? '', [Validators.required, Validators.maxLength(50)]],
-        nom: [g?.nom ?? '', [Validators.required, Validators.maxLength(255)]],
-        description: [g?.description ?? '', [Validators.maxLength(500)]],
-        priority: [g?.priority ?? 10, [Validators.required]],
-        actif: [g?.actif ?? true],
-        type_groupe: [ (g?.type_groupe ?? 'DYNAMIQUE') as GroupeType, [Validators.required] ]
-      });
-
-      // si on change le type -> on “reset” les onglets / datasources
-      this.form.get('type_groupe')!.valueChanges.subscribe(() => {
-        this.membresDataSource = undefined;
-        this.dynDataSource = undefined;
-      });
-
-      return;
-    }
-
-    // create
-    this.isEdit = false;
-    this.groupeId = undefined;
-
+    // Form initial, pour éviter les erreurs template
     this.form = this.fb.group({
       code: ['', [Validators.required, Validators.maxLength(50)]],
       nom: ['', [Validators.required, Validators.maxLength(255)]],
@@ -106,6 +81,47 @@ export class RecouvGroupesEditDialogComponent implements OnInit {
       priority: [10, [Validators.required]],
       actif: [true],
       type_groupe: ['DYNAMIQUE' as GroupeType, [Validators.required]]
+    });
+
+    // reset ds si on change type
+    this.form.get('type_groupe')!.valueChanges.subscribe(() => {
+      this.membresDataSource = undefined;
+      this.dynDataSource = undefined;
+    });
+
+    if (!isEditData(this.data)) {
+      this.isEdit = false;
+      this.groupeId = undefined;
+      return;
+    }
+
+    // ---- MODE EDIT ----
+    this.isEdit = true;
+    this.groupeId = this.data.groupeId;
+
+    this.loading = true;
+
+    // Normalise le retour get() : Observable | Promise | objet direct
+    const raw: any = this.groupesApi.get(this.groupeId);
+    const g$: Observable<any> =
+      isObservable(raw) ? raw : (raw?.then ? from(raw) : of(raw));
+
+    // Debug utile : on voit immédiatement si ce n'est pas un Observable
+    console.log('RcvGroupesApi.get return =', raw, 'subscribe?', (raw as any)?.subscribe);
+
+    g$.subscribe({
+      next: (g: any) => {
+        this.form.patchValue({
+          code: g?.code ?? '',
+          nom: g?.nom ?? '',
+          description: g?.description ?? '',
+          priority: g?.priority ?? 10,
+          actif: g?.actif ?? true,
+          type_groupe: (g?.type_groupe ?? 'DYNAMIQUE') as GroupeType
+        });
+      },
+      error: () => alert('Chargement groupe impossible'),
+      complete: () => (this.loading = false)
     });
   }
 
@@ -143,16 +159,35 @@ export class RecouvGroupesEditDialogComponent implements OnInit {
     }
 
     const dto = this.form.value;
+    this.loading = true;
 
-    if (this.isEdit && this.groupeId) {
-      this.groupesApi.update(this.groupeId, dto);
-      this.ref.close(true);
+    const req: any = (this.isEdit && this.groupeId)
+      ? this.groupesApi.update(this.groupeId, dto)
+      : this.groupesApi.create(dto);
+
+    // ✅ Protection : si req est null/undefined, on ne plante pas
+    if (!req || typeof req.subscribe !== 'function') {
+      this.loading = false;
+      console.error('create/update returned null/undefined (or not Observable).', {
+        isEdit: this.isEdit,
+        groupeId: this.groupeId,
+        returned: req
+      });
+      alert("Erreur technique: l'appel d'enregistrement n'a pas retourné de requête.");
       return;
     }
 
-    this.groupesApi.create(dto);
-    this.ref.close(true);
+    req.pipe(
+      finalize(() => (this.loading = false))
+    ).subscribe({
+      next: () => this.ref.close(true),     // ✅ succès => ferme + signal changed
+      error: (e: any) => {
+        console.error(e);
+        alert('Enregistrement impossible');
+      }
+    });
   }
+
 
   close(): void {
     this.ref.close(false);
@@ -176,43 +211,52 @@ export class RecouvGroupesEditDialogComponent implements OnInit {
     this.membresDataSource?.setFilters({});
   }
 
+  // ⚠️ encore en Fake Store : à migrer ensuite vers ClientService (backend)
   refreshClientOptions(): void {
-    const all = this.store.list<any>('clients');
+    const all = this.store.list<any>('clients') || [];
     const s = this.clientSearch.trim().toLowerCase();
 
     this.clientOptions = all
       .filter(c =>
         !s ||
-        String(c.code).toLowerCase().includes(s) ||
-        String(c.denomination).toLowerCase().includes(s)
+        String(c.code ?? '').toLowerCase().includes(s) ||
+        String(c.denomination ?? '').toLowerCase().includes(s)
       )
       .slice(0, 20);
   }
 
   addMembre(): void {
-    if (!this.groupeId) return;
-    if (!this.selectedClientId) return;
-    if (!this.isManuel) return; // sécurité
+    if (!this.groupeId || !this.selectedClientId || !this.isManuel) return;
 
-    this.groupesApi.addMembre(this.groupeId, this.selectedClientId);
-    this.selectedClientId = undefined;
-    this.clientSearch = '';
-    this.clientOptions = [];
-    this.membresDataSource?.setFilters({ exclu: this.excluFilter });
+    this.groupesApi.addMembre(this.groupeId, this.selectedClientId).subscribe({
+      next: () => {
+        this.selectedClientId = undefined;
+        this.clientSearch = '';
+        this.clientOptions = [];
+        this.membresDataSource?.setFilters({ exclu: this.excluFilter });
+      },
+      error: () => alert('Ajout membre impossible')
+    });
   }
 
   toggleExclu(m: any): void {
     const exclu = !m.exclu;
     const motif = exclu ? prompt('Motif exclusion (optionnel) :', m.motif_override ?? '') ?? undefined : undefined;
-    this.groupesApi.toggleExclu(m.id, exclu, motif);
-    this.membresDataSource?.setFilters({ exclu: this.excluFilter });
+
+    this.groupesApi.toggleExclu(m.id, exclu, motif).subscribe({
+      next: () => this.membresDataSource?.setFilters({ exclu: this.excluFilter }),
+      error: () => alert('Modification impossible')
+    });
   }
 
   removeMembre(m: any): void {
-    const ok = confirm(`Retirer ${m.client?.denomination} du groupe ?`);
+    const ok = confirm(`Retirer ${m.client?.denomination_sociale || ('Client ' + m.client_id)} du groupe ?`);
     if (!ok) return;
-    this.groupesApi.removeMembre(m.id);
-    this.membresDataSource?.setFilters({ exclu: this.excluFilter });
+
+    this.groupesApi.removeMembre(m.id).subscribe({
+      next: () => this.membresDataSource?.setFilters({ exclu: this.excluFilter }),
+      error: () => alert('Suppression impossible')
+    });
   }
 
   // -------- Preview dynamique --------

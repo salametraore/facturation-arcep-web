@@ -26,6 +26,8 @@ export class FicheTechniques {
   date_debut?: string | null;
   periode?: string | null;
 
+  date_retrait?: string | null;
+  motif_retrait?: string | null;
 
 }
 
@@ -76,3 +78,15 @@ export function buildProduitsLibelles(fiche: FicheTechniques | null | undefined)
     .filter((lib): lib is string => !!lib && lib.trim().length > 0)
     .join(', ');
 }
+
+
+export interface DesactiverFicheTechniqueProduit {
+  fiche_technique_id: number;
+  fiche_produits: number[];
+  date_retrait?: string;
+  motif_retrait?: string;
+}
+
+
+
+

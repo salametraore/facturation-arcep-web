@@ -1,4 +1,4 @@
-
+//src/app/recouvrement/pages/recouv-plans/recouv-plans.component.ts
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -40,7 +40,7 @@ export class RecouvPlansComponent implements AfterViewInit {
     this.dataSource = new LocalPageDataSource<any>(
       this.paginator,
       this.sort,
-      (q) => this.api.list(q) as PageResult<any>
+      (q) => this.api.list(q)
     );
 
     this.total$ = this.dataSource.totalCount$();
@@ -96,7 +96,11 @@ export class RecouvPlansComponent implements AfterViewInit {
   delete(row: any) {
     const ok = confirm(`Supprimer le plan "${row.nom}" ?`);
     if (!ok) return;
-    this.api.delete(row.id);
-    this.applyFilters();
+
+    this.api.delete(row.id).subscribe({
+      next: () => this.applyFilters(),   // ou refreshList() forcé
+      error: () => alert('Suppression impossible')
+    });
   }
+
 }

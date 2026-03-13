@@ -8,6 +8,8 @@ import {PageResult} from '../../../rcv/rcv-query';
 import {RcvAgendaApi} from '../../../rcv/endpoints/rcv-agenda.api';
 
 import {RecouvAgendaDetailsDialogComponent} from './recouv-agenda-details-dialog.component';
+import {of} from "rxjs";
+
 
 type AgendaStatut = 'A_FAIRE' | 'EN_COURS' | 'FAIT' | 'ECHOUE' | 'REPORTE' | 'ANNULE';
 type ModeExecution = 'AUTO' | 'SEMI_AUTO' | 'MANU' | 'MANUEL';
@@ -87,7 +89,7 @@ export class RecouvAgendaComponent implements AfterViewInit {
       this.dataSource = new LocalPageDataSource<any>(
         this.paginator,
         this.sort,
-        (q) => this.api.list(q) as PageResult<any>
+        (q) => of(this.api.list(q))   // ✅
       );
 
       this.total$ = this.dataSource.totalCount$();

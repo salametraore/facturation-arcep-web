@@ -164,6 +164,8 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
   }
 
   getClientName(clientId: number | null | undefined): string {
+    console.log("clientId");
+    console.log(clientId);
     if (!clientId) return '';
     return this.clientNameById.get(clientId) ?? '';
   }

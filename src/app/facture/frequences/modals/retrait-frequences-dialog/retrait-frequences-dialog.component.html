@@ -1,0 +1,134 @@
+<mat-card class="dialog-crud-card">
+
+  <div class="page-title">
+    <h2>Fréquences : Retrait / désactivation des stations et canaux </h2>
+  </div>
+
+  <div *ngIf="errorMessage?.length > 0" class="alert-box">
+    <div class="alert-line">
+      <mat-icon class="alert-icon">error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <section class="list-box">
+    <div class="list-header">
+      <h3 class="list-title">
+        <ng-container *ngIf="modeRetrait === 'GLOBAL'">
+          Retrait global de la fiche fréquence
+        </ng-container>
+        <ng-container *ngIf="modeRetrait === 'PARTIEL'">
+          Désactivation partielle stations / canaux
+        </ng-container>
+      </h3>
+    </div>
+
+
+    <div class="list-body scrollable-body">
+      <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+        <div class="mode-box">
+          <label class="mode-label">Mode d’opération</label>
+
+          <div class="mode-box-content">
+            <mat-radio-group formControlName="mode_retrait" class="mode-radio-group inline-radio-group">
+              <mat-radio-button value="GLOBAL">Retrait global</mat-radio-button>
+              <mat-radio-button value="PARTIEL">Désactivation partielle</mat-radio-button>
+            </mat-radio-group>
+
+            <div
+              *ngIf="modeRetrait === 'PARTIEL' && form.hasError('partialSelectionRequired')"
+              class="info-warning info-warning-inline">
+              Veuillez sélectionner au moins une station ou un canal.
+            </div>
+          </div>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+          <mat-label>Client</mat-label>
+          <input matInput formControlName="client" readonly>
+        </mat-form-field>
+
+        <div class="two-cols">
+          <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-label>Catégorie produit</mat-label>
+            <input matInput formControlName="categorie_produit" readonly>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-label>Statut actuel</mat-label>
+            <input matInput formControlName="statut" readonly>
+          </mat-form-field>
+        </div>
+
+<!--        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+          <mat-label>Objet</mat-label>
+          <input matInput formControlName="objet" readonly>
+        </mat-form-field>-->
+
+        <ng-container *ngIf="modeRetrait === 'PARTIEL'">
+
+          <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-label>Stations à désactiver</mat-label>
+            <mat-select formControlName="station_ids" multiple>
+              <mat-option *ngFor="let station of stationsActives; let i = index" [value]="station.id">
+                {{ stationLabel(station, i) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+
+          <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-label>Canaux à désactiver</mat-label>
+            <mat-select formControlName="canal_ids" multiple>
+              <mat-option *ngFor="let canal of canauxActifs; let i = index" [value]="canal.id">
+                {{ canalLabel(canal, i) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+<!--          <div *ngIf="form.hasError('partialSelectionRequired')" class="info-warning">
+            Veuillez sélectionner au moins une station ou un canal.
+          </div>-->
+
+        </ng-container>
+
+
+        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+          <mat-label>Date de retrait</mat-label>
+          <input matInput [matDatepicker]="pickerStart" formControlName="date_retrait">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+          <mat-datepicker #pickerStart></mat-datepicker>
+          <mat-error *ngIf="form.get('date_retrait')?.hasError('required')">
+            La date de retrait est obligatoire.
+          </mat-error>
+        </mat-form-field>
+
+
+        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+          <mat-label>Motif du retrait</mat-label>
+          <textarea matInput rows="2" formControlName="motif_retrait"></textarea>
+          <mat-error *ngIf="form.get('motif_retrait')?.hasError('required')">
+            Le motif du retrait est obligatoire.
+          </mat-error>
+          <mat-error *ngIf="form.get('motif_retrait')?.hasError('maxlength')">
+            Le motif ne doit pas dépasser 500 caractères.
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-actions sticky-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || submitting || loading">
+            <mat-icon>save</mat-icon>
+            {{ submitLabel }}
+          </button>
+
+          <button mat-stroked-button color="warn" type="button" mat-dialog-close [disabled]="submitting">
+            <mat-icon>close</mat-icon>
+            Annuler
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</mat-card>

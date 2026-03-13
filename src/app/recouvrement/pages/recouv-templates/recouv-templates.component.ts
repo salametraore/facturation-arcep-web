@@ -1,3 +1,5 @@
+//src/app/recouvrement/pages/recouv-templates/recouv-templates.component.ts
+
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -58,7 +60,7 @@ export class RecouvTemplatesComponent implements AfterViewInit {
     this.dataSource = new LocalPageDataSource<any>(
       this.paginator,
       this.sort,
-      (q) => this.api.list(q) as PageResult<any>
+      (q) => this.api.list(q)
     );
 
     this.total$ = this.dataSource.totalCount$();
@@ -75,11 +77,7 @@ export class RecouvTemplatesComponent implements AfterViewInit {
   }
 
   applyFilters() {
-    // mapping UI -> seed
-    // UI COURRIER correspond au seed LETTRE
-    const canalSeed: CanalSeed | null =
-      this.canal === 'COURRIER' ? 'LETTRE' : (this.canal as any);
-
+    const canalSeed = this.api.toSeedCanal(this.canal);
     this.dataSource.setFilters({
       actif: this.actif === null ? null : this.actif,
       canal: canalSeed === null ? null : canalSeed
@@ -125,7 +123,7 @@ export class RecouvTemplatesComponent implements AfterViewInit {
       maxWidth: '98vw',
       data: { mode: 'create' }
     }).afterClosed().subscribe(changed => {
-      if (changed) this.applyFilters();
+      if (changed) this.refreshList();
     });
   }
 
@@ -135,15 +133,29 @@ export class RecouvTemplatesComponent implements AfterViewInit {
       maxWidth: '98vw',
       data: { mode: 'edit', templateId: row.id }
     }).afterClosed().subscribe(changed => {
-      if (changed) this.applyFilters();
+      if (changed) this.refreshList();
     });
   }
+
+  private refreshList() {
+    this.paginator?.firstPage?.();
+    this.dataSource.setFilters({
+      actif: this.actif,
+      canal: this.api.toSeedCanal(this.canal),
+      __ts: Date.now()
+    } as any);
+    this.dataSource.setSearch(this.search);
+  }
+
 
   delete(row: any) {
     const ok = confirm(`Supprimer le modèle "${row.nom}" ?`);
     if (!ok) return;
-    this.api.delete(row.id);
-    this.applyFilters();
+
+    this.api.delete(row.id).subscribe({
+      next: () => this.refreshList(),
+      error: () => alert('Suppression impossible')
+    });
   }
 
   trackById(_: number, r: any) {

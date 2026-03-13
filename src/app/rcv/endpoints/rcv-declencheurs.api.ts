@@ -1,31 +1,71 @@
-import {Injectable} from '@angular/core';
-import {RcvStoreService} from '../rcv-store.service';
-import {PageQuery, PageResult} from '../rcv-query';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 
-@Injectable({providedIn: 'root'})
+import { PageQuery, PageResult } from '../rcv-query';
+import { applyPageQuery } from '../apply-page-query';
+
+import { RecouvDeclencheurServices } from '../../shared/services/recouv-declencheur.services';
+
+@Injectable({ providedIn: 'root' })
 export class RcvDeclencheursApi {
-  private COL = 'declencheurs';
+  private refresh$ = new BehaviorSubject<void>(undefined);
 
-  constructor(private store: RcvStoreService) {
+  private declencheurs$ = this.refresh$.pipe(
+    switchMap(() => this.srv.getItems()),  // backend -> tableau
+    shareReplay(1)
+  );
+
+  constructor(private srv: RecouvDeclencheurServices) {}
+
+  list(q: PageQuery): Observable<PageResult<any>> {
+    return this.declencheurs$.pipe(
+      map(all =>
+        applyPageQuery(
+          all || [],
+          q,
+          ['code', 'nom', 'description'],
+          (d, f) => {
+            // filtre actif
+            if (f['actif'] !== null && f['actif'] !== undefined && f['actif'] !== '') {
+              if ((d as any).actif !== f['actif']) return false;
+            }
+
+            // filtre groupe_id (si présent)
+            if (f['groupe_id'] !== null && f['groupe_id'] !== undefined && f['groupe_id'] !== '') {
+              if ((d as any).groupe_id !== f['groupe_id']) return false;
+            }
+
+            // filtre "délai" via flags NOT_NULL (logique UI actuelle)
+            if (f['criteres.jours_avant_echeance_min'] === 'NOT_NULL') {
+              const v = (d as any)?.criteres?.jours_avant_echeance_min;
+              if (v === null || v === undefined) return false;
+            }
+            if (f['criteres.jours_apres_echeance_min'] === 'NOT_NULL') {
+              const v = (d as any)?.criteres?.jours_apres_echeance_min;
+              if (v === null || v === undefined) return false;
+            }
+
+            return true;
+          }
+        )
+      )
+    );
   }
 
-  list(q: PageQuery): PageResult<any> {
-    return this.store.query<any>(this.COL, q, ['code', 'nom', 'description']);
+  get(id: number): Observable<any> {
+    return this.srv.getItem(id);
   }
 
-  get(id: number) {
-    return this.store.getById<any>(this.COL, id);
+  create(dto: any): Observable<any> {
+    return this.srv.create(dto).pipe(tap(() => this.refresh$.next()));
   }
 
-  create(dto: any) {
-    return this.store.create<any>(this.COL, dto);
+  update(id: number, dto: any): Observable<any> {
+    return this.srv.update(id, dto).pipe(tap(() => this.refresh$.next()));
   }
 
-  update(id: number, patch: any) {
-    return this.store.update<any>(this.COL, id, patch);
-  }
-
-  delete(id: number) {
-    this.store.delete(this.COL, id);
+  delete(id: number): Observable<void> {
+    return this.srv.delete(id).pipe(tap(() => this.refresh$.next()));
   }
 }

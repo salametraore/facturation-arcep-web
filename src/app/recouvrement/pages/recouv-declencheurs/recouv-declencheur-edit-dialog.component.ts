@@ -1,3 +1,4 @@
+//src/app/recouvrement/pages/recouv-declencheurs/recouv-declencheur-edit-dialog.component.ts
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
@@ -127,14 +128,25 @@ export class RecouvDeclencheurEditDialogComponent {
       criteres,
     };
 
-    try {
-      if (this.data.mode === 'create') this.api.create(payload);
-      else this.api.update(this.data.row.id, payload);
+    const req$: any = (this.data.mode === 'create')
+      ? this.api.create(payload)
+      : this.api.update(this.data.row.id, payload);
 
-      this.ref.close(true);
-    } finally {
+    if (!req$ || typeof req$.subscribe !== 'function') {
       this.saving = false;
+      console.error('req$ invalid', req$);
+      alert("Erreur technique: req$ invalide.");
+      return;
     }
+
+    req$.subscribe({
+      next: () => this.ref.close(true),
+      error: (e: any) => {
+        console.error(e);
+        this.saving = false;
+        alert("Enregistrement impossible");
+      }
+    });
   }
 
   private minMaxValidator(group: AbstractControl): ValidationErrors | null {

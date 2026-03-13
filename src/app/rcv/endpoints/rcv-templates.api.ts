@@ -1,31 +1,75 @@
-import {Injectable} from '@angular/core';
-import {RcvStoreService} from '../rcv-store.service';
-import {PageQuery, PageResult} from '../rcv-query';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 
-@Injectable({providedIn: 'root'})
+import { PageQuery, PageResult } from '../rcv-query';
+import { applyPageQuery } from '../apply-page-query';
+
+import { RecouvTemplateServices } from '../../shared/services/recouv-template.services';
+
+type CanalSeed = 'EMAIL' | 'SMS' | 'APPEL' | 'LETTRE';
+type CanalUi = 'EMAIL' | 'SMS' | 'APPEL' | 'COURRIER' | null;
+
+@Injectable({ providedIn: 'root' })
 export class RcvTemplatesApi {
-  private COL = 'templates';
+  private refresh$ = new BehaviorSubject<void>(undefined);
 
-  constructor(private store: RcvStoreService) {
+  private templates$ = this.refresh$.pipe(
+    switchMap(() => this.srv.getItems()),   // backend -> tableau
+    shareReplay(1)
+  );
+
+  constructor(private srv: RecouvTemplateServices) {}
+
+  /** UI -> seed (COURRIER => LETTRE) */
+  toSeedCanal(ui: CanalUi): CanalSeed | null {
+    if (!ui) return null;
+    return ui === 'COURRIER' ? 'LETTRE' : (ui as any);
   }
 
-  list(q: PageQuery): PageResult<any> {
-    return this.store.query<any>(this.COL, q, ['nom', 'canal']);
+  /** LIST (paging/tri/recherche local) */
+  list(q: PageQuery): Observable<PageResult<any>> {
+    return this.templates$.pipe(
+      map(all =>
+        applyPageQuery(
+          all || [],
+          q,
+          ['nom', 'code', 'canal', 'sujet', 'contenu'],
+          (t, f) => {
+            // filtre actif
+            if (f['actif'] !== null && f['actif'] !== undefined && f['actif'] !== '') {
+              if ((t as any).actif !== f['actif']) return false;
+            }
+            // filtre canal (seed)
+            if (f['canal'] !== null && f['canal'] !== undefined && f['canal'] !== '') {
+              const tc = String((t as any).canal || '').toUpperCase();
+              const fc = String(f['canal'] || '').toUpperCase();
+              if (tc !== fc) return false;
+            }
+            return true;
+          }
+        )
+      )
+    );
   }
 
-  get(id: number) {
-    return this.store.getById<any>(this.COL, id);
+  /** READ */
+  get(id: number): Observable<any> {
+    return this.srv.getItem(id);
   }
 
-  create(dto: any) {
-    return this.store.create<any>(this.COL, dto);
+  /** CREATE */
+  create(dto: any): Observable<any> {
+    return this.srv.create(dto).pipe(tap(() => this.refresh$.next()));
   }
 
-  update(id: number, patch: any) {
-    return this.store.update<any>(this.COL, id, patch);
+  /** UPDATE */
+  update(id: number, dto: any): Observable<any> {
+    return this.srv.update(id, dto).pipe(tap(() => this.refresh$.next()));
   }
 
-  delete(id: number) {
-    this.store.delete(this.COL, id);
+  /** DELETE */
+  delete(id: number): Observable<void> {
+    return this.srv.delete(id).pipe(tap(() => this.refresh$.next()));
   }
 }

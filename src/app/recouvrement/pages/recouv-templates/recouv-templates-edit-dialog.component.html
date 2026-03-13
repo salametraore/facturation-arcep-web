@@ -1,3 +1,5 @@
+<!--src/app/recouvrement/pages/recouv-templates/recouv-templates-edit-dialog.component.html-->
+
 <h2 mat-dialog-title>
   {{ data.mode === 'create' ? 'Ajouter un modèle' : 'Modifier le modèle' }}
 </h2>
@@ -15,11 +17,13 @@
         <mat-form-field appearance="outline">
           <mat-label>Code</mat-label>
           <input matInput formControlName="code" />
+          <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Nom</mat-label>
           <input matInput formControlName="nom" />
+          <mat-error *ngIf="form.get('nom')?.hasError('required')">Requis</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
@@ -52,6 +56,7 @@
         <mat-form-field appearance="outline" class="col-2">
           <mat-label>Contenu</mat-label>
           <textarea matInput rows="14" formControlName="contenu"></textarea>
+          <mat-error *ngIf="form.get('contenu')?.hasError('required')">Requis</mat-error>
         </mat-form-field>
 
         <div class="vars-box">
@@ -84,7 +89,9 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="close()">Fermer</button>
-  <button mat-raised-button color="primary" (click)="save()" [disabled]="saving">
+  <button mat-raised-button color="primary"
+          (click)="save()"
+          [disabled]="saving || form.invalid">
     Enregistrer
   </button>
 </mat-dialog-actions>

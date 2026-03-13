@@ -7,10 +7,12 @@ import {Observable} from 'rxjs';
 import {FicheTechniqueFrequenceRequest} from '../models/fiche-technique-frequence';
 import {AppConfigService} from '../../core/config/app-config.service';
 import {
-  CalculFraisFrequenceRequest,
+  CalculFraisFrequenceRequest, DesactiverElementsFicheFrequenceRequest,
   FicheTechniqueFrequenceCreateRequest,
   FicheTechniqueFrequenceDetail
 } from "../models/fiche-technique-frequence-create-request";
+import {RetraitAutorisationRequest} from "../models/ficheTechniques";
+
 
 @Injectable({providedIn: 'root'})
 export class FichesTechniquesFrequenceService {
@@ -58,6 +60,14 @@ export class FichesTechniquesFrequenceService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}/`);
+  }
+
+  retraitGlobal(req: RetraitAutorisationRequest): Observable<any> {
+    return this.http.post<any>(`${this.cfg.baseUrl}/retrait_autorisation/`, req);
+  }
+
+  desactiverStationsCanaux(req: DesactiverElementsFicheFrequenceRequest): Observable<any> {
+    return this.http.post<any>(`${this.cfg.baseUrl}/fiche-technique/desactiver-frequences/`, req);
   }
 
 }

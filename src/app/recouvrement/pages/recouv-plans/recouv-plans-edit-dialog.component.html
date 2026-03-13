@@ -6,6 +6,7 @@
 
   <mat-tab-group>
 
+    <!-- =================== GENERAL =================== -->
     <mat-tab label="Général">
 
       <div class="blank-row"></div>
@@ -40,6 +41,7 @@
       </div>
     </mat-tab>
 
+    <!-- =================== ETAPES =================== -->
     <mat-tab label="Étapes">
       <div class="steps-wrap">
 
@@ -65,7 +67,10 @@
 
           <ng-container matColumnDef="delai">
             <th mat-header-cell *matHeaderCellDef>Délai</th>
-            <td mat-cell *matCellDef="let row">{{ row.delai_jours }} j</td>
+            <td mat-cell *matCellDef="let row">
+              {{ row.type_delai ? (row.type_delai === 'AVANT_ECHEANCE' ? 'Avant' : 'Après') : '' }}
+              {{ row.nb_jours }} j
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="mode">
@@ -75,7 +80,9 @@
 
           <ng-container matColumnDef="template">
             <th mat-header-cell *matHeaderCellDef>Modèle</th>
-            <td mat-cell *matCellDef="let row">{{ row.template_id ?? '—' }}</td>
+            <td mat-cell *matCellDef="let row">
+              {{ row.template ? (templateLabelById[row.template] || row.template) : '—' }}
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="actif">
@@ -109,49 +116,62 @@
           <tr mat-row *matRowDef="let row; columns: ['ordre','type_action','delai','mode','template','actif','actions'];"></tr>
         </table>
 
-        <!-- mini-form étape -->
+        <!-- =================== MINI FORM ETAPE =================== -->
         <div class="step-form" [formGroup]="etapeForm">
           <div class="step-form-title">
             {{ editingEtapeId ? 'Modifier étape' : 'Nouvelle étape' }}
           </div>
 
           <div class="grid">
+            <!-- Type action -->
             <mat-form-field appearance="outline">
               <mat-label>Type action</mat-label>
               <mat-select formControlName="type_action">
-                <mat-option *ngFor="let t of typeActions" [value]="t">{{ t }}</mat-option>
+                <mat-option *ngFor="let t of typeActions" [value]="t">
+                  {{ actionLabel(t) }}
+                </mat-option>
               </mat-select>
             </mat-form-field>
 
+            <!-- Mode -->
             <mat-form-field appearance="outline">
               <mat-label>Mode d’exécution</mat-label>
               <mat-select formControlName="mode_execution">
-                <mat-option *ngFor="let m of modeExecutions" [value]="m">{{ m }}</mat-option>
+                <mat-option *ngFor="let m of modeExecutions" [value]="m">
+                  {{ modeLabel(m) }}
+                </mat-option>
               </mat-select>
             </mat-form-field>
 
+            <!-- Type délai -->
             <mat-form-field appearance="outline">
-              <mat-label>Délai (jours)</mat-label>
-              <input matInput type="number" formControlName="delai_jours" />
+              <mat-label>Type délai</mat-label>
+              <mat-select formControlName="type_delai">
+                <mat-option *ngFor="let d of typeDelais" [value]="d.value">
+                  {{ d.label }}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
 
+            <!-- Nb jours -->
+            <mat-form-field appearance="outline">
+              <mat-label>Nbre jours</mat-label>
+              <input matInput type="number" formControlName="nb_jours" />
+            </mat-form-field>
+
+            <!-- Template -->
             <mat-form-field appearance="outline">
               <mat-label>Modèle (optionnel)</mat-label>
-              <mat-select formControlName="template_id">
+              <mat-select formControlName="template">
                 <mat-option [value]="null">— Aucun —</mat-option>
-
                 <mat-option *ngFor="let t of templatesForSelect" [value]="t.id">
                   {{ templateOptionLabel(t) }}
                 </mat-option>
               </mat-select>
-
-              <mat-hint *ngIf="etapeForm.get('template_id')?.value as tplId">
-                {{ templateLabelById[tplId] || ('Template #' + tplId) }}
-              </mat-hint>
             </mat-form-field>
 
-            <!-- ✅ Preview en dessous (pas dans mat-form-field) -->
-            <div class="tpl-preview col-2" *ngIf="templateById(etapeForm.get('template_id')?.value) as tpl">
+            <!-- Preview template -->
+            <div class="tpl-preview col-2" *ngIf="templateById(etapeForm.get('template')?.value) as tpl">
               <div class="tpl-title">
                 {{ tpl.nom }} — {{ tpl.canal === 'LETTRE' ? 'COURRIER' : tpl.canal }}
               </div>

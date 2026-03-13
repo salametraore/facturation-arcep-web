@@ -4,6 +4,9 @@ export class FicheTechniqueProduit {
   produit: number;
   fiche_technique_id: number;
   readonly produit_libelle: string;
+
+  actif?: boolean;
+
   designation?: string | null;
   quantite?: number | null;
   prix_unitaire?: number | null;
@@ -12,6 +15,9 @@ export class FicheTechniqueProduit {
   modele?: string | null;
   plage_numero?: string | null;
   zone_id?: number | null;
+
+  date_retrait?: string | null;
+  motif_retrait?: string | null;
 }
 
 export class FicheTechniquesProduits {

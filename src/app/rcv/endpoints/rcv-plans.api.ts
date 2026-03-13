@@ -1,38 +1,102 @@
 import { Injectable } from '@angular/core';
-import { RcvStoreService } from '../rcv-store.service';
+import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
+import { map, shareReplay, switchMap, tap, catchError } from 'rxjs/operators';
+
 import { PageQuery, PageResult } from '../rcv-query';
+import { applyPageQuery } from '../apply-page-query';
+
+import { RecouvPlanActionServices } from '../../shared/services/recouv-plan-action.services';
+import { RecouvPlanEtapeServices } from '../../shared/services/recouv-plan-etape.services';
 
 @Injectable({ providedIn: 'root' })
 export class RcvPlansApi {
-  private PLANS = 'plans';
-  private ETAPES = 'planEtapes';
+  private refreshPlans$ = new BehaviorSubject<void>(undefined);
+  private refreshEtapes$ = new BehaviorSubject<void>(undefined);
 
-  constructor(private store: RcvStoreService) {}
+  private plans$ = this.refreshPlans$.pipe(
+    switchMap(() => this.planSrv.getItems()),
+    shareReplay(1)
+  );
 
-  list(q: PageQuery): PageResult<any> {
-    return this.store.query<any>(this.PLANS, q, ['code','nom']);
+  private etapes$ = this.refreshEtapes$.pipe(
+    switchMap(() => this.etapeSrv.getItems()),
+    shareReplay(1)
+  );
+
+  constructor(
+    private planSrv: RecouvPlanActionServices,
+    private etapeSrv: RecouvPlanEtapeServices
+  ) {}
+
+  // ===== Plans =====
+  list(q: PageQuery): Observable<PageResult<any>> {
+    return this.plans$.pipe(
+      map(all =>
+        applyPageQuery(
+          all || [],
+          q,
+          ['code', 'nom'],
+          (p, f) => {
+            if (f['actif'] !== null && f['actif'] !== undefined && f['actif'] !== '') {
+              if ((p as any).actif !== f['actif']) return false;
+            }
+            return true;
+          }
+        )
+      )
+    );
   }
-  get(id: number) { return this.store.getById<any>(this.PLANS, id); }
-  create(dto: any) { return this.store.create<any>(this.PLANS, dto); }
-  update(id: number, patch: any) { return this.store.update<any>(this.PLANS, id, patch); }
-  delete(id: number) { this.store.delete(this.PLANS, id); }
 
-  listEtapes(planId: number): any[] {
-    return this.store.list<any>(this.ETAPES)
-      .filter(e => e.plan_action_id === planId)
-      .sort((a,b) => a.ordre - b.ordre);
+  get(id: number): Observable<any> {
+    return this.planSrv.getItem(id);
   }
-  addEtape(planId: number, dto: any) {
-    const existing = this.listEtapes(planId);
-    const ordre = dto.ordre ?? (existing.length ? Math.max(...existing.map(x => x.ordre)) + 1 : 1);
-    return this.store.create<any>(this.ETAPES, { ...dto, plan_action_id: planId, ordre });
-  }
-  updateEtape(etapeId: number, patch: any) { return this.store.update<any>(this.ETAPES, etapeId, patch); }
-  deleteEtape(etapeId: number) { this.store.delete(this.ETAPES, etapeId); }
 
-  reorder(planId: number, orderedIds: number[]) {
-    orderedIds.forEach((id, idx) => {
-      this.store.update<any>(this.ETAPES, id, { ordre: idx + 1, plan_action_id: planId });
-    });
+  create(dto: any): Observable<any> {
+    return this.planSrv.create(dto).pipe(tap(() => this.refreshPlans$.next()));
+  }
+
+  update(id: number, dto: any): Observable<any> {
+    return this.planSrv.update(id, dto).pipe(tap(() => this.refreshPlans$.next()));
+  }
+
+  delete(id: number): Observable<void> {
+    return this.planSrv.delete(id).pipe(tap(() => this.refreshPlans$.next()));
+  }
+
+  // ===== Étapes =====
+  listEtapes(planId: number): Observable<any[]> {
+    return this.etapes$.pipe(
+      map(all =>
+        (all || [])
+          .filter(e => (e as any).plan_action === planId) // ✅ plan_action (pas plan_action_id)
+          .sort((a: any, b: any) => (a.ordre ?? 0) - (b.ordre ?? 0))
+      )
+    );
+  }
+
+  addEtape(planId: number, dto: any): Observable<any> {
+    return this.listEtapes(planId).pipe(
+      switchMap(existing => {
+        const ordre = dto.ordre ?? (existing.length ? Math.max(...existing.map(x => x.ordre ?? 0)) + 1 : 1);
+        return this.etapeSrv.create({ ...dto, plan_action: planId, ordre })
+          .pipe(tap(() => this.refreshEtapes$.next()));
+      })
+    );
+  }
+
+  updateEtape(etapeId: number, patch: any): Observable<any> {
+    return this.etapeSrv.update(etapeId, patch).pipe(tap(() => this.refreshEtapes$.next()));
+  }
+
+  deleteEtape(etapeId: number): Observable<void> {
+    return this.etapeSrv.delete(etapeId).pipe(tap(() => this.refreshEtapes$.next()));
+  }
+
+  reorder(planId: number, orderedIds: number[]): Observable<any> {
+    const calls = orderedIds.map((id, idx) =>
+      this.etapeSrv.patch(id, { ordre: idx + 1, plan_action: planId } as any)
+        .pipe(catchError(() => of(null)))
+    );
+    return forkJoin(calls).pipe(tap(() => this.refreshEtapes$.next()));
   }
 }

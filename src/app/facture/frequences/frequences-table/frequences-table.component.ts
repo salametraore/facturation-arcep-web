@@ -28,6 +28,7 @@ import {
   FicheTechniqueFrequenceDetail
 } from "../../../shared/models/fiche-technique-frequence-create-request";
 import {FichesTechniquesFrequenceService} from "../../../shared/services/fiches-techniques-frequences";
+import {RetraitFrequencesDialogComponent} from "../modals/retrait-frequences-dialog/retrait-frequences-dialog.component";
 
 
 interface FTListFilter {
@@ -347,16 +348,21 @@ export class FrequencesTableComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onRetraitAutorisation(ficheTechnique: FicheTechniques, operation?: string) {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.width = '800px';
-    dialogConfig.autoFocus = true;
-    dialogConfig.data = {ficheTechnique, operation};
-    dialogConfig.disableClose = true;
-    let ref = this.dialog.open(RetraitAutorisationDialogComponent, dialogConfig);
-    ref.afterClosed().subscribe(() => {
-      this.reloadData();
-    }, error => {
+  onRetraitAutorisation(ficheTechnique: FicheTechniques): void {
+    const ref = this.dialog.open(RetraitFrequencesDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      disableClose: true,
+      data: {
+        ficheTechniqueId: ficheTechnique.id
+      }
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if (result === 'Yes') {
+        this.reloadData();
+      }
     });
   }
 

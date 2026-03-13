@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import {
-  AvisEtudeTechnique, ChercheFiche,
+  AvisEtudeTechnique, ChercheFiche, DesactiverFicheTechniqueProduit,
   FicheTechniques,
   MiseAJourStatutFiche,
   RetraitAutorisationRequest
@@ -38,7 +38,8 @@ export class FicheTechniquesService {
   private get urlHistoriqueApi()   { return this.joinUrl(this.cfg.baseUrl, 'api', 'historique'); }
   private get urlWorkflowHistory() { return this.joinUrl(this.cfg.baseUrl, 'workflow-history'); }
   private get urlUpdateAvis()      { return this.joinUrl(this.cfg.baseUrl, 'update-avis-fiche-technique'); }
-  private get urlRetrait()         { return this.joinUrl(this.cfg.baseUrl, 'retrait-fiche-technique'); }
+  private get urlRetrait()         { return this.joinUrl(this.cfg.baseUrl, 'retrait_autorisation'); }
+  private get urlDesactivation()         { return this.joinUrl(this.cfg.baseUrl, 'fiche-technique/desactiver-produits'); }
 
   // --- CRUD Fiches techniques ---
   getItem(id: number): Observable<FicheTechniques> {
@@ -72,6 +73,10 @@ export class FicheTechniquesService {
 
   retraitAutorisation(req: RetraitAutorisationRequest): Observable<RetraitAutorisationRequest> {
     return this.http.post<RetraitAutorisationRequest>(`${this.urlRetrait}/`, req);
+  }
+
+  desactiverProduits(req: DesactiverFicheTechniqueProduit): Observable<any> {
+    return this.http.post<any>(`${this.urlDesactivation}/`, req);
   }
 
   setStatutFiche(m: MiseAJourStatutFiche): Observable<MiseAJourStatutFiche> {

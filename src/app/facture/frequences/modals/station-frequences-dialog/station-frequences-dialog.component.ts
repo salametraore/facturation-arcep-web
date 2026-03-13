@@ -1,4 +1,4 @@
-// src/app/facture/frequences/modals/station-frequences-dialog/station-frequences-dialog.component.ts
+// src/app/facture/frequences/modals/station-frequences-dialog/retrait-frequence-dialog.component.ts
 
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';

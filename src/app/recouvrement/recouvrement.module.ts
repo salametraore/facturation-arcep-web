@@ -33,6 +33,9 @@ import {RecouvClientFichesTechniques} from "./pages/recouv_client/recouv-client-
 import {RecouvClientReleveCompteComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-releve-compte/recouv-client-releve-compte.component";
 import {RecouvClientRelancesComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-relances/recouv-client-relances.component";
 import {RecouvClientPromessesComponent} from "./pages/recouv_client/recouv-client-tables/recouv-client-promesses/recouv-client-promesses.component";
+import { RcvGroupesApi } from '../rcv/endpoints/rcv-groupes.api';
+import { RcvGroupesBackendApi } from '../rcv/endpoints/rcv-groupes-backend.api';
+
 
 @NgModule({
   declarations: [
@@ -70,6 +73,7 @@ import {RecouvClientPromessesComponent} from "./pages/recouv_client/recouv-clien
     ScrollingModule,
     MaterialModule,
     RecouvrementRoutingModule,
-  ]
+  ],
+
 })
 export class RecouvrementModule { }

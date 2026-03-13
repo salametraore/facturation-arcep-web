@@ -61,7 +61,6 @@ export class RecouvDeclencheurService {
 
   /** Base URL normalisée */
   private get urlDeclencheurs(): string {
-    // cfg.baseUrl ex: http://localhost:8000/facturation_api
     const base = this.cfg.baseUrl.replace(/\/$/, '');
     return `${base}/recouvrement/declencheurs`;
   }

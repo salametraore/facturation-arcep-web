@@ -1,3 +1,4 @@
+//src/app/recouvrement/pages/recouv-declencheurs/recouv-declencheurs.component.ts
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
@@ -53,10 +54,10 @@ export class RecouvDeclencheursComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
-    this.dataSource = new LocalPageDataSource<RcvDeclencheur>(
+    this.dataSource = new LocalPageDataSource<any>(
       this.paginator,
       this.sort,
-      (q) => this.api.list(q) as PageResult<RcvDeclencheur>
+      (q) => this.api.list(q)   // ✅ Observable<PageResult>
     );
 
     this.total$ = this.dataSource.totalCount$();
@@ -97,11 +98,6 @@ export class RecouvDeclencheursComponent implements AfterViewInit {
 
     this.dataSource.setSearch('');
     this.dataSource.setFilters({});
-  }
-
-  private refresh() {
-    this.applyFilters();
-    this.applySearch();
   }
 
 
@@ -198,8 +194,17 @@ export class RecouvDeclencheursComponent implements AfterViewInit {
     const yes = confirm(`Supprimer le déclencheur "${row.nom}" ?`);
     if (!yes) return;
 
-    this.api.delete(row.id);
-    this.refresh();
+    this.api.delete(row.id).subscribe({
+      next: () => this.refresh(),
+      error: () => alert('Suppression impossible')
+    });
+  }
+
+  private refresh() {
+    this.paginator?.firstPage?.();
+    this.dataSource.setFilters({ ...(this.dataSource as any), __ts: Date.now() } as any); // ou juste applyFilters+applySearch
+    this.applyFilters();
+    this.applySearch();
   }
 
 

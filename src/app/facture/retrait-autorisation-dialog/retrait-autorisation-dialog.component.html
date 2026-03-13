@@ -1,64 +1,147 @@
-<div>
-  <form (ngSubmit)="crud()" [formGroup]="form">
-    <div mat-dialog-content>
-      <h2>Retrait Autorisation/Licence</h2>
-      <div>
-        <mat-form-field>
+<mat-card class="dialog-crud-card">
+
+  <!-- Titre -->
+  <div class="page-title">
+    <h2>Retrait / désactivation d’autorisation</h2>
+  </div>
+
+  <!-- Messages d'erreur -->
+  <div *ngIf="errorMessage?.length > 0" class="alert-box">
+    <div class="alert-line">
+      <mat-icon class="alert-icon">error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <!-- Bloc formulaire -->
+  <section class="list-box">
+    <div class="list-header">
+      <h3 class="list-title">
+        <ng-container *ngIf="modeRetrait === 'GLOBAL'">
+          Retrait global de la fiche
+        </ng-container>
+        <ng-container *ngIf="modeRetrait === 'PARTIEL'">
+          Désactivation partielle par produit
+        </ng-container>
+      </h3>
+    </div>
+
+    <div class="list-body">
+      <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
+
+        <!-- Mode -->
+        <div class="mode-box">
+          <label class="mode-label">Mode d’opération</label>
+          <mat-radio-group formControlName="mode_retrait" class="mode-radio-group">
+            <mat-radio-button value="GLOBAL">
+              Retrait global de la fiche
+            </mat-radio-button>
+
+            <mat-radio-button value="PARTIEL">
+              Désactivation par produit
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <div class="blank-row"></div>
+
+        <!-- Client -->
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Client</mat-label>
-          <input matInput formControlName="client" matInput matTooltip="Client" placeholder="Client" readonly>
+          <input matInput formControlName="client" readonly>
         </mat-form-field>
-      </div>
 
-      <div>
-        <mat-form-field>
+        <div class="blank-row"></div>
+
+        <!-- Objet -->
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Objet</mat-label>
-          <input matInput formControlName="objet" matInput matTooltip="Objet" placeholder="Objet" readonly>
+          <input matInput formControlName="objet" readonly>
         </mat-form-field>
-      </div>
 
-      <div>
-        <mat-form-field>
-          <mat-label>Catégorie</mat-label>
-          <input matInput formControlName="categorie_produit" matInput matTooltip="Catégorie" placeholder="Catégorie"
-                 readonly>
+        <div class="blank-row"></div>
+
+        <!-- Catégorie -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Catégorie produit</mat-label>
+          <input matInput formControlName="categorie_produit" readonly>
         </mat-form-field>
-      </div>
 
-      <div>
-        <mat-form-field>
-          <mat-label>Commentaire</mat-label>
-          <input matInput formControlName="commentaire" matInput matTooltip="Commentaire" placeholder="Commentaire"
-                 readonly>
-        </mat-form-field>
-      </div>
+        <div class="blank-row"></div>
 
-      <div>
-        <mat-form-field>
-          <mat-label>Date retrait</mat-label>
-          <input matInput [matDatepicker]="pickerStart" formControlName="date_retrait" matTooltip="Date retrait"
-                 placeholder="Date retrait" required>
+        <!-- Produits à désactiver -->
+        <ng-container *ngIf="modeRetrait === 'PARTIEL'">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Produits à désactiver</mat-label>
+            <mat-select formControlName="fiche_produits" multiple>
+              <mat-option *ngFor="let produit of produitsActifs" [value]="produit.id">
+                {{ produit.produit_libelle }}
+              </mat-option>
+            </mat-select>
+
+            <mat-error *ngIf="form.get('fiche_produits')?.hasError('required')">
+              Veuillez sélectionner au moins un produit.
+            </mat-error>
+          </mat-form-field>
+
+          <div *ngIf="!produitsActifs.length" class="info-warning">
+            Aucun produit actif disponible pour une désactivation partielle.
+          </div>
+
+          <div class="blank-row"></div>
+        </ng-container>
+
+        <!-- Date retrait -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Date de retrait</mat-label>
+          <input
+            matInput
+            [matDatepicker]="pickerStart"
+            formControlName="date_retrait"
+            placeholder="Date de retrait">
           <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
           <mat-datepicker #pickerStart></mat-datepicker>
-        </mat-form-field>
-      </div>
 
-      <div >
-        <mat-form-field>
-          <mat-label>Motif retrait</mat-label>
-          <input matInput formControlName="motif_retrait" matTooltip="Motif retrait" type="text" placeholder="Motif retrait" required>
+          <mat-error *ngIf="form.get('date_retrait')?.hasError('required')">
+            La date de retrait est obligatoire.
+          </mat-error>
         </mat-form-field>
-      </div>
 
+        <div class="blank-row"></div>
+
+        <!-- Motif -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Motif du retrait</mat-label>
+          <textarea
+            matInput
+            formControlName="motif_retrait"
+            rows="3"
+            placeholder="Motif du retrait"></textarea>
+
+          <mat-error *ngIf="form.get('motif_retrait')?.hasError('required')">
+            Le motif du retrait est obligatoire.
+          </mat-error>
+
+          <mat-error *ngIf="form.get('motif_retrait')?.hasError('maxlength')">
+            Le motif ne doit pas dépasser 500 caractères.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+            <mat-icon>save</mat-icon>
+            {{ submitLabel }}
+          </button>
+
+          <button mat-stroked-button color="warn" type="button" mat-dialog-close>
+            <mat-icon>close</mat-icon>
+            {{ bouton_names.cancel }}
+          </button>
+        </div>
+
+      </form>
     </div>
-    <div align="end" mat-dialog-actions>
-      <button [disabled]="form.invalid"color="warn" mat-button type="submit">
-        <mat-icon>save</mat-icon>
-        {{this.bouton_names.save}}
-      </button>
-      <button color="warn" mat-button mat-dialog-close>
-        <mat-icon>close</mat-icon>
-        {{this.bouton_names.cancel}}
-      </button>
-    </div>
-  </form>
-</div>
+  </section>
+
+</mat-card>

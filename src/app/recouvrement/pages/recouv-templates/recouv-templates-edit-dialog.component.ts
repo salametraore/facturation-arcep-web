@@ -1,3 +1,6 @@
+
+///src/app/recouvrement/pages/recouv-templates/recouv-templates-edit-dialog.component.ts
+
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
@@ -18,12 +21,19 @@ export type RcvTemplateEditDialogData =
 export class RecouvTemplatesEditDialogComponent {
   saving = false;
 
-  readonly canals: { value: 'EMAIL'|'SMS'|'COURRIER'|'APPEL'|'LETTRE'; label: string }[] = [
+/*  readonly canals: { value: 'EMAIL'|'SMS'|'COURRIER'|'APPEL'|'LETTRE'; label: string }[] = [
     { value: 'EMAIL', label: 'Email' },
     { value: 'SMS', label: 'SMS' },
     { value: 'APPEL', label: 'Appel' },
     { value: 'COURRIER', label: 'Courrier' },
     { value: 'LETTRE', label: 'Lettre (legacy seed)' },
+  ];*/
+
+  readonly canals: { value: 'EMAIL'|'SMS'|'COURRIER'|'APPEL'; label: string }[] = [
+    { value: 'EMAIL', label: 'Email' },
+    { value: 'SMS', label: 'SMS' },
+    { value: 'APPEL', label: 'Appel' },
+    { value: 'COURRIER', label: 'Courrier' },
   ];
 
   // Variables d’exemple pour la prévisualisation
@@ -47,7 +57,7 @@ export class RecouvTemplatesEditDialogComponent {
     this.form = this.fb.group({
       code: ['', [Validators.required, Validators.maxLength(50)]],
       nom: ['', [Validators.required, Validators.maxLength(255)]],
-      canal: ['SMS' as Canal, [Validators.required]],
+      canal: ['EMAIL' as Canal, [Validators.required]],
       sujet: [''],
       contenu: ['', [Validators.required]],
       actif: [true],
@@ -55,10 +65,18 @@ export class RecouvTemplatesEditDialogComponent {
     }, { validators: [this.variablesJsonValidator] });
 
     if (data.mode === 'edit') {
-      const row = this.api.get(data.templateId);
-      if (!row) throw new Error(`Template #${data.templateId} introuvable`);
-      this.patch(row);
+      this.saving = true;
+      this.api.get(data.templateId).subscribe({
+        next: (row) => this.patch(row),
+        error: () => {
+          this.saving = false;
+          alert(`Template #${data.templateId} introuvable`);
+          this.ref.close(false);
+        },
+        complete: () => (this.saving = false)
+      });
     }
+
   }
 
   private patch(row: any) {
@@ -78,9 +96,13 @@ export class RecouvTemplatesEditDialogComponent {
   close() { this.ref.close(false); }
 
   save() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    this.saving = true;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      alert('Veuillez renseigner les champs obligatoires (Code, Nom, Contenu).');
+      return;
+    }
 
+    this.saving = true;
     const v = this.form.value;
 
     const payload: any = {
@@ -93,13 +115,26 @@ export class RecouvTemplatesEditDialogComponent {
       variables: this.parseJsonOrNull(v.variables)
     };
 
-    try {
-      if (this.data.mode === 'create') this.api.create(payload);
-      else this.api.update(this.data.templateId, payload);
-      this.ref.close(true);
-    } finally {
+    const req$: any = (this.data.mode === 'create')
+      ? this.api.create(payload)
+      : this.api.update(this.data.templateId, payload);
+
+    // ✅ garde-fou (si provider override / mauvaise API)
+    if (!req$ || typeof req$.subscribe !== 'function') {
       this.saving = false;
+      console.error('create/update did not return an Observable', req$);
+      alert("Erreur technique : l'appel backend n'est pas opérationnel (req$ invalide).");
+      return;
     }
+
+    req$.subscribe({
+      next: () => this.ref.close(true), // ✅ succès => ferme
+      error: (e: any) => {
+        console.error(e);
+        this.saving = false;
+        alert('Enregistrement impossible');
+      }
+    });
   }
 
   /* ===== Prévisualisation ===== */

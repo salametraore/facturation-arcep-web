@@ -82,7 +82,7 @@
             <mat-label>Client</mat-label>
             <mat-select [(ngModel)]="selectedClientId">
               <mat-option *ngFor="let c of clientOptions" [value]="c.id">
-                {{ c.code }} — {{ c.denomination }}
+                {{ c.denomination_sociale }} — {{ c.compte_comptable || c.ifu || ('ID ' + c.id) }}
               </mat-option>
             </mat-select>
           </mat-form-field>
@@ -99,15 +99,17 @@
             <th mat-header-cell *matHeaderCellDef>Client</th>
             <td mat-cell *matCellDef="let row">
               <div class="client-cell">
-                <div class="title">{{ row.client?.denomination }}</div>
-                <div class="sub">{{ row.client?.code }} • {{ row.client?.email }}</div>
+                <div class="title">{{ row.client?.denomination_sociale }}</div>
+                <div class="sub">
+                  {{ row.client?.compte_comptable || row.client?.ifu || ('ID ' + row.client_id) }} • {{ row.client?.email || '-' }}
+                </div>
               </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="type_client">
             <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let row">{{ row.client?.type_client }}</td>
+            <td mat-cell *matCellDef="let row">{{ row.client?.type }}</td>
           </ng-container>
 
           <ng-container matColumnDef="exclu">

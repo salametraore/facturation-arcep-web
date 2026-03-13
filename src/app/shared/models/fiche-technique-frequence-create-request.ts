@@ -121,6 +121,10 @@ export interface FicheTechniqueFrequenceDetail {
 
   date_avis?: string;
 
+  date_retrait?: string | null;
+  motif_retrait?: string | null;
+
+
   canaux?: FicheTechniqueCanalDetail[];
   stations?: FicheTechniqueStationDetail[];
 }
@@ -155,6 +159,10 @@ export interface FicheTechniqueCanalDetail {
   caractere_radio?: number;
 
   designation?: string;
+
+  actif?: boolean;
+  date_retrait?: string | null;
+  motif_retrait?: string | null;
 }
 
 
@@ -188,6 +196,10 @@ export interface FicheTechniqueStationDetail {
   caractere_radio?: number;
 
   designation?: string;
+
+  actif?: boolean;
+  date_retrait?: string | null;
+  motif_retrait?: string | null;
 
   created_at: string; // ISO date-time
   updated_at: string; // ISO date-time
@@ -243,3 +255,15 @@ export interface CalculFraisFrequenceResult {
 
   details: CalculFraisFrequenceDetail[];
 }
+
+
+export interface DesactiverElementsFicheFrequenceRequest {
+  fiche_technique_id: number;
+  station_ids: number[];
+  canal_ids: number[];
+  date_retrait: string;
+  motif_retrait: string;
+}
+
+
+export type ModeRetraitFrequence = 'GLOBAL' | 'PARTIEL';

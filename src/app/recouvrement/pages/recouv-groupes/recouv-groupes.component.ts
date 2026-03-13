@@ -75,8 +75,22 @@ export class RecouvGroupesComponent implements AfterViewInit {
     });
 
     ref.afterClosed().subscribe((changed) => {
-      if (changed) this.applyFilters();
+      if (!changed) return;
+
+      // revenir à la 1ère page (optionnel mais conseillé)
+      this.paginator?.firstPage?.();
+
+      // forcer le reload (même si filtres identiques)
+      this.dataSource.setFilters({
+        actif: this.actif,
+        type_groupe: this.typeGroupe,
+        __ts: Date.now()
+      });
+
+      // garder la recherche courante
+      this.dataSource.setSearch(this.search);
     });
+
   }
 
   openEdit(row: any) {
@@ -87,8 +101,37 @@ export class RecouvGroupesComponent implements AfterViewInit {
     });
 
     ref.afterClosed().subscribe((changed) => {
-      if (changed) this.applyFilters();
+      if (!changed) return;
+
+      // revenir à la 1ère page (optionnel mais conseillé)
+      this.paginator?.firstPage?.();
+
+      // forcer le reload (même si filtres identiques)
+      this.dataSource.setFilters({
+        actif: this.actif,
+        type_groupe: this.typeGroupe,
+        __ts: Date.now()
+      });
+
+      // garder la recherche courante
+      this.dataSource.setSearch(this.search);
     });
+  }
+
+  /** Force le rechargement de la liste (même si filtres identiques) */
+  private refreshList(): void {
+    // optionnel : revenir à la 1ère page
+    this.paginator?.firstPage?.();
+
+    // force un "tick" de filtres (nouvelle référence + timestamp)
+    this.dataSource.setFilters({
+      actif: this.actif,
+      type_groupe: this.typeGroupe,
+      __ts: Date.now() // clé "dummy" pour forcer la relance
+    });
+
+    // (facultatif) si tu veux aussi relancer la recherche courante :
+    this.dataSource.setSearch(this.search);
   }
 
   // Optionnel: ouvre direct sur l'onglet membres (si tu veux gérer ça dans le dialog)
@@ -105,7 +148,12 @@ export class RecouvGroupesComponent implements AfterViewInit {
   delete(row: any) {
     const ok = confirm(`Supprimer le groupe "${row.nom}" ?`);
     if (!ok) return;
-    this.groupesApi.delete(row.id);
-    this.applyFilters();
+
+    this.groupesApi.delete(row.id).subscribe({
+      next: () => this.applyFilters(),
+      error: () => alert("Suppression impossible")
+    });
   }
+
+
 }

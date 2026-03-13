@@ -1,3 +1,4 @@
+<!--src/app/recouvrement/pages/recouv-declencheurs/recouv-declencheur-edit-dialog.component.html-->
 <h2 mat-dialog-title>
   {{ data.mode === 'create' ? 'Ajouter un déclencheur' : 'Modifier le déclencheur' }}
 </h2>
@@ -6,7 +7,11 @@
 
   <mat-tab-group>
     <mat-tab label="Général">
+      <div class="blank-row"></div>
+
       <div class="grid">
+
+        <!-- Ligne 1 : Code | Nom -->
         <mat-form-field appearance="outline">
           <mat-label>Code</mat-label>
           <input matInput formControlName="code"/>
@@ -17,11 +22,7 @@
           <input matInput formControlName="nom"/>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="col-2">
-          <mat-label>Description</mat-label>
-          <textarea matInput rows="3" formControlName="description"></textarea>
-        </mat-form-field>
-
+        <!-- Ligne 2 : Groupe associé | Plan d’action -->
         <mat-form-field appearance="outline">
           <mat-label>Groupe associé</mat-label>
           <mat-select formControlName="groupe_id">
@@ -34,11 +35,23 @@
           <input matInput type="number" formControlName="plan_action_id"/>
         </mat-form-field>
 
+        <!-- Ligne 3 : Description (pleine largeur) -->
+        <mat-form-field appearance="outline" class="col-2">
+          <mat-label>Description</mat-label>
+          <textarea matInput rows="2" formControlName="description"></textarea>
+        </mat-form-field>
+
+        <!-- (Option) Ligne 4 : Actif -->
         <mat-slide-toggle formControlName="actif">Actif</mat-slide-toggle>
+
       </div>
+
     </mat-tab>
 
     <mat-tab label="Critères & délai">
+
+      <div class="blank-row"></div>
+
       <div class="grid">
 
         <mat-form-field appearance="outline">
@@ -72,17 +85,21 @@
         </mat-form-field>
 
         <div class="col-2 delay-box">
-          <div class="delay-title">Délai</div>
+
+          <div class="delay-title">Délai :</div>
+
+          <div class="delay-days-wrap">
+            <span class="delay-days-label">Nbre jours :</span>
+            <mat-form-field appearance="outline" class="delay-days">
+              <input matInput type="number" formControlName="nb_jours" />
+            </mat-form-field>
+          </div>
 
           <mat-radio-group formControlName="type_delai" class="delay-radio">
             <mat-radio-button value="AVANT">Avant échéance</mat-radio-button>
             <mat-radio-button value="APRES">Après échéance</mat-radio-button>
           </mat-radio-group>
 
-          <mat-form-field appearance="outline" class="delay-days">
-            <mat-label>N jours</mat-label>
-            <input matInput type="number" formControlName="nb_jours"/>
-          </mat-form-field>
         </div>
 
       </div>

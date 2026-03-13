@@ -119,6 +119,7 @@ import {FicheTechniquesActivitesPostalesComponent} from "./fiche-techniques-acti
 import { ImportBilanDialogComponent } from './fiche-techniques-activites-postales/import-bilan-dialog/import-bilan-dialog.component';
 import {ClientDfcPenalitesCrudComponent} from "./client-dfc/client-dfc-details/client-dfc-penalites-crud/client-dfc-penalites-crud.component";
 import {FichesTechniquesDapCrudComponent} from "./fiche-techniques-activites-postales/fiches-techniques-dap-crud/fiches-techniques-dap-crud.component";
+import {RetraitFrequencesDialogComponent} from "./frequences/modals/retrait-frequences-dialog/retrait-frequences-dialog.component";
 
 
 @NgModule({
@@ -215,6 +216,7 @@ import {FichesTechniquesDapCrudComponent} from "./fiche-techniques-activites-pos
     ImportBilanDialogComponent,
     ClientDfcPenalitesCrudComponent,
     FichesTechniquesDapCrudComponent,
+    RetraitFrequencesDialogComponent,
   ],
   imports: [
     CommonModule,

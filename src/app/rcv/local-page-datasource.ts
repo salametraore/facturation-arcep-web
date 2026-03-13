@@ -1,11 +1,11 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { catchError, finalize, map, startWith, switchMap } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { PageQuery, PageResult } from './rcv-query';
 
-export type PageLoader<T> = (q: PageQuery) => PageResult<T>;
+export type PageLoader<T> = (q: PageQuery) => Observable<PageResult<T>>;
 
 export class LocalPageDataSource<T> extends DataSource<T> {
   private rows$ = new BehaviorSubject<T[]>([]);
@@ -33,7 +33,7 @@ export class LocalPageDataSource<T> extends DataSource<T> {
       this.search$.pipe(startWith('')),
       this.filters$.pipe(startWith({}))
     ]).pipe(
-      map(() => {
+      switchMap(() => {
         this.loading$.next(true);
 
         const pageIndex = this.paginator?.pageIndex ?? 0;
@@ -50,12 +50,20 @@ export class LocalPageDataSource<T> extends DataSource<T> {
           filters: this.filters$.value
         };
 
-        const res = this.loadPage(q);
-        this.rows$.next(res.items);
-        this.total$.next(res.total);
-        this.loading$.next(false);
-
-        return res.items;
+        return this.loadPage(q).pipe(
+          map(res => {
+            this.rows$.next(res.items);
+            this.total$.next(res.total);
+            return res.items;
+          }),
+          catchError(err => {
+            console.error('[LocalPageDataSource] loadPage error', err);
+            this.rows$.next([]);
+            this.total$.next(0);
+            return of([]);
+          }),
+          finalize(() => this.loading$.next(false))
+        );
       })
     );
   }

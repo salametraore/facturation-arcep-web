@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config.service';
 import { Direction, DirectionRequest, toDirectionRequest } from '../models/direction';
+import {StatistiquesDashboardDirections} from "../models/statistiques-dashboard-directions.model";
+
+
 
 @Injectable({ providedIn: 'root' })
 export class DirectionsService {
@@ -53,4 +56,10 @@ export class DirectionsService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.urlDirection}/${id}/`);
   }
+
+  /** Retourne les statitsiqus par direction*/
+  getStatistiquesByDirection(id: number): Observable<StatistiquesDashboardDirections> {
+    return this.http.get<StatistiquesDashboardDirections>(`${this.cfg.baseUrl.replace(/\/$/, '')}/stats/direction/${id}/`);
+  }
+
 }

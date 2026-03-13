@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../authentication/auth.service';
 import { MENU_ITEMS, MenuItem } from '../../shared/menu/menu-items';
-import {DirectionService} from "../../shared/services/direction.service";
+
 import {Direction} from "../../shared/models/direction";
+import {ClasseDebit} from "../../shared/models/classe-debit.model";
+import {DirectionsService} from "../../shared/services/directions.services";
 
 
 type QuickLink = { label: string; route: string; icon?: string };
@@ -44,6 +46,7 @@ export class HomeComponent implements OnInit {
   tiles: ModuleTile[] = [];
 
   direction: Direction;
+  stats: any;
 
   workflows: Workflow[] = [
     {
@@ -156,7 +159,7 @@ export class HomeComponent implements OnInit {
   ];
 
   constructor(private authService: AuthService,
-              private directionService: DirectionService) {}
+              private directionService: DirectionsService) {}
 
   ngOnInit(): void {
     const u = this.authService.getConnectedUser();
@@ -168,6 +171,10 @@ export class HomeComponent implements OnInit {
     this.directionLabel = dir != null ? `Direction #${dir}` : '—';
 
     this.buildTiles(dir);
+
+    this.directionService.getStatistiquesByDirection(1).subscribe((items:any) => {
+      this.stats = items ;
+    });
 
     // DEBUG (à enlever après)
     console.log('[HOME] dir =', dir);
