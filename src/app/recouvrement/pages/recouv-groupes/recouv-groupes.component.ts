@@ -7,6 +7,7 @@ import { LocalPageDataSource } from '../../../rcv/local-page-datasource';
 import { RcvGroupesApi } from '../../../rcv/endpoints/rcv-groupes.api';
 
 import { RecouvGroupesEditDialogComponent } from '../recouv-groupes/recouv-groupes-edit-dialog/recouv-groupes-edit-dialog.component';
+import {AuthzService} from "../../../authentication/authz.service";
 
 type GroupeType = 'MANUEL' | 'DYNAMIQUE';
 
@@ -31,7 +32,8 @@ export class RecouvGroupesComponent implements AfterViewInit {
 
   constructor(
     private groupesApi: RcvGroupesApi,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authzService: AuthzService,
   ) {}
 
   ngAfterViewInit(): void {
@@ -46,6 +48,14 @@ export class RecouvGroupesComponent implements AfterViewInit {
 
     // applique les filtres init
     this.applyFilters();
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   applySearch() {

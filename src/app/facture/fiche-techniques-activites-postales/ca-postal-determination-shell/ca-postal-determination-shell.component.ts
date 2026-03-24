@@ -15,6 +15,7 @@ import { ActivitesPostalesChiffresAffairesService } from '../../../shared/servic
 import { ImportBilanDialogComponent } from '../import-bilan-dialog/import-bilan-dialog.component';
 import {ClientService} from "../../../shared/services/client.service";
 import {Client} from "../../../shared/models/client";
+import {AuthzService} from "../../../authentication/authz.service";
 
 
 @Component({
@@ -77,8 +78,14 @@ export class CaPostalDeterminationShellComponent implements OnInit {
     private caPostalService: ActivitesPostalesChiffresAffairesService,
     private dialog: MatDialog,
     private clientService: ClientService,
+    private authzService: AuthzService,
     private snackBar: MatSnackBar
   ) {}
+
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
 
   ngOnInit(): void {
     this.chargerClients();

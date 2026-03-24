@@ -1,44 +1,57 @@
-// src/app/shared/models/recouv-plan-etape.ts
-
 import { RecouvTemplate } from './recouv-template';
 
 export type TypeActionEnum = 'EMAIL' | 'SMS' | 'COURRIER' | 'APPEL';
 export type ModeExecutionEnum = 'AUTO' | 'SEMI_AUTO' | 'MANU';
 export type TypeDelaiEnum = 'AVANT_ECHEANCE' | 'APRES_ECHEANCE';
 
-export class RecouvPlanEtape {
-  readonly id!: number;                 // readOnly
+export interface RecouvPlanEtape {
+  id: number;
 
-  /** détail template (readOnly, enrichi côté backend) */
-  readonly template_detail?: RecouvTemplate;
+  /** enrichi côté backend, lecture seule */
+  template_detail?: RecouvTemplate;
 
-  created_at?: string;                  // ISO date-time
-  updated_at?: string;                  // ISO date-time
+  created_at?: string;
+  updated_at?: string;
 
-  ordre!: number;                       // int32
-  type_action!: TypeActionEnum;         // required
-  mode_execution!: ModeExecutionEnum;   // required
-  type_delai!: TypeDelaiEnum;           // required
-  nb_jours!: number;                    // int32
+  ordre: number;
+  type_action: TypeActionEnum;
+  mode_execution: ModeExecutionEnum;
+  type_delai: TypeDelaiEnum;
+  nb_jours: number;
 
   actif?: boolean;
 
   created_by?: number | null;
   updated_by?: number | null;
 
-  plan_action!: number;                 // FK required
-  template?: number | null;             // FK nullable (id template)
+  plan_action: number;
+  template?: number | null;
 }
 
 /**
- * Payload POST/PUT/PATCH (d'après RecouvPlanEtapeRequest).
- * On exclut: id + template_detail (enrichi/readOnly).
- * (Si ton backend considère created_at/updated_at readOnly, enlève-les aussi.)
+ * Payload d'écriture côté frontend.
+ * On n'envoie pas les champs purement read-only / techniques.
  */
-export type RecouvPlanEtapeRequest =
-  Omit<RecouvPlanEtape, 'id' | 'template_detail'>;
+export interface RecouvPlanEtapeRequest {
+  ordre: number;
+  type_action: TypeActionEnum;
+  mode_execution: ModeExecutionEnum;
+  type_delai: TypeDelaiEnum;
+  nb_jours: number;
+  actif?: boolean;
+  plan_action: number;
+  template?: number | null;
+}
 
 export function toRecouvPlanEtapeRequest(x: RecouvPlanEtape): RecouvPlanEtapeRequest {
-  const { id, template_detail, ...payload } = x as any;
-  return payload as RecouvPlanEtapeRequest;
+  return {
+    ordre: x.ordre,
+    type_action: x.type_action,
+    mode_execution: x.mode_execution,
+    type_delai: x.type_delai,
+    nb_jours: x.nb_jours,
+    actif: x.actif,
+    plan_action: x.plan_action,
+    template: x.template ?? null
+  };
 }

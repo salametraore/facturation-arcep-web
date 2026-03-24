@@ -17,7 +17,6 @@
         <mat-error *ngIf="form.get('nom')?.hasError('required')">Requis</mat-error>
       </mat-form-field>
 
-      <!-- NEW: type_groupe -->
       <mat-form-field appearance="outline">
         <mat-label>Type de groupe</mat-label>
         <mat-select formControlName="type_groupe">
@@ -35,73 +34,96 @@
 
       <mat-form-field appearance="outline" class="desc">
         <mat-label>Description</mat-label>
-        <textarea matInput rows="3" formControlName="description"></textarea>
+        <textarea matInput rows="2" formControlName="description"></textarea>
       </mat-form-field>
     </div>
   </form>
 
   <mat-divider class="divider"></mat-divider>
 
-  <!-- Onglets uniquement en mode edit (on a besoin de groupeId) -->
   <div *ngIf="isEdit && groupeId" class="members">
-
     <mat-tab-group (selectedIndexChange)="onTabChange()">
 
-      <!-- TAB 1: Membres manuels (uniquement si MANUEL) -->
+      <!-- TAB MANUEL -->
       <mat-tab label="Membres manuels" *ngIf="isManuel">
 
         <div class="members-toolbar">
           <mat-form-field appearance="outline">
             <mat-label>Recherche membre</mat-label>
-            <input matInput [(ngModel)]="membresSearch" (keyup.enter)="applyMembresSearch()">
+            <input
+              matInput
+              [(ngModel)]="membresSearch"
+              [ngModelOptions]="{standalone: true}"
+              (keyup.enter)="applyMembresSearch()"
+              placeholder="code, dénomination, compte, IFU..."
+            >
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Exclusion</mat-label>
-            <mat-select [(ngModel)]="excluFilter" (selectionChange)="applyMembresFilters()">
+            <mat-select
+              [(ngModel)]="excluFilter"
+              [ngModelOptions]="{standalone: true}"
+              (selectionChange)="applyMembresFilters()"
+            >
               <mat-option [value]="null">Tous</mat-option>
               <mat-option [value]="false">Actifs</mat-option>
               <mat-option [value]="true">Exclus</mat-option>
             </mat-select>
           </mat-form-field>
 
-          <button mat-stroked-button (click)="clearMembresFilters()">
+          <button mat-stroked-button type="button" (click)="clearMembresFilters()">
             <mat-icon>restart_alt</mat-icon>
             Reset
           </button>
         </div>
 
-        <!-- Ajout membre -->
+        <!-- Ajout membre depuis la base -->
         <div class="add-member">
           <mat-form-field appearance="outline" class="client-search">
             <mat-label>Rechercher un client</mat-label>
-            <input matInput [(ngModel)]="clientSearch" (input)="refreshClientOptions()" placeholder="code ou denomination">
+            <input
+              matInput
+              [(ngModel)]="clientSearch"
+              [ngModelOptions]="{standalone: true}"
+              (input)="refreshClientOptions()"
+              placeholder="code, dénomination, compte, IFU, email..."
+            >
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="client-select">
             <mat-label>Client</mat-label>
-            <mat-select [(ngModel)]="selectedClientId">
+            <mat-select
+              [(ngModel)]="selectedClientId"
+              [ngModelOptions]="{standalone: true}"
+            >
               <mat-option *ngFor="let c of clientOptions" [value]="c.id">
-                {{ c.denomination_sociale }} — {{ c.compte_comptable || c.ifu || ('ID ' + c.id) }}
+                {{ getClientName(c) }} — {{ getClientReference(c) }}
               </mat-option>
             </mat-select>
           </mat-form-field>
 
-          <button mat-flat-button color="primary" (click)="addMembre()"
-                  [disabled]="!selectedClientId || !isManuel">
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="addMembre()"
+            [disabled]="loading || !selectedClientId || !isManuel"
+          >
             <mat-icon>person_add</mat-icon>
             Ajouter
           </button>
         </div>
 
         <table mat-table [dataSource]="membresDataSource" matSort #membresSort="matSort" class="mat-elevation-z1">
+
           <ng-container matColumnDef="client">
             <th mat-header-cell *matHeaderCellDef>Client</th>
             <td mat-cell *matCellDef="let row">
               <div class="client-cell">
-                <div class="title">{{ row.client?.denomination_sociale }}</div>
+                <div class="title">{{ getClientName(row) }}</div>
                 <div class="sub">
-                  {{ row.client?.compte_comptable || row.client?.ifu || ('ID ' + row.client_id) }} • {{ row.client?.email || '-' }}
+                  {{ getClientReference(row) }} • {{ getClientEmail(row) }}
                 </div>
               </div>
             </td>
@@ -109,7 +131,7 @@
 
           <ng-container matColumnDef="type_client">
             <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let row">{{ row.client?.type }}</td>
+            <td mat-cell *matCellDef="let row">{{ getClientType(row) }}</td>
           </ng-container>
 
           <ng-container matColumnDef="exclu">
@@ -129,11 +151,12 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let row" class="actions">
-              <button mat-button (click)="toggleExclu(row)">
+              <button mat-button type="button" (click)="toggleExclu(row)">
                 <mat-icon>{{ row.exclu ? 'person_add' : 'person_off' }}</mat-icon>
                 {{ row.exclu ? 'Réintégrer' : 'Exclure' }}
               </button>
-              <button mat-button color="warn" (click)="removeMembre(row)">
+
+              <button mat-button color="warn" type="button" (click)="removeMembre(row)">
                 <mat-icon>remove_circle</mat-icon>
                 Retirer
               </button>
@@ -144,19 +167,29 @@
           <tr mat-row *matRowDef="let row; columns: membresDisplayed;"></tr>
         </table>
 
-        <mat-paginator #membresPaginator [pageSize]="10" [pageSizeOptions]="[5,10,25]"></mat-paginator>
+        <mat-paginator
+            #membresPaginator
+            [pageSize]="10"
+            [pageSizeOptions]="[5,10,25]">
+        </mat-paginator>
       </mat-tab>
 
-      <!-- TAB 2: Preview dynamique (uniquement si DYNAMIQUE) -->
+      <!-- TAB DYNAMIQUE -->
       <mat-tab label="Prévisualisation membres dynamiques" *ngIf="isDynamique">
 
         <div class="members-toolbar">
           <mat-form-field appearance="outline">
             <mat-label>Recherche client</mat-label>
-            <input matInput [(ngModel)]="dynSearch" (keyup.enter)="applyDynSearch()" placeholder="code, denomination...">
+            <input
+              matInput
+              [(ngModel)]="dynSearch"
+              [ngModelOptions]="{standalone: true}"
+              (keyup.enter)="applyDynSearch()"
+              placeholder="code, dénomination..."
+            >
           </mat-form-field>
 
-          <button mat-stroked-button (click)="dynSearch=''; applyDynSearch()">
+          <button mat-stroked-button type="button" (click)="dynSearch=''; applyDynSearch()">
             <mat-icon>restart_alt</mat-icon>
             Reset
           </button>
@@ -168,15 +201,17 @@
             <th mat-header-cell *matHeaderCellDef>Client</th>
             <td mat-cell *matCellDef="let row">
               <div class="client-cell">
-                <div class="title">{{ row.client?.denomination }}</div>
-                <div class="sub">{{ row.client?.code }} • {{ row.client?.email }}</div>
+                <div class="title">{{ getClientName(row) }}</div>
+                <div class="sub">
+                  {{ getClientReference(row) }} • {{ getClientEmail(row) }}
+                </div>
               </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="type_client">
             <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let row">{{ row.client?.type_client }}</td>
+            <td mat-cell *matCellDef="let row">{{ getClientType(row) }}</td>
           </ng-container>
 
           <ng-container matColumnDef="nb_factures">
@@ -192,8 +227,7 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let row" class="actions">
-              <!-- optionnel: action placeholder -->
-              <button mat-button (click)="openDynFactures(row)">
+              <button mat-button type="button" (click)="openDynFactures(row)">
                 <mat-icon>visibility</mat-icon>
                 Voir factures
               </button>
@@ -204,17 +238,20 @@
           <tr mat-row *matRowDef="let row; columns: dynDisplayed;"></tr>
         </table>
 
-        <mat-paginator #dynPaginator [pageSize]="10" [pageSizeOptions]="[5,10,25]"></mat-paginator>
+        <mat-paginator
+            #dynPaginator
+            [pageSize]="10"
+            [pageSizeOptions]="[5,10,25]">
+        </mat-paginator>
       </mat-tab>
 
     </mat-tab-group>
-
   </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="close()">Annuler</button>
-  <button mat-flat-button color="primary" (click)="save()">
+  <button mat-button type="button" (click)="close()">Annuler</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="loading">
     <mat-icon>save</mat-icon>
     Enregistrer
   </button>

@@ -1,8 +1,7 @@
 <div class="login-container">
-  <!-- [FIX] suppression du second '>' à la fin de la ligne -->
   <div class="background-container" [style.--bg-image]="'url(' + bgUrl + ')'">
     <div class="content-row">
-      <!-- Partie gauche avec le slogan -->
+      <!-- Partie gauche -->
       <div class="slogan-section">
         <div class="slogan-content">
           <h1 class="text-white">Un seul accès, toutes vos factures à portée de main.</h1>
@@ -12,7 +11,7 @@
         </div>
       </div>
 
-      <!-- Partie droite avec le formulaire -->
+      <!-- Partie droite -->
       <div class="form-section">
         <mat-card class="login-form-container mat-elevation-z8">
           <div class="custom-card-header">
@@ -20,11 +19,15 @@
               <img src="assets/images/logo.png" alt="Logo de l'application" class="logo">
             </div>
             <h2 class="mat-title text-center">Connectez-vous à votre compte</h2>
-            <p class="mat-subtitle text-center">Bienvenue, entrez vos informations de connexion</p>
+            <p class="mat-subtitle text-center">
+              Bienvenue, entrez vos informations de connexion
+            </p>
           </div>
 
           <mat-card-content>
-            <div *ngIf="errorMessage" class="alert alert-danger mat-body-1">{{ errorMessage }}</div>
+            <div *ngIf="errorMessage" class="alert alert-danger mat-body-1">
+              {{ errorMessage }}
+            </div>
 
             <div class="alert-box" *ngIf="authErrorMsg">
               {{ authErrorMsg }}
@@ -32,51 +35,101 @@
 
             <div class="spacer-12" *ngIf="authErrorMsg"></div>
 
-            <!-- Formulaire de login (inchangé, sauf commentaires) -->
+            <!-- Formulaire de login -->
             <form *ngIf="!show2faForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-              <mat-form-field class="full-width">
+              <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Adresse mail</mat-label>
-                <input matInput type="email" formControlName="email" placeholder="exemple@mail.com">
+                <input
+                  matInput
+                  type="email"
+                  formControlName="email"
+                  placeholder="exemple@mail.com"
+                  autocomplete="username"
+                />
+                <mat-error *ngIf="loginF['email'].touched && loginF['email'].errors">
+                  <span *ngIf="loginF['email'].errors['required']">L’adresse mail est requise.</span>
+                  <span *ngIf="loginF['email'].errors['email']">Le format de l’adresse mail est invalide.</span>
+                </mat-error>
               </mat-form-field>
 
-              <mat-form-field class="full-width">
+              <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Mot de passe</mat-label>
-                <input matInput type="password" formControlName="password" placeholder="Au moins 4 caractères">
+                <input
+                  matInput
+                  type="password"
+                  formControlName="password"
+                  placeholder="Au moins 4 caractères"
+                  autocomplete="current-password"
+                />
+                <mat-error *ngIf="loginF['password'].touched && loginF['password'].errors">
+                  <span *ngIf="loginF['password'].errors['required']">Le mot de passe est requis.</span>
+                  <span *ngIf="loginF['password'].errors['minlength']">
+                    Le mot de passe doit contenir au moins 4 caractères.
+                  </span>
+                </mat-error>
               </mat-form-field>
 
               <div class="remember-forgot">
-                <!--                <mat-checkbox formControlName="rememberMe">Restez connecté</mat-checkbox>-->
-                <!--                <a [routerLink]="['/auth/forgot-password']" class="link">Mot de passe oublié ?</a>-->
+                <!-- emplacement futur -->
               </div>
 
-              <button type="submit" mat-raised-button color="primary" class="full-width">
+              <button
+                type="submit"
+                mat-raised-button
+                color="primary"
+                class="full-width"
+                [disabled]="isLoading || loginForm.invalid"
+              >
                 <span *ngIf="isLoading">Connexion...</span>
                 <span *ngIf="!isLoading">Se connecter</span>
               </button>
             </form>
 
-            <!-- [BYPASS 2FA] Bloc 2FA mis en commentaire, conservé pour un retour ultérieur -->
-            <!--
+            <!-- Formulaire OTP -->
             <form *ngIf="show2faForm" [formGroup]="twoFaForm" (ngSubmit)="on2FaSubmit()">
               <h2 class="text-center mat-title">Vérification en deux étapes</h2>
-              <p class="text-center mat-body-1">Un code de vérification a été envoyé à votre adresse email.</p>
+              <p class="text-center mat-body-1">
+                Un code de vérification a été envoyé à votre adresse email.
+              </p>
 
-              <mat-form-field class="full-width">
+              <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Code de vérification</mat-label>
-                <input matInput type="text" formControlName="code" minlength="6" maxlength="6">
+                <input
+                  matInput
+                  type="text"
+                  formControlName="code"
+                  minlength="6"
+                  maxlength="6"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                />
                 <mat-error *ngIf="twoFaF['code'].touched && twoFaF['code'].errors">
-                  <div *ngIf="twoFaF['code'].errors['required']">Le code est requis.</div>
-                  <div *ngIf="twoFaF['code'].errors['pattern']">Le code doit contenir 6 chiffres.</div>
+                  <span *ngIf="twoFaF['code'].errors['required']">Le code est requis.</span>
+                  <span *ngIf="twoFaF['code'].errors['pattern']">Le code doit contenir 6 chiffres.</span>
                 </mat-error>
               </mat-form-field>
 
-              <button type="submit" mat-raised-button color="primary" class="full-width">
-                <span *ngIf="isLoading && show2faForm">Vérification...</span>
-                <span *ngIf="!isLoading || !show2faForm">Vérifier le code</span>
+              <button
+                type="submit"
+                mat-raised-button
+                color="primary"
+                class="full-width"
+                [disabled]="isLoading || twoFaForm.invalid"
+              >
+                <span *ngIf="isLoading">Vérification...</span>
+                <span *ngIf="!isLoading">Vérifier le code</span>
+              </button>
+
+              <button
+                type="button"
+                mat-button
+                class="full-width"
+                [disabled]="isLoading"
+                (click)="show2faForm = false; twoFaForm.reset()"
+              >
+                Retour
               </button>
             </form>
-            -->
-
           </mat-card-content>
         </mat-card>
       </div>

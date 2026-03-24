@@ -14,6 +14,7 @@ import {
   RecouvPromessesDetailsDialogComponent,
   RecouvPromesseDetailsDialogData
 } from './recouv-promesses-details-dialog.component';
+import {AuthzService} from "../../../authentication/authz.service";
 
 @Component({
   selector: 'recouv-promesses',
@@ -50,7 +51,8 @@ export class RecouvPromessesComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private api: RcvPromessesApi,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authzService: AuthzService,
   ) {}
 
   ngAfterViewInit(): void {
@@ -69,6 +71,14 @@ export class RecouvPromessesComponent implements AfterViewInit, OnDestroy {
         this.paginator.pageIndex = 0;
         this.load();
       });
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   ngOnDestroy(): void {
@@ -163,5 +173,14 @@ export class RecouvPromessesComponent implements AfterViewInit, OnDestroy {
     ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(changed => {
       if (changed) this.load();
     });
+  }
+
+
+  openEdit(row: any) {
+
+  }
+
+  delete(row: any) {
+
   }
 }

@@ -20,6 +20,7 @@ import {DevisService} from "../../shared/services/devis.service";
 import {HttpResponse} from "@angular/common/http";
 
 import { take, finalize } from 'rxjs/operators';
+import { AuthzService } from '../../authentication/authz.service';
 
 const NON_CANCELLABLE = new Set<string>(['PAYE', 'ANNULE']);
 
@@ -65,6 +66,7 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
+    private authzService: AuthzService,
   ) {
     this.t_Devis = new MatTableDataSource<Devis>([]);
   }
@@ -72,6 +74,14 @@ export class GestionDevisComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.t_Devis.paginator = this.paginator;
     this.t_Devis.sort = this.sort;
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   ngOnInit(): void {

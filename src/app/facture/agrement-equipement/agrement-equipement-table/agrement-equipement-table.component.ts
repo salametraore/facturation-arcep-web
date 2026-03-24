@@ -21,6 +21,7 @@ import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dia
 import {Role, UtilisateurRole} from "../../../shared/models/droits-utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
 import {Utilisateur} from "../../../shared/models/utilisateur";
+import {AuthzService} from "../../../authentication/authz.service";
 
 interface FTListFilter {
   clientText?: string;   // texte saisi dans "Nom du client"
@@ -59,8 +60,6 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
   client: Client;
 
   productAllowedIds = [ 73, 74];
-  utilisateurConnecte:Utilisateur;
-  roleUtilisateurConnecte:UtilisateurRole;
 
   private filterValues: FTListFilter = {};
 
@@ -74,10 +73,15 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
     private authService:AuthService,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
+    private authzService: AuthzService,
   ) {
     this.ficheTechniques = new MatTableDataSource<FicheTechniques>([]);
   }
 
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
   ngAfterViewInit(): void {
     this.ficheTechniques.paginator = this.paginator;
     this.ficheTechniques.sort = this.sort;
@@ -86,9 +90,6 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.reloadData();
 
-    this.utilisateurConnecte=this.authService.getConnectedUser();
-    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
-    console.log(this.utilisateurConnecte);
 
     // 👉 Filtre multi-critères
     this.ficheTechniques.filterPredicate = (row: FicheTechniques, raw: string) => {
@@ -302,27 +303,6 @@ export class AgrementEquipementTableComponent implements OnInit, AfterViewInit {
     });
   }
 
-  hasOperationCode( opCode: string): boolean {
-    const  user=this.roleUtilisateurConnecte;
-
-    if (!user || !opCode) return false;
-
-    const needle = opCode.trim().toLowerCase();
-
-    // Normaliser: accepter user.role = Role | Role[]
-    const roles: Role[] = Array.isArray((user as any).role)
-      ? (user as any).role
-      : (user as any).role
-        ? [ (user as any).role ]
-        : [];
-
-    for (const role of roles) {
-      for (const op of (role?.operations ?? [])) {
-        if ((op.code ?? '').trim().toLowerCase() === needle) return true;
-      }
-    }
-    return false;
-  }
 
   getProduitsLibelles(fiche: FicheTechniques | null | undefined): string {
     if (!fiche || !fiche.produits_detail || fiche.produits_detail.length === 0) {

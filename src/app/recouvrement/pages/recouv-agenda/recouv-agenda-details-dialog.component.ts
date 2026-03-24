@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { RcvAgendaApi } from '../../../rcv/endpoints/rcv-agenda.api';
+import {AuthzService} from "../../../authentication/authz.service";
 
 type DialogData = { agendaId: number };
 
@@ -24,7 +25,8 @@ export class RecouvAgendaDetailsDialogComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private ref: MatDialogRef<RecouvAgendaDetailsDialogComponent>,
-    private api: RcvAgendaApi
+    private api: RcvAgendaApi,
+    private authzService: AuthzService,
   ) {}
 
   ngOnInit(): void {
@@ -59,6 +61,14 @@ export class RecouvAgendaDetailsDialogComponent implements OnInit {
 
     this.totalDelta =
       this.totalSeed != null ? (Number(this.totalSeed) - this.totalRecalc) : 0;
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   close() {

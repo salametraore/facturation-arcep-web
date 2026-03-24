@@ -1,27 +1,24 @@
-// menu-items.ts
+// src/app/core/menu/menu-items.ts
+
+import { OperationCode, OPS } from '../../authentication/operations';
+import { RBAC_GROUPS } from '../../authentication/rbac-groups';
+
 export interface MenuItem {
   id: number;
   direction: number;
   titre: string;
   description?: string;
-
   icone?: string | null;
-
-  /** Route interne (Angular routerLink) */
   url?: string | null;
-
-  /** Alias legacy */
   lien?: string | null;
-
   externalUrl?: string | null;
-
   actif: 'OUI' | 'NON' | string;
   module: number;
   feuille: 0 | 1;
-
   sous_menus?: MenuItem[] | null;
+  requiredAny?: OperationCode[];
+  requiredAll?: OperationCode[];
 }
-
 
 export const MENU_ITEMS: MenuItem[] = [
   {
@@ -32,9 +29,13 @@ export const MENU_ITEMS: MenuItem[] = [
     actif: 'OUI',
     module: 1,
     feuille: 0,
+    requiredAny: [
+      ...RBAC_GROUPS.PARAM_REFERENTIELS,
+      ...RBAC_GROUPS.PARAM_FREQUENCES,
+      ...RBAC_GROUPS.PARAM_TARIFS,
+      ...RBAC_GROUPS.SECURITE_MENU
+    ],
     sous_menus: [
-
-      // ===================== Référentiels généraux =====================
       {
         id: 1200,
         direction: 2,
@@ -44,6 +45,7 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 0,
         url: null,
+        requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS],
         sous_menus: [
           {
             id: 1020,
@@ -54,10 +56,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/clients'
+            url: 'parametre/clients',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           },
           {
-            id: 1020,
+            id: 1021,
             direction: 2,
             titre: 'Les paramètres applicatifs',
             description: 'Les paramètres applicatifs',
@@ -65,10 +68,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/parametres-applicatifs'
+            url: 'parametre/parametres-applicatifs',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           },
           {
-            id: 1020,
+            id: 1022,
             direction: 2,
             titre: 'Les types de directions',
             description: 'Les types de directions',
@@ -76,10 +80,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/type-directions'
+            url: 'parametre/type-directions',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           },
           {
-            id: 1020,
+            id: 1023,
             direction: 2,
             titre: 'Les directions',
             description: 'Les directions',
@@ -87,10 +92,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/directions'
+            url: 'parametre/directions',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           },
           {
-            id: 1020,
+            id: 1024,
             direction: 2,
             titre: 'Les catégories de produits',
             description: 'Les catégories de produits',
@@ -98,7 +104,8 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/categorie-produits'
+            url: 'parametre/categorie-produits',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           },
           {
             id: 1025,
@@ -109,10 +116,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/produits'
+            url: 'parametre/produits',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           },
           {
-            id: 1025,
+            id: 1026,
             direction: 2,
             titre: 'Les zones de couverture',
             description: 'Les zones de couverture',
@@ -120,10 +128,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/zone-couverture'
+            url: 'parametre/zone-couverture',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           },
           {
-            id: 1025,
+            id: 1027,
             direction: 2,
             titre: 'Les statuts des fiches techniques',
             description: 'Les statuts des fiches techniques',
@@ -131,13 +140,12 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/statut-fiche-technique'
+            url: 'parametre/statut-fiche-technique',
+            requiredAny: [...RBAC_GROUPS.PARAM_REFERENTIELS]
           }
-
         ]
       },
 
-      // ===================== FREQUENCES =====================
       {
         id: 1100,
         direction: 2,
@@ -147,6 +155,7 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 0,
         url: null,
+        requiredAny: [...RBAC_GROUPS.PARAM_FREQUENCES],
         sous_menus: [
           {
             id: 1005,
@@ -157,7 +166,8 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/type-stations'
+            url: 'parametre/type-stations',
+            requiredAny: [...RBAC_GROUPS.PARAM_FREQUENCES]
           },
           {
             id: 1010,
@@ -168,10 +178,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/type-canaux'
+            url: 'parametre/type-canaux',
+            requiredAny: [...RBAC_GROUPS.PARAM_FREQUENCES]
           },
           {
-            id: 1010,
+            id: 1011,
             direction: 2,
             titre: 'Les types de bande de fréquence',
             description: 'Les types de bande de fréquence',
@@ -179,10 +190,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/type-bandes-frequence'
+            url: 'parametre/type-bandes-frequence',
+            requiredAny: [...RBAC_GROUPS.PARAM_FREQUENCES]
           },
           {
-            id: 1010,
+            id: 1012,
             direction: 2,
             titre: 'Les classes de débits',
             description: 'Les classes de débits',
@@ -190,10 +202,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/classe-debit'
+            url: 'parametre/classe-debit',
+            requiredAny: [...RBAC_GROUPS.PARAM_FREQUENCES]
           },
           {
-            id: 1010,
+            id: 1013,
             direction: 2,
             titre: 'Les classes de largeur de bande',
             description: 'Les classes de largeur de bande',
@@ -201,10 +214,11 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/classe-largeur-bande'
+            url: 'parametre/classe-largeur-bande',
+            requiredAny: [...RBAC_GROUPS.PARAM_FREQUENCES]
           },
           {
-            id: 1010,
+            id: 1014,
             direction: 2,
             titre: 'Les classes de puissance',
             description: 'Les classes de puissance',
@@ -212,13 +226,12 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/classe-puissance'
+            url: 'parametre/classe-puissance',
+            requiredAny: [...RBAC_GROUPS.PARAM_FREQUENCES]
           }
-
         ]
       },
 
-      // ===================== TARIFS =====================
       {
         id: 1300,
         direction: 2,
@@ -228,6 +241,7 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 0,
         url: null,
+        requiredAny: [...RBAC_GROUPS.PARAM_TARIFS],
         sous_menus: [
           {
             id: 1030,
@@ -238,7 +252,8 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/tarif-frais-dossiers'
+            url: 'parametre/tarif-frais-dossiers',
+            requiredAny: [...RBAC_GROUPS.PARAM_TARIFS]
           },
           {
             id: 1035,
@@ -249,36 +264,24 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/tarif-redevances-gestion'
+            url: 'parametre/tarif-redevances-gestion',
+            requiredAny: [...RBAC_GROUPS.PARAM_TARIFS]
           },
-          /*            {
-                        id: 1040,
-                        direction: 5555,
-                        titre: 'Les garanties',
-                        description: 'Les garanties',
-                        actif: 'OUI',
-                        module: 0,
-                        feuille: 1,
-                        sous_menus: null,
-                        url: 'parametre/garanties'
-                      },*/
           {
             id: 1045,
             direction: 2,
             titre: 'Les tarifs liés aux fréquences',
-            description: 'Les tarifss liés aux fréquences',
+            description: 'Les tarifs liés aux fréquences',
             actif: 'OUI',
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/regles-tarif-frequences'
+            url: 'parametre/regles-tarif-frequences',
+            requiredAny: [...RBAC_GROUPS.PARAM_TARIFS]
           }
         ]
       },
 
-
-
-      // ===================== SECURITE / UTILISATEURS =====================
       {
         id: 1500,
         direction: 2,
@@ -288,6 +291,7 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 0,
         url: null,
+        requiredAny: [...RBAC_GROUPS.SECURITE_MENU],
         sous_menus: [
           {
             id: 1050,
@@ -298,18 +302,20 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/roles-page'
+            url: 'parametre/roles-page',
+            requiredAny: [OPS.ADMIN_GERER_ROLES]
           },
           {
-            id: 1050,
+            id: 1051,
             direction: 2,
-            titre: 'Les utilisateurs internes' ,
+            titre: 'Les utilisateurs internes',
             description: 'Les utilisateurs internes',
             actif: 'OUI',
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/utilisateurs'
+            url: 'parametre/utilisateurs',
+            requiredAny: [OPS.ADMIN_GERER_UTILISATEURS]
           },
           {
             id: 1060,
@@ -320,28 +326,24 @@ export const MENU_ITEMS: MenuItem[] = [
             module: 0,
             feuille: 1,
             sous_menus: null,
-            url: 'parametre/utilisateurs-externes'
+            url: 'parametre/utilisateurs-externes',
+            requiredAny: [OPS.ADMIN_GERER_UTILISATEURS]
           }
         ]
       }
-
     ]
   },
+
   {
-    id: 20, direction: 0, titre: 'Fiches Techniques', description: 'Fiches Techniques',
-    actif: 'OUI', module: 1, feuille: 0,
+    id: 20,
+    direction: 0,
+    titre: 'Fiches Techniques',
+    description: 'Fiches Techniques',
+    actif: 'OUI',
+    module: 1,
+    feuille: 0,
+    requiredAny: [...RBAC_GROUPS.FICHE],
     sous_menus: [
-      /*        {
-                id: 2005,
-                direction: 100,
-                titre: 'Tableau de bord',
-                description: 'Tableau de bord',
-                actif: 'OUI',
-                module: 0,
-                feuille: 1,
-                sous_menus: null,
-                url: 'dashboard/dashboard-fiche-technique'
-              },*/
       {
         id: 2010,
         direction: 2,
@@ -351,7 +353,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/domaines'
+        url: 'facture/domaines',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2015,
@@ -362,7 +365,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/service-confiance'
+        url: 'facture/service-confiance',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2020,
@@ -373,7 +377,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/prestations-divers'
+        url: 'facture/prestations-divers',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2025,
@@ -384,7 +389,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/service-a-valeur-ajoute'
+        url: 'facture/service-a-valeur-ajoute',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2030,
@@ -395,18 +401,20 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/autorisation-generale'
+        url: 'facture/autorisation-generale',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2040,
         direction: 3,
         titre: 'Agrement installateur',
-        description: 'Agrement d\'installateur',
+        description: "Agrement d'installateur",
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/agrement-installeur'
+        url: 'facture/agrement-installeur',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2042,
@@ -417,7 +425,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/autorisations-postales'
+        url: 'facture/autorisations-postales',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2045,
@@ -428,7 +437,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/numerotation'
+        url: 'facture/numerotation',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2050,
@@ -439,7 +449,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/agrement-equipement'
+        url: 'facture/agrement-equipement',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2060,
@@ -450,10 +461,11 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/frequences'
+        url: 'facture/frequences',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
-        id: 2060,
+        id: 2061,
         direction: 3,
         titre: 'Activites postales',
         description: 'Activites postales',
@@ -461,7 +473,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/fiche-techniques-activites-postales'
+        url: 'facture/fiche-techniques-activites-postales',
+        requiredAny: [...RBAC_GROUPS.FICHE]
       },
       {
         id: 2100,
@@ -472,25 +485,25 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/client-direction-technique'
-      },
+        url: 'facture/client-direction-technique',
+        requiredAny: [...RBAC_GROUPS.CLIENTS_FICHES]
+      }
     ]
   },
+
   {
-    id: 30, direction: 0, titre: 'Facturation/Devis', description: 'Facturation/Devis',
-    actif: 'OUI', module: 1, feuille: 0,
+    id: 30,
+    direction: 0,
+    titre: 'Facturation/Devis',
+    description: 'Facturation/Devis',
+    actif: 'OUI',
+    module: 1,
+    feuille: 0,
+    requiredAny: [
+      ...RBAC_GROUPS.FICHES_RECUES_FACTURATION,
+      ...RBAC_GROUPS.ENCAISSEMENT
+    ],
     sous_menus: [
-      /*        {
-                id: 3005,
-                direction: 100,
-                titre: 'Tableau de bord',
-                description: 'Tableau de bord',
-                actif: 'OUI',
-                module: 0,
-                feuille: 1,
-                sous_menus: null,
-                url: 'dashboard/dashboard-dfc'
-              },*/
       {
         id: 3010,
         direction: 1,
@@ -500,7 +513,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/elements-recu-dsi'
+        url: 'facture/elements-recu-dsi',
+        requiredAny: [...RBAC_GROUPS.FICHES_RECUES_FACTURATION]
       },
       {
         id: 3015,
@@ -511,7 +525,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/gestion-devis'
+        url: 'facture/gestion-devis',
+        requiredAny: [...RBAC_GROUPS.DEVIS_FACTURE]
       },
       {
         id: 3020,
@@ -522,7 +537,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/devis-facure'
+        url: 'facture/devis-facure',
+        requiredAny: [...RBAC_GROUPS.DEVIS_FACTURE]
       },
       {
         id: 3025,
@@ -533,7 +549,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/encaissement'
+        url: 'facture/encaissement',
+        requiredAny: [...RBAC_GROUPS.ENCAISSEMENT]
       },
       {
         id: 3035,
@@ -544,7 +561,8 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/generation-redevances-annuelles'
+        url: 'facture/generation-redevances-annuelles',
+        requiredAny: [OPS.GENERER_DEVIS_FACTURE]
       },
       {
         id: 3100,
@@ -555,92 +573,106 @@ export const MENU_ITEMS: MenuItem[] = [
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'facture/client-dfc'
-      },
+        url: 'facture/client-dfc',
+        requiredAny: [...RBAC_GROUPS.CLIENTS_FACTURATION]
+      }
     ]
   },
+
   {
-    id: 40, direction: 0, titre: 'Recouvrement', description: 'Recouvrement',
-    actif: 'OUI', module: 1, feuille: 0,
+    id: 40,
+    direction: 1,
+    titre: 'Recouvrement',
+    description: 'Recouvrement',
+    actif: 'OUI',
+    module: 1,
+    feuille: 0,
+    requiredAny: [...RBAC_GROUPS.RECOUVREMENT],
     sous_menus: [
       {
         id: 4005,
-        direction: 100,
+        direction: 1,
         titre: 'Groupes recouvrement',
         description: 'Groupes recouvrement',
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'recouvrement/groupes'
+        url: 'recouvrement/groupes',
+        requiredAny: [OPS.RECOUVREMENT_GERER_GROUPES]
       },
       {
         id: 4010,
-        direction: 100,
+        direction: 1,
         titre: 'Les modèles de relance',
         description: 'Les modèles de relance',
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'recouvrement/templates'
+        url: 'recouvrement/templates',
+        requiredAny: [OPS.RECOUVREMENT_GERER_MODELES_LETTRES]
       },
       {
         id: 4015,
-        direction: 100,
+        direction: 1,
         titre: 'Plans de recouvrement',
         description: 'Plans de recouvrement',
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'recouvrement/plans'
+        url: 'recouvrement/plans',
+        requiredAny: [OPS.RECOUVREMENT_GERER_PLANS]
       },
       {
         id: 4020,
-        direction: 100,
+        direction: 1,
         titre: 'Declencheurs de recouvrement',
-        description: 'Declencheurs  de recouvrement',
+        description: 'Declencheurs de recouvrement',
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'recouvrement/declencheurs'
+        url: 'recouvrement/declencheurs',
+        requiredAny: [OPS.RECOUVREMENT_GERER_DECLENCHEURS]
       },
       {
         id: 4025,
-        direction: 100,
+        direction: 1,
         titre: 'Agenda de recouvrement',
         description: 'Agenda de recouvrement',
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'recouvrement/agenda'
+        url: 'recouvrement/agenda',
+        requiredAny: [OPS.RECOUVREMENT_GERER_AGENDA]
       },
       {
         id: 4030,
-        direction: 100,
+        direction: 1,
         titre: 'Les promesses de paiement',
         description: 'Les promesses de paiement',
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'recouvrement/promesses'
+        url: 'recouvrement/promesses',
+        requiredAny: [OPS.RECOUVREMENT_GERER_PROMESSES]
       },
       {
         id: 4075,
-        direction: 0,
+        direction: 1,
         titre: 'Clients',
         description: 'Clients',
         actif: 'OUI',
         module: 0,
         feuille: 1,
         sous_menus: null,
-        url: 'recouvrement/clients'
-      },
+        url: 'recouvrement/clients',
+        requiredAny: [...RBAC_GROUPS.CLIENTS_RECOUVREMENT]
+      }
     ]
   }
 ];
-

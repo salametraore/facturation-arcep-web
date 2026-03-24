@@ -39,8 +39,8 @@ export interface RetraitFrequencesDialogData {
 function selectionPartielleValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const mode = control.get('mode_retrait')?.value as ModeRetraitFrequence;
-    const stationIds: number[] = control.get('station_ids')?.value ?? [];
-    const canalIds: number[] = control.get('canal_ids')?.value ?? [];
+    const stationIds: number[] = control.get('stations')?.value ?? [];
+    const canalIds: number[] = control.get('canaux')?.value ?? [];
 
     if (mode !== 'PARTIEL') {
       return null;
@@ -101,8 +101,8 @@ export class RetraitFrequencesDialogComponent implements OnInit, OnDestroy {
         date_retrait: ['', Validators.required],
         motif_retrait: ['', [Validators.required, Validators.maxLength(500)]],
 
-        station_ids: [[]],
-        canal_ids: [[]]
+        stations: [[]],
+        canaux: [[]]
       },
       { validators: selectionPartielleValidator() }
     );
@@ -112,11 +112,11 @@ export class RetraitFrequencesDialogComponent implements OnInit, OnDestroy {
     return this.form.get('mode_retrait')?.value as ModeRetraitFrequence;
   }
 
-  get stationsActives(): FicheTechniqueStation[] {
+  get stationsActives(): FicheTechniqueStationDetail[] {
     return (this.detail?.stations ?? []).filter(s => s.actif !== false);
   }
 
-  get canauxActifs(): FicheTechniqueCanal[] {
+  get canauxActifs(): FicheTechniqueCanalDetail[] {
     return (this.detail?.canaux ?? []).filter(c => c.actif !== false);
   }
 
@@ -135,6 +135,8 @@ export class RetraitFrequencesDialogComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (detail) => {
           this.detail = detail;
+          console.log("detail ");
+          console.log(detail);
 
           this.form.patchValue({
             client: detail.client_nom ?? '',
@@ -254,8 +256,8 @@ export class RetraitFrequencesDialogComponent implements OnInit, OnDestroy {
 
     const payload: DesactiverElementsFicheFrequenceRequest = {
       fiche_technique_id: this.data.ficheTechniqueId,
-      station_ids: raw.station_ids ?? [],
-      canal_ids: raw.canal_ids ?? [],
+      stations: raw.stations ?? [],
+      canaux: raw.canaux ?? [],
       date_retrait: date_converte(raw.date_retrait),
       motif_retrait: raw.motif_retrait
     };

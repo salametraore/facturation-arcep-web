@@ -1,5 +1,3 @@
-//src/app/rcv/endpoints/rcv-groupes.api.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
@@ -19,15 +17,14 @@ export class RcvGroupesApi {
   private refreshMembres$ = new BehaviorSubject<void>(undefined);
 
   private groupes$ = this.refreshGroupes$.pipe(
-    switchMap(() => this.grpSrv.getItems()), // tableaux
+    switchMap(() => this.grpSrv.getItems()),
     shareReplay(1)
   );
 
   private membres$ = this.refreshMembres$.pipe(
-    switchMap(() => this.membreSrv.getItems()), // tableaux
+    switchMap(() => this.membreSrv.getItems()),
     shareReplay(1)
   );
-
 
   private clients$!: Observable<any[]>;
 
@@ -87,10 +84,13 @@ export class RcvGroupesApi {
   listMembres(groupeId: number, q: PageQuery): Observable<PageResult<any>> {
     return combineLatest([this.membres$, this.clients$]).pipe(
       map(([membres, clients]) => {
-        const onlyGroup = (membres || []).filter(m => (m as any).groupe === groupeId);
+        const onlyGroup = (membres || []).filter(m => Number((m as any).groupe) === Number(groupeId));
 
-        const clientById = new Map<number, any>((clients || []).map(c => [c.id, c]));
-        const enriched = onlyGroup.map(m => ({ ...m, client: clientById.get((m as any).client_id) }));
+        const clientById = new Map<number, any>((clients || []).map(c => [Number(c.id), c]));
+        const enriched = onlyGroup.map(m => ({
+          ...m,
+          client: clientById.get(Number((m as any).client_id))
+        }));
 
         return applyPageQuery(
           enriched,
@@ -116,11 +116,16 @@ export class RcvGroupesApi {
 
   addMembre(groupeId: number, clientId: number): Observable<any> {
     return this.membreSrv.create({
-      groupe: groupeId,
-      client_id: clientId,
+      groupe: Number(groupeId),
+      client_id: Number(clientId),
       exclu: false,
       motif_override: null
-    } as any).pipe(tap(() => this.refreshMembres$.next()));
+    } as any).pipe(
+      tap((res) => {
+        console.log('addMembre response =', res);
+        this.refreshMembres$.next();
+      })
+    );
   }
 
   toggleExclu(membreId: number, exclu: boolean, motif?: string): Observable<any> {
@@ -143,8 +148,8 @@ export class RcvGroupesApi {
       this.clients$
     ]).pipe(
       map(([rows, clients]) => {
-        const clientById = new Map<number, any>((clients || []).map(c => [c.id, c]));
-        const enriched = (rows || []).map(r => ({ ...r, client: clientById.get(r.client_id) }));
+        const clientById = new Map<number, any>((clients || []).map(c => [Number(c.id), c]));
+        const enriched = (rows || []).map(r => ({ ...r, client: clientById.get(Number(r.client_id)) }));
 
         return applyPageQuery(
           enriched,

@@ -151,34 +151,54 @@
               </button>
               <mat-menu #menu="matMenu">
 
-                <button mat-menu-item (click)="crud(element, operations.details)">
-                  <mat-icon color="primary">info</mat-icon>
-                  Détail
+                <button
+                  mat-menu-item
+                  *ngIf="hasAnyOperationCode(['GENERER_DEVIS_FACTURE','MODIFIER_DEVIS_FACTURE','EDITER_DEVIS_FACTURE'])"
+                  (click)="crud(element, operations.details)">
+                  <mat-icon>visibility</mat-icon>
+                  Détails
                 </button>
 
-                <button mat-menu-item *ngIf="element.etat === 'EMIS'" (click)="crud(element, operations.update)">
+                <button
+                  mat-menu-item
+                  *ngIf="element.etat === 'EMIS' && hasOperationCode('MODIFIER_DEVIS_FACTURE')"
+                  (click)="crud(element, operations.update)">
                   <mat-icon color="primary">edit</mat-icon>
                   Modifier
                 </button>
 
-                <button mat-menu-item class="btn_delete"   *ngIf="element.etat === 'EMIS'"   (click)="onAnnulerDevis(element)">
-                  <mat-icon color="warn">delete</mat-icon>
-                  Annuler Devis
-                </button>
-                <!--&& element.encaissable-->
-                <button mat-menu-item class="btn_delete"   *ngIf="element.etat === 'EMIS'  "   (click)="onGenererFacture(element)">
-                  <mat-icon color="warn">save</mat-icon>
-                  Generer Facture
-                </button>
-
-                <button mat-menu-item (click)="onPrintDevisPDF(element)">
-                  <mat-icon color="primary">print</mat-icon>
-                  Éditer devis PDF
+                <button
+                  mat-menu-item
+                  class="btn_delete"
+                  *ngIf="element.etat === 'EMIS' && hasOperationCode('ANNULER_DEVIS_FACTURE')"
+                  (click)="onAnnulerDevis(element)">
+                  <mat-icon color="warn">cancel</mat-icon>
+                  Annuler
                 </button>
 
-                <button mat-menu-item (click)="onPrintDevisExcel(element)">
+                <button
+                  mat-menu-item
+                  class="btn_delete"
+                  *ngIf="element.etat === 'EMIS' && hasOperationCode('GENERER_DEVIS_FACTURE')"
+                  (click)="onGenererFacture(element)">
+                  <mat-icon color="primary">receipt_long</mat-icon>
+                  Générer facture
+                </button>
+
+                <button
+                  mat-menu-item
+                  *ngIf="hasOperationCode('EDITER_DEVIS_FACTURE')"
+                  (click)="onPrintDevisPDF(element)">
                   <mat-icon color="primary">print</mat-icon>
-                  Éditer devis Excel
+                  Imprimer PDF
+                </button>
+
+                <button
+                  mat-menu-item
+                  *ngIf="hasOperationCode('EDITER_DEVIS_FACTURE')"
+                  (click)="onPrintDevisExcel(element)">
+                  <mat-icon color="primary">table_view</mat-icon>
+                  Export Excel
                 </button>
 
               </mat-menu>

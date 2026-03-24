@@ -15,7 +15,6 @@ import {RolesPageComponent} from "./roles/roles-page/roles-page.component";
 import {ClientsComponent} from "./clients/clients.component";
 import {ClientsCrudComponent} from "./clients/clients-crud/clients-crud.component";
 import {ParametresApplicatifsComponent} from "./parametres-applicatifs/parametres-applicatifs.component";
-import {TypeDirection} from "../shared/models/typeDirection";
 import {TypeDirectionComponent} from "./type-direction/type-direction.component";
 import {DirectionComponent} from "./direction/direction.component";
 import {TypeStationsComponent} from "./type-stations/type-stations.component";
@@ -26,48 +25,48 @@ import {ClassePuissanceComponent} from "./classe-puissance/classe-puissance.comp
 import {ClasseLargeurBandeComponent} from "./classe-largeur-bande/classe-largeur-bande.component";
 import {UtilisateursComponent} from "./utilisateurs/utilisateurs.component";
 import {UtilisateursExternesComponent} from "./utilisateurs-externes/utilisateurs-externes.component";
-
+import { withAccess } from '../authentication/route-access.helper';
 
 const routes: Routes = [
   {
     path: '', component: DefaultComponent,
     children: [
+      withAccess('parametre/categorie-produits', { path: 'categorie-produits', component: CategorieProduitComponent }),
+      { path: 'categorie-stations', component: CategorieStationComponent },
+      { path: 'garanties', component: GarantieComponent },
+      withAccess('parametre/produits', { path: 'produits', component: ProduitComponent }),
 
-      {path: 'categorie-produits', component: CategorieProduitComponent},
-      {path: 'categorie-stations', component: CategorieStationComponent},
-      {path: 'garanties', component: GarantieComponent},
-      {path: 'produits', component: ProduitComponent},
+      withAccess('parametre/zone-couverture', { path: 'zone-couverture', component: ZoneCouvertureComponent }),
+      withAccess('parametre/statut-fiche-technique', { path: 'statut-fiche-technique', component: StatutFicheTechniqueComponent }),
 
-      {path: 'zone-couverture', component: ZoneCouvertureComponent},
-      {path: 'statut-fiche-technique', component: StatutFicheTechniqueComponent},
+      withAccess('parametre/roles-page', { path: 'roles-page', component: RolesPageComponent }),
+      withAccess('parametre/utilisateurs', { path: 'utilisateurs', component: UtilisateursComponent }),
+      withAccess('parametre/utilisateurs-externes', { path: 'utilisateurs-externes', component: UtilisateursExternesComponent }),
 
-      {path: 'roles-page', component: RolesPageComponent},
-      {path: 'utilisateurs', component: UtilisateursComponent},
-      {path: 'utilisateurs-externes', component: UtilisateursExternesComponent},
+      withAccess('parametre/clients', { path: 'clients', component: ClientsComponent }),
+      withAccess('parametre/clients/new', { path: 'clients/new', component: ClientsCrudComponent }),
+      withAccess('parametre/clients/:id', { path: 'clients/:id', component: ClientsCrudComponent }),
 
-      { path: 'clients', component: ClientsComponent },
-      { path: 'clients/new', component: ClientsCrudComponent },
-      { path: 'clients/:id', component: ClientsCrudComponent },
-      {path: 'parametres-applicatifs', component: ParametresApplicatifsComponent},
-      {path: 'type-directions', component:TypeDirectionComponent },
-      {path: 'directions', component: DirectionComponent},
+      withAccess('parametre/parametres-applicatifs', { path: 'parametres-applicatifs', component: ParametresApplicatifsComponent }),
+      withAccess('parametre/type-directions', { path: 'type-directions', component: TypeDirectionComponent }),
+      withAccess('parametre/directions', { path: 'directions', component: DirectionComponent }),
 
-      {path: 'type-stations', component:TypeStationsComponent },
-      {path: 'type-canaux', component:TypeCanauxComponent },
-      {path: 'type-bandes-frequence', component:TypeBandesFrequenceComponent },
-      {path: 'classe-debit', component: ClasseDebitComponent},
-      {path: 'classe-puissance', component: ClassePuissanceComponent},
-      {path: 'classe-largeur-bande', component: ClasseLargeurBandeComponent},
+      withAccess('parametre/type-stations', { path: 'type-stations', component: TypeStationsComponent }),
+      withAccess('parametre/type-canaux', { path: 'type-canaux', component: TypeCanauxComponent }),
+      withAccess('parametre/type-bandes-frequence', { path: 'type-bandes-frequence', component: TypeBandesFrequenceComponent }),
+      withAccess('parametre/classe-debit', { path: 'classe-debit', component: ClasseDebitComponent }),
+      withAccess('parametre/classe-puissance', { path: 'classe-puissance', component: ClassePuissanceComponent }),
+      withAccess('parametre/classe-largeur-bande', { path: 'classe-largeur-bande', component: ClasseLargeurBandeComponent }),
 
-      {path: 'tarif-frais-dossiers', component: TarifFraisDossierComponent},
-      {path: 'tarif-redevances-gestion', component: TarifRedevanceGestionComponent},
-      {path: 'regles-tarif-frequences', component: ReglesTarifFrequenceComponent},
+      withAccess('parametre/tarif-frais-dossiers', { path: 'tarif-frais-dossiers', component: TarifFraisDossierComponent }),
+      withAccess('parametre/tarif-redevances-gestion', { path: 'tarif-redevances-gestion', component: TarifRedevanceGestionComponent }),
+      withAccess('parametre/regles-tarif-frequences', { path: 'regles-tarif-frequences', component: ReglesTarifFrequenceComponent }),
     ]
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes),],
+  imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
 export class ParametreRoutingModule {

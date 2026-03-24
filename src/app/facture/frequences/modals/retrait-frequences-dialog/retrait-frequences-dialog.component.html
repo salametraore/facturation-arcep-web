@@ -1,7 +1,7 @@
 <mat-card class="dialog-crud-card">
 
   <div class="page-title">
-    <h2>Fréquences : Retrait / désactivation des stations et canaux </h2>
+    <h2>Fréquences : Retrait / désactivation des stations et canaux</h2>
   </div>
 
   <div *ngIf="errorMessage?.length > 0" class="alert-box">
@@ -22,7 +22,6 @@
         </ng-container>
       </h3>
     </div>
-
 
     <div class="list-body scrollable-body">
       <form [formGroup]="form" (ngSubmit)="crud()" class="form-grid">
@@ -61,38 +60,34 @@
           </mat-form-field>
         </div>
 
-<!--        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+        <!--
+        <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
           <mat-label>Objet</mat-label>
           <input matInput formControlName="objet" readonly>
-        </mat-form-field>-->
+        </mat-form-field>
+        -->
 
         <ng-container *ngIf="modeRetrait === 'PARTIEL'">
 
           <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
             <mat-label>Stations à désactiver</mat-label>
-            <mat-select formControlName="station_ids" multiple>
+            <mat-select formControlName="stations" multiple>
               <mat-option *ngFor="let station of stationsActives; let i = index" [value]="station.id">
                 {{ stationLabel(station, i) }}
               </mat-option>
             </mat-select>
           </mat-form-field>
 
-
           <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
             <mat-label>Canaux à désactiver</mat-label>
-            <mat-select formControlName="canal_ids" multiple>
+            <mat-select formControlName="canaux" multiple>
               <mat-option *ngFor="let canal of canauxActifs; let i = index" [value]="canal.id">
                 {{ canalLabel(canal, i) }}
               </mat-option>
             </mat-select>
           </mat-form-field>
 
-<!--          <div *ngIf="form.hasError('partialSelectionRequired')" class="info-warning">
-            Veuillez sélectionner au moins une station ou un canal.
-          </div>-->
-
         </ng-container>
-
 
         <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
           <mat-label>Date de retrait</mat-label>
@@ -103,7 +98,6 @@
             La date de retrait est obligatoire.
           </mat-error>
         </mat-form-field>
-
 
         <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
           <mat-label>Motif du retrait</mat-label>

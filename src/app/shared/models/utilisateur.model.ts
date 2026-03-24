@@ -49,7 +49,7 @@ export interface UtilisateurRequest {
   nature?: string;
 
   /** writeOnly */
-  password: string;
+  password?: string;
 
   client?: number | null;
   portail_role?: 'PORTAIL_CONSULTATION' | 'PORTAIL_PAIEMENT' | null;

@@ -16,10 +16,10 @@ import {
 
 import {
   CalculFraisFrequenceRequest,
-  CalculFraisFrequenceResult,
+  CalculFraisFrequenceResult, FicheTechniqueCanalDetail,
   FicheTechniqueCanalRequest,
   FicheTechniqueFrequenceCreateRequest,
-  FicheTechniqueFrequenceDetail,
+  FicheTechniqueFrequenceDetail, FicheTechniqueStationDetail,
   FicheTechniqueStationRequest
 } from '../../../shared/models/fiche-technique-frequence-create-request';
 
@@ -68,7 +68,6 @@ import { ZoneCouverture } from '../../../shared/models/zone-couverture';
 import { ZoneCouvertureService } from '../../../shared/services/zone-couverture.service';
 import { Utilisateur } from '../../../shared/models/utilisateur';
 import { AuthService } from '../../../authentication/auth.service';
-import { FicheTechniqueCanal, FicheTechniqueStation } from '../../../shared/models/fiche-technique-frequence';
 
 import { startWith, map, finalize, mapTo, switchMap, tap } from 'rxjs/operators';
 
@@ -435,13 +434,13 @@ export class FrequencesCrudComponent implements OnInit {
         // ✅ force id sur le form + affiche l'objet si dispo + match liste sinon
         this.tryPrefillClientAutocompleteFrom(fiche);
 
-        (fiche.stations || []).forEach((s: FicheTechniqueStation) => {
+        (fiche.stations || []).forEach((s: FicheTechniqueStationDetail) => {
           const fg = buildStationFG(this.fb, s, this.cat);
           this.setCategorieOnLineFG(fg, this.cat); // ✅ PATCH binder
           this.stationsFA.push(fg);
         });
 
-        (fiche.canaux || []).forEach((c: FicheTechniqueCanal) => {
+        (fiche.canaux || []).forEach((c: FicheTechniqueCanalDetail) => {
           const fg = buildCanalFG(this.fb, c, this.cat);
           this.setCategorieOnLineFG(fg, this.cat); // ✅ PATCH binder
           this.canauxFA.push(fg);

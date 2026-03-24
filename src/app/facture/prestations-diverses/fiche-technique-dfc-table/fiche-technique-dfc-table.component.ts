@@ -22,6 +22,7 @@ import {Utilisateur} from "../../../shared/models/utilisateur";
 import {AuthService} from "../../../authentication/auth.service";
 import {AvisEtuteTechniqueDialogComponent} from "../../avis-etute-technique-dialog/avis-etute-technique-dialog.component";
 import {RetraitAutorisationDialogComponent} from "../../retrait-autorisation-dialog/retrait-autorisation-dialog.component";
+import {AuthzService} from "../../../authentication/authz.service";
 
 interface FTListFilter {
   clientText?: string;   // texte dans le nom du client
@@ -59,8 +60,6 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
   statutFicheTechniques: StatutFicheTechnique[];
   clients: Client[];
   client: Client;
-  utilisateurConnecte:Utilisateur;
-  roleUtilisateurConnecte:UtilisateurRole;
 
   private filterValues: FTListFilter = {};
 
@@ -74,8 +73,14 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
     private authService:AuthService,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
+    private authzService: AuthzService,
   ) {
     this.ficheTechniques = new MatTableDataSource<FicheTechniques>([]);
+  }
+
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
   }
 
   ngAfterViewInit(): void {
@@ -85,10 +90,6 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.reloadData();
-
-    this.utilisateurConnecte=this.authService.getConnectedUser();
-    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
-    console.log(this.utilisateurConnecte);
 
     this.ficheTechniques.filterPredicate = (row: FicheTechniques, raw: string) => {
       if (!raw) return true;
@@ -224,27 +225,7 @@ export class FicheTechniqueDfcTableComponent implements OnInit, AfterViewInit {
     }
   }
 
-  hasOperationCode( opCode: string): boolean {
-    const  user=this.roleUtilisateurConnecte;
 
-    if (!user || !opCode) return false;
-
-    const needle = opCode.trim().toLowerCase();
-
-    // Normaliser: accepter user.role = Role | Role[]
-    const roles: Role[] = Array.isArray((user as any).role)
-      ? (user as any).role
-      : (user as any).role
-        ? [ (user as any).role ]
-        : [];
-
-    for (const role of roles) {
-      for (const op of (role?.operations ?? [])) {
-        if ((op.code ?? '').trim().toLowerCase() === needle) return true;
-      }
-    }
-    return false;
-  }
 
   getStatusColor(status: string): string {
     switch (status.toLowerCase()) {

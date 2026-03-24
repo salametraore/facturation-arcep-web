@@ -1,32 +1,28 @@
-<!-- src/app/features/agrement-equipement/fiche-technique/ae-ft-edit-page.component.html -->
 <mat-card>
 
-  <!-- Titre de page -->
   <div class="page-title">
     <h2>Saisie et mise à jour d'une fiche technique — Agrément d'équipement</h2>
   </div>
 
-  <!-- Grille 2 colonnes : 75% / 25% -->
   <div class="two-col two-col--75-25">
 
-    <!-- ===== Colonne gauche : FICHE TECHNIQUE + LIGNES ===== -->
     <section class="list-box">
       <div class="list-header">
         <h3 class="list-title">Fiche technique</h3>
 
-        <!-- Actions globales alignées à droite -->
         <div class="list-actions">
           <button
             mat-flat-button
             color="primary"
+            type="button"
             *ngIf="operation===operations.create || operation===operations.update"
             (click)="onSave()"
-            [disabled]="t_FicheTechniquesProduits.data?.length<1   || saveLocked  ">
+            [disabled]="t_FicheTechniquesProduits.data?.length < 1 || saveLocked">
             <mat-icon>save</mat-icon>
             Enregistrer
           </button>
 
-          <button mat-stroked-button color="primary" (click)="onRetour()">
+          <button mat-stroked-button color="primary" type="button" (click)="onRetour()">
             <mat-icon>undo</mat-icon>
             Retour
           </button>
@@ -34,6 +30,7 @@
           <button
             mat-flat-button
             color="warn"
+            type="button"
             *ngIf="operation===operations.transmettre"
             (click)="onTransmettre()"
             [disabled]="transmitLocked || isTransmitting">
@@ -47,16 +44,12 @@
               Transmission...
             </span>
           </button>
-
-
         </div>
       </div>
 
       <div class="list-body">
-        <!-- Formulaire principal -->
         <form [formGroup]="form_ficheTechnique" class="form-grid">
 
-          <!-- Client (plein) -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Client</mat-label>
             <mat-select formControlName="client" matTooltip="Client">
@@ -64,35 +57,35 @@
                 {{ item?.denomination_sociale }}
               </mat-option>
             </mat-select>
+            <mat-error *ngIf="form_ficheTechnique.get('client')?.hasError('required')">
+              Le client est obligatoire.
+            </mat-error>
           </mat-form-field>
 
           <div class="blank-row"></div>
 
-          <!-- Commentaire -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Commentaire</mat-label>
             <textarea matInput formControlName="commentaire" rows="1" matTooltip="Commentaire"></textarea>
           </mat-form-field>
         </form>
 
-        <div align="center" *ngIf=" ficheTechnique &&   ficheTechnique?.statut?.id > 5">
-          <avis-technique-infos
-            [ficheTechnique]="ficheTechnique">
-          </avis-technique-infos>
+        <div align="center" *ngIf="ficheTechnique && ficheTechnique?.statut?.id > 5">
+          <avis-technique-infos [ficheTechnique]="ficheTechnique"></avis-technique-infos>
         </div>
 
         <div class="blank-row"></div>
 
-        <!-- ===== Sous-collection : Ajout d'un type d'agrément ===== -->
-        <section class="list-box list-box--compact" *ngIf="ficheTechnique?.statut?.id<4">
+        <section class="list-box list-box--compact" *ngIf="ficheTechnique?.statut?.id < 4">
           <div class="list-header">
-            <h3 class="list-title">Ajout d'un type d’agrément</h3>
+            <h3 class="list-title">
+              {{ editingRowKey ? "Modification d'un type d’agrément" : "Ajout d'un type d’agrément" }}
+            </h3>
           </div>
 
           <div class="list-body">
             <form [formGroup]="form_ficheTechniquesProduit" class="product-row product-row--tight">
 
-              <!-- Type d'agrément -->
               <mat-form-field appearance="outline" class="product-field">
                 <mat-label>Type d’agrément</mat-label>
                 <mat-select formControlName="produit" matTooltip="Type d’agrément">
@@ -100,29 +93,46 @@
                     {{ item.libelle }}
                   </mat-option>
                 </mat-select>
+                <mat-error *ngIf="form_ficheTechniquesProduit.get('produit')?.hasError('required')">
+                  Le type d’agrément est obligatoire.
+                </mat-error>
               </mat-form-field>
 
-              <!-- Marque -->
               <mat-form-field appearance="outline" class="product-field short">
                 <mat-label>Marque</mat-label>
                 <input type="text" matInput formControlName="marque" required>
+                <mat-error *ngIf="form_ficheTechniquesProduit.get('marque')?.hasError('required')">
+                  La marque est obligatoire.
+                </mat-error>
               </mat-form-field>
 
-              <!-- Modèle -->
               <mat-form-field appearance="outline" class="product-field short">
                 <mat-label>Modèle</mat-label>
                 <input type="text" matInput formControlName="modele" required>
+                <mat-error *ngIf="form_ficheTechniquesProduit.get('modele')?.hasError('required')">
+                  Le modèle est obligatoire.
+                </mat-error>
               </mat-form-field>
 
-              <!-- Bouton sur la même ligne -->
               <button
                 mat-flat-button
                 color="primary"
                 class="add-btn"
+                type="button"
                 [disabled]="form_ficheTechniquesProduit.invalid"
                 (click)="onAdd()">
-                <mat-icon>add</mat-icon>
-                Ajouter
+                <mat-icon>{{ editingRowKey ? 'edit' : 'add' }}</mat-icon>
+                {{ editingRowKey ? 'Mettre à jour' : 'Ajouter' }}
+              </button>
+
+              <button
+                *ngIf="editingRowKey"
+                mat-stroked-button
+                color="warn"
+                type="button"
+                (click)="onCancelLineEdit()">
+                <mat-icon>close</mat-icon>
+                Annuler
               </button>
             </form>
           </div>
@@ -130,29 +140,24 @@
 
         <div class="blank-row"></div>
 
-        <!-- ===== Tableau des types d’agréments sélectionnés ===== -->
         <div class="mat-elevation-z10 compact-table">
           <table mat-table [dataSource]="t_FicheTechniquesProduits" matSort style="width: 100%">
 
-            <!-- Type d'agrément -->
             <ng-container matColumnDef="produit">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Type d’agrément</th>
               <td mat-cell *matCellDef="let element">{{ getProduit(element.produit) }}</td>
             </ng-container>
 
-            <!-- Marque -->
             <ng-container matColumnDef="marque">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Marque</th>
               <td mat-cell *matCellDef="let element">{{ element.marque }}</td>
             </ng-container>
 
-            <!-- Modèle -->
             <ng-container matColumnDef="modele">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Modèle</th>
               <td mat-cell *matCellDef="let element">{{ element.modele }}</td>
             </ng-container>
 
-            <!-- Actions -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>Actions</th>
               <td mat-cell *matCellDef="let element">
@@ -160,11 +165,11 @@
                   <mat-icon>settings</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
-                  <button mat-menu-item class="btn_edit" (click)="onUpdate(element)">
+                  <button mat-menu-item class="btn_edit" type="button" (click)="onUpdate(element)">
                     <mat-icon color="primary">edit</mat-icon>
                     Modifier
                   </button>
-                  <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
+                  <button mat-menu-item class="btn_delete" type="button" (click)="onDelete(element)">
                     <mat-icon color="warn">delete</mat-icon>
                     Supprimer
                   </button>
@@ -172,11 +177,9 @@
               </td>
             </ng-container>
 
-            <!-- Lignes -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-            <!-- Aucune donnée -->
             <tr class="mat-row" *matNoDataRow>
               <td class="mat-cell" colspan="4">
                 Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
@@ -185,14 +188,12 @@
           </table>
 
           <div class="list-body" style="display:flex; justify-content:flex-end;">
-            <!-- si besoin d’un total/infos, place-les ici -->
           </div>
         </div>
 
-      </div> <!-- /list-body -->
+      </div>
     </section>
 
-    <!-- ===== Colonne droite : HISTORIQUE ===== -->
     <section class="list-box">
       <div class="list-header">
         <h3 class="list-title">Historique de la demande</h3>
@@ -204,5 +205,5 @@
       </div>
     </section>
 
-  </div> <!-- /two-col -->
+  </div>
 </mat-card>

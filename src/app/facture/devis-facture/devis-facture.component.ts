@@ -23,6 +23,7 @@ import {EncaissementDirectCrudComponent} from "../encaissement-direct/encaisseme
 import {GenerationRedevanceCrudComponent} from "../generation-redevance/generation-redevance-crud/generation-redevance-crud.component";
 import {Devis} from "../../shared/models/devis";
 import {finalize, take} from "rxjs/operators";
+import {AuthzService} from "../../authentication/authz.service";
 
 
 const NON_CANCELLABLE = new Set<string>(['PAYEE', 'ANNULEE']);
@@ -65,6 +66,7 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     public dialogService: DialogService,
     private msgMessageService: MsgMessageServiceService,
+    private authzService: AuthzService,
   ) {
     this.t_Facture = new MatTableDataSource<Facture>([]);
   }
@@ -72,6 +74,15 @@ export class DevisFactureComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.t_Facture.paginator = this.paginator;
     this.t_Facture.sort = this.sort;
+  }
+
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   ngOnInit(): void {

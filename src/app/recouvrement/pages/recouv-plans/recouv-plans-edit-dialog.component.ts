@@ -1,21 +1,23 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { take } from 'rxjs/operators';
 
 import { RcvPlansApi } from '../../../rcv/endpoints/rcv-plans.api';
-import { RcvStoreService } from '../../../rcv/rcv-store.service';
+import {
+  TypeActionEnum,
+  ModeExecutionEnum,
+  TypeDelaiEnum
+} from '../../../shared/models/recouv-plan-etape';
+import { RcvTemplatesApi } from '../../../rcv/endpoints/rcv-templates.api';
 
 export type RcvPlansEditDialogData =
   | { mode: 'create' }
   | { mode: 'edit'; planId: number };
 
-// ✅ enums demandés
-export type TypeActionEnum = 'EMAIL' | 'SMS' | 'COURRIER' | 'APPEL';
-export type ModeExecutionEnum = 'AUTO' | 'SEMI_AUTO' | 'MANU';
-export type TypeDelaiEnum = 'AVANT_ECHEANCE' | 'APRES_ECHEANCE';
-
-// seed templates (peut contenir LETTRE)
 type CanalSeed = 'EMAIL' | 'SMS' | 'APPEL' | 'LETTRE';
+type DialogMode = 'create' | 'edit';
+type UiMessageType = 'success' | 'error' | 'info';
 
 @Component({
   selector: 'recouv-plans-edit-dialog',
@@ -24,11 +26,19 @@ type CanalSeed = 'EMAIL' | 'SMS' | 'APPEL' | 'LETTRE';
 })
 export class RecouvPlansEditDialogComponent {
   saving = false;
+  savingEtape = false;
+  loadingEtapes = false;
+  loadingTemplates = false;
 
   planId?: number;
   etapes: any[] = [];
 
-  // ✅ listes UI
+  dialogMode: DialogMode;
+  selectedTabIndex = 0;
+
+  uiMessage: string | null = null;
+  uiMessageType: UiMessageType = 'info';
+
   readonly typeActions: TypeActionEnum[] = ['EMAIL', 'SMS', 'APPEL', 'COURRIER'];
   readonly modeExecutions: ModeExecutionEnum[] = ['AUTO', 'SEMI_AUTO', 'MANU'];
   readonly typeDelais: Array<{ value: TypeDelaiEnum; label: string }> = [
@@ -50,8 +60,10 @@ export class RecouvPlansEditDialogComponent {
     private ref: MatDialogRef<RecouvPlansEditDialogComponent>,
     private fb: FormBuilder,
     private api: RcvPlansApi,
-    private store: RcvStoreService
+    private apiTemplates: RcvTemplatesApi
   ) {
+    this.dialogMode = data.mode;
+
     this.form = this.fb.group({
       code: ['', [Validators.required, Validators.maxLength(50)]],
       nom: ['', [Validators.required, Validators.maxLength(255)]],
@@ -60,7 +72,6 @@ export class RecouvPlansEditDialogComponent {
       actif: [true]
     });
 
-    // ✅ IMPORTANT: on standardise "template" = ID (number|null)
     this.etapeForm = this.fb.group({
       type_action: ['' as TypeActionEnum | '', [Validators.required]],
       mode_execution: ['MANU' as ModeExecutionEnum, [Validators.required]],
@@ -70,10 +81,8 @@ export class RecouvPlansEditDialogComponent {
       actif: [true]
     });
 
-    // ✅ templates (une seule fois)
     this.loadTemplates();
 
-    // ✅ filtre templates quand le type_action change
     this.etapeForm.get('type_action')?.valueChanges.subscribe(() => {
       this.recomputeTemplatesForSelect();
 
@@ -85,7 +94,7 @@ export class RecouvPlansEditDialogComponent {
 
     if (data.mode === 'edit') {
       this.saving = true;
-      this.api.get(data.planId).subscribe({
+      this.api.get(data.planId).pipe(take(1)).subscribe({
         next: (plan: any) => {
           this.planId = plan.id;
           this.form.patchValue({
@@ -97,13 +106,26 @@ export class RecouvPlansEditDialogComponent {
           });
           this.reloadEtapes();
         },
-        error: () => alert(`Plan #${data.planId} introuvable`),
-        complete: () => (this.saving = false)
+        error: () => {
+          this.saving = false;
+          this.showMessage(`Plan #${data.planId} introuvable`, 'error');
+        },
+        complete: () => {
+          this.saving = false;
+        }
       });
     }
   }
 
-  /* ===== Labels UI ===== */
+  private showMessage(message: string, type: UiMessageType = 'info'): void {
+    this.uiMessage = message;
+    this.uiMessageType = type;
+  }
+
+  clearMessage(): void {
+    this.uiMessage = null;
+  }
+
   actionLabel(a: TypeActionEnum): string {
     switch (a) {
       case 'EMAIL': return 'Email';
@@ -125,17 +147,36 @@ export class RecouvPlansEditDialogComponent {
     return v === 'AVANT_ECHEANCE' ? 'Avant échéance' : 'Après échéance';
   }
 
-  /* ===== Templates ===== */
   private loadTemplates(): void {
-    this.templatesAll = (this.store.list<any>('templates') || [])
-      .filter(t => !!t && t.actif === true);
+    this.loadingTemplates = true;
 
-    this.templateLabelById = {};
-    this.templatesAll.forEach(t => {
-      this.templateLabelById[t.id] = this.templateOptionLabel(t);
+    this.apiTemplates.getItems().pipe(take(1)).subscribe({
+      next: (rows: any[]) => {
+        this.templatesAll = (rows || []).filter(t => !!t && t.actif === true);
+
+        this.templateLabelById = {};
+        this.templatesAll.forEach(t => {
+          this.templateLabelById[t.id] = this.templateOptionLabel(t);
+        });
+
+        this.recomputeTemplatesForSelect();
+
+        const currentTplId = this.etapeForm.get('template')?.value;
+        if (currentTplId && !this.templatesAll.some(t => t.id === currentTplId)) {
+          this.etapeForm.get('template')?.setValue(null);
+        }
+      },
+      error: (e: any) => {
+        console.error(e);
+        this.templatesAll = [];
+        this.templatesForSelect = [];
+        this.templateLabelById = {};
+        this.showMessage('Chargement des modèles impossible.', 'error');
+      },
+      complete: () => {
+        this.loadingTemplates = false;
+      }
     });
-
-    this.recomputeTemplatesForSelect();
   }
 
   private recomputeTemplatesForSelect(): void {
@@ -155,7 +196,6 @@ export class RecouvPlansEditDialogComponent {
 
   private canalFromTypeAction(typeAction: TypeActionEnum | '' | null | undefined): CanalSeed | null {
     if (!typeAction) return null;
-    // ✅ "COURRIER" correspond aux templates "LETTRE" côté seed legacy
     return typeAction === 'COURRIER'
       ? 'LETTRE'
       : (typeAction as Exclude<TypeActionEnum, 'COURRIER'>);
@@ -186,12 +226,21 @@ export class RecouvPlansEditDialogComponent {
     return this.templatesAll.find(t => t.id === id) ?? null;
   }
 
-  /* ===== Plan ===== */
-  close() { this.ref.close(false); }
+  close(): void {
+    if (this.saving || this.savingEtape) return;
+    this.ref.close(false);
+  }
 
-  savePlan() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+  savePlan(): void {
+    if (this.saving) return;
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.saving = true;
+    this.clearMessage();
 
     const v = this.form.value;
     const payload = {
@@ -202,37 +251,52 @@ export class RecouvPlansEditDialogComponent {
       actif: !!v.actif
     };
 
-    const req$ = (this.data.mode === 'create')
+    const req$ = this.dialogMode === 'create'
       ? this.api.create(payload)
       : this.api.update(this.planId!, payload);
 
-    req$.subscribe({
+    req$.pipe(take(1)).subscribe({
       next: (res: any) => {
-        if (this.data.mode === 'create') {
+        if (this.dialogMode === 'create') {
           this.planId = res?.id;
+          this.dialogMode = 'edit';
+          this.selectedTabIndex = 1;
           this.reloadEtapes();
+          this.showMessage(
+            'Plan enregistré avec succès. Vous pouvez maintenant ajouter des étapes.',
+            'success'
+          );
+          return;
         }
+
+        this.showMessage('Plan mis à jour avec succès.', 'success');
         this.ref.close(true);
       },
       error: (e: any) => {
         console.error(e);
+        this.showMessage('Enregistrement impossible.', 'error');
+      },
+      complete: () => {
         this.saving = false;
-        alert('Enregistrement impossible');
       }
     });
   }
 
-  /* ===== Étapes ===== */
-  reloadEtapes() {
-    if (!this.planId) { this.etapes = []; return; }
+  reloadEtapes(): void {
+    if (!this.planId) {
+      this.etapes = [];
+      return;
+    }
 
-    this.api.listEtapes(this.planId).subscribe({
+    this.loadingEtapes = true;
+
+    this.api.listEtapes(this.planId).pipe(take(1)).subscribe({
       next: (rows: any[]) => {
-        // ✅ on normalise au format attendu par l’écran
         this.etapes = (rows || []).map(r => {
           const templateId =
-            typeof r?.template === 'object' ? r.template?.id :
-              (r?.template ?? r?.template_id ?? null);
+            typeof r?.template === 'object'
+              ? r.template?.id
+              : (r?.template ?? r?.template_id ?? null);
 
           const nbJours = r?.nb_jours ?? r?.delai_jours ?? 0;
 
@@ -243,12 +307,18 @@ export class RecouvPlansEditDialogComponent {
           };
         });
       },
-      error: () => alert('Chargement étapes impossible')
+      error: () => this.showMessage('Chargement des étapes impossible.', 'error'),
+      complete: () => {
+        this.loadingEtapes = false;
+      }
     });
   }
 
-  startAddEtape() {
+  startAddEtape(): void {
     this.editingEtapeId = null;
+    this.selectedTabIndex = 1;
+    this.clearMessage();
+
     this.etapeForm.reset({
       type_action: '',
       mode_execution: 'MANU',
@@ -257,15 +327,19 @@ export class RecouvPlansEditDialogComponent {
       template: null,
       actif: true
     });
+
     this.recomputeTemplatesForSelect();
   }
 
-  startEditEtape(row: any) {
+  startEditEtape(row: any): void {
     this.editingEtapeId = row.id;
+    this.selectedTabIndex = 1;
+    this.clearMessage();
 
     const templateId =
-      typeof row?.template === 'object' ? row.template?.id :
-        (row?.template ?? row?.template_id ?? null);
+      typeof row?.template === 'object'
+        ? row.template?.id
+        : (row?.template ?? row?.template_id ?? null);
 
     this.etapeForm.patchValue({
       type_action: row.type_action,
@@ -279,8 +353,11 @@ export class RecouvPlansEditDialogComponent {
     this.recomputeTemplatesForSelect();
   }
 
-  cancelEtapeEdit() {
+  cancelEtapeEdit(): void {
+    if (this.savingEtape) return;
+
     this.editingEtapeId = null;
+
     this.etapeForm.reset({
       type_action: '',
       mode_execution: 'MANU',
@@ -289,12 +366,25 @@ export class RecouvPlansEditDialogComponent {
       template: null,
       actif: true
     });
+
     this.recomputeTemplatesForSelect();
   }
 
-  saveEtape() {
-    if (!this.planId) { alert('Veuillez d’abord enregistrer le plan.'); return; }
-    if (this.etapeForm.invalid) { this.etapeForm.markAllAsTouched(); return; }
+  saveEtape(): void {
+    if (this.savingEtape) return;
+
+    if (!this.planId) {
+      this.showMessage('Veuillez d’abord enregistrer le plan.', 'info');
+      return;
+    }
+
+    if (this.etapeForm.invalid) {
+      this.etapeForm.markAllAsTouched();
+      return;
+    }
+
+    this.savingEtape = true;
+    this.clearMessage();
 
     const v = this.etapeForm.value;
 
@@ -307,41 +397,81 @@ export class RecouvPlansEditDialogComponent {
       actif: !!v.actif
     };
 
-    const req$ = (this.editingEtapeId == null)
-      ? this.api.addEtape(this.planId, payload)
-      : this.api.updateEtape(this.editingEtapeId, { ...payload, plan_action: this.planId });
+    const isEdit = this.editingEtapeId != null;
 
-    req$.subscribe({
-      next: () => { this.cancelEtapeEdit(); this.reloadEtapes(); },
-      error: () => alert('Enregistrement étape impossible')
+    const req$ = isEdit
+      ? this.api.updateEtape(this.editingEtapeId!, { ...payload, plan_action: this.planId })
+      : this.api.addEtape(this.planId, payload);
+
+    req$.pipe(take(1)).subscribe({
+      next: () => {
+        this.cancelEtapeEdit();
+        this.reloadEtapes();
+        this.showMessage(
+          isEdit ? 'Étape mise à jour avec succès.' : 'Étape ajoutée avec succès.',
+          'success'
+        );
+      },
+      error: (e: any) => {
+        console.error(e);
+        this.showMessage('Enregistrement étape impossible.', 'error');
+      },
+      complete: () => {
+        this.savingEtape = false;
+      }
     });
   }
 
-  deleteEtape(row: any) {
+  deleteEtape(row: any): void {
+    if (this.savingEtape) return;
+
     const ok = confirm(`Supprimer l’étape #${row.ordre} ?`);
     if (!ok) return;
 
-    this.api.deleteEtape(row.id).subscribe({
-      next: () => this.reloadEtapes(),
-      error: () => alert('Suppression impossible')
+    this.savingEtape = true;
+    this.clearMessage();
+
+    this.api.deleteEtape(row.id).pipe(take(1)).subscribe({
+      next: () => {
+        this.reloadEtapes();
+        this.showMessage('Étape supprimée avec succès.', 'success');
+      },
+      error: () => this.showMessage('Suppression impossible.', 'error'),
+      complete: () => {
+        this.savingEtape = false;
+      }
     });
   }
 
-  moveUp(row: any) {
+  moveUp(row: any): void {
     const idx = this.etapes.findIndex(x => x.id === row.id);
-    if (idx <= 0) return;
+    if (idx <= 0 || !this.planId) return;
+
     const ids = [...this.etapes.map(x => x.id)];
     [ids[idx - 1], ids[idx]] = [ids[idx], ids[idx - 1]];
-    this.api.reorder(this.planId!, ids);
-    this.reloadEtapes();
+
+    this.api.reorder(this.planId, ids).pipe(take(1)).subscribe({
+      next: () => {
+        this.reloadEtapes();
+        this.showMessage('Ordre des étapes mis à jour.', 'success');
+      },
+      error: () => this.showMessage('Réordonnancement impossible.', 'error')
+    });
   }
 
-  moveDown(row: any) {
+  moveDown(row: any): void {
     const idx = this.etapes.findIndex(x => x.id === row.id);
-    if (idx < 0 || idx >= this.etapes.length - 1) return;
+    if (idx < 0 || idx >= this.etapes.length - 1 || !this.planId) return;
+
     const ids = [...this.etapes.map(x => x.id)];
     [ids[idx], ids[idx + 1]] = [ids[idx + 1], ids[idx]];
-    this.api.reorder(this.planId!, ids);
-    this.reloadEtapes();
+
+    this.api.reorder(this.planId, ids).pipe(take(1)).subscribe({
+      next: () => {
+        this.reloadEtapes();
+        this.showMessage('Ordre des étapes mis à jour.', 'success');
+      },
+      error: () => this.showMessage('Réordonnancement impossible.', 'error')
+    });
   }
 }

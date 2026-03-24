@@ -47,7 +47,7 @@ export interface FicheTechniqueStationRequest {
 
   nbre_tranche?: number;
 
-  largeur_bande_mhz?: string;
+  largeur_bande_mhz?: number | null;
 
   type_bande_frequence?: number;
   classe_largeur_bande?: number;
@@ -97,7 +97,7 @@ export interface FicheTechniqueFrequenceDetail {
   client_nom: string;
 
   direction: number;
-  utilisateur: number;
+  utilisateur: number | null;
 
   date_creation?: string;
 
@@ -108,22 +108,21 @@ export interface FicheTechniqueFrequenceDetail {
 
   statut: StatutFicheTechnique;
   objet?: string;
-  commentaire?: string;
+  commentaire?: string | null;
 
   avis?: 'FAV' | 'DEF' | string;
 
-  duree?: number;
+  duree?: number | null;
 
-  date_fin?: string;
-  date_debut?: string;
+  date_fin?: string | null;
+  date_debut?: string | null;
 
-  periode?: string;
+  periode?: string | null;
 
-  date_avis?: string;
+  date_avis?: string | null;
 
   date_retrait?: string | null;
   motif_retrait?: string | null;
-
 
   canaux?: FicheTechniqueCanalDetail[];
   stations?: FicheTechniqueStationDetail[];
@@ -137,28 +136,27 @@ export interface FicheTechniqueCanalDetail {
 
   type_station: number;
 
-
   type_canal: number;
-  nbre_canaux?: number;
+  nbre_canaux?: number | null;
 
-  zone_couverture: number;
+  zone_couverture: number | null;
 
   nbre_tranche_facturation: number;
 
-  largeur_bande_khz: string;
-  classe_largeur_bande?: number;
+  largeur_bande_khz: string | null;
+  classe_largeur_bande?: number | null;
 
-  type_bande_frequence: number;
+  type_bande_frequence: number | null;
 
-  mode_duplexage?: string;
+  mode_duplexage?: string | null;
 
-  puissance_sortie: number;
+  puissance_sortie: number | null;
 
-  classe_puissance_id: number;
+  classe_puissance_id: number | null;
 
-  caractere_radio?: number;
+  caractere_radio?: number | null;
 
-  designation?: string;
+  designation?: string | null;
 
   actif?: boolean;
   date_retrait?: string | null;
@@ -171,38 +169,38 @@ export interface FicheTechniqueStationDetail {
 
   categorie_produit: number;
 
-  type_station?: number;
+  type_station?: number | null;
 
-  sous_type_station: number;
+  sous_type_station: number | null;
 
-  puissance?: number;
-  classe_puissance?: number;
+  puissance?: number | null;
+  classe_puissance?: number | null;
 
-  nombre_station?: number;
+  nombre_station?: number | null;
 
-  zone_couverture?: number;
-  localite?: string;
+  zone_couverture?: number | null;
+  localite?: string | null;
 
-  nbre_tranche?: number;
+  nbre_tranche?: number | null;
 
-  largeur_bande_mhz?: string;
+  largeur_bande_mhz?: number | null;
 
-  type_bande_frequence?: number;
-  classe_largeur_bande?: number;
+  type_bande_frequence?: number | null;
+  classe_largeur_bande?: number | null;
 
-  debit_kbps?: number;
-  classe_debit?: number;
+  debit_kbps?: number | null;
+  classe_debit?: number | null;
 
-  caractere_radio?: number;
+  caractere_radio?: number | null;
 
-  designation?: string;
+  designation?: string | null;
 
   actif?: boolean;
   date_retrait?: string | null;
   motif_retrait?: string | null;
 
-  created_at: string; // ISO date-time
-  updated_at: string; // ISO date-time
+  created_at?: string;
+  updated_at?: string;
 }
 
 export class CalculFraisFrequenceRequest {
@@ -259,8 +257,8 @@ export interface CalculFraisFrequenceResult {
 
 export interface DesactiverElementsFicheFrequenceRequest {
   fiche_technique_id: number;
-  station_ids: number[];
-  canal_ids: number[];
+  stations: number[];
+  canaux: number[];
   date_retrait: string;
   motif_retrait: string;
 }

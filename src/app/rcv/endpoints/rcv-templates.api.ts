@@ -6,6 +6,7 @@ import { PageQuery, PageResult } from '../rcv-query';
 import { applyPageQuery } from '../apply-page-query';
 
 import { RecouvTemplateServices } from '../../shared/services/recouv-template.services';
+import { RecouvTemplate } from '../../shared/models/recouv-template';
 
 type CanalSeed = 'EMAIL' | 'SMS' | 'APPEL' | 'LETTRE';
 type CanalUi = 'EMAIL' | 'SMS' | 'APPEL' | 'COURRIER' | null;
@@ -15,8 +16,8 @@ export class RcvTemplatesApi {
   private refresh$ = new BehaviorSubject<void>(undefined);
 
   private templates$ = this.refresh$.pipe(
-    switchMap(() => this.srv.getItems()),   // backend -> tableau
-    shareReplay(1)
+    switchMap(() => this.srv.getItems()),
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   constructor(private srv: RecouvTemplateServices) {}
@@ -24,7 +25,19 @@ export class RcvTemplatesApi {
   /** UI -> seed (COURRIER => LETTRE) */
   toSeedCanal(ui: CanalUi): CanalSeed | null {
     if (!ui) return null;
-    return ui === 'COURRIER' ? 'LETTRE' : (ui as any);
+    return ui === 'COURRIER' ? 'LETTRE' : (ui as CanalSeed);
+  }
+
+  /** lecture brute depuis backend (cache via templates$) */
+  getItems(): Observable<RecouvTemplate[]> {
+    return this.templates$.pipe(
+      map(all => all || [])
+    );
+  }
+
+  /** permet de recharger explicitement si besoin */
+  refresh(): void {
+    this.refresh$.next();
   }
 
   /** LIST (paging/tri/recherche local) */
@@ -36,16 +49,16 @@ export class RcvTemplatesApi {
           q,
           ['nom', 'code', 'canal', 'sujet', 'contenu'],
           (t, f) => {
-            // filtre actif
             if (f['actif'] !== null && f['actif'] !== undefined && f['actif'] !== '') {
               if ((t as any).actif !== f['actif']) return false;
             }
-            // filtre canal (seed)
+
             if (f['canal'] !== null && f['canal'] !== undefined && f['canal'] !== '') {
               const tc = String((t as any).canal || '').toUpperCase();
               const fc = String(f['canal'] || '').toUpperCase();
               if (tc !== fc) return false;
             }
+
             return true;
           }
         )
@@ -53,23 +66,25 @@ export class RcvTemplatesApi {
     );
   }
 
-  /** READ */
   get(id: number): Observable<any> {
     return this.srv.getItem(id);
   }
 
-  /** CREATE */
   create(dto: any): Observable<any> {
-    return this.srv.create(dto).pipe(tap(() => this.refresh$.next()));
+    return this.srv.create(dto).pipe(
+      tap(() => this.refresh$.next())
+    );
   }
 
-  /** UPDATE */
   update(id: number, dto: any): Observable<any> {
-    return this.srv.update(id, dto).pipe(tap(() => this.refresh$.next()));
+    return this.srv.update(id, dto).pipe(
+      tap(() => this.refresh$.next())
+    );
   }
 
-  /** DELETE */
   delete(id: number): Observable<void> {
-    return this.srv.delete(id).pipe(tap(() => this.refresh$.next()));
+    return this.srv.delete(id).pipe(
+      tap(() => this.refresh$.next())
+    );
   }
 }

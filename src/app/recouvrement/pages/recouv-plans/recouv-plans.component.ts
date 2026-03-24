@@ -10,6 +10,7 @@ import { PageResult } from '../../../rcv/rcv-query';
 
 import { RcvPlansApi } from '../../../rcv/endpoints/rcv-plans.api';
 import { RecouvPlansEditDialogComponent } from './recouv-plans-edit-dialog.component';
+import {AuthzService} from "../../../authentication/authz.service";
 
 @Component({
   selector: 'recouv-plans',
@@ -33,7 +34,8 @@ export class RecouvPlansComponent implements AfterViewInit {
 
   constructor(
     private api: RcvPlansApi,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authzService: AuthzService,
   ) {}
 
   ngAfterViewInit(): void {
@@ -54,6 +56,14 @@ export class RecouvPlansComponent implements AfterViewInit {
 
   applySearch() {
     this.dataSource.setSearch(this.search);
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   applyFilters() {

@@ -11,6 +11,7 @@ import { PageResult } from '../../../rcv/rcv-query';
 
 import { RcvTemplatesApi } from '../../../rcv/endpoints/rcv-templates.api';
 import { RecouvTemplatesEditDialogComponent } from './recouv-templates-edit-dialog.component';
+import {AuthzService} from "../../../authentication/authz.service";
 
 type CanalSeed = 'EMAIL' | 'SMS' | 'APPEL' | 'LETTRE';
 type CanalUi = 'EMAIL' | 'SMS' | 'APPEL' | 'COURRIER' | null;
@@ -51,10 +52,17 @@ export class RecouvTemplatesComponent implements AfterViewInit {
 
   constructor(
     private api: RcvTemplatesApi,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authzService: AuthzService,
   ) {}
 
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
 
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
+  }
 
   ngAfterViewInit(): void {
     this.dataSource = new LocalPageDataSource<any>(

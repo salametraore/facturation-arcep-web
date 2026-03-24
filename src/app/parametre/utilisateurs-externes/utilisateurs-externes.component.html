@@ -88,20 +88,40 @@
               </button>
 
               <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="crud(u, this.operations.details)">
+
+                <button
+                  *ngIf="hasOperationCode('ADMIN_GERER_UTILISATEURS')"
+                  mat-flat-button color="primary"
+                  (click)="crud(null, this.operations.create)">
+                  <mat-icon>add</mat-icon>
+                  {{ bouton_names.add }}
+                </button>
+
+                <button
+                  mat-menu-item
+                  *ngIf="hasOperationCode('ADMIN_GERER_UTILISATEURS')"
+                  (click)="crud(u, this.operations.details)">
                   <mat-icon>visibility</mat-icon>
                   Détails
                 </button>
 
-                <button mat-menu-item (click)="crud(u, this.operations.update)">
+                <button
+                  mat-menu-item
+                  *ngIf="hasOperationCode('ADMIN_GERER_UTILISATEURS')"
+                  (click)="crud(u, this.operations.update)">
                   <mat-icon color="accent">edit</mat-icon>
                   Modifier
                 </button>
 
-                <button mat-menu-item class="btn_delete" (click)="onDelete(u)">
+                <button
+                  mat-menu-item
+                  class="btn_delete"
+                  *ngIf="hasOperationCode('ADMIN_GERER_UTILISATEURS')"
+                  (click)="onDelete(u)">
                   <mat-icon color="warn">delete</mat-icon>
                   Supprimer
                 </button>
+
               </mat-menu>
             </td>
           </ng-container>

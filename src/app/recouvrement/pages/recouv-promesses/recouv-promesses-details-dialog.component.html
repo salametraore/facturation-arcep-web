@@ -1,123 +1,143 @@
 <h2 mat-dialog-title>
-  {{ data.mode === 'create' ? 'Nouvelle promesse' : ('Détails promesse #' + promesse?.id) }}
+  {{ data.mode === 'create' ? 'Nouvelle promesse' : 'Modifier la promesse' }}
 </h2>
 
-<mat-dialog-content class="content">
-  <div class="loading" *ngIf="loading">Chargement…</div>
+<mat-dialog-content class="dialog-content">
+  <div *ngIf="loading" class="loading-zone">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
 
-  <ng-container *ngIf="!loading">
+  <div class="form-grid">
+    <!-- Client -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Client</mat-label>
+      <input
+        matInput
+        [formControl]="clientCtrl"
+        [matAutocomplete]="autoClient"
+        placeholder="Rechercher un client" />
 
-    <div class="info">
-      <div class="row">
-        <div class="k">Client</div>
-        <div class="v">
-          <div class="title">{{ clientLabel() }}</div>
-          <div class="muted" *ngIf="data.mode === 'edit' && promesse">
-            Client #{{ promesse.client_id }} · {{ promesse.client?.code }}
+      <button
+        *ngIf="clientCtrl.value"
+        matSuffix
+        mat-icon-button
+        type="button"
+        aria-label="Effacer le client"
+        (click)="clearClient()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <mat-autocomplete
+          #autoClient="matAutocomplete"
+          [displayWith]="displayClient"
+          (optionSelected)="onClientSelected($event.option.value)">
+        <mat-option *ngFor="let c of filteredClients$ | async" [value]="c">
+          {{ displayClient(c) }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- Facture -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Facture impayée</mat-label>
+      <input
+        matInput
+        [formControl]="factureCtrl"
+        [matAutocomplete]="autoFacture"
+        placeholder="Rechercher une facture impayée" />
+
+      <button
+        *ngIf="factureCtrl.value"
+        matSuffix
+        mat-icon-button
+        type="button"
+        aria-label="Effacer la facture"
+        (click)="clearFacture()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <mat-autocomplete
+          #autoFacture="matAutocomplete"
+          [displayWith]="displayFacture"
+          (optionSelected)="onFactureSelected($event.option.value)">
+        <mat-option *ngFor="let f of filteredFactures$ | async" [value]="f">
+          <div class="option-line">
+            <span>{{ f.reference || ('Facture #' + f.id) }}</span>
+            <span class="option-amount">
+              {{ getFactureMontantAffiche(f) | number:'1.0-2' }}
+            </span>
           </div>
-        </div>
-      </div>
+        </mat-option>
+      </mat-autocomplete>
 
-      <div class="row">
-        <div class="k">Facture</div>
-        <div class="v">
-          <div class="title">{{ factureLabel() }}</div>
-          <div class="muted" *ngIf="data.mode === 'edit' && promesse?.facture_id">
-            Échéance : {{ promesse.facture?.date_echeance }}
-          </div>
-        </div>
-      </div>
-    </div>
+      <mat-hint *ngIf="edit.client_id && !facturesClient.length">
+        Aucune facture impayée disponible pour ce client.
+      </mat-hint>
+    </mat-form-field>
 
-    <!-- Champs création -->
-    <div class="form" *ngIf="data.mode === 'create'">
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Client</mat-label>
+    <!-- Montant -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Montant de la promesse</mat-label>
+      <input
+        matInput
+        type="number"
+        min="0"
+        step="0.01"
+        [(ngModel)]="edit.montant"
+        name="montantPromesse"
+        placeholder="Montant" />
+    </mat-form-field>
 
-        <input type="text"
-               matInput
-               [formControl]="clientCtrl"
-               [matAutocomplete]="autoClient"
-               placeholder="Rechercher par dénomination, compte comptable, IFU, ID…" />
+    <!-- Date promesse -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Date de promesse</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [(ngModel)]="edit.date_promesse"
+        name="datePromesse" />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
 
-        <mat-autocomplete #autoClient="matAutocomplete"
-                          [displayWith]="displayClient"
-                          (optionSelected)="onClientSelected($event.option.value)">
-          <mat-option *ngFor="let c of (filteredClients$ | async)" [value]="c">
-            <div style="display:flex; flex-direction:column; line-height:1.2;">
-              <span><strong>{{ c.denomination_sociale }}</strong></span>
-              <small style="opacity:.75;">
-                {{ c.compte_comptable || c.ifu || ('ID ' + c.id) }}
-                <span *ngIf="c.email"> · {{ c.email }}</span>
-              </small>
-            </div>
-          </mat-option>
-        </mat-autocomplete>
+    <!-- Statut -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Statut</mat-label>
+      <mat-select [(ngModel)]="edit.statut" name="statutPromesse">
+        <mat-option *ngFor="let s of statuts" [value]="s">
+          {{ s }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 
-        <mat-hint *ngIf="edit.client_id">Client sélectionné : #{{ edit.client_id }}</mat-hint>
-        <mat-hint *ngIf="!edit.client_id">Sélectionnez d’abord un client.</mat-hint>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Facture (impayée, optionnel)</mat-label>
-
-        <input type="text"
-               matInput
-               [formControl]="factureCtrl"
-               [matAutocomplete]="autoFacture"
-               placeholder="Rechercher par référence…" />
-
-        <mat-autocomplete #autoFacture="matAutocomplete"
-                          [displayWith]="displayFacture"
-                          (optionSelected)="onFactureSelected($event.option.value)">
-          <mat-option [value]="null">Promesse globale</mat-option>
-
-          <mat-option *ngFor="let f of (filteredFactures$ | async)" [value]="f">
-            <div style="display:flex; flex-direction:column; line-height:1.2;">
-              <span><strong>{{ f.reference }}</strong></span>
-              <small style="opacity:.75;">
-                Échéance: {{ f.date_echeance }} · Restant: {{ f.montant_restant | number }}
-              </small>
-            </div>
-          </mat-option>
-        </mat-autocomplete>
-
-        <mat-hint *ngIf="edit.client_id && !facturesClient.length">
-          Aucune facture impayée (EMISE & restant > 0) pour ce client.
-        </mat-hint>
-      </mat-form-field>
-
-    </div>
-
-    <div class="blank-row"></div>
-    <!-- Champs communs -->
-    <div class="form">
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Montant</mat-label>
-        <input matInput type="number" [(ngModel)]="edit.montant" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Date promesse</mat-label>
-        <input matInput type="date" [(ngModel)]="edit.date_promesse" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Statut</mat-label>
-        <mat-select [(ngModel)]="edit.statut">
-          <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-  </ng-container>
+  <!-- Résumé -->
+  <mat-card class="summary-card" *ngIf="data.mode === 'edit' || edit.client_id">
+    <mat-card-content>
+      <div><strong>Client :</strong> {{ clientLabel() }}</div>
+      <div><strong>Facture :</strong> {{ factureLabel() }}</div>
+    </mat-card-content>
+  </mat-card>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="close()">Fermer</button>
+  <button
+    mat-stroked-button
+    type="button"
+    (click)="close()"
+    [disabled]="saving">
+    Annuler
+  </button>
 
-  <button mat-flat-button color="primary" (click)="save()" [disabled]="saving || loading">
-    <mat-icon>save</mat-icon>
-    {{ data.mode === 'create' ? 'Créer' : 'Enregistrer' }}
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    (click)="save()"
+    [disabled]="saving || !edit.client_id || !edit.date_promesse || edit.montant <= 0">
+    <mat-spinner *ngIf="saving" diameter="18"></mat-spinner>
+    <span *ngIf="!saving">
+      {{ data.mode === 'create' ? 'Créer' : 'Enregistrer' }}
+    </span>
   </button>
 </mat-dialog-actions>

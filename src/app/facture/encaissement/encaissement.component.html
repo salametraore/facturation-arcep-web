@@ -156,14 +156,17 @@
                 <mat-icon>settings</mat-icon>
               </button>
               <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="crud(element, operations.update)">
+
+                <button  *ngIf="hasOperationCode('ENCAISSER')"
+                         mat-menu-item (click)="crud(element, operations.update)">
                   <mat-icon color="primary">edit</mat-icon>
                   Modifier
                 </button>
 
                 <mat-divider></mat-divider>
 
-                <button mat-menu-item (click)="onPrintRecu(element)">
+                <button  *ngIf="hasOperationCode('EDITER_RECU_ENCAISSEMENT')"
+                         mat-menu-item (click)="onPrintRecu(element)">
                   <mat-icon color="primary">print</mat-icon>
                   Éditer reçu
                 </button>

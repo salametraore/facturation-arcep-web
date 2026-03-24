@@ -9,6 +9,7 @@ import {RcvAgendaApi} from '../../../rcv/endpoints/rcv-agenda.api';
 
 import {RecouvAgendaDetailsDialogComponent} from './recouv-agenda-details-dialog.component';
 import {of} from "rxjs";
+import {AuthzService} from "../../../authentication/authz.service";
 
 
 type AgendaStatut = 'A_FAIRE' | 'EN_COURS' | 'FAIT' | 'ECHOUE' | 'REPORTE' | 'ANNULE';
@@ -77,11 +78,20 @@ export class RecouvAgendaComponent implements AfterViewInit {
     private api: RcvAgendaApi,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
+    private authzService: AuthzService,
   ) {
   }
 
   ngOnInit(): void {
     this.typeActionsOptions = ['APPEL', 'COURRIER', 'EMAIL', 'SMS'];
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   ngAfterViewInit(): void {

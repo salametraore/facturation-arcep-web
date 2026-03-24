@@ -1,27 +1,23 @@
-<!-- src/app/features/numerotation/fiche-technique/num-ft-edit-page.component.html -->
 <mat-card>
 
-  <!-- Titre de page -->
   <div class="page-title">
     <h2>Saisie et mise à jour d'une fiche technique — Numérotation</h2>
   </div>
 
-  <!-- Grille 2 colonnes : 75% / 25% -->
   <div class="two-col two-col--75-25">
 
-    <!-- ===== Colonne gauche : FICHE TECHNIQUE + LIGNES ===== -->
     <section class="list-box">
       <div class="list-header">
         <h3 class="list-title">Fiche technique</h3>
 
-        <!-- Actions globales alignées à droite -->
         <div class="list-actions">
           <button
             mat-flat-button
             color="primary"
+            type="button"
             *ngIf="operation===operations.create || operation===operations.update"
             (click)="onSave()"
-            [disabled]="t_FicheTechniquesProduits.data?.length<1    || saveLocked   ">
+            [disabled]="t_FicheTechniquesProduits.data?.length < 1 || saveLocked">
             <mat-icon>save</mat-icon>
             Enregistrer
           </button>
@@ -29,12 +25,12 @@
           <button
             mat-flat-button
             color="warn"
+            type="button"
             *ngIf="operation===operations.transmettre"
             (click)="onTransmettre()"
             [disabled]="transmitLocked || isTransmitting">
 
             <mat-icon *ngIf="!isTransmitting">send</mat-icon>
-
             <span *ngIf="!isTransmitting">Transmettre</span>
 
             <span *ngIf="isTransmitting" class="inline-flex items-center gap-2">
@@ -43,21 +39,16 @@
             </span>
           </button>
 
-
-          <button mat-stroked-button color="primary" (click)="onRetour()">
+          <button mat-stroked-button color="primary" type="button" (click)="onRetour()">
             <mat-icon>undo</mat-icon>
             Retour
           </button>
-
-
         </div>
       </div>
 
       <div class="list-body">
-        <!-- Formulaire principal -->
         <form [formGroup]="form_ficheTechnique" class="form-grid">
 
-          <!-- Client (plein, comme SVA) -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Client</mat-label>
             <mat-select formControlName="client" matTooltip="Client">
@@ -67,14 +58,17 @@
             </mat-select>
           </mat-form-field>
 
-
-
           <div class="blank-row"></div>
 
           <div class="date-row">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Date début</mat-label>
-              <input matInput [matDatepicker]="pickerStart" formControlName="date_debut" placeholder="Date début" required>
+              <input
+                matInput
+                [matDatepicker]="pickerStart"
+                formControlName="date_debut"
+                placeholder="Date début"
+                required>
               <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
               <mat-datepicker #pickerStart></mat-datepicker>
             </mat-form-field>
@@ -91,7 +85,12 @@
 
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Date fin</mat-label>
-              <input matInput [matDatepicker]="pickerEnd" formControlName="date_fin" placeholder="Date fin" readonly>
+              <input
+                matInput
+                [matDatepicker]="pickerEnd"
+                formControlName="date_fin"
+                placeholder="Date fin"
+                readonly>
               <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
               <mat-datepicker #pickerEnd></mat-datepicker>
             </mat-form-field>
@@ -99,33 +98,28 @@
 
           <div class="blank-row"></div>
 
-
-          <!-- Commentaire -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Commentaire</mat-label>
             <textarea matInput formControlName="commentaire" rows="1" matTooltip="Commentaire"></textarea>
           </mat-form-field>
         </form>
 
-        <div align="center" *ngIf="ficheTechnique?.statut?.id>5">
-          <avis-technique-infos
-            [ficheTechnique]="ficheTechnique">
-          </avis-technique-infos>
+        <div align="center" *ngIf="ficheTechnique?.statut?.id > 5">
+          <avis-technique-infos [ficheTechnique]="ficheTechnique"></avis-technique-infos>
         </div>
 
         <div class="blank-row"></div>
 
-        <!-- ===== Sous-collection : Ajout d’une catégorie de numéro ===== -->
-        <section class="list-box list-box--compact" *ngIf="ficheTechnique?.statut?.id <4">
+        <section class="list-box list-box--compact" *ngIf="ficheTechnique?.statut?.id < 4">
           <div class="list-header">
-            <h3 class="list-title">Ajout d'une catégorie de numéro</h3>
+            <h3 class="list-title">
+              {{ editingRowKey ? "Modification d'une catégorie de numéro" : "Ajout d'une catégorie de numéro" }}
+            </h3>
           </div>
 
           <div class="list-body">
-            <!--<form [formGroup]="form_ficheTechniquesProduit" class="product-row product-row&#45;&#45;tight">-->
             <form [formGroup]="form_ficheTechniquesProduit" class="product-row product-row--tight">
 
-              <!-- Catégorie de numéro -->
               <mat-form-field appearance="outline" class="product-field">
                 <mat-label>Type de ressource</mat-label>
                 <mat-select formControlName="produit" matTooltip="Catégorie de numéro">
@@ -133,35 +127,59 @@
                     {{ item.libelle }}
                   </mat-option>
                 </mat-select>
+                <mat-error *ngIf="form_ficheTechniquesProduit.get('produit')?.hasError('required')">
+                  Le type de ressource est obligatoire.
+                </mat-error>
               </mat-form-field>
 
-              <!-- Nombre de numéros (court) -->
               <mat-form-field appearance="outline" class="product-field short">
                 <mat-label>Nombre de numéros</mat-label>
-                <input type="number" min="1" matInput formControlName="quantite"
-                       (blur)="onGetTotalLigne()" required>
+                <input
+                  type="number"
+                  min="1"
+                  matInput
+                  formControlName="quantite"
+                  (blur)="onGetTotalLigne()"
+                  required>
+                <mat-error *ngIf="form_ficheTechniquesProduit.get('quantite')?.hasError('required')">
+                  La quantité est obligatoire.
+                </mat-error>
+                <mat-error *ngIf="form_ficheTechniquesProduit.get('quantite')?.hasError('min')">
+                  La quantité doit être supérieure à 0.
+                </mat-error>
               </mat-form-field>
 
-              <!-- Plages de numéros (large) -->
               <mat-form-field appearance="outline" class="product-field designation">
                 <mat-label>Plages de numéros/Numéro</mat-label>
-                <input type="text" matInput formControlName="plage_numero"
-                       matTooltip="Ex. 70 00 00 00–70 00 99 99; 71 10 00 00–71 10 49 99">
-
+                <input
+                  type="text"
+                  matInput
+                  formControlName="plage_numero"
+                  matTooltip="Ex. 70 00 00 00–70 00 99 99; 71 10 00 00–71 10 49 99">
                 <mat-error *ngIf="form_ficheTechniquesProduit.get('plage_numero')?.hasError('required')">
                   La plage de numéros est obligatoire pour ce type de ressource.
                 </mat-error>
               </mat-form-field>
 
-              <!-- Bouton sur la même ligne -->
               <button
                 mat-flat-button
                 color="primary"
                 class="add-btn"
+                type="button"
                 [disabled]="form_ficheTechniquesProduit.invalid"
                 (click)="onAdd()">
-                <mat-icon>add</mat-icon>
-                Ajouter
+                <mat-icon>{{ editingRowKey ? 'edit' : 'add' }}</mat-icon>
+                {{ editingRowKey ? 'Mettre à jour' : 'Ajouter' }}
+              </button>
+
+              <button
+                *ngIf="editingRowKey"
+                mat-stroked-button
+                color="warn"
+                type="button"
+                (click)="onCancelLineEdit()">
+                <mat-icon>close</mat-icon>
+                Annuler
               </button>
             </form>
           </div>
@@ -169,41 +187,38 @@
 
         <div class="blank-row"></div>
 
-        <!-- ===== Tableau des catégories sélectionnées ===== -->
         <div class="mat-elevation-z10 compact-table">
           <table mat-table [dataSource]="t_FicheTechniquesProduits" matSort style="width: 100%">
 
-            <!-- Catégorie -->
             <ng-container matColumnDef="produit">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Type de ressource</th>
               <td mat-cell *matCellDef="let element">{{ getProduit(element.produit) }}</td>
             </ng-container>
 
-            <!-- Nombre de numéros -->
             <ng-container matColumnDef="quantite">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de numéros</th>
               <td mat-cell *matCellDef="let element">{{ element.quantite?.toLocaleString('fr-FR') }}</td>
             </ng-container>
 
-            <!-- Plages -->
             <ng-container matColumnDef="plage_numero">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Plages de numéros/Numéro</th>
               <td mat-cell *matCellDef="let element">{{ element.plage_numero }}</td>
             </ng-container>
 
-            <!-- Actions -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>Actions</th>
               <td mat-cell *matCellDef="let element">
                 <button mat-icon-button color="primary" [matMenuTriggerFor]="menu">
                   <mat-icon>settings</mat-icon>
                 </button>
+
                 <mat-menu #menu="matMenu">
-                  <button mat-menu-item class="btn_edit" (click)="onUpdate(element)">
+                  <button mat-menu-item class="btn_edit" type="button" (click)="onUpdate(element)">
                     <mat-icon color="primary">edit</mat-icon>
                     Modifier
                   </button>
-                  <button mat-menu-item class="btn_delete" (click)="onDelete(element)">
+
+                  <button mat-menu-item class="btn_delete" type="button" (click)="onDelete(element)">
                     <mat-icon color="warn">delete</mat-icon>
                     Supprimer
                   </button>
@@ -211,11 +226,9 @@
               </td>
             </ng-container>
 
-            <!-- Lignes -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-            <!-- Aucune donnée -->
             <tr class="mat-row" *matNoDataRow>
               <td class="mat-cell" colspan="4">
                 Aucune correspondance trouvée dans la base de données correspondant au critère de recherche
@@ -224,12 +237,9 @@
           </table>
         </div>
 
-      </div> <!-- /list-body -->
-
-
+      </div>
     </section>
 
-    <!-- ===== Colonne droite : HISTORIQUE ===== -->
     <section class="list-box">
       <div class="list-header">
         <h3 class="list-title">Historique de la demande</h3>
@@ -241,5 +251,5 @@
       </div>
     </section>
 
-  </div> <!-- /two-col -->
+  </div>
 </mat-card>

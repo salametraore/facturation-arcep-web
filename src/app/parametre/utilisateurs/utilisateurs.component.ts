@@ -20,6 +20,7 @@ import { UtilisateursCrudComponent } from './utilisateurs-crud/utilisateurs-crud
 import {DirectionsService} from "../../shared/services/directions.services";
 import {Direction} from "../../shared/models/direction";
 import {AuthService} from "../../authentication/auth.service";
+import {AuthzService} from "../../authentication/authz.service";
 
 @Component({
   selector: 'utilisateurs',
@@ -58,7 +59,8 @@ export class UtilisateursComponent implements OnInit, AfterViewInit {
     private authService:AuthService,
     public dialog: MatDialog,
     public dialogService: DialogService,
-    private msgMessageService: MsgMessageServiceService
+    private msgMessageService: MsgMessageServiceService,
+    private authzService: AuthzService,
   ) {}
 
   ngOnInit(): void {
@@ -85,6 +87,14 @@ export class UtilisateursComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.t_Utilisateurs.paginator = this.paginator;
     this.t_Utilisateurs.sort = this.sort;
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   reloadData(): void {

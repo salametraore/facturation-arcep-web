@@ -1,30 +1,31 @@
+///src/app/authentication/auth.models.ts
 export interface LoginPayload {
   email: string;
   password: string;
 }
 
 export interface TwoFaPayload {
-  email: string; // L'email est souvent requis pour l'étape 2FA
+  email: string;
   code: string;
 }
 
 export interface LoginResponse {
-  token?: string; // Le token JWT, facultatif
-  requires2fa?: boolean;
-  message?: string;
-  detail?: string;
-  user: User;
+  access?: string;    // format JWT actuel
+  refresh?: string;   // format JWT actuel
+  token?: string;     // ancien format, conservé pour compatibilité
+  detail?: string;    // message OTP envoyé / message backend
+  user?: User;
 }
 
 export interface User {
   id: number;
+  username?: string;
 
   email?: string;
   first_name?: string;
   last_name?: string;
   telephone?: string;
 
-  // ✅ nouveaux champs renvoyés par l’API
   home?: 'BACKOFFICE' | 'PORTAIL_CLIENT';
   nature?: 'PERSONNEL' | 'CLIENT';
 
@@ -36,43 +37,39 @@ export interface User {
 
   direction?: { id: number; libelle?: string } | null;
 
-  // (optionnel) si ton backend renvoie encore roles/operations
   roles?: any[];
   operations?: any[];
 }
 
-
-export interface Direction{
+export interface Direction {
   id: number;
-  code:string ;
+  code: string;
   libelle: string;
-  typeDirection : string;
-
-}
-export interface TypeDirection{
-    id: number;
-  code:string ;
-  libelle: string;
-
+  typeDirection: string;
 }
 
-
-
-
+export interface TypeDirection {
+  id: number;
+  code: string;
+  libelle: string;
+}
 
 export interface AuthState {
   isAuthenticated: boolean;
   token: string | null;
   user: User | null;
 }
+
 export interface PasswordResetPayload {
   email?: string;
 }
+
 export interface PasswordResetConfirmPayload {
   email?: string;
-  password?: String;
+  password?: string;
   token?: string;
 }
+
 export interface VerifyResetCodePayload {
   email?: string;
   token?: string;

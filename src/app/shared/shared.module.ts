@@ -24,6 +24,9 @@ import {FlexLayoutModule} from "@ngbracket/ngx-layout";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {Periode} from "./pipes/periode";
 import {SearchPipe} from "./pipes/search.pipe";
+import {CanDirective} from "../authentication/can.directive";
+import { ForbiddenComponent } from './components/forbidden/forbidden.component';
+
 @NgModule({
   declarations: [
     FooterComponent,
@@ -39,6 +42,8 @@ import {SearchPipe} from "./pipes/search.pipe";
     ThousandsSeparatorDirective,
     Periode,
     SearchPipe,
+    CanDirective,
+    ForbiddenComponent,
   ],
   imports: [
     CommonModule,
@@ -67,6 +72,8 @@ import {SearchPipe} from "./pipes/search.pipe";
     MatGridList,
     MatGridTile,
     SearchPipe,
+    CanDirective,
+    ForbiddenComponent,
   ],
 })
 export class SharedModule {

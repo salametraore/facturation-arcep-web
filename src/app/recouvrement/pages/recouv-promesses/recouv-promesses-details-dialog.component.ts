@@ -62,7 +62,6 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // clients
     this.clientSrv.getItems().subscribe({
       next: (clients) => {
         this.clients = clients || [];
@@ -72,26 +71,32 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
           map(v => this.filterClients(v))
         );
 
-        // si on est déjà en edit et qu'on a une promesse chargée, on peut pré-sélectionner l'objet client
+        // si promesse déjà chargée avant la fin du chargement des clients
         if (this.promesse?.client_id) {
           const selected = this.clients.find(x => x.id === this.promesse!.client_id);
-          if (selected) this.clientCtrl.setValue(selected, { emitEvent: false });
+          if (selected) {
+            this.clientCtrl.setValue(selected, { emitEvent: false });
+          }
         }
       },
       error: (e) => console.error(e)
     });
 
-    // facture autocomplete stream (sera alimenté quand on charge factures)
     this.filteredFactures$ = this.factureCtrl.valueChanges.pipe(
       startWith(''),
       map(v => this.filterFactures(v))
     );
 
-    if (this.data.mode === 'edit') this.reload();
-    else this.initCreate();
+    if (this.data.mode === 'edit') {
+      this.reload();
+    } else {
+      this.initCreate();
+    }
   }
 
-  // ===== displayWith (doit toujours retourner string) =====
+  // =========================
+  // displayWith
+  // =========================
   displayClient = (value: any): string => {
     if (!value) return '';
     if (typeof value === 'string') return value;
@@ -102,6 +107,21 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
     return cc ? `${denom} — ${cc}` : denom;
   };
 
+  getFactureMontantAffiche(f: Facture | null | undefined): number {
+    if (!f) return 0;
+
+    const factureAny = f as any;
+    const raw =
+      factureAny.montant_restant ??
+        factureAny.solde_restant ??
+          factureAny.reste_a_payer ??
+            f.montant ??
+              0;
+
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : 0;
+  }
+
   displayFacture = (value: any): string => {
     if (!value) return '';
     if (typeof value === 'string') return value;
@@ -110,7 +130,9 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
     return f.reference ?? (f.id != null ? `Facture #${f.id}` : '');
   };
 
-  // ===== filtering =====
+  // =========================
+  // filtering
+  // =========================
   private filterClients(val: string | Client | null): Client[] {
     const s = (typeof val === 'string' ? val : this.displayClient(val)).toLowerCase().trim();
     if (!s) return this.clients.slice(0, 20);
@@ -131,11 +153,34 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
     if (!s) return this.facturesClient.slice(0, 20);
 
     return this.facturesClient
-      .filter(f => String(f.reference ?? '').toLowerCase().includes(s))
+      .filter(f => {
+        const ref = String(f.reference ?? '').toLowerCase();
+        const id = String(f.id ?? '');
+        return ref.includes(s) || id.includes(s);
+      })
       .slice(0, 20);
   }
 
-  // ===== client selection => reset + reload factures =====
+  // =========================
+  // montant depuis facture
+  // =========================
+  private getMontantPromesseFromFacture(f: Facture | null): number {
+    if (!f) return 0;
+
+    const raw =
+      (f as any).montant_restant ??
+        (f as any).solde_restant ??
+          (f as any).reste_a_payer ??
+            f.montant ??
+              0;
+
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  // =========================
+  // client / facture selection
+  // =========================
   onClientSelected(c: Client): void {
     const newClientId = c?.id ?? null;
 
@@ -145,6 +190,7 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
 
     // reset facture
     this.edit.facture_id = null;
+    this.edit.montant = 0;
     this.facturesClient = [];
     this.factureCtrl.setValue('', { emitEvent: false });
 
@@ -159,6 +205,38 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
 
   onFactureSelected(f: Facture | null): void {
     this.edit.facture_id = f?.id ?? null;
+
+    if (f) {
+      // ✅ affectation automatique du montant de la facture à la promesse
+      this.edit.montant = this.getMontantPromesseFromFacture(f);
+      return;
+    }
+
+    // si on efface la facture en création
+    if (this.data.mode === 'create') {
+      this.edit.montant = 0;
+    }
+  }
+
+  clearClient(): void {
+    this.clientCtrl.setValue('', { emitEvent: true });
+    this.edit.client_id = null;
+
+    this.edit.facture_id = null;
+    this.edit.montant = 0;
+
+    this.facturesClient = [];
+    this.factureCtrl.setValue('', { emitEvent: false });
+    this.factureCtrl.disable({ emitEvent: false });
+  }
+
+  clearFacture(): void {
+    this.edit.facture_id = null;
+    this.factureCtrl.setValue('', { emitEvent: true });
+
+    if (this.data.mode === 'create') {
+      this.edit.montant = 0;
+    }
   }
 
   private loadFacturesForClient(clientId: number, preselectFactureId: number | null): void {
@@ -166,18 +244,21 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
       next: (rows) => {
         const all = rows || [];
 
-        // ✅ impayées selon ta règle
+        // factures impayées selon ta règle actuelle
         this.facturesClient = all.filter(f =>
           String(f.etat || '').toUpperCase() === 'EMISE' &&
-          Number(f.montant ?? 0) >= 0
+          Number(f.montant ?? 0) > 0
         );
 
-        // préselection objet facture (displayWith parfait)
+        // préselection en mode edit
         if (preselectFactureId) {
           const match = this.facturesClient.find(f => f.id === preselectFactureId) || null;
           if (match) {
             this.edit.facture_id = match.id ?? null;
             this.factureCtrl.setValue(match, { emitEvent: false });
+
+            // en édition, on conserve le montant existant de la promesse
+            // pour éviter d’écraser une valeur déjà enregistrée
           }
         }
       },
@@ -188,7 +269,9 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
     });
   }
 
-  // ===== init/reload =====
+  // =========================
+  // init / reload
+  // =========================
   private initCreate(): void {
     const iso = new Date().toISOString().slice(0, 10);
     this.promesse = null;
@@ -207,11 +290,14 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
   }
 
   reload(): void {
-    if (!this.data.id) { this.ref.close(false); return; }
+    if (!this.data.id) {
+      this.ref.close(false);
+      return;
+    }
 
     this.loading = true;
     this.api.getById(this.data.id).pipe(
-      take(1), // ✅ évite blocage finalize si source "live"
+      take(1),
       finalize(() => (this.loading = false))
     ).subscribe({
       next: (p) => {
@@ -225,11 +311,11 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
           statut: p.statut
         };
 
-        // clientCtrl : objet si dispo
         const selectedClient = this.clients.find(x => x.id === p.client_id);
-        if (selectedClient) this.clientCtrl.setValue(selectedClient, { emitEvent: false });
+        if (selectedClient) {
+          this.clientCtrl.setValue(selectedClient, { emitEvent: false });
+        }
 
-        // factures impayées du client + préselection objet facture
         if (p.client_id) {
           this.factureCtrl.enable({ emitEvent: false });
           this.loadFacturesForClient(p.client_id, p.facture_id ?? null);
@@ -244,11 +330,14 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
     });
   }
 
-  // ===== labels (header) =====
+  // =========================
+  // labels
+  // =========================
   clientLabel(): string {
     if (this.data.mode === 'create') {
       return this.edit.client_id ? `Client #${this.edit.client_id}` : '(non défini)';
     }
+
     const p = this.promesse;
     return p?.client?.denomination
       ?? (p as any)?.client?.denomination_sociale
@@ -259,16 +348,22 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
     if (this.data.mode === 'create') {
       return this.edit.facture_id ? `Facture #${this.edit.facture_id}` : 'Promesse globale';
     }
+
     if (!this.promesse?.facture_id) return 'Promesse globale';
     return this.promesse?.facture?.reference ?? `Facture #${this.promesse?.facture_id}`;
   }
 
-  // ===== save =====
+  // =========================
+  // save
+  // =========================
   save(): void {
     this.saving = true;
 
     if (this.data.mode === 'create') {
-      if (!this.edit.client_id) { this.saving = false; return; }
+      if (!this.edit.client_id) {
+        this.saving = false;
+        return;
+      }
 
       this.api.create({
         client_id: this.edit.client_id,
@@ -286,7 +381,10 @@ export class RecouvPromessesDetailsDialogComponent implements OnInit {
       return;
     }
 
-    if (!this.promesse) { this.saving = false; return; }
+    if (!this.promesse) {
+      this.saving = false;
+      return;
+    }
 
     this.api.update(this.promesse.id, {
       montant: this.edit.montant,

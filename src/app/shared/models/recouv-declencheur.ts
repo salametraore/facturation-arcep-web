@@ -1,5 +1,3 @@
-// src/app/shared/models/recouv-declencheur.ts
-
 import { RecouvGroupe } from './recouv-groupe';
 import { RecouvPlanAction } from './recouv-plan-action';
 
@@ -7,47 +5,41 @@ export type RecouvDeclencheurScopeEnum = 'TOUS' | 'MEMBRES_GROUPE';
 export type TypeDelaiEnum = 'AVANT_ECHEANCE' | 'APRES_ECHEANCE';
 
 export class RecouvDeclencheur {
-  readonly id!: number; // readOnly
+  readonly id!: number;
 
-  /** détails enrichis readOnly côté backend */
   readonly groupe_detail?: RecouvGroupe;
   readonly plan_action_detail?: RecouvPlanAction;
 
-  created_at?: string; // ISO date-time
-  updated_at?: string; // ISO date-time
+  created_at?: string;
+  updated_at?: string;
 
-  code!: string;       // maxLength: 80
-  nom!: string;        // maxLength: 255
+  code!: string;
+  nom!: string;
   description?: string | null;
 
   actif?: boolean;
-  priority?: number | null; // int32
+  priority?: number | null;
 
   scope?: RecouvDeclencheurScopeEnum;
 
-  type_client?: string | null;           // maxLength: 1000
-  type_produit_service?: string | null;  // maxLength: 1000
+  type_client?: string | null;
+  type_produit_service?: string | null;
 
-  montant_min?: string | null;           // decimal string nullable
-  montant_max?: string | null;           // decimal string nullable
+  montant_min?: string | null;
+  montant_max?: string | null;
 
   nb_factures_impayees_min?: number | null;
 
-  type_delai!: TypeDelaiEnum;            // required
-  nb_jours!: number;                     // required
+  type_delai!: TypeDelaiEnum;
+  nb_jours!: number;
 
   created_by?: number | null;
   updated_by?: number | null;
 
-  groupe!: number;       // FK required
-  plan_action!: number;  // FK required
+  groupe!: number;
+  plan_action!: number;
 }
 
-/**
- * Payload POST/PUT/PATCH.
- * On exclut: id + *_detail (readOnly/enrichi).
- * (Si ton backend refuse created_at/updated_at en écriture, enlève-les aussi.)
- */
 export type RecouvDeclencheurRequest =
   Omit<RecouvDeclencheur, 'id' | 'groupe_detail' | 'plan_action_detail'>;
 

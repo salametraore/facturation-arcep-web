@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../authentication/auth.service';
-import { MENU_ITEMS, MenuItem } from '../../shared/menu/menu-items';
+import { MENU_ITEMS, MenuItem } from '../../core/menu/menu-items';
 
-import {Direction} from "../../shared/models/direction";
-import {ClasseDebit} from "../../shared/models/classe-debit.model";
-import {DirectionsService} from "../../shared/services/directions.services";
-
+import { Direction } from "../../shared/models/direction";
+import { DirectionsService } from "../../shared/services/directions.services";
+import { AuthzService } from "../../authentication/authz.service";
 
 type QuickLink = { label: string; route: string; icon?: string };
 
@@ -14,14 +13,13 @@ type ModuleTile = {
   title: string;
   description: string;
   icon: string;
-  links: QuickLink[]; // liens visibles (filtrés)
+  links: QuickLink[];
 };
 
 type WorkflowStep = {
   title: string;
   actor: string;
   bullets: string[];
-  // optionnel : si tu veux des raccourcis (tu peux laisser vide)
   route?: string;
   routeLabel?: string;
 };
@@ -32,7 +30,6 @@ type Workflow = {
   icon: string;
   steps: WorkflowStep[];
 };
-
 
 @Component({
   selector: 'app-home',
@@ -45,7 +42,7 @@ export class HomeComponent implements OnInit {
 
   tiles: ModuleTile[] = [];
 
-  direction: Direction;
+  direction!: Direction;
   stats: any;
 
   workflows: Workflow[] = [
@@ -115,7 +112,6 @@ export class HomeComponent implements OnInit {
         },
       ],
     },
-
     {
       title: 'Variantes de facturation : redevances annuelles',
       description: 'Génération annuelle (individuelle ou en lot) et redevances indexées au chiffre d’affaires.',
@@ -140,7 +136,6 @@ export class HomeComponent implements OnInit {
         },
       ],
     },
-
     {
       title: 'Recouvrement',
       description: 'Traitement des factures non réglées : relances, pénalités, échéanciers, actions…',
@@ -158,13 +153,14 @@ export class HomeComponent implements OnInit {
     },
   ];
 
-  constructor(private authService: AuthService,
-              private directionService: DirectionsService) {}
+  constructor(
+    private authService: AuthService,
+    private directionService: DirectionsService,
+    private authzService: AuthzService
+  ) {}
 
   ngOnInit(): void {
     const u = this.authService.getConnectedUser();
-
-    // si direction vient en string => convertit
     const dir = u?.direction != null ? Number(u.direction) : null;
 
     this.fullName = u?.username ? `Bienvenue ${u.username}` : this.fullName;
@@ -172,20 +168,15 @@ export class HomeComponent implements OnInit {
 
     this.buildTiles(dir);
 
-    this.directionService.getStatistiquesByDirection(1).subscribe((items:any) => {
-      this.stats = items ;
+    this.directionService.getStatistiquesByDirection(1).subscribe((items: any) => {
+      this.stats = items;
     });
-
-    // DEBUG (à enlever après)
-    console.log('[HOME] dir =', dir);
-    console.log('[HOME] tiles =', this.tiles);
   }
 
   private isActive(item: MenuItem): boolean {
     return (item.actif ?? 'OUI') === 'OUI';
   }
 
-  /** EXACTEMENT ta règle du menu latéral */
   private isVisibleByDirection(item: MenuItem, dir: number | null): boolean {
     return dir === 0 || item.direction === dir || item.direction === 0;
   }
@@ -230,9 +221,9 @@ export class HomeComponent implements OnInit {
   }
 
   private buildTiles(dir: number | null): void {
-    const roots = MENU_ITEMS.filter(mi => [10, 20, 30, 40].includes(mi.id));
+    const rbacMenu = this.authzService.filterMenu(MENU_ITEMS);
+    const roots = rbacMenu.filter(mi => [10, 20, 30, 40].includes(mi.id));
 
-    // IMPORTANT: même si roots vide, tu peux forcer 4 tuiles de base
     this.tiles = roots.map(root => {
       const links = this.collectLeafLinks(root, dir);
       return {
@@ -240,7 +231,7 @@ export class HomeComponent implements OnInit {
         title: root.titre,
         description: root.description || root.titre,
         icon: this.tileIconById(root.id),
-        links: links, // tu peux faire .slice(0,6) si tu veux
+        links
       };
     });
   }

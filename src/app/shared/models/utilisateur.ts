@@ -11,8 +11,8 @@ export class Utilisateur {
   email?: string;
   role?: RoleEnum;
   direction?: number | null;
-  password: string;
-  nature: string;
+  password?: string;
+  nature?: string;
 }
 
 

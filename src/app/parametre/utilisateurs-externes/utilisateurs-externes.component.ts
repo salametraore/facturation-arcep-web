@@ -15,6 +15,7 @@ import { MsgMessageServiceService } from '../../shared/services/msg-message-serv
 import { UtilisateursExternesCrudComponent } from './utilisateurs-externes-crud/utilisateurs-externes-crud.component';
 import {Client} from "../../shared/models/client";
 import {ClientService} from "../../shared/services/client.service";
+import {AuthzService} from "../../authentication/authz.service";
 
 @Component({
   selector: 'utilisateurs-externes',
@@ -51,7 +52,8 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
     private clientService: ClientService,
     public dialog: MatDialog,
     public dialogService: DialogService,
-    private msgMessageService: MsgMessageServiceService
+    private msgMessageService: MsgMessageServiceService,
+    private authzService: AuthzService,
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +79,14 @@ export class UtilisateursExternesComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.t_Utilisateurs.paginator = this.paginator;
     this.t_Utilisateurs.sort = this.sort;
+  }
+
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
+  }
+
+  hasAnyOperationCode(codes: string[]): boolean {
+    return codes.some(code => this.authzService.has(code));
   }
 
   reloadData(): void {

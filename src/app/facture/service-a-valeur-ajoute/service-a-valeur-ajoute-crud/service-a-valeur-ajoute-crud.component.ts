@@ -1,67 +1,88 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FicheTechniques, MiseAJourStatutFiche} from "../../../shared/models/ficheTechniques";
-import {Client} from "../../../shared/models/client";
-import {CategorieProduit} from "../../../shared/models/categorie-produit";
-import {StatutFicheTechnique} from "../../../shared/models/statut-fiche-technique";
-import {FormBuilder, FormGroup} from "@angular/forms";
-import {MatTableDataSource} from "@angular/material/table";
-import {FicheTechniqueProduit} from "../../../shared/models/ficheTechniquesProduits";
-import {MatPaginator} from "@angular/material/paginator";
-import {MatSort} from "@angular/material/sort";
-import {Produit} from "../../../shared/models/produit";
-import {FicheTechniquesService} from "../../../shared/services/fiche-techniques.service";
-import {CategorieProduitService} from "../../../shared/services/categorie-produit.service";
-import {ProduitService} from "../../../shared/services/produits.service";
-import {ClientService} from "../../../shared/services/client.service";
-import {StatutFicheTechniqueService} from "../../../shared/services/statut-fiche-technique.service";
-import {MsgMessageServiceService} from "../../../shared/services/msg-message-service.service";
-import {DialogService} from "../../../shared/services/dialog.service";
-import {operations,bouton_names} from "../../../constantes";
-import {HistoriqueFicheTechnique} from "../../../shared/models/historique-traitement-fiche-technique";
-import { startWith, takeUntil ,finalize} from 'rxjs/operators';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
+import { FicheTechniques, MiseAJourStatutFiche } from "../../../shared/models/ficheTechniques";
+import { Client } from "../../../shared/models/client";
+import { CategorieProduit } from "../../../shared/models/categorie-produit";
+import { StatutFicheTechnique } from "../../../shared/models/statut-fiche-technique";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { MatTableDataSource } from "@angular/material/table";
+import { FicheTechniqueProduit } from "../../../shared/models/ficheTechniquesProduits";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatSort } from "@angular/material/sort";
+import { Produit } from "../../../shared/models/produit";
+import { FicheTechniquesService } from "../../../shared/services/fiche-techniques.service";
+import { CategorieProduitService } from "../../../shared/services/categorie-produit.service";
+import { ProduitService } from "../../../shared/services/produits.service";
+import { ClientService } from "../../../shared/services/client.service";
+import { StatutFicheTechniqueService } from "../../../shared/services/statut-fiche-technique.service";
+import { MsgMessageServiceService } from "../../../shared/services/msg-message-service.service";
+import { DialogService } from "../../../shared/services/dialog.service";
+import { operations, bouton_names } from "../../../constantes";
+import { HistoriqueFicheTechnique } from "../../../shared/models/historique-traitement-fiche-technique";
+import { startWith, takeUntil, finalize } from 'rxjs/operators';
 import { combineLatest, Subject } from 'rxjs';
-import { OnDestroy } from '@angular/core';
 
-
+interface FicheTechniqueProduitRow extends FicheTechniqueProduit {
+  __rowKey: string;
+  __persisted: boolean;
+}
 
 @Component({
   selector: 'service-a-valeur-ajoute-crud',
   templateUrl: './service-a-valeur-ajoute-crud.component.html'
 })
-export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit {
+export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() fixeCategorie: number;
   @Input() ficheTechnique: FicheTechniques;
   @Input() operation: string;
+
   @Output() notifyFicheTechnique: EventEmitter<FicheTechniques> = new EventEmitter<FicheTechniques>();
   @Output() notifyActionOperation: EventEmitter<string> = new EventEmitter<string>();
-  clients: Client[];
+
+  clients: Client[] = [];
   client: Client;
-  categories: CategorieProduit[];
+
+  categories: CategorieProduit[] = [];
   categorie: CategorieProduit;
-  statutFicheTechniques: StatutFicheTechnique[];
+
+  statutFicheTechniques: StatutFicheTechnique[] = [];
   statutFicheTechnique: StatutFicheTechnique;
+
   form_ficheTechnique: FormGroup;
   form_ficheTechniquesProduit: FormGroup;
-  t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduit>;
-  historiqueFicheTechniques:HistoriqueFicheTechnique[];
+
+  t_FicheTechniquesProduits?: MatTableDataSource<FicheTechniqueProduitRow>;
+  historiqueFicheTechniques: HistoriqueFicheTechnique[] = [];
 
   public operations = operations;
   public bouton_names = bouton_names;
   public data_operation: string = '';
 
   saveLocked = false;
-
   transmitLocked = false;
   isTransmitting = false;
 
+  deletedProduitIds: number[] = [];
+  editingRowKey: string | null = null;
+  private rowSeq = 0;
   private destroy$ = new Subject<void>();
 
-  displayedColumns: string[] = ['produit','designation','quantite', 'actions'];
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  displayedColumns: string[] = ['produit', 'designation', 'quantite', 'actions'];
+
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+
   montant_de_la_commade: number = 0;
-  produits: Produit[];
+  produits: Produit[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -73,7 +94,23 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     private msgMessageService: MsgMessageServiceService,
     private dialogService: DialogService,
   ) {
-    this.t_FicheTechniquesProduits = new MatTableDataSource<FicheTechniqueProduit>([]);
+    this.t_FicheTechniquesProduits = new MatTableDataSource<FicheTechniqueProduitRow>([]);
+  }
+
+  ngOnInit(): void {
+    console.log(this.ficheTechnique);
+
+    this.loadData();
+    this.initFormCommandeClient_create();
+    this.initFormFicheTechniquesProduit_create();
+
+    if (this.ficheTechnique) {
+      this.t_FicheTechniquesProduits.data =
+        (this.ficheTechnique?.produits_detail ?? []).map(p => this.toRow(p));
+
+      this.initFormCommandeClient_update();
+      this.getMontantTotal(this.t_FicheTechniquesProduits.data);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -86,28 +123,14 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     this.destroy$.complete();
   }
 
-
-  ngOnInit(): void {
-    console.log(this.ficheTechnique)
-    this.loadData();
-    this.initFormCommandeClient_create();
-    this.initFormFicheTechniquesProduit_create();
-    if (this.ficheTechnique) {
-      this.t_FicheTechniquesProduits.data = this.ficheTechnique?.produits_detail;
-      this.initFormCommandeClient_update();
-    }
-  }
-
   loadData() {
     this.categorieProduitService.getListItems().subscribe((categories: CategorieProduit[]) => {
       this.categories = categories;
     });
+
     this.statutFicheTechniqueService.getListItems().subscribe((statutFicheTechniques: StatutFicheTechnique[]) => {
       this.statutFicheTechniques = statutFicheTechniques.filter(st => st.id < 7);
       this.statutFicheTechnique = statutFicheTechniques.find(st => st.id === 1);
-    });
-    this.clientService.getItems().subscribe((clients: Client[]) => {
-      this.clients = clients;
     });
 
     this.clientService.getItems().subscribe((clients: Client[]) => {
@@ -127,8 +150,6 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     } else {
       this.historiqueFicheTechniques = [];
     }
-
-
   }
 
   initFormCommandeClient_create() {
@@ -136,26 +157,6 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
       id: [],
       client: [this.ficheTechnique?.client],
       commentaire: [],
-
-      // ✅ DATES
-      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
-      duree: [this.ficheTechnique?.duree],
-
-      // ✅ calculée => on désactive
-      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
-    });
-
-    this.setupAutoDateFin();
-    this.updateDateFin(); // calc immédiat
-  }
-
-  initFormCommandeClient_update() {
-    this.form_ficheTechnique = this.formBuilder.group({
-      id: [],
-      client: [this.ficheTechnique?.client],
-      commentaire: [this.ficheTechnique?.commentaire],
-
-      // ✅ DATES
       date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
       duree: [this.ficheTechnique?.duree],
       date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
@@ -165,9 +166,77 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     this.updateDateFin();
   }
 
+  initFormCommandeClient_update() {
+    this.form_ficheTechnique = this.formBuilder.group({
+      id: [],
+      client: [this.ficheTechnique?.client],
+      commentaire: [this.ficheTechnique?.commentaire],
+      date_debut: [this.toDateOrNull(this.ficheTechnique?.date_debut)],
+      duree: [this.ficheTechnique?.duree],
+      date_fin: [{ value: this.toDateOrNull(this.ficheTechnique?.date_fin), disabled: true }],
+    });
+
+    this.setupAutoDateFin();
+    this.updateDateFin();
+  }
+
+  initFormFicheTechniquesProduit_create() {
+    this.form_ficheTechniquesProduit = this.formBuilder.group({
+      id: [null],
+      designation: ['', Validators.required],
+      quantite: [1, [Validators.required, Validators.min(1)]],
+      produit: [null, Validators.required],
+      prix_unitaire: [null],
+    });
+  }
+
+  private resetProduitLineForm() {
+    this.editingRowKey = null;
+
+    this.form_ficheTechniquesProduit.reset({
+      id: null,
+      designation: '',
+      quantite: 1,
+      produit: null,
+      prix_unitaire: null,
+    });
+
+    this.form_ficheTechniquesProduit.markAsPristine();
+    this.form_ficheTechniquesProduit.markAsUntouched();
+  }
+
+  private hasPersistedId(
+    item: Partial<FicheTechniqueProduit> | null | undefined
+  ): item is Partial<FicheTechniqueProduit> & { id: number } {
+    return item?.id !== null && item?.id !== undefined;
+  }
+
+  private buildRowKey(item?: Partial<FicheTechniqueProduit>): string {
+    if (this.hasPersistedId(item)) {
+      return `db-${item.id}`;
+    }
+
+    this.rowSeq += 1;
+    return `tmp-${Date.now()}-${this.rowSeq}`;
+  }
+
+  private toRow(item: FicheTechniqueProduit): FicheTechniqueProduitRow {
+    return {
+      ...item,
+      __rowKey: this.buildRowKey(item),
+      __persisted: this.hasPersistedId(item),
+    };
+  }
+
+  private stripRowMeta(row: FicheTechniqueProduitRow): FicheTechniqueProduit {
+    const { __rowKey, __persisted, ...rest } = row;
+    return rest as FicheTechniqueProduit;
+  }
+
   private setupAutoDateFin() {
     const dateCtrl = this.form_ficheTechnique.get('date_debut');
     const dureeCtrl = this.form_ficheTechnique.get('duree');
+
     if (!dateCtrl || !dureeCtrl) return;
 
     combineLatest([
@@ -194,7 +263,6 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
 
     const day = d.getDate();
 
-    // éviter les sauts fin de mois
     const res = new Date(d);
     res.setDate(1);
     res.setMonth(res.getMonth() + m);
@@ -209,104 +277,14 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     if (!v) return null;
     if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
 
-    const d = new Date(v); // ISO 'YYYY-MM-DD' ou 'YYYY-MM-DDTHH:mm:ss'
+    const d = new Date(v);
     return isNaN(d.getTime()) ? null : d;
-  }
-
-  onGetClient(item: Client) {
-    this.client = item;
-  }
-
-  initFormFicheTechniquesProduit_create() {
-    this.form_ficheTechniquesProduit = this.formBuilder.group({
-      id: [''],
-      designation: [''],
-      quantite: ['1'],
-      produit: ['1'],
-    });
-  }
-
-  onGetTotalLigne() {
-    const formValue = this.form_ficheTechniquesProduit.value;
-    if (formValue['quantite'] && formValue['prix_unitaire']) {
-      const total = formValue['quantite'] * formValue['prix_unitaire'];
-      this.form_ficheTechniquesProduit.get('total').setValue(total);
-    }
-
-  }
-
-  onAdd() {
-    const ficheTechniquesProduit: FicheTechniqueProduit = new FicheTechniqueProduit();
-    const formValue = this.form_ficheTechniquesProduit.value;
-    ficheTechniquesProduit.designation = formValue['designation'];
-    ficheTechniquesProduit.quantite = formValue['quantite'];
-    ficheTechniquesProduit.produit = formValue['produit'];
-    console.log(ficheTechniquesProduit);
-    this.add_ligneCommande(ficheTechniquesProduit);
-    // if (this.t_FicheTechniquesProduits.data?.find(ap => (ap.designation === ficheTechniquesProduit.designation&&))) {
-    //   this.dialogService.yes_no({
-    //     title: 'Confirmation de modifiaction',
-    //     message: 'Ce produit existe déjà dans la commande, voulez-vous le modifier  ?'
-    //   }).subscribe(yes_no => {
-    //     if (yes_no === true) {
-    //       this.delete_ligneCommande(ficheTechniquesProduit);
-    //       this.add_ligneCommande(ficheTechniquesProduit);
-    //     }
-    //   });
-    // } else {
-    //   this.add_ligneCommande(ficheTechniquesProduit);
-    // }
-  }
-
-  add_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
-    // Ajouter l'élément à la liste existante
-    this.t_FicheTechniquesProduits.data.push(ficheTechniquesProduit);
-
-// Réaffecter le tableau mis à jour à la source de données
-    this.t_FicheTechniquesProduits.data = [...this.t_FicheTechniquesProduits.data]; // Création d'une nouvelle référence
-    this.initFormFicheTechniquesProduit_create();
-    this.getMontantTotal([...this.t_FicheTechniquesProduits.data]);
-  }
-
-  onUpdate(ficheTechniquesProduit: FicheTechniqueProduit) {
-    this.form_ficheTechniquesProduit = this.formBuilder.group({
-      id: [ficheTechniquesProduit?.id],
-      designation: [ficheTechniquesProduit?.designation],
-      quantite: [ficheTechniquesProduit?.quantite],
-      prix_unitaire: [ficheTechniquesProduit?.prix_unitaire],
-    });
-  }
-
-
-
-  delete_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
-    this.t_FicheTechniquesProduits.data = this.t_FicheTechniquesProduits.data.filter(p => p.id !== ficheTechniquesProduit.id);
-    // Rafraîchir la table
-    this.t_FicheTechniquesProduits._updateChangeSubscription();
-    this.getMontantTotal([...this.t_FicheTechniquesProduits.data]);
-  }
-
-  getMontantTotal(ficheTechniquesProduits: FicheTechniqueProduit[]) {
-    this.montant_de_la_commade = 0;
-    if (ficheTechniquesProduits?.length > 0) {
-      this.t_FicheTechniquesProduits.data.forEach((ficheTechniquesProduit: FicheTechniqueProduit) => {
-        this.montant_de_la_commade += ficheTechniquesProduit.quantite * ficheTechniquesProduit.prix_unitaire;
-      });
-    } else {
-      return 0;
-    }
-  }
-
-  onPrint() {
-
   }
 
   private formatDateYYYYMMDD(input: any): string {
     if (!input) return '';
 
-    // si c'est déjà une string ISO/date-only
     if (typeof input === 'string') {
-      // "2026-02-24" ou "2026-02-24T..." => on garde YYYY-MM-DD
       return input.length >= 10 ? input.substring(0, 10) : input;
     }
 
@@ -316,12 +294,151 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
+
     return `${y}-${m}-${day}`;
+  }
+
+  onGetClient(item: Client) {
+    this.client = item;
+  }
+
+  onGetTotalLigne() {
+    const formValue = this.form_ficheTechniquesProduit.value;
+
+    if (formValue['quantite'] && formValue['prix_unitaire']) {
+      const total = Number(formValue['quantite']) * Number(formValue['prix_unitaire']);
+      this.form_ficheTechniquesProduit.get('total')?.setValue(total);
+    }
+  }
+
+  onAdd() {
+    if (this.form_ficheTechniquesProduit.invalid) {
+      this.form_ficheTechniquesProduit.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.form_ficheTechniquesProduit.getRawValue();
+
+    const ficheTechniquesProduit: FicheTechniqueProduit = {
+      id: formValue['id'] ?? undefined,
+      designation: formValue['designation'],
+      quantite: Number(formValue['quantite'] ?? 1),
+      produit: formValue['produit'],
+      prix_unitaire: formValue['prix_unitaire'] ?? undefined,
+    } as FicheTechniqueProduit;
+
+    if (this.editingRowKey) {
+      this.update_ligneCommande(ficheTechniquesProduit);
+    } else {
+      this.add_ligneCommande(ficheTechniquesProduit);
+    }
+  }
+
+  add_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
+    const row = this.toRow(ficheTechniquesProduit);
+
+    this.t_FicheTechniquesProduits.data = [
+      ...this.t_FicheTechniquesProduits.data,
+      row
+    ];
+
+    this.resetProduitLineForm();
+    this.getMontantTotal(this.t_FicheTechniquesProduits.data);
+  }
+
+  update_ligneCommande(ficheTechniquesProduit: FicheTechniqueProduit) {
+    const rows = [...this.t_FicheTechniquesProduits.data];
+    const index = rows.findIndex(r => r.__rowKey === this.editingRowKey);
+
+    if (index < 0) {
+      this.add_ligneCommande(ficheTechniquesProduit);
+      return;
+    }
+
+    const current = rows[index];
+
+    rows[index] = {
+      ...current,
+      ...ficheTechniquesProduit,
+      __rowKey: current.__rowKey,
+      __persisted: current.__persisted || this.hasPersistedId(ficheTechniquesProduit),
+    };
+
+    this.t_FicheTechniquesProduits.data = rows;
+    this.resetProduitLineForm();
+    this.getMontantTotal(this.t_FicheTechniquesProduits.data);
+  }
+
+  onUpdate(row: FicheTechniqueProduitRow) {
+    this.editingRowKey = row.__rowKey;
+
+    this.form_ficheTechniquesProduit.patchValue({
+      id: row.id ?? null,
+      designation: row.designation ?? '',
+      quantite: row.quantite ?? 1,
+      produit: row.produit ?? null,
+      prix_unitaire: row.prix_unitaire ?? null,
+    });
+
+    this.form_ficheTechniquesProduit.markAsDirty();
+  }
+
+  onCancelLineEdit() {
+    this.resetProduitLineForm();
+  }
+
+  onDelete(row: FicheTechniqueProduitRow) {
+    this.dialogService.yes_no({
+      title: 'Confirmation de la suppression',
+      message: row.__persisted
+        ? 'Cette ligne est déjà enregistrée. Confirmez-vous sa suppression ?'
+        : 'Confirmez-vous supprimer cette ligne non encore enregistrée ?'
+    }).subscribe(yes_no => {
+      if (yes_no === true) {
+        this.delete_ligneCommande(row);
+      }
+    });
+  }
+
+  delete_ligneCommande(row: FicheTechniqueProduitRow) {
+    const rows = [...this.t_FicheTechniquesProduits.data];
+
+    if (row.__persisted && row.id != null) {
+      if (!this.deletedProduitIds.includes(row.id)) {
+        this.deletedProduitIds.push(row.id);
+      }
+
+      this.t_FicheTechniquesProduits.data = rows.filter(p => p.id !== row.id);
+    } else {
+      this.t_FicheTechniquesProduits.data = rows.filter(p => p.__rowKey !== row.__rowKey);
+    }
+
+    if (this.editingRowKey === row.__rowKey) {
+      this.resetProduitLineForm();
+    }
+
+    this.t_FicheTechniquesProduits._updateChangeSubscription();
+    this.getMontantTotal(this.t_FicheTechniquesProduits.data);
+  }
+
+  getMontantTotal(ficheTechniquesProduits: FicheTechniqueProduit[]) {
+    this.montant_de_la_commade = 0;
+
+    if (ficheTechniquesProduits?.length > 0) {
+      ficheTechniquesProduits.forEach((ficheTechniquesProduit: FicheTechniqueProduit) => {
+        this.montant_de_la_commade +=
+          Number(ficheTechniquesProduit.quantite ?? 0) *
+          Number(ficheTechniquesProduit.prix_unitaire ?? 0);
+      });
+    }
+  }
+
+  onPrint() {
   }
 
   onSave() {
     const formValue = this.form_ficheTechnique.value;
-
+    const produitsPayload = this.t_FicheTechniquesProduits.data.map(row => this.stripRowMeta(row));
 
     const dataFicheTechnique: FicheTechniques = {
       client: formValue['client'],
@@ -330,19 +447,18 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
       position: 1,
       commentaire: formValue['commentaire'],
       categorie_produit: this.fixeCategorie,
-      produits_detail: this.t_FicheTechniquesProduits?.data,
+      produits_detail: produitsPayload,
     };
-    // Construire FormData
+
     const formData = new FormData();
 
-    // Champs simples
     formData.append('client', String(dataFicheTechnique.client));
     formData.append('direction', String(dataFicheTechnique.direction));
     formData.append('utilisateur', String(dataFicheTechnique.utilisateur));
     formData.append('position', String(dataFicheTechnique.position));
-    formData.append('commentaire', String(dataFicheTechnique.commentaire));
+    formData.append('commentaire', String(dataFicheTechnique.commentaire ?? ''));
     formData.append('categorie_produit', String(dataFicheTechnique.categorie_produit));
-    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit)));
+    formData.append('objet', String(this.getCategorieProduit(dataFicheTechnique.categorie_produit) ?? ''));
 
     const dDebut = this.form_ficheTechnique.get('date_debut')?.value;
     const dFin = this.form_ficheTechnique.get('date_fin')?.value;
@@ -351,39 +467,31 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     formData.append('duree', String(this.form_ficheTechnique.get('duree')?.value ?? ''));
     formData.append('date_fin', this.formatDateYYYYMMDD(dFin));
 
-    // Produits (JSON stringifié)
-    formData.append('produits', JSON.stringify(dataFicheTechnique.produits_detail));
+    formData.append('produits', JSON.stringify(produitsPayload));
+    ///formData.append('produits_supprimes_ids', JSON.stringify(this.deletedProduitIds));
 
-
-    // Choisir la requête : création ou mise à jour
     const request$ =
       this.operation === operations.update
         ? this.ficheTechniquesService.update(this.ficheTechnique.id, formData)
         : this.ficheTechniquesService.create(formData);
 
     request$.subscribe(
-      (data) => {
-        this.msgMessageService.success('Fiche technique enregistrée avec succès');
-
-      },
-      (error) => {
-        this.dialogService.alert({message: error.message});
-      }
-    );
-
-    request$.subscribe(
       (data: FicheTechniques) => {
         this.msgMessageService.success('Fiche technique enregistrée avec succès');
 
-        // 🔒 on bloque la sauvegarde après succès
         this.saveLocked = true;
-
-        // (optionnel) on met à jour l'opération / la fiche en mémoire
         this.operation = this.operations.update;
         this.ficheTechnique = data;
+
+        this.deletedProduitIds = [];
+        this.editingRowKey = null;
+        this.t_FicheTechniquesProduits.data =
+          (data?.produits_detail ?? []).map(p => this.toRow(p));
+
+        this.getMontantTotal(this.t_FicheTechniquesProduits.data);
       },
       (error) => {
-        this.dialogService.alert({message: error.message});
+        this.dialogService.alert({ message: error.message });
       }
     );
   }
@@ -405,7 +513,7 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
   onTransmettre() {
     if (this.transmitLocked || this.isTransmitting) return;
 
-    this.transmitLocked = true;   // lock immédiat anti double-clic
+    this.transmitLocked = true;
     this.isTransmitting = true;
 
     const miseAJourStatutFiche: MiseAJourStatutFiche = new MiseAJourStatutFiche();
@@ -415,23 +523,19 @@ export class ServiceAValeurAjouteCrudComponent implements OnInit, AfterViewInit 
     this.ficheTechniquesService.setStatutFiche(miseAJourStatutFiche)
       .pipe(
         finalize(() => {
-          this.isTransmitting = false; // stop spinner
+          this.isTransmitting = false;
         })
       )
       .subscribe({
-        next: (respone: MiseAJourStatutFiche) => {
+        next: () => {
           this.msgMessageService.success("Fiche transmise avec succès !");
-          // ✅ on garde transmitLocked = true => bouton reste désactivé
         },
         error: (error) => {
-          // ❌ erreur => on réactive pour permettre retry
           this.transmitLocked = false;
-
           this.dialogService.alert({
             message: error?.message ?? "Erreur lors de la transmission. Réessayez."
           });
         }
       });
   }
-
 }

@@ -74,10 +74,16 @@
       <h3 class="list-title">Liste des groupes</h3>
 
       <div class="list-actions">
-        <button mat-flat-button color="primary" (click)="openCreate()">
+
+        <button
+          *ngIf="hasOperationCode('RECOUVREMENT_GERER_GROUPES')"
+          mat-flat-button color="primary"
+          (click)="openCreate()">
           <mat-icon>add</mat-icon>
-          Nouveau groupe
+          Ajouter
         </button>
+
+
       </div>
     </div>
 
@@ -150,11 +156,19 @@
                 <mat-icon>group</mat-icon>
               </button>
 
-              <button mat-icon-button (click)="openEdit(row)" matTooltip="Modifier">
+              <button
+                *ngIf="hasOperationCode('RECOUVREMENT_GERER_GROUPES')"
+                mat-icon-button
+                (click)="openEdit(row)"
+                matTooltip="Modifier">
                 <mat-icon>edit</mat-icon>
               </button>
 
-              <button mat-icon-button color="warn" (click)="delete(row)" matTooltip="Supprimer">
+              <button
+                *ngIf="hasOperationCode('RECOUVREMENT_GERER_GROUPES')"
+                mat-icon-button color="warn"
+                (click)="delete(row)"
+                matTooltip="Supprimer">
                 <mat-icon>delete</mat-icon>
               </button>
 

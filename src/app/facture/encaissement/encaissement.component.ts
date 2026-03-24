@@ -25,6 +25,7 @@ import {Role, UtilisateurRole} from "../../shared/models/droits-utilisateur";
 import {AuthService} from "../../authentication/auth.service";
 import {HttpResponse} from "@angular/common/http";
 import {PdfViewService} from "../../shared/services/pdf-view.service";
+import {AuthzService} from "../../authentication/authz.service";
 
 
 type FilterState = {
@@ -61,10 +62,6 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
   clients: Client[];
   modePaiements: ModePaiement[];
 
-  utilisateurConnecte:Utilisateur;
-  roleUtilisateurConnecte:UtilisateurRole;
-
-
 
   constructor(
     private encaissementsService: EncaissementsService,
@@ -76,6 +73,7 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     public dialogService: DialogService,
     private authService:AuthService,
+    private authzService: AuthzService,
     private msgMessageService: MsgMessageServiceService,
   ) {
     this.t_RecouvListeEncaissement = new MatTableDataSource<RecouvListeEncaissement>([]);
@@ -89,10 +87,6 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.reloadData();
     this.fixeCategorie = 9;
-
-    this.utilisateurConnecte=this.authService.getConnectedUser();
-    this.roleUtilisateurConnecte=this.authService.getConnectedUtilisateurRole();
-    console.log(this.utilisateurConnecte);
 
   }
 
@@ -281,26 +275,9 @@ export class EncaissementComponent implements OnInit, AfterViewInit {
     });
   }
 
-  hasOperationCode( opCode: string): boolean {
-    const  user=this.roleUtilisateurConnecte;
 
-    if (!user || !opCode) return false;
-
-    const needle = opCode.trim().toLowerCase();
-
-    // Normaliser: accepter user.role = Role | Role[]
-    const roles: Role[] = Array.isArray((user as any).role)
-      ? (user as any).role
-      : (user as any).role
-        ? [ (user as any).role ]
-        : [];
-
-    for (const role of roles) {
-      for (const op of (role?.operations ?? [])) {
-        if ((op.code ?? '').trim().toLowerCase() === needle) return true;
-      }
-    }
-    return false;
+  hasOperationCode(opCode: string): boolean {
+    return !!opCode && this.authzService.has(opCode);
   }
 
 
